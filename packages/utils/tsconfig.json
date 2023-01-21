@@ -2,7 +2,9 @@
   "extends": "@tsconfig/strictest",
   "include": ["src"],
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "dist/tsc",
+    "noEmit": true,
+    "declaration": true,
     "noUncheckedIndexedAccess": false,
     "moduleResolution": "Node",
     "module": "ESNext",

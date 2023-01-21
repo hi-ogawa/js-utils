@@ -1,9 +1,23 @@
 {
   "name": "@hiogawa/utils",
+  "version": "1.0.0-pre.1",
+  "type": "commonjs",
+  "main": "./dist/esbuild/index.js",
+  "types": "./dist/tsc/index.d.js",
+  "files": [
+    "dist/esbuild/index.js",
+    "dist/tsc/*.d.ts"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
     "directory": "packages/utils"
+  },
+  "scripts": {
+    "build": "run-s build:*",
+    "build:cjs": "esbuild ./src/index.ts --bundle --outdir=./dist/esbuild --format=cjs",
+    "build:dts": "tsc --noEmit false --emitDeclarationOnly",
+    "release": "pnpm publish --no-git-checks --access public"
   }
 }
