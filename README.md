@@ -9,3 +9,10 @@
   - `Debug`
 - `@hiogawa/utils-zod`
   - `tinycli`
+
+```sh
+# development
+pnpm i
+pnpm dev
+pnpm test
+```
