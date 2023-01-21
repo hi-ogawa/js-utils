@@ -1,0 +1,15 @@
+{
+  "name": "@hiogawa/utils-zod",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/utils-zod"
+  },
+  "devDependencies": {
+    "zod": "^3.20.2"
+  },
+  "peerDependencies": {
+    "zod": "*"
+  }
+}

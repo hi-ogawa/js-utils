@@ -1,0 +1,9 @@
+{
+  "name": "@hiogawa/utils",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/utils"
+  }
+}

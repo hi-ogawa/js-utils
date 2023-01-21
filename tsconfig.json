@@ -1,0 +1,14 @@
+{
+  "include": [],
+  "references": [
+    {
+      "path": "packages/utils"
+    },
+    {
+      "path": "packages/utils-react"
+    },
+    {
+      "path": "packages/utils-zod"
+    }
+  ]
+}
