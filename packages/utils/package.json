@@ -1,9 +1,9 @@
 {
   "name": "@hiogawa/utils",
-  "version": "1.0.0-pre.0",
+  "version": "1.0.0-pre.1",
   "type": "commonjs",
-  "main": "./build/esbuild/index.js",
-  "types": "./build/tsc/index.d.js",
+  "main": "./dist/esbuild/index.js",
+  "types": "./dist/tsc/index.d.js",
   "files": [
     "dist/esbuild/index.js",
     "dist/tsc/*.d.ts"
