@@ -1,0 +1,22 @@
+name: release
+on:
+  workflow_dispatch:
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          # create .npmrc with NODE_AUTH_TOKEN https://github.com/actions/setup-node/blob/3dbcda8bc2eb5ec6aa3fbde01feaae3236952db8/src/authutil.ts#L48
+          registry-url: "https://registry.npmjs.org"
+          cache: pnpm
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm -C packages/utils release
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

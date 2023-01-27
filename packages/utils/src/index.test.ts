@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { booleanGuard } from "./boolean-guard";
 import { defaultDict } from "./default-dict";
+import { DefaultMap } from "./default-map";
 import { Err, Ok, Result, wrapError, wrapPromise } from "./result";
 
 describe("booleanGuard", () => {
@@ -45,6 +46,34 @@ describe("defaultDict", () => {
           1,
         ],
         "y": [
+          0,
+          1,
+        ],
+      }
+    `);
+  });
+});
+
+describe("defaultMap", () => {
+  it("basic", () => {
+    const map: DefaultMap<string, number[]> = new DefaultMap(() => [0]);
+    expect(map).toMatchInlineSnapshot("Map {}");
+
+    map.get("x");
+    expect(map).toMatchInlineSnapshot(`
+      Map {
+        "x" => [
+          0,
+        ],
+      }
+    `);
+    map.delete("x");
+    expect(map).toMatchInlineSnapshot("Map {}");
+
+    map.get("y").push(1);
+    expect(map).toMatchInlineSnapshot(`
+      Map {
+        "y" => [
           0,
           1,
         ],
