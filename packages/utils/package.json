@@ -1,12 +1,19 @@
 {
   "name": "@hiogawa/utils",
-  "version": "1.0.0",
-  "type": "commonjs",
-  "main": "./dist/esbuild/index.js",
-  "types": "./dist/tsc/index.d.js",
+  "version": "1.0.1-pre.1",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
-    "dist/esbuild/index.js",
-    "dist/tsc/*.d.ts"
+    "dist"
   ],
   "license": "MIT",
   "repository": {
@@ -15,9 +22,7 @@
     "directory": "packages/utils"
   },
   "scripts": {
-    "build": "run-s build:*",
-    "build:cjs": "esbuild ./src/index.ts --bundle --outdir=./dist/esbuild --format=cjs",
-    "build:dts": "tsc --noEmit false --emitDeclarationOnly",
+    "build": "tsup",
     "release": "pnpm publish --no-git-checks --access public"
   }
 }
