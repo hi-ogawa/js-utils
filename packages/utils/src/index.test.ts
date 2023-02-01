@@ -24,7 +24,7 @@ describe("booleanGuard", () => {
 
 describe("defaultDict", () => {
   it("basic", () => {
-    const record = defaultDict(() => [0]);
+    const record = defaultDict<string, number[]>(() => [0]);
 
     // `Proxy` itself breaks vitest snapshot with the following error message:
     //   PrettyFormatPluginError: val.getMockName is not a function
