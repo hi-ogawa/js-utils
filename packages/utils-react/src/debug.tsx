@@ -1,9 +1,11 @@
-export function Debug(props: { data: any } & JSX.IntrinsicElements["details"]) {
-  const { data, ...rest } = props;
+export function Debug(
+  props: { debug: unknown } & JSX.IntrinsicElements["details"]
+) {
+  const { debug, ...rest } = props;
   return (
     <details {...rest}>
-      <summary onClick={() => console.log("debug", data)}>debug</summary>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+      <summary onClick={() => console.log("[Debug]", debug)}>debug</summary>
+      <pre>{JSON.stringify(debug, null, 2)}</pre>
     </details>
   );
 }

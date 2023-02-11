@@ -1,13 +1,12 @@
 {
-  "extends": "@tsconfig/strictest",
+  "extends": "@tsconfig/strictest/tsconfig.json",
   "include": ["src"],
   "compilerOptions": {
-    "outDir": "dist",
-    "noUncheckedIndexedAccess": false,
+    "noEmit": true,
     "moduleResolution": "Node",
     "module": "ESNext",
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],
-    "jsx": "preserve"
+    "jsx": "react-jsx"
   }
 }
