@@ -22,7 +22,8 @@
     "directory": "packages/utils-react"
   },
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
