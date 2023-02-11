@@ -4,9 +4,11 @@
   - `tinyassert`
   - `booleanGuard`
   - `defaultDict`
+  - `defaultMap`
   - `Result`
-- `@hiogawa/utils-react` (wip)
+- `@hiogawa/utils-react`
   - `Debug`
+  - `Compose`
 - `@hiogawa/utils-zod` (wip)
   - `tinycli`
 
