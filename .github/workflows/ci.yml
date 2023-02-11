@@ -15,4 +15,5 @@ jobs:
       - run: pnpm i --frozen-lockfile
       - run: pnpm lint-check
       - run: pnpm tsc
-      - run: pnpm test run
+      - run: pnpm test
+      - run: pnpm build
