@@ -1,6 +1,14 @@
 name: release
 on:
   workflow_dispatch:
+    inputs:
+      package:
+        required: true
+        type: choice
+        options:
+          - utils
+          - utils-react
+        default: utils
 jobs:
   release:
     runs-on: ubuntu-22.04
@@ -17,6 +25,6 @@ jobs:
           cache: pnpm
       - run: pnpm i --frozen-lockfile
       - run: pnpm build
-      - run: pnpm -C packages/utils release
+      - run: pnpm -C packages/${{ inputs.package }} release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
