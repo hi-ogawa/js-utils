@@ -2,6 +2,7 @@ export function range(n: number): number[] {
   return Array.from(Array(n), (_, i) => i);
 }
 
+// TODO: probably we can restrict key function to be ((x: T) => string) | ((x: T) => number)
 export function sortBy<T>(ls: T[], ...keyFns: ((x: T) => any)[]): T[] {
   return sortByMap(ls, (x) => keyFns.map((f) => f(x)), arrayCompareFn);
 }
@@ -35,12 +36,11 @@ export function uniqBy<T>(ls: T[], f: (x: T) => unknown): T[] {
 }
 
 export function partition<T>(ls: T[], f: (x: T) => boolean): [T[], T[]] {
-  const lhs: T[] = [];
-  const rhs: T[] = [];
+  const result: [T[], T[]] = [[], []];
   for (const x of ls) {
-    (f(x) ? lhs : rhs).push(x);
+    result[f(x) ? 0 : 1].push(x);
   }
-  return [lhs, rhs];
+  return result;
 }
 
 //
