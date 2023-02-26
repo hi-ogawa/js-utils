@@ -34,6 +34,15 @@ export function uniqBy<T>(ls: T[], f: (x: T) => unknown): T[] {
   });
 }
 
+export function partition<T>(ls: T[], f: (x: T) => boolean): [T[], T[]] {
+  const lhs: T[] = [];
+  const rhs: T[] = [];
+  for (const x of ls) {
+    (f(x) ? lhs : rhs).push(x);
+  }
+  return [lhs, rhs];
+}
+
 //
 // internal
 //
