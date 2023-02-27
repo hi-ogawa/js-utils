@@ -2,7 +2,6 @@ export function range(n: number): number[] {
   return Array.from(Array(n), (_, i) => i);
 }
 
-// TODO: probably we can restrict key function to be ((x: T) => string) | ((x: T) => number)
 export function sortBy<T>(ls: T[], ...keyFns: ((x: T) => any)[]): T[] {
   return sortByMap(ls, (x) => keyFns.map((f) => f(x)), arrayCompareFn);
 }
