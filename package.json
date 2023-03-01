@@ -15,6 +15,7 @@
     "lint-check:prettier": "prettier --cache . --check"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.26.0",
     "@hiogawa/isort-ts": "1.0.0-pre.11",
     "@tsconfig/strictest": "^1.0.2",
     "esbuild": "^0.17.3",
