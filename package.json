@@ -1,4 +1,6 @@
 {
+  "name": "@hiogawa/utils-monorepo",
+  "private": true,
   "scripts": {
     "dev": "run-p dev:*",
     "build": "pnpm -r build",
@@ -13,12 +15,14 @@
     "lint-check:prettier": "prettier --cache . --check"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.26.0",
     "@hiogawa/isort-ts": "1.0.0-pre.11",
     "@tsconfig/strictest": "^1.0.2",
     "esbuild": "^0.17.3",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.3",
     "tsup": "^6.5.0",
+    "typedoc": "^0.23.26",
     "typescript": "^4.9.4",
     "vitest": "^0.27.2"
   },
