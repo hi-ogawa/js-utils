@@ -1,0 +1,6 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "out": "dist/docs",
+  "entryPointStrategy": "packages",
+  "entryPoints": ["packages/utils", "packages/utils-react"]
+}
