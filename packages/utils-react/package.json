@@ -21,6 +21,11 @@
     "url": "https://github.com/hi-ogawa/js-utils",
     "directory": "packages/utils-react"
   },
+  "typedoc": {
+    "displayName": "@hiogawa/utils-react",
+    "readmeFile": "./README.md",
+    "entryPoint": "./src/index.ts"
+  },
   "scripts": {
     "build": "tsup",
     "release": "pnpm publish --no-git-checks --access public"
