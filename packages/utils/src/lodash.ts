@@ -1,5 +1,8 @@
-export function range(n: number): number[] {
-  return Array.from(Array(n), (_, i) => i);
+export function range(start: number, end?: number): number[] {
+  if (typeof end === "undefined") {
+    return Array.from(Array(start), (_, i) => i);
+  }
+  return Array.from(Array(start - end), (_, i) => i + start);
 }
 
 export function sortBy<T>(ls: T[], ...keyFns: ((x: T) => any)[]): T[] {
