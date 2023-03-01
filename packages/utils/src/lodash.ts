@@ -2,7 +2,7 @@ export function range(start: number, end?: number): number[] {
   if (typeof end === "undefined") {
     return Array.from(Array(start), (_, i) => i);
   }
-  return Array.from(Array(start - end), (_, i) => i + start);
+  return Array.from(Array(end - start), (_, i) => i + start);
 }
 
 export function sortBy<T>(ls: T[], ...keyFns: ((x: T) => any)[]): T[] {
