@@ -12,3 +12,11 @@ export class DefaultMap<K, V> extends Map<K, V> {
     return super.get(key)!;
   }
 }
+
+export class UncheckedMap<K, V> extends DefaultMap<K, V> {
+  constructor() {
+    super(() => {
+      throw new Error("UncheckedMap");
+    });
+  }
+}
