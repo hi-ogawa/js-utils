@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { groupBy, partition, range, sortBy, uniqBy } from "./lodash";
+import {
+  groupBy,
+  mapKeys,
+  mapValues,
+  partition,
+  pickBy,
+  range,
+  sortBy,
+  uniqBy,
+} from "./lodash";
 
 describe("range", () => {
   it("basic", () => {
@@ -34,6 +43,71 @@ describe("groupBy", () => {
           1,
           4,
           7,
+        ],
+        2 => [
+          2,
+          5,
+        ],
+      }
+    `);
+  });
+});
+
+describe("mapKeys", () => {
+  it("basic", () => {
+    const result = mapKeys(
+      groupBy(range(8), (x) => x % 3),
+      (_v, k) => k + 10
+    );
+    expect(result).toMatchInlineSnapshot(`
+      Map {
+        10 => [
+          0,
+          3,
+          6,
+        ],
+        11 => [
+          1,
+          4,
+          7,
+        ],
+        12 => [
+          2,
+          5,
+        ],
+      }
+    `);
+  });
+});
+
+describe("mapValues", () => {
+  it("basic", () => {
+    const result = mapValues(
+      groupBy(range(8), (x) => x % 3),
+      (v) => v.length
+    );
+    expect(result).toMatchInlineSnapshot(`
+      Map {
+        0 => 3,
+        1 => 3,
+        2 => 2,
+      }
+    `);
+  });
+});
+
+describe("pickBy", () => {
+  it("basic", () => {
+    const result = pickBy(
+      groupBy(range(8), (x) => x % 3),
+      (_v, k) => k % 2 === 0
+    );
+    expect(result).toMatchInlineSnapshot(`
+      Map {
+        0 => [
+          0,
+          3,
+          6,
         ],
         2 => [
           2,

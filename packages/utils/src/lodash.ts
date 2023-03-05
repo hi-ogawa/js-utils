@@ -21,6 +21,27 @@ export function groupBy<T, K>(ls: T[], f: (x: T) => K): Map<K, T[]> {
   return result;
 }
 
+export function mapKeys<K, V, K2>(
+  map: Map<K, V>,
+  f: (v: V, k: K) => K2
+): Map<K2, V> {
+  return new Map([...map].map(([k, v]) => [f(v, k), v]));
+}
+
+export function mapValues<K, V, V2>(
+  map: Map<K, V>,
+  f: (v: V, k: K) => V2
+): Map<K, V2> {
+  return new Map([...map].map(([k, v]) => [k, f(v, k)]));
+}
+
+export function pickBy<K, V>(
+  map: Map<K, V>,
+  f: (v: V, k: K) => boolean
+): Map<K, V> {
+  return new Map([...map].filter(([k, v]) => f(v, k)));
+}
+
 export function uniq<T>(ls: T[]): T[] {
   return Array.from(new Set(ls));
 }
