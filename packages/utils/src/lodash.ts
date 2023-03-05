@@ -35,6 +35,13 @@ export function mapValues<K, V, V2>(
   return new Map([...map].map(([k, v]) => [k, f(v, k)]));
 }
 
+export function pickBy<K, V>(
+  map: Map<K, V>,
+  f: (v: V, k: K) => boolean
+): Map<K, V> {
+  return new Map([...map].filter(([k, v]) => f(v, k)));
+}
+
 export function uniq<T>(ls: T[]): T[] {
   return Array.from(new Set(ls));
 }

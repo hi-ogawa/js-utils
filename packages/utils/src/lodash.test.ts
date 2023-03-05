@@ -4,6 +4,7 @@ import {
   mapKeys,
   mapValues,
   partition,
+  pickBy,
   range,
   sortBy,
   uniqBy,
@@ -90,6 +91,28 @@ describe("mapValues", () => {
         0 => 3,
         1 => 3,
         2 => 2,
+      }
+    `);
+  });
+});
+
+describe("pickBy", () => {
+  it("basic", () => {
+    const result = pickBy(
+      groupBy(range(8), (x) => x % 3),
+      (_v, k) => k % 2 === 0
+    );
+    expect(result).toMatchInlineSnapshot(`
+      Map {
+        0 => [
+          0,
+          3,
+          6,
+        ],
+        2 => [
+          2,
+          5,
+        ],
       }
     `);
   });
