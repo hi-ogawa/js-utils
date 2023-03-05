@@ -6,9 +6,6 @@
     },
     {
       "path": "packages/utils-react"
-    },
-    {
-      "path": "packages/utils-zod"
     }
   ]
 }
