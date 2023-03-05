@@ -67,6 +67,27 @@ export function partition<T>(ls: T[], f: (x: T) => boolean): [T[], T[]] {
 }
 
 //
+// cheating type for convenience
+//
+
+export function pickUnsafe<T, K extends keyof T>(o: T, keys: K[]): Pick<T, K> {
+  return Object.fromEntries(keys.map((k) => [k, o[k]])) as any;
+}
+
+export function pickByUnsafe<K extends PropertyKey, V>(
+  o: Record<K, V>,
+  f: (v: V, k: K) => boolean
+): Record<K, V> {
+  return Object.fromEntries(
+    Object.entries<V>(o).filter(([k, v]) => f(v, k as any))
+  ) as any;
+}
+
+export function keysUnsafe<T extends object>(o: T): (keyof T)[] {
+  return Object.keys(o) as any;
+}
+
+//
 // internal
 //
 
