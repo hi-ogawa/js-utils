@@ -1,7 +1,9 @@
+import React from "react";
 import reactTestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";
 import { Compose } from "./compose";
 import { Debug } from "./debug";
+import { useStableRef } from "./use-stable-ref";
 
 describe("Debug", () => {
   it("basic", () => {
@@ -48,6 +50,40 @@ describe("Compose", () => {
         >
           <button />
         </div>
+      </div>
+    `);
+  });
+});
+
+describe("useStableRef", () => {
+  it("basic", () => {
+    function useInterval(ms: number, callback: () => void) {
+      const handlerRef = useStableRef(callback);
+
+      React.useEffect(() => {
+        const subscription = setInterval(() => {
+          handlerRef.current();
+        }, ms);
+        return () => {
+          clearInterval(subscription);
+        };
+      }, []);
+    }
+
+    function Component() {
+      const [count, setCount] = React.useState(0);
+
+      useInterval(1000, () => setCount((c) => c + 1));
+
+      return <div>count = {count}</div>;
+    }
+
+    let el = <Component />;
+
+    expect(render(el)).toMatchInlineSnapshot(`
+      <div>
+        count = 
+        0
       </div>
     `);
   });
