@@ -1,4 +1,5 @@
-import { renderHook } from "@testing-library/react";
+import { render, renderHook, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import React from "react";
 import { describe, expect, it } from "vitest";
 import { Compose } from "./compose";
@@ -57,36 +58,52 @@ describe("Compose", () => {
 });
 
 describe("useStableRef", () => {
-  // TODO
-  it("basic", () => {
-    function useInterval(ms: number, callback: () => void) {
-      const handlerRef = useStableRef(callback);
+  it("basic", async () => {
+    function useDocumentEvent<K extends keyof DocumentEventMap>(
+      type: K,
+      handler: (e: DocumentEventMap[K]) => void
+    ) {
+      const handlerRef = useStableRef(handler);
 
       React.useEffect(() => {
-        const subscription = setInterval(() => {
-          handlerRef.current();
-        }, ms);
-        return () => {
-          clearInterval(subscription);
+        const wrapper = (e: DocumentEventMap[K]) => {
+          handlerRef.current(e);
         };
-      }, []);
+        document.addEventListener(type, wrapper);
+        return () => {
+          document.removeEventListener(type, wrapper);
+        };
+      });
     }
 
-    function Component() {
-      const [count, setCount] = React.useState(0);
+    const { result } = renderHook(() => {
+      const [enabled, setEnabled] = React.useState(false);
 
-      useInterval(1000, () => setCount((c) => c + 1));
+      useDocumentEvent("keyup", (e) => {
+        if (e.key === " ") {
+          setEnabled(!enabled);
+        }
+      });
 
-      return <div>count={count}</div>;
-    }
+      return { enabled };
+    });
 
-    let el = <Component />;
-
-    expect(renderToJson(el)).toMatchInlineSnapshot(`
-      <div>
-        count=
-        0
-      </div>
+    expect(result.current).toMatchInlineSnapshot(`
+      {
+        "enabled": false,
+      }
+    `);
+    await userEvent.keyboard(" ");
+    expect(result.current).toMatchInlineSnapshot(`
+      {
+        "enabled": true,
+      }
+    `);
+    await userEvent.keyboard(" ");
+    expect(result.current).toMatchInlineSnapshot(`
+      {
+        "enabled": false,
+      }
     `);
   });
 });

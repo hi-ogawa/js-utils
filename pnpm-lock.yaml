@@ -33,6 +33,7 @@ importers:
     specifiers:
       '@testing-library/jest-dom': ^5.16.5
       '@testing-library/react': ^14.0.0
+      '@testing-library/user-event': ^14.4.3
       '@types/react': ^18.0.27
       '@types/react-test-renderer': ^18.0.0
       '@vitejs/plugin-react': ^3.1.0
@@ -43,6 +44,7 @@ importers:
     devDependencies:
       '@testing-library/jest-dom': 5.16.5
       '@testing-library/react': 14.0.0_biqbaboplfbrettd7655fr4n2y
+      '@testing-library/user-event': 14.4.3
       '@types/react': 18.0.27
       '@types/react-test-renderer': 18.0.0
       '@vitejs/plugin-react': 3.1.0
@@ -1054,6 +1056,13 @@ packages:
       '@types/react-dom': 18.0.11
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+    dev: true
+
+  /@testing-library/user-event/14.4.3:
+    resolution: {integrity: sha512-kCUc5MEwaEMakkO5x7aoD+DLi02ehmEM2QCGWvNqAS1dV/fAvORWEjnjsEIvml59M7Y5kCkWN6fCCyPOe8OL6Q==}
+    engines: {node: '>=12', npm: '>=6'}
+    peerDependencies:
+      '@testing-library/dom': '>=7.21.4'
     dev: true
 
   /@tootallnate/once/2.0.0:
