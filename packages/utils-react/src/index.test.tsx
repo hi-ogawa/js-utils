@@ -3,7 +3,7 @@ import reactTestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";
 import { Compose } from "./compose";
 import { Debug } from "./debug";
-import { useStableRef } from "./use-stable-ref";
+import { useStableRef } from "./misc";
 
 describe("Debug", () => {
   it("basic", () => {
@@ -82,7 +82,7 @@ describe("useStableRef", () => {
 
     expect(render(el)).toMatchInlineSnapshot(`
       <div>
-        count = 
+        count =
         0
       </div>
     `);
