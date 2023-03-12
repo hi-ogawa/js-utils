@@ -1,10 +1,11 @@
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { describe, expect, it } from "vitest";
 import { Compose } from "./compose";
 import { Debug } from "./debug";
 import { usePrevious, useStableRef } from "./misc";
+import { toArraySetState } from "./set-state";
 import { renderToJson } from "./test/helper";
 
 describe("Debug", () => {
@@ -143,6 +144,68 @@ describe("usePrevious", () => {
         "prev": 2,
         "value": 2,
       }
+    `);
+  });
+});
+
+describe("toArraySetState", () => {
+  it("basic", async () => {
+    const { result } = renderHook(() => {
+      const [state, setState] = React.useState(() => [0]);
+      const setArrayState = toArraySetState(setState);
+      return { state, setState, setArrayState };
+    });
+
+    expect(result.current.state).toMatchInlineSnapshot(`
+      [
+        0,
+      ]
+    `);
+
+    act(() => {
+      result.current.setArrayState.push(1);
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      [
+        0,
+        1,
+      ]
+    `);
+
+    act(() => {
+      result.current.setArrayState.push(2, 3);
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      [
+        0,
+        1,
+        2,
+        3,
+      ]
+    `);
+
+    act(() => {
+      result.current.setArrayState.sort((x, y) => y - x);
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      [
+        3,
+        2,
+        1,
+        0,
+      ]
+    `);
+
+    act(() => {
+      result.current.setArrayState.splice(1, 2, /* ...items */ 4, 5);
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      [
+        3,
+        4,
+        5,
+        0,
+      ]
     `);
   });
 });
