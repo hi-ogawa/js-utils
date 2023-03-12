@@ -67,14 +67,25 @@ export function partition<T>(ls: T[], f: (x: T) => boolean): [T[], T[]] {
 }
 
 //
-// cheating type for convenience
+// unsafe but convenient plain object key manipulation
+// https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
 //
 
-export function pickUnsafe<T, K extends keyof T>(o: T, keys: K[]): Pick<T, K> {
-  return Object.fromEntries(keys.map((k) => [k, o[k]])) as any;
+export function objectPick<T extends object, K extends keyof T>(
+  o: T,
+  keys: K[]
+): Pick<T, K> {
+  return objectPickBy(o, (_v, k) => keys.includes(k)) as any;
 }
 
-export function pickByUnsafe<K extends PropertyKey, V>(
+export function objectOmit<T extends object, K extends keyof T>(
+  o: T,
+  keys: K[]
+): Omit<T, K> {
+  return objectPickBy(o, (_v, k) => !keys.includes(k)) as any;
+}
+
+export function objectPickBy<K extends PropertyKey, V>(
   o: Record<K, V>,
   f: (v: V, k: K) => boolean
 ): Record<K, V> {
@@ -83,7 +94,14 @@ export function pickByUnsafe<K extends PropertyKey, V>(
   ) as any;
 }
 
-export function keysUnsafe<T extends object>(o: T): (keyof T)[] {
+export function objectOmitBy<K extends PropertyKey, V>(
+  o: Record<K, V>,
+  f: (v: V, k: K) => boolean
+): Record<K, V> {
+  return objectPickBy(o, (v, k) => !f(v, k));
+}
+
+export function objectKeys<T extends object>(o: T): (keyof T)[] {
   return Object.keys(o) as any;
 }
 
