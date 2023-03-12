@@ -1,8 +1,9 @@
+import { renderHook } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it } from "vitest";
 import { Compose } from "./compose";
 import { Debug } from "./debug";
-import { useStableRef } from "./misc";
+import { usePrevious, useStableRef } from "./misc";
 import { renderToJson } from "./test/helper";
 
 describe("Debug", () => {
@@ -56,6 +57,7 @@ describe("Compose", () => {
 });
 
 describe("useStableRef", () => {
+  // TODO
   it("basic", () => {
     function useInterval(ms: number, callback: () => void) {
       const handlerRef = useStableRef(callback);
@@ -85,6 +87,45 @@ describe("useStableRef", () => {
         count=
         0
       </div>
+    `);
+  });
+});
+
+describe("usePrevious", () => {
+  it("basic", () => {
+    const { result, rerender } = renderHook(
+      ({ value }: { value: number }) => {
+        const prev = usePrevious(value);
+        return { value, prev };
+      },
+      { initialProps: { value: 0 } }
+    );
+    expect(result.current).toMatchInlineSnapshot(`
+      {
+        "prev": 0,
+        "value": 0,
+      }
+    `);
+    rerender({ value: 1 });
+    expect(result.current).toMatchInlineSnapshot(`
+      {
+        "prev": 0,
+        "value": 1,
+      }
+    `);
+    rerender({ value: 2 });
+    expect(result.current).toMatchInlineSnapshot(`
+      {
+        "prev": 1,
+        "value": 2,
+      }
+    `);
+    rerender({ value: 2 });
+    expect(result.current).toMatchInlineSnapshot(`
+      {
+        "prev": 2,
+        "value": 2,
+      }
     `);
   });
 });
