@@ -1,14 +1,14 @@
 import React from "react";
-import reactTestRenderer from "react-test-renderer";
 import { describe, expect, it } from "vitest";
 import { Compose } from "./compose";
 import { Debug } from "./debug";
 import { useStableRef } from "./misc";
+import { renderToJson } from "./test/helper";
 
 describe("Debug", () => {
   it("basic", () => {
     const el = <Debug debug={{ hello: "world" }} />;
-    expect(render(el)).toMatchInlineSnapshot(`
+    expect(renderToJson(el)).toMatchInlineSnapshot(`
       <details>
         <summary
           onClick={[Function]}
@@ -41,7 +41,7 @@ describe("Compose", () => {
       />
     );
 
-    expect(render(el)).toMatchInlineSnapshot(`
+    expect(renderToJson(el)).toMatchInlineSnapshot(`
       <div
         className="wrapper-1"
       >
@@ -80,7 +80,7 @@ describe("useStableRef", () => {
 
     let el = <Component />;
 
-    expect(render(el)).toMatchInlineSnapshot(`
+    expect(renderToJson(el)).toMatchInlineSnapshot(`
       <div>
         count=
         0
@@ -88,7 +88,3 @@ describe("useStableRef", () => {
     `);
   });
 });
-
-function render(el: React.ReactElement) {
-  return reactTestRenderer.create(el).toJSON();
-}

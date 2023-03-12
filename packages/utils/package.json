@@ -28,6 +28,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "test": "vitest",
     "release": "pnpm publish --no-git-checks --access public"
   }
 }
