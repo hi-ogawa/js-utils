@@ -67,6 +67,45 @@ export function partition<T>(ls: T[], f: (x: T) => boolean): [T[], T[]] {
 }
 
 //
+// unsafe but convenient plain object key manipulation
+// https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
+//
+
+export function objectPick<T extends object, K extends keyof T>(
+  o: T,
+  keys: K[]
+): Pick<T, K> {
+  return objectPickBy(o, (_v, k) => keys.includes(k)) as any;
+}
+
+export function objectOmit<T extends object, K extends keyof T>(
+  o: T,
+  keys: K[]
+): Omit<T, K> {
+  return objectPickBy(o, (_v, k) => !keys.includes(k)) as any;
+}
+
+export function objectPickBy<K extends PropertyKey, V>(
+  o: Record<K, V>,
+  f: (v: V, k: K) => boolean
+): Record<K, V> {
+  return Object.fromEntries(
+    Object.entries<V>(o).filter(([k, v]) => f(v, k as any))
+  ) as any;
+}
+
+export function objectOmitBy<K extends PropertyKey, V>(
+  o: Record<K, V>,
+  f: (v: V, k: K) => boolean
+): Record<K, V> {
+  return objectPickBy(o, (v, k) => !f(v, k));
+}
+
+export function objectKeys<T extends object>(o: T): (keyof T)[] {
+  return Object.keys(o) as any;
+}
+
+//
 // internal
 //
 

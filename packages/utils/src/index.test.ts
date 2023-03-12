@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { booleanGuard } from "./boolean-guard";
 import { defaultDict } from "./default-dict";
-import { DefaultMap } from "./default-map";
+import { DefaultMap, UncheckedMap } from "./default-map";
 import { Err, Ok, Result, wrapError, wrapPromise } from "./result";
+import { tinyassert } from "./tinyassert";
 
 describe("booleanGuard", () => {
   it("basic", () => {
@@ -54,7 +55,7 @@ describe("defaultDict", () => {
   });
 });
 
-describe("defaultMap", () => {
+describe("DefaultMap", () => {
   it("basic", () => {
     const map: DefaultMap<string, number[]> = new DefaultMap(() => [0]);
     expect(map).toMatchInlineSnapshot("Map {}");
@@ -77,6 +78,41 @@ describe("defaultMap", () => {
           0,
           1,
         ],
+      }
+    `);
+  });
+});
+
+describe("UncheckedMap", () => {
+  it("basic", () => {
+    const map = new UncheckedMap<string, number>();
+    expect(map).toMatchInlineSnapshot("Map {}");
+
+    expect(wrapError(() => map.get("x"))).toMatchInlineSnapshot(`
+      {
+        "ok": false,
+        "value": [Error: UncheckedMap],
+      }
+    `);
+    expect(map.set("x", 1)).toMatchInlineSnapshot(`
+      Map {
+        "x" => 1,
+      }
+    `);
+    expect(wrapError(() => map.get("x"))).toMatchInlineSnapshot(`
+      {
+        "ok": true,
+        "value": 1,
+      }
+    `);
+    expect(map.delete("x")).toMatchInlineSnapshot("true");
+
+    const result = wrapError(() => map.get("x"));
+    tinyassert(result.value instanceof Error);
+    expect(result.value).toMatchInlineSnapshot("[Error: UncheckedMap]");
+    expect(result.value.cause).toMatchInlineSnapshot(`
+      {
+        "key": "x",
       }
     `);
   });
