@@ -1,11 +1,11 @@
 import { act, renderHook } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Compose } from "./compose";
 import { Debug } from "./debug";
 import { usePrevious, useStableRef } from "./misc";
-import { toArraySetState } from "./set-state";
+import { toArraySetState, toDelayedSetState } from "./set-state";
 import { renderToJson } from "./test/helper";
 
 describe("Debug", () => {
@@ -207,5 +207,46 @@ describe("toArraySetState", () => {
         0,
       ]
     `);
+  });
+});
+
+describe("toDelayedSetState", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  it("basic", async () => {
+    const { result } = renderHook(() => {
+      const [state, setState] = React.useState(false);
+      const [setStateDelayed, reset, pending] = toDelayedSetState(setState);
+      return { state, setState, setStateDelayed, reset, pending };
+    });
+
+    expect(result.current.state).toMatchInlineSnapshot("false");
+    expect(result.current.pending).toMatchInlineSnapshot("false");
+
+    act(() => {
+      result.current.setState(true);
+    });
+    expect(result.current.state).toMatchInlineSnapshot("true");
+    expect(result.current.pending).toMatchInlineSnapshot("false");
+
+    act(() => {
+      result.current.setStateDelayed(false, 100);
+    });
+    expect(result.current.state).toMatchInlineSnapshot("true");
+    expect(result.current.pending).toMatchInlineSnapshot("true");
+
+    act(() => {
+      vi.advanceTimersByTime(80);
+    });
+    expect(result.current.state).toMatchInlineSnapshot("true");
+    expect(result.current.pending).toMatchInlineSnapshot("true");
+
+    act(() => {
+      vi.advanceTimersByTime(80);
+    });
+    expect(result.current.state).toMatchInlineSnapshot("false");
+    expect(result.current.pending).toMatchInlineSnapshot("false");
   });
 });

@@ -13,6 +13,7 @@ export function toDelayedSetState<T>(
     setSubscribe(() => () => {
       const unsubscribe = setTimeout(() => {
         setState(value);
+        setSubscribe(undefined);
       }, ms);
       return () => {
         clearTimeout(unsubscribe);
@@ -24,11 +25,14 @@ export function toDelayedSetState<T>(
     setSubscribe(undefined);
   }
 
+  const pending = Boolean(subscribe);
+
   React.useEffect(() => subscribe?.(), [subscribe]);
 
   return [
     React.useCallback(setStateDelayed, [setState]),
     React.useCallback(reset, []),
+    pending,
   ] as const;
 }
 
