@@ -75,14 +75,14 @@ describe("useStableRef", () => {
 
       useInterval(1000, () => setCount((c) => c + 1));
 
-      return <div>count = {count}</div>;
+      return <div>count={count}</div>;
     }
 
     let el = <Component />;
 
     expect(render(el)).toMatchInlineSnapshot(`
       <div>
-        count =
+        count=
         0
       </div>
     `);
