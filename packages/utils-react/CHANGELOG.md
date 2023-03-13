@@ -1,5 +1,11 @@
 # @hiogawa/utils-react
 
+## 1.1.1
+
+### Patch Changes
+
+- c438cc5: chore(utils-react): package without jsx-runtime
+
 ## 1.1.0
 
 ### Minor Changes
