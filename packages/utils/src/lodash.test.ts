@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   groupBy,
+  isNil,
   mapKeys,
   mapValues,
   objectKeys,
@@ -292,4 +293,31 @@ describe("objectKeys", () => {
       ]
     `);
   });
+});
+
+describe("isNil", () => {
+  it("typing", () => {
+    const ls = [0, true, false, null, undefined] as const;
+
+    ls.filter(isNil) satisfies (null | undefined)[];
+
+    expect(ls.filter(isNil)).toMatchInlineSnapshot(`
+      [
+        null,
+        undefined,
+      ]
+    `);
+  });
+
+  it("typing", () => {
+    let x: number | undefined;
+
+    expect(isNil(x)).toMatchInlineSnapshot('true');
+
+    if (isNil(x)) {
+      x satisfies undefined;
+    } else {
+      x satisfies number;
+    }
+  })
 });

@@ -66,6 +66,10 @@ export function partition<T>(ls: T[], f: (x: T) => boolean): [T[], T[]] {
   return result;
 }
 
+export function isNil<T>(value: T): value is T & (null | undefined) {
+  return value === null || typeof value === "undefined";
+}
+
 //
 // unsafe but convenient plain object key manipulation
 // https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
