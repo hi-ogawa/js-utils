@@ -312,12 +312,12 @@ describe("isNil", () => {
   it("typing", () => {
     let x: number | undefined;
 
-    expect(isNil(x)).toMatchInlineSnapshot('true');
+    expect(isNil(x)).toMatchInlineSnapshot("true");
 
     if (isNil(x)) {
       x satisfies undefined;
     } else {
       x satisfies number;
     }
-  })
+  });
 });
