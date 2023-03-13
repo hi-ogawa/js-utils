@@ -3,6 +3,11 @@ import {
   groupBy,
   mapKeys,
   mapValues,
+  objectKeys,
+  objectOmit,
+  objectOmitBy,
+  objectPick,
+  objectPickBy,
   partition,
   pickBy,
   range,
@@ -169,6 +174,121 @@ describe("uniqBy", () => {
         0,
         1,
         2,
+      ]
+    `);
+  });
+});
+
+describe("objectPick", () => {
+  it("basic", () => {
+    const o = {
+      x: 0,
+      y: 1,
+    } as const;
+    const result = objectPick(o, ["x"]) satisfies { x: 0 };
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "x": 0,
+      }
+    `);
+  });
+
+  it("record", () => {
+    const o: Record<string, number> = {
+      x: 0,
+      y: 1,
+    };
+    const result = objectPick(o, ["x"]) satisfies { x: number };
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "x": 0,
+      }
+    `);
+  });
+});
+
+describe("objectOmit", () => {
+  it("basic", () => {
+    const o = {
+      x: 0,
+      y: 1,
+    } as const;
+    const result = objectOmit(o, ["x"]) satisfies { y: 1 };
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "y": 1,
+      }
+    `);
+  });
+
+  it("record", () => {
+    const o: Record<string, number> = {
+      x: 0,
+      y: 1,
+    };
+    const result = objectOmit(o, ["x"]) satisfies Omit<
+      Record<string, number>,
+      "x"
+    >;
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "y": 1,
+      }
+    `);
+  });
+});
+
+describe("objectPickBy", () => {
+  it("basic", () => {
+    const result = objectPickBy(
+      Object.fromEntries(groupBy(range(8), (x) => x % 3)),
+      (_v, k) => Number(k) % 2 === 0
+    );
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "0": [
+          0,
+          3,
+          6,
+        ],
+        "2": [
+          2,
+          5,
+        ],
+      }
+    `);
+  });
+});
+
+describe("objectOmitBy", () => {
+  it("basic", () => {
+    const result = objectOmitBy(
+      Object.fromEntries(groupBy(range(8), (x) => x % 3)),
+      (_v, k) => Number(k) % 2 === 0
+    );
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "1": [
+          1,
+          4,
+          7,
+        ],
+      }
+    `);
+  });
+});
+
+describe("objectKeys", () => {
+  it("basic", () => {
+    const o = {
+      x: 0,
+      y: 1,
+    };
+    const result = objectKeys(o) satisfies ("x" | "y")[];
+    expect(result).toMatchInlineSnapshot(`
+      [
+        "x",
+        "y",
       ]
     `);
   });

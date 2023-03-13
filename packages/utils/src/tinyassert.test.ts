@@ -20,13 +20,13 @@ describe("tinyassert", () => {
         .replaceAll(process.cwd(), "__CWD__");
       expect(stack).toMatchInlineSnapshot(`
         "Error: 
-            at boom (__CWD__/packages/utils/src/tinyassert.test.ts:8:7)
-            at __CWD__/packages/utils/src/tinyassert.test.ts:11:7"
+            at boom (__CWD__/src/tinyassert.test.ts:8:7)
+            at __CWD__/src/tinyassert.test.ts:11:7"
       `);
     }
   });
 
-  it.skip("error stacktrace vitest", () => {
+  it.fails("error stacktrace vitest", () => {
     function boom() {
       tinyassert(false);
     }
