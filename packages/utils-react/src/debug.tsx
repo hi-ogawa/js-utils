@@ -1,3 +1,5 @@
+import React from "react";
+
 export function Debug(
   props: { debug: unknown } & JSX.IntrinsicElements["details"]
 ) {
