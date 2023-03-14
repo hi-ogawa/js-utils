@@ -217,6 +217,6 @@ describe("mapOption", () => {
     const result = mapOption(map.get(0), (v) => v.length) satisfies
       | number
       | undefined;
-    expect(result).toMatchInlineSnapshot('3');
+    expect(result).toMatchInlineSnapshot("3");
   });
 });
