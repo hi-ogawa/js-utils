@@ -1,5 +1,11 @@
 # @hiogawa/utils
 
+## 1.4.1
+
+### Patch Changes
+
+- fix: fix export
+
 ## 1.4.0
 
 ### Minor Changes
