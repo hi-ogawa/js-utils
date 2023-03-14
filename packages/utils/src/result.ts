@@ -1,3 +1,5 @@
+// https://doc.rust-lang.org/std/result/
+
 export type Result<T, E> = { ok: true; value: T } | { ok: false; value: E };
 
 export function Ok<T>(value: T): Result<T, never> {

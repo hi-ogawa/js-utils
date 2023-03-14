@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   groupBy,
+  isNil,
+  isNotNil,
   mapKeys,
   mapValues,
   objectKeys,
@@ -291,5 +293,39 @@ describe("objectKeys", () => {
         "y",
       ]
     `);
+  });
+});
+
+describe("isNil", () => {
+  it("typing", () => {
+    const ls = [0, true, false, null, undefined] as const;
+
+    ls.filter(isNil) satisfies (null | undefined)[];
+    ls.filter(isNotNil) satisfies (0 | true | false)[];
+
+    expect(ls.filter(isNil)).toMatchInlineSnapshot(`
+      [
+        null,
+        undefined,
+      ]
+    `);
+  });
+
+  it("typing", () => {
+    let x: number | undefined;
+
+    expect(isNil(x)).toMatchInlineSnapshot("true");
+
+    if (isNil(x)) {
+      x satisfies undefined;
+    } else {
+      x satisfies number;
+    }
+
+    if (isNotNil(x)) {
+      x satisfies number;
+    } else {
+      x satisfies undefined;
+    }
   });
 });
