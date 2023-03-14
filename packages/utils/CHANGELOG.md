@@ -1,5 +1,11 @@
 # @hiogawa/utils
 
+## 1.4.0
+
+### Minor Changes
+
+- be406d6: feat: more lodash utils
+
 ## 1.3.0
 
 ### Minor Changes
