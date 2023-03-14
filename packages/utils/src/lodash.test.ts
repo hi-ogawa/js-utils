@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   groupBy,
   isNil,
+  isNotNil,
   mapKeys,
   mapValues,
   objectKeys,
@@ -300,6 +301,7 @@ describe("isNil", () => {
     const ls = [0, true, false, null, undefined] as const;
 
     ls.filter(isNil) satisfies (null | undefined)[];
+    ls.filter(isNotNil) satisfies (0 | true | false)[];
 
     expect(ls.filter(isNil)).toMatchInlineSnapshot(`
       [
@@ -318,6 +320,12 @@ describe("isNil", () => {
       x satisfies undefined;
     } else {
       x satisfies number;
+    }
+
+    if (isNotNil(x)) {
+      x satisfies number;
+    } else {
+      x satisfies undefined;
     }
   });
 });

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { booleanGuard } from "./boolean-guard";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, UncheckedMap } from "./default-map";
+import { groupBy, range } from "./lodash";
+import { mapOption } from "./option";
 import { Err, Ok, Result, wrapError, wrapPromise } from "./result";
 import { tinyassert } from "./tinyassert";
 
@@ -206,5 +208,15 @@ describe("Result", () => {
         }
       `);
     });
+  });
+});
+
+describe("mapOption", () => {
+  it("basic", () => {
+    const map = groupBy(range(8), (x) => x % 3);
+    const result = mapOption(map.get(0), (v) => v.length) satisfies
+      | number
+      | undefined;
+    expect(result).toMatchInlineSnapshot('3');
   });
 });
