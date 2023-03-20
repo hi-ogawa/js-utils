@@ -3,3 +3,4 @@ export * from "./compose";
 export * from "./misc";
 export * from "./raf";
 export * from "./set-state";
+export * from "./browser";
