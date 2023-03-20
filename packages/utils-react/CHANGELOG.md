@@ -1,5 +1,11 @@
 # @hiogawa/utils-react
 
+## 1.2.0
+
+### Minor Changes
+
+- c0196c2: feat: add toggle state utils
+
 ## 1.1.1
 
 ### Patch Changes

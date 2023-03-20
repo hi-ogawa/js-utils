@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Compose } from "./compose";
 import { Debug } from "./debug";
 import { usePrevious, useStableRef } from "./misc";
-import { toArraySetState, toDelayedSetState } from "./set-state";
+import { toArraySetState, toDelayedSetState, toSetSetState } from "./set-state";
 import { renderToJson } from "./test/helper";
 
 describe("Debug", () => {
@@ -206,6 +206,70 @@ describe("toArraySetState", () => {
         5,
         0,
       ]
+    `);
+
+    act(() => {
+      result.current.setArrayState.toggle(4);
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      [
+        3,
+        5,
+        0,
+      ]
+    `);
+  });
+});
+
+describe("toSetSetState", () => {
+  it("basic", async () => {
+    const { result } = renderHook(() => {
+      const [state, setState] = React.useState(() => new Set([0]));
+      const setArrayState = toSetSetState(setState);
+      return { state, setState, setArrayState };
+    });
+
+    expect(result.current.state).toMatchInlineSnapshot(`
+      Set {
+        0,
+      }
+    `);
+
+    act(() => {
+      result.current.setArrayState.add(1);
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      Set {
+        0,
+        1,
+      }
+    `);
+
+    act(() => {
+      result.current.setArrayState.delete(0);
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      Set {
+        1,
+      }
+    `);
+
+    act(() => {
+      result.current.setArrayState.toggle(3);
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      Set {
+        1,
+        3,
+      }
+    `);
+    act(() => {
+      result.current.setArrayState.toggle(1);
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      Set {
+        3,
+      }
     `);
   });
 });
