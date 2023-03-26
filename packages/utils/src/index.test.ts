@@ -4,6 +4,7 @@ import { defaultDict } from "./default-dict";
 import { DefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
 import { mapOption } from "./option";
+import { newPromiseWithResolvers } from "./promise";
 import { Err, Ok, Result, wrapError, wrapPromise } from "./result";
 import { tinyassert } from "./tinyassert";
 
@@ -218,5 +219,31 @@ describe("mapOption", () => {
       | number
       | undefined;
     expect(result).toMatchInlineSnapshot("3");
+  });
+});
+
+describe("newPromiseWithResolvers", () => {
+  it("resolve", async () => {
+    const { promise, resolve } = newPromiseWithResolvers<number>();
+    resolve(123);
+    const result = await wrapPromise(promise);
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "ok": true,
+        "value": 123,
+      }
+    `);
+  });
+
+  it("reject", async () => {
+    const { promise, reject } = newPromiseWithResolvers<number>();
+    reject(123);
+    const result = await wrapPromise(promise);
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "ok": false,
+        "value": 123,
+      }
+    `);
   });
 });
