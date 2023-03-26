@@ -13,3 +13,7 @@ export function useStableRef<T>(value: T) {
   ref.current = value;
   return ref;
 }
+
+export function useRerender() {
+  return React.useReducer((prev) => !prev, false)[1];
+}
