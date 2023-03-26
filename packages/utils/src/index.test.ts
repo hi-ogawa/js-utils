@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { booleanGuard } from "./boolean-guard";
+import { typedBoolean } from "./boolean-guard";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
 import { mapOption } from "./option";
 import { newPromiseWithResolvers } from "./promise";
-import { Err, Ok, Result, wrapError, wrapPromise } from "./result";
+import { Err, Ok, Result, okToOption, wrapError, wrapPromise } from "./result";
 import { tinyassert } from "./tinyassert";
 
-describe("booleanGuard", () => {
+describe("typedBoolean", () => {
   it("basic", () => {
     const someBoolean = true as boolean;
     const numberOrNull = null as number | null;
@@ -21,7 +21,7 @@ describe("booleanGuard", () => {
     ];
 
     const result1 = someArray.filter(Boolean);
-    const result2 = someArray.filter(booleanGuard) satisfies { x: number }[];
+    const result2 = someArray.filter(typedBoolean) satisfies { x: number }[];
     expect(result1).toEqual(result2);
   });
 });
@@ -208,6 +208,13 @@ describe("Result", () => {
           "value": [Error: boom],
         }
       `);
+    });
+  });
+
+  describe("okToOption", () => {
+    it("basic", () => {
+      expect(okToOption(Ok(1))).toMatchInlineSnapshot("1");
+      expect(okToOption(Err("xxx"))).toMatchInlineSnapshot("undefined");
     });
   });
 });
