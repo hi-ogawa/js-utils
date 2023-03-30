@@ -336,10 +336,10 @@ describe("once", () => {
     let count = 0;
     const f = once(() => ++count);
 
-    expect(count).toMatchInlineSnapshot('0');
-    expect(f()).toMatchInlineSnapshot('1');
-    expect(count).toMatchInlineSnapshot('1');
-    expect(f()).toMatchInlineSnapshot('1');
-    expect(count).toMatchInlineSnapshot('1');
+    expect(count).toMatchInlineSnapshot("0");
+    expect(f()).toMatchInlineSnapshot("1");
+    expect(count).toMatchInlineSnapshot("1");
+    expect(f()).toMatchInlineSnapshot("1");
+    expect(count).toMatchInlineSnapshot("1");
   });
 });
