@@ -74,11 +74,26 @@ export function isNotNil<T>(value: T): value is NonNullable<T> {
   return !isNil(value);
 }
 
+// TODO: handle error?
+export function once<F extends (...args: any[]) => any>(f: F): F {
+  let result: unknown;
+  let called = false;
+  const wrapper = () => {
+    if (!called) {
+      result = f(...arguments);
+      called = true;
+    }
+    return result;
+  };
+  return wrapper as F;
+}
+
 //
 // unsafe but convenient plain object key manipulation
 // https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
 //
 
+// TODO: better DX with objectPick(o, ...keys: K[]) ?
 export function objectPick<T extends object, K extends keyof T>(
   o: T,
   keys: K[]

@@ -10,6 +10,7 @@ import {
   objectOmitBy,
   objectPick,
   objectPickBy,
+  once,
   partition,
   pickBy,
   range,
@@ -297,7 +298,7 @@ describe("objectKeys", () => {
 });
 
 describe("isNil", () => {
-  it("typing", () => {
+  it("typing-1", () => {
     const ls = [0, true, false, null, undefined] as const;
 
     ls.filter(isNil) satisfies (null | undefined)[];
@@ -311,7 +312,7 @@ describe("isNil", () => {
     `);
   });
 
-  it("typing", () => {
+  it("typing-2", () => {
     let x: number | undefined;
 
     expect(isNil(x)).toMatchInlineSnapshot("true");
@@ -327,5 +328,18 @@ describe("isNil", () => {
     } else {
       x satisfies undefined;
     }
+  });
+});
+
+describe("once", () => {
+  it("basic", () => {
+    let count = 0;
+    const f = once(() => ++count);
+
+    expect(count).toMatchInlineSnapshot("0");
+    expect(f()).toMatchInlineSnapshot("1");
+    expect(count).toMatchInlineSnapshot("1");
+    expect(f()).toMatchInlineSnapshot("1");
+    expect(count).toMatchInlineSnapshot("1");
   });
 });
