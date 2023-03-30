@@ -18,6 +18,10 @@ export function wrapError<T>(getValue: () => T): Result<T, unknown> {
   }
 }
 
+export function okToOption<T>(result: Result<T, unknown>): T | undefined {
+  return result.ok ? result.value : undefined;
+}
+
 export async function wrapPromise<T>(
   value: Promise<T>
 ): Promise<Result<T, unknown>> {
