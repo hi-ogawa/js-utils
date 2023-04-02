@@ -121,7 +121,7 @@ describe("UncheckedMap", () => {
   });
 
   it("constructor", () => {
-    const map = new UncheckedMap(range(8).map(i => [i, String(i % 3)]));
+    const map = new UncheckedMap(range(8).map((i) => [i, String(i % 3)]));
     map satisfies UncheckedMap<number, string>;
     expect(wrapError(() => map.get(4))).toMatchInlineSnapshot(`
       {
@@ -135,7 +135,7 @@ describe("UncheckedMap", () => {
         "value": [Error: UncheckedMap],
       }
     `);
-  })
+  });
 });
 
 describe("Result", () => {
