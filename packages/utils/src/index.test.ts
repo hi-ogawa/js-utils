@@ -119,6 +119,23 @@ describe("UncheckedMap", () => {
       }
     `);
   });
+
+  it("constructor", () => {
+    const map = new UncheckedMap(range(8).map((i) => [i, String(i % 3)]));
+    map satisfies UncheckedMap<number, string>;
+    expect(wrapError(() => map.get(4))).toMatchInlineSnapshot(`
+      {
+        "ok": true,
+        "value": "1",
+      }
+    `);
+    expect(wrapError(() => map.get(8))).toMatchInlineSnapshot(`
+      {
+        "ok": false,
+        "value": [Error: UncheckedMap],
+      }
+    `);
+  });
 });
 
 describe("Result", () => {

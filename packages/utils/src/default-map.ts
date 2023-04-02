@@ -1,8 +1,11 @@
 // https://stackoverflow.com/a/51321724
 
 export class DefaultMap<K, V> extends Map<K, V> {
-  constructor(private defaultFactory: (key: K) => V) {
-    super();
+  constructor(
+    private defaultFactory: (key: K) => V,
+    entries?: readonly (readonly [K, V])[]
+  ) {
+    super(entries);
   }
 
   override get(key: K): V {
@@ -14,9 +17,9 @@ export class DefaultMap<K, V> extends Map<K, V> {
 }
 
 export class UncheckedMap<K, V> extends DefaultMap<K, V> {
-  constructor() {
+  constructor(entries?: readonly (readonly [K, V])[]) {
     super((key) => {
       throw new Error("UncheckedMap", { cause: { key } });
-    });
+    }, entries);
   }
 }
