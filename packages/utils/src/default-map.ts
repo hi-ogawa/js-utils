@@ -3,7 +3,7 @@
 export class DefaultMap<K, V> extends Map<K, V> {
   constructor(
     private defaultFactory: (key: K) => V,
-    entries?: readonly (readonly [K, V])[]
+    entries?: Iterable<readonly [K, V]>
   ) {
     super(entries);
   }
@@ -17,7 +17,7 @@ export class DefaultMap<K, V> extends Map<K, V> {
 }
 
 export class UncheckedMap<K, V> extends DefaultMap<K, V> {
-  constructor(entries?: readonly (readonly [K, V])[]) {
+  constructor(entries?: Iterable<readonly [K, V]>) {
     super((key) => {
       throw new Error("UncheckedMap", { cause: { key } });
     }, entries);
