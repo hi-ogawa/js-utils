@@ -84,6 +84,56 @@ describe("DefaultMap", () => {
       }
     `);
   });
+
+  it("constructor-Iterable", () => {
+    const map = new DefaultMap(
+      () => [],
+      groupBy(range(10), (x) => x % 3)
+    );
+    map satisfies DefaultMap<number, number[]>;
+    expect(map).toMatchInlineSnapshot(`
+      Map {
+        0 => [
+          0,
+          3,
+          6,
+          9,
+        ],
+        1 => [
+          1,
+          4,
+          7,
+        ],
+        2 => [
+          2,
+          5,
+          8,
+        ],
+      }
+    `);
+    expect(map.get(100)).toMatchInlineSnapshot("[]");
+    expect(map).toMatchInlineSnapshot(`
+      Map {
+        0 => [
+          0,
+          3,
+          6,
+          9,
+        ],
+        1 => [
+          1,
+          4,
+          7,
+        ],
+        2 => [
+          2,
+          5,
+          8,
+        ],
+        100 => [],
+      }
+    `);
+  });
 });
 
 describe("UncheckedMap", () => {
