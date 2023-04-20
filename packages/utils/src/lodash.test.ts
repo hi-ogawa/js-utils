@@ -342,4 +342,15 @@ describe("once", () => {
     expect(f()).toMatchInlineSnapshot("1");
     expect(count).toMatchInlineSnapshot("1");
   });
+
+  it("args", () => {
+    let count = 0;
+    const f = once((increment: number) => (count = count + increment));
+
+    expect(count).toMatchInlineSnapshot("0");
+    expect(f(2)).toMatchInlineSnapshot("2");
+    expect(count).toMatchInlineSnapshot("2");
+    expect(f(4)).toMatchInlineSnapshot("2");
+    expect(count).toMatchInlineSnapshot("2");
+  });
 });
