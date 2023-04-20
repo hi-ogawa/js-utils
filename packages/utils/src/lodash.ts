@@ -78,13 +78,13 @@ export function isNotNil<T>(value: T): value is NonNullable<T> {
 export function once<F extends (...args: any[]) => any>(f: F): F {
   let result: unknown;
   let called = false;
-  const wrapper = () => {
+  function wrapper(...args: any[]) {
     if (!called) {
-      result = f(...arguments);
+      result = f(...args);
       called = true;
     }
     return result;
-  };
+  }
   return wrapper as F;
 }
 
