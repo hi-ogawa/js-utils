@@ -12,6 +12,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-22.04
+    environment:
+      name: npm-release
+      url: ${{ steps.release_log.outputs.RELEASE_URL }}
     permissions:
       contents: read
       id-token: write
@@ -32,3 +35,9 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
+      # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
+      - id: release_log
+        run: |
+          package_name="@hiogawa/${{ inputs.package }}"
+          package_version=$(jq -r .version packages/${{ inputs.package }}/package.json)
+          echo "RELEASE_URL=https://www.npmjs.com/package/${package_name}/v/${package_version}" >> "$GITHUB_OUTPUT"
