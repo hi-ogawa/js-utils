@@ -35,11 +35,12 @@ export function useRerender() {
   return React.useReducer((prev) => !prev, false)[1];
 }
 
-// create RefCallback vai useEffect-like api
+// create RefCallback via useEffect-like api
 export function useRefCallbackEffect<T>(
   effect: (value: T) => (() => void) | void | undefined
 ): React.RefCallback<T> {
   const stableEffect = useStableCallback(effect);
+
   const destructorRef = React.useRef<(() => void) | void>();
 
   const refCallback: React.RefCallback<T> = (value) => {
