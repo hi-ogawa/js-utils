@@ -1,5 +1,5 @@
 import React from "react";
-import { useStableRef } from "./misc";
+import { useStableRef } from "./utils";
 
 // cf. https://github.com/hi-ogawa/ytsub-v3/blob/859264f683e8d1c6331ca1c630101c037a78dd94/app/utils/hooks.ts#L6
 
