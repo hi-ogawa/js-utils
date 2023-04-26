@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, render, renderHook, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -6,7 +6,7 @@ import { Compose } from "./compose";
 import { Debug } from "./debug";
 import { toArraySetState, toDelayedSetState, toSetSetState } from "./set-state";
 import { renderToJson } from "./test/helper";
-import { usePrevious, useStableCallback } from "./utils";
+import { usePrevious, useRefCallbackEffect, useStableCallback } from "./utils";
 
 describe("Debug", () => {
   it("basic", () => {
@@ -102,6 +102,70 @@ describe("useStableCallback", () => {
       {
         "enabled": false,
       }
+    `);
+  });
+});
+
+describe("useRefCallbackEffect", () => {
+  it("basic", async () => {
+    function TestComponent() {
+      const [result, setResult] = React.useState<unknown[]>([]);
+      const { push } = toArraySetState(setResult);
+
+      const ref = useRefCallbackEffect<HTMLElement>((el) => {
+        push({ begin: el.tagName });
+        return () => {
+          push({ end: el.tagName });
+        };
+      });
+
+      const [step, setStep] = React.useState(0);
+
+      return (
+        <div>
+          <main
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(result) }}
+          ></main>
+          <button onClick={() => setStep((x) => x + 1)}></button>
+          {step === 1 && <span ref={ref}></span>}
+          {step === 3 && <div ref={ref}></div>}
+        </div>
+      );
+    }
+
+    render(<TestComponent />);
+    expect(screen.getByRole("main")).toMatchInlineSnapshot(`
+      <main>
+        []
+      </main>
+    `);
+
+    await userEvent.click(screen.getByRole("button"));
+    expect(screen.getByRole("main")).toMatchInlineSnapshot(`
+      <main>
+        [{"begin":"SPAN"}]
+      </main>
+    `);
+
+    await userEvent.click(screen.getByRole("button"));
+    expect(screen.getByRole("main")).toMatchInlineSnapshot(`
+      <main>
+        [{"begin":"SPAN"},{"end":"SPAN"}]
+      </main>
+    `);
+
+    await userEvent.click(screen.getByRole("button"));
+    expect(screen.getByRole("main")).toMatchInlineSnapshot(`
+      <main>
+        [{"begin":"SPAN"},{"end":"SPAN"},{"begin":"DIV"}]
+      </main>
+    `);
+
+    await userEvent.click(screen.getByRole("button"));
+    expect(screen.getByRole("main")).toMatchInlineSnapshot(`
+      <main>
+        [{"begin":"SPAN"},{"end":"SPAN"},{"begin":"DIV"},{"end":"DIV"}]
+      </main>
     `);
   });
 });
