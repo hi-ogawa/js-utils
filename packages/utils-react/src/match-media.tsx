@@ -1,5 +1,5 @@
 import React from "react";
-import { useRerender } from "./misc";
+import { useRerender } from "./utils";
 
 export function useMatchMedia(query: string) {
   const result = React.useMemo(() => window.matchMedia(query), [query]);

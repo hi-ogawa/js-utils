@@ -4,9 +4,9 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Compose } from "./compose";
 import { Debug } from "./debug";
-import { usePrevious, useStableRef } from "./misc";
 import { toArraySetState, toDelayedSetState, toSetSetState } from "./set-state";
 import { renderToJson } from "./test/helper";
+import { usePrevious, useStableRef } from "./utils";
 
 describe("Debug", () => {
   it("basic", () => {
