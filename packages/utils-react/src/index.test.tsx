@@ -6,7 +6,7 @@ import { Compose } from "./compose";
 import { Debug } from "./debug";
 import { toArraySetState, toDelayedSetState, toSetSetState } from "./set-state";
 import { renderToJson } from "./test/helper";
-import { usePrevious, useStableRef } from "./utils";
+import { usePrevious, useStableCallback, useStableRef } from "./utils";
 
 describe("Debug", () => {
   it("basic", () => {
@@ -58,21 +58,18 @@ describe("Compose", () => {
   });
 });
 
-describe("useStableRef", () => {
+describe("useStableCallback", () => {
   it("basic", async () => {
     function useDocumentEvent<K extends keyof DocumentEventMap>(
       type: K,
       handler: (e: DocumentEventMap[K]) => void
     ) {
-      const handlerRef = useStableRef(handler);
+      const stableHandler = useStableCallback(handler);
 
       React.useEffect(() => {
-        const wrapper = (e: DocumentEventMap[K]) => {
-          handlerRef.current(e);
-        };
-        document.addEventListener(type, wrapper);
+        document.addEventListener(type, stableHandler);
         return () => {
-          document.removeEventListener(type, wrapper);
+          document.removeEventListener(type, stableHandler);
         };
       });
     }

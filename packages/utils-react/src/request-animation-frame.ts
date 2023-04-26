@@ -1,19 +1,19 @@
 import React from "react";
-import { useStableRef } from "./utils";
+import { useStableCallback } from "./utils";
 
 // cf. https://github.com/hi-ogawa/ytsub-v3/blob/859264f683e8d1c6331ca1c630101c037a78dd94/app/utils/hooks.ts#L6
 
 export function useRafLoop(
   callback: (time?: DOMHighResTimeStamp) => void
 ): void {
-  const callbackRef = useStableRef(callback);
+  const stableCallback = useStableCallback(callback);
 
   // TODO: concurrent-safe?
   React.useEffect(() => {
     let id: number | undefined;
     function loop(time?: DOMHighResTimeStamp) {
       id = requestAnimationFrame(loop);
-      callbackRef.current(time);
+      stableCallback(time);
     }
     loop();
     return () => {
