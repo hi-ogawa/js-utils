@@ -6,7 +6,7 @@ import { Compose } from "./compose";
 import { Debug } from "./debug";
 import { toArraySetState, toDelayedSetState, toSetSetState } from "./set-state";
 import { renderToJson } from "./test/helper";
-import { usePrevious, useStableCallback, useStableRef } from "./utils";
+import { usePrevious, useStableCallback } from "./utils";
 
 describe("Debug", () => {
   it("basic", () => {
