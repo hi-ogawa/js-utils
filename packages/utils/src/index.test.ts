@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { typedBoolean } from "./boolean-guard";
 import { defaultDict } from "./default-dict";
-import { DefaultMap, UncheckedMap } from "./default-map";
+import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
 import { mapOption } from "./option";
 import { newPromiseWithResolvers } from "./promise";
@@ -131,6 +131,84 @@ describe("DefaultMap", () => {
           8,
         ],
         100 => [],
+      }
+    `);
+  });
+});
+
+describe(HashKeyDefaultMap.name, () => {
+  it("basic", () => {
+    const map: HashKeyDefaultMap<{ mod3: number; mod4: number }, number[]> =
+      new HashKeyDefaultMap(() => []);
+
+    for (const x of range(10)) {
+      map.get({ mod3: x % 2, mod4: x % 3 }).push(x);
+    }
+
+    expect(map).toMatchInlineSnapshot(`
+      HashKeyDefaultMap {
+        "defaultFn": [Function],
+        "keyFn": [Function],
+        "map": Map {
+          "[[\\"mod3\\",0],[\\"mod4\\",0]]" => [
+            {
+              "mod3": 0,
+              "mod4": 0,
+            },
+            [
+              0,
+              6,
+            ],
+          ],
+          "[[\\"mod3\\",1],[\\"mod4\\",1]]" => [
+            {
+              "mod3": 1,
+              "mod4": 1,
+            },
+            [
+              1,
+              7,
+            ],
+          ],
+          "[[\\"mod3\\",0],[\\"mod4\\",2]]" => [
+            {
+              "mod3": 0,
+              "mod4": 2,
+            },
+            [
+              2,
+              8,
+            ],
+          ],
+          "[[\\"mod3\\",1],[\\"mod4\\",0]]" => [
+            {
+              "mod3": 1,
+              "mod4": 0,
+            },
+            [
+              3,
+              9,
+            ],
+          ],
+          "[[\\"mod3\\",0],[\\"mod4\\",1]]" => [
+            {
+              "mod3": 0,
+              "mod4": 1,
+            },
+            [
+              4,
+            ],
+          ],
+          "[[\\"mod3\\",1],[\\"mod4\\",2]]" => [
+            {
+              "mod3": 1,
+              "mod4": 2,
+            },
+            [
+              5,
+            ],
+          ],
+        },
       }
     `);
   });
