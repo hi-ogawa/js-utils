@@ -16,6 +16,7 @@ import {
   range,
   sortBy,
   uniqBy,
+  zip,
 } from "./lodash";
 
 describe("range", () => {
@@ -352,5 +353,29 @@ describe("once", () => {
     expect(count).toMatchInlineSnapshot("2");
     expect(f(4)).toMatchInlineSnapshot("2");
     expect(count).toMatchInlineSnapshot("2");
+  });
+});
+
+describe("zip", () => {
+  it("basic", () => {
+    const ls1 = range(2, 5);
+    const ls2 = range(10, 20).map(String);
+    const ls: [number, string][] = zip(ls1, ls2);
+    expect(ls).toMatchInlineSnapshot(`
+      [
+        [
+          2,
+          "10",
+        ],
+        [
+          3,
+          "11",
+        ],
+        [
+          4,
+          "12",
+        ],
+      ]
+    `);
   });
 });
