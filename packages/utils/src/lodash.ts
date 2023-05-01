@@ -66,6 +66,10 @@ export function partition<T>(ls: T[], f: (x: T) => boolean): [T[], T[]] {
   return result;
 }
 
+export function zip<T1, T2>(ls1: T1[], ls2: T2[]): [T1, T2][] {
+  return range(Math.min(ls1.length, ls2.length)).map((i) => [ls1[i], ls2[i]]);
+}
+
 export function isNil<T>(value: T): value is T & (null | undefined) {
   return value === null || typeof value === "undefined";
 }
