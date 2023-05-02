@@ -3,6 +3,7 @@ import { typedBoolean } from "./boolean-guard";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
+import { assertUnreachable } from "./misc";
 import { mapOption } from "./option";
 import { newPromiseWithResolvers } from "./promise";
 import { Err, Ok, Result, okToOption, wrapError, wrapPromise } from "./result";
@@ -321,3 +322,35 @@ describe("newPromiseWithResolvers", () => {
     `);
   });
 });
+
+describe(assertUnreachable.name, () => {
+  it("basic", () => {
+    type X = "a" | "b";
+
+    function f(x: X) {
+      if (x === "a") {
+        return 0;
+      }
+      if (x === "b") {
+        return 0;
+      }
+      assertUnreachable(x);
+    }
+
+    function g(x: X) {
+      if (x === "a") {
+        return 0;
+      }
+      // @ts-expect-error
+      assertUnreachable(x);
+    }
+
+    expect(f("a")).toMatchInlineSnapshot('0');
+
+    const result = wrapError(() => g("b"));
+    tinyassert(!result.ok);
+    tinyassert(result.value instanceof Error);
+    expect(result.value).toMatchInlineSnapshot('[Error: assertUnreachable]');
+    expect(result.value.cause).toMatchInlineSnapshot('"b"');
+  });
+})

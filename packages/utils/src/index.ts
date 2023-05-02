@@ -6,3 +6,4 @@ export * from "./result";
 export * from "./tinyassert";
 export * from "./lodash";
 export * from "./promise";
+export * from "./misc";
