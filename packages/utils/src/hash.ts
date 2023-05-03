@@ -19,7 +19,7 @@ export class HashRng {
     return (this.state = hashInt32(this.state));
   }
 
-  uniform() {
+  float() {
     return this.int32() / 2 ** 32;
   }
 }
