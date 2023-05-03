@@ -345,12 +345,12 @@ describe(assertUnreachable.name, () => {
       assertUnreachable(x);
     }
 
-    expect(f("a")).toMatchInlineSnapshot('0');
+    expect(f("a")).toMatchInlineSnapshot("0");
 
     const result = wrapError(() => g("b"));
     tinyassert(!result.ok);
     tinyassert(result.value instanceof Error);
-    expect(result.value).toMatchInlineSnapshot('[Error: assertUnreachable]');
+    expect(result.value).toMatchInlineSnapshot("[Error: assertUnreachable]");
     expect(result.value.cause).toMatchInlineSnapshot('"b"');
   });
-})
+});
