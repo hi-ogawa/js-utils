@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HashRng, hashInt32 } from "./hash";
+import { HashRng, hashInt32, hashString } from "./hash";
 import { groupBy, mapValues, range } from "./lodash";
 
 function formatBin(x: number) {
@@ -97,6 +97,29 @@ describe(HashRng.name, () => {
         8 => 72,
         9 => 99,
       }
+    `);
+  });
+});
+
+describe(hashString.name, () => {
+  it("basic", () => {
+    expect(hashString("hello").length).toMatchInlineSnapshot("32");
+    expect(hashString("hello")).toMatchInlineSnapshot(
+      '"462fb14350ba33a98b3f4c9deb027e58"'
+    );
+    expect(range(10).map(String).map(hashString)).toMatchInlineSnapshot(`
+      [
+        "8ef8ffb785943b292e2f971ce26c1e52",
+        "00afd0df2bea949d65dd8b6d3d3218d2",
+        "8d0a631566cd81eaea114a04e7141510",
+        "0cd3f4168410c08ef4290adc2bd5f692",
+        "49f55c78cd61fc64bcc4d71f3ee7a7df",
+        "3e7b6f2806dbe6d82dde8a1b81b912ff",
+        "152c9a3f90af38ada29222a0ad2bd42b",
+        "551fd72cd6162d1e681bb5e246f107ec",
+        "1600836ef14883c00017467a2b1fb3eb",
+        "d9c289ac21e3bc6e2d0b5368990bc733",
+      ]
     `);
   });
 });
