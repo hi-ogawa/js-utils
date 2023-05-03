@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { HashRng, hashInt32, hashString } from "./hash";
-import { groupBy, mapValues, range } from "./lodash";
+import { mapGroupBy, range } from "./lodash";
 
 function formatBin(x: number) {
   return range(32)
@@ -76,11 +76,9 @@ describe(HashRng.name, () => {
 
   it("bins", () => {
     const rng = new HashRng(18181);
-    const bins = mapValues(
-      groupBy(
-        range(1000).map(() => rng.float()),
-        (v) => Math.floor(v * 10)
-      ),
+    const bins = mapGroupBy(
+      range(1000).map(() => rng.float()),
+      (v) => Math.floor(v * 10),
       (vs) => vs.length
     );
     const sorted = new Map([...bins.entries()].sort());

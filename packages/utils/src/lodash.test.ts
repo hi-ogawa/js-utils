@@ -5,6 +5,7 @@ import {
   groupBy,
   isNil,
   isNotNil,
+  mapGroupBy,
   mapKeys,
   mapValues,
   objectKeys,
@@ -98,6 +99,24 @@ describe("mapValues", () => {
       (v) => v.length
     );
     expect(result).toMatchInlineSnapshot(`
+      Map {
+        0 => 3,
+        1 => 3,
+        2 => 2,
+      }
+    `);
+  });
+});
+
+describe(mapGroupBy.name, () => {
+  it("basic", () => {
+    expect(
+      mapGroupBy(
+        range(8),
+        (x) => x % 3,
+        (xs) => xs.length
+      )
+    ).toMatchInlineSnapshot(`
       Map {
         0 => 3,
         1 => 3,
