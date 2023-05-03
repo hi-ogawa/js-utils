@@ -1,4 +1,3 @@
-
 // https://nullprogram.com/blog/2018/07/31/
 export function hashInt32(x: number) {
   x ^= x >>> 16;
@@ -17,7 +16,7 @@ export class HashRng {
   }
 
   int32(): number {
-    return this.state = hashInt32(this.state);
+    return (this.state = hashInt32(this.state));
   }
 
   uniform() {
