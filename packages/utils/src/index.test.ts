@@ -1,9 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { typedBoolean } from "./boolean-guard";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
-import { assertUnreachable } from "./misc";
+import { assertUnreachable, typedBoolean } from "./misc";
 import { mapOption } from "./option";
 import { newPromiseWithResolvers } from "./promise";
 import { Err, Ok, Result, okToOption, wrapError, wrapPromise } from "./result";
