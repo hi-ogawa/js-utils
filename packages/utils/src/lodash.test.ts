@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  capitalize,
+  difference,
   groupBy,
   isNil,
   isNotNil,
@@ -377,5 +379,37 @@ describe("zip", () => {
         ],
       ]
     `);
+  });
+});
+
+describe(difference.name, () => {
+  it("basic", () => {
+    expect(difference(range(2, 8), range(5, 10))).toMatchInlineSnapshot(`
+      [
+        2,
+        3,
+        4,
+      ]
+    `);
+    expect(difference([], range(5, 10))).toMatchInlineSnapshot("[]");
+    expect(difference(range(2, 8), [])).toMatchInlineSnapshot(`
+      [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+      ]
+    `);
+  });
+});
+
+describe(capitalize.name, () => {
+  it("basic", () => {
+    expect(capitalize("")).toMatchInlineSnapshot('""');
+    expect(capitalize("abc")).toMatchInlineSnapshot('"Abc"');
+    expect(capitalize("Abc")).toMatchInlineSnapshot('"Abc"');
+    expect(capitalize("abc def")).toMatchInlineSnapshot('"Abc def"');
   });
 });
