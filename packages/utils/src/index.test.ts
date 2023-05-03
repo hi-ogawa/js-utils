@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultDict } from "./default-dict";
-import { DefaultMap, UncheckedMap } from "./default-map";
+import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
 import { assertUnreachable, typedBoolean } from "./misc";
 import { mapOption } from "./option";
@@ -131,6 +131,84 @@ describe("DefaultMap", () => {
           8,
         ],
         100 => [],
+      }
+    `);
+  });
+});
+
+describe(HashKeyDefaultMap.name, () => {
+  it("basic", () => {
+    const map: HashKeyDefaultMap<{ mod2: number; mod3: number }, number[]> =
+      new HashKeyDefaultMap(() => []);
+
+    for (const x of range(10)) {
+      map.get({ mod2: x % 2, mod3: x % 3 }).push(x);
+    }
+
+    expect(map).toMatchInlineSnapshot(`
+      HashKeyDefaultMap {
+        "defaultFn": [Function],
+        "keyFn": [Function],
+        "map": Map {
+          "[[\\"mod2\\",0],[\\"mod3\\",0]]" => [
+            {
+              "mod2": 0,
+              "mod3": 0,
+            },
+            [
+              0,
+              6,
+            ],
+          ],
+          "[[\\"mod2\\",1],[\\"mod3\\",1]]" => [
+            {
+              "mod2": 1,
+              "mod3": 1,
+            },
+            [
+              1,
+              7,
+            ],
+          ],
+          "[[\\"mod2\\",0],[\\"mod3\\",2]]" => [
+            {
+              "mod2": 0,
+              "mod3": 2,
+            },
+            [
+              2,
+              8,
+            ],
+          ],
+          "[[\\"mod2\\",1],[\\"mod3\\",0]]" => [
+            {
+              "mod2": 1,
+              "mod3": 0,
+            },
+            [
+              3,
+              9,
+            ],
+          ],
+          "[[\\"mod2\\",0],[\\"mod3\\",1]]" => [
+            {
+              "mod2": 0,
+              "mod3": 1,
+            },
+            [
+              4,
+            ],
+          ],
+          "[[\\"mod2\\",1],[\\"mod3\\",2]]" => [
+            {
+              "mod2": 1,
+              "mod3": 2,
+            },
+            [
+              5,
+            ],
+          ],
+        },
       }
     `);
   });
