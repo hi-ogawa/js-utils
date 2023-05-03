@@ -27,22 +27,14 @@ export class HashRng {
 }
 
 export function hashString(input: string): string {
-  // read to Uint8Array
-  const encoder = new TextEncoder();
-  const u8Array = encoder.encode(input);
-
-  // convert to Uint32Array after padding
-  const u8ArrayPad = new Uint8Array(Math.ceil(u8Array.length / 4) * 4);
-  u8ArrayPad.set(u8Array);
-  const u32Array = new Uint32Array(u8ArrayPad.buffer);
-
   // iterate on 32 bits x 4
   const xs = new Uint32Array(range(4).map((i) => hashInt32(i + 1)));
-  for (const i of range(u32Array.length)) {
-    xs[0] = hashInt32(xs[3] ^ u32Array[i]);
-    xs[1] = hashInt32(xs[0] ^ u32Array[i]);
-    xs[2] = hashInt32(xs[1] ^ u32Array[i]);
-    xs[3] = hashInt32(xs[2] ^ u32Array[i]);
+  for (const i of range(input.length)) {
+    const c = input.codePointAt(i) ?? 0;
+    xs[0] = hashInt32(xs[3] ^ c);
+    xs[1] = hashInt32(xs[0] ^ c);
+    xs[2] = hashInt32(xs[1] ^ c);
+    xs[3] = hashInt32(xs[2] ^ c);
   }
 
   // format to hex (4bits) x 32

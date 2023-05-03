@@ -105,7 +105,7 @@ describe(hashString.name, () => {
   it("basic", () => {
     expect(hashString("hello").length).toMatchInlineSnapshot("32");
     expect(hashString("hello")).toMatchInlineSnapshot(
-      '"462fb14350ba33a98b3f4c9deb027e58"'
+      '"d92b722e0eb15a3645ba72fd43c96bd2"'
     );
     expect(range(10).map(String).map(hashString)).toMatchInlineSnapshot(`
       [
