@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  capitalize,
+  difference,
   groupBy,
   isNil,
   isNotNil,
@@ -16,6 +18,7 @@ import {
   range,
   sortBy,
   uniqBy,
+  zip,
 } from "./lodash";
 
 describe("range", () => {
@@ -352,5 +355,61 @@ describe("once", () => {
     expect(count).toMatchInlineSnapshot("2");
     expect(f(4)).toMatchInlineSnapshot("2");
     expect(count).toMatchInlineSnapshot("2");
+  });
+});
+
+describe("zip", () => {
+  it("basic", () => {
+    const ls1 = range(2, 5);
+    const ls2 = range(10, 20).map(String);
+    const ls: [number, string][] = zip(ls1, ls2);
+    expect(ls).toMatchInlineSnapshot(`
+      [
+        [
+          2,
+          "10",
+        ],
+        [
+          3,
+          "11",
+        ],
+        [
+          4,
+          "12",
+        ],
+      ]
+    `);
+  });
+});
+
+describe(difference.name, () => {
+  it("basic", () => {
+    expect(difference(range(2, 8), range(5, 10))).toMatchInlineSnapshot(`
+      [
+        2,
+        3,
+        4,
+      ]
+    `);
+    expect(difference([], range(5, 10))).toMatchInlineSnapshot("[]");
+    expect(difference(range(2, 8), [])).toMatchInlineSnapshot(`
+      [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+      ]
+    `);
+  });
+});
+
+describe(capitalize.name, () => {
+  it("basic", () => {
+    expect(capitalize("")).toMatchInlineSnapshot('""');
+    expect(capitalize("abc")).toMatchInlineSnapshot('"Abc"');
+    expect(capitalize("Abc")).toMatchInlineSnapshot('"Abc"');
+    expect(capitalize("abc def")).toMatchInlineSnapshot('"Abc def"');
   });
 });

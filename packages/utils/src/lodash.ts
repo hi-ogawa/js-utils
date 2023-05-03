@@ -66,6 +66,22 @@ export function partition<T>(ls: T[], f: (x: T) => boolean): [T[], T[]] {
   return result;
 }
 
+export function zip<T1, T2>(
+  ls1: readonly T1[],
+  ls2: readonly T2[]
+): [T1, T2][] {
+  return range(Math.min(ls1.length, ls2.length)).map((i) => [ls1[i], ls2[i]]);
+}
+
+export function difference<T>(ls1: readonly T[], ls2: readonly T[]): T[] {
+  const exclude = new Set(ls2);
+  return ls1.filter((e) => !exclude.has(e));
+}
+
+export function capitalize(s: string): string {
+  return s.slice(0, 1).toUpperCase() + s.slice(1);
+}
+
 export function isNil<T>(value: T): value is T & (null | undefined) {
   return value === null || typeof value === "undefined";
 }
