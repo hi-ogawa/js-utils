@@ -35,6 +35,14 @@ export function mapValues<K, V, V2>(
   return new Map([...map].map(([k, v]) => [k, f(v, k)]));
 }
 
+export function mapGroupBy<T, K, V>(
+  ls: T[],
+  keyFn: (v: T) => K,
+  valueFn: (vs: T[], k: K) => V
+) {
+  return mapValues(groupBy(ls, keyFn), valueFn);
+}
+
 export function pickBy<K, V>(
   map: Map<K, V>,
   f: (v: V, k: K) => boolean
