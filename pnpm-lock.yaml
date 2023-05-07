@@ -37,6 +37,8 @@ importers:
 
   packages/utils: {}
 
+  packages/utils-experimental: {}
+
   packages/utils-react:
     devDependencies:
       '@testing-library/jest-dom':
