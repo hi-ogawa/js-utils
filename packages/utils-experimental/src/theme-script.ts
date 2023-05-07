@@ -1,14 +1,14 @@
 const themeApi = globalThis as unknown as {
-  // user input
+  // user config
   __themeStorageKey?: string;
-  __themeDefaultTheme?: string;
+  __themeDefault?: string;
   // exposed api
   __themeSet: (theme: string) => void;
   __themeGet: () => string;
 };
 
 const key = themeApi.__themeStorageKey ?? "theme-script";
-const defaultTheme = themeApi.__themeDefaultTheme || "system";
+const defaultTheme = themeApi.__themeDefault ?? "system";
 const prefersDarkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
 function getTheme() {
