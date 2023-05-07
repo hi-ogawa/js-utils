@@ -8,6 +8,7 @@ on:
         options:
           - utils
           - utils-react
+          - utils-experimental
         default: utils
 jobs:
   release:
