@@ -10,6 +10,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
+    },
+    "./dist/theme-script.global.js": {
+      "import": "./dist/theme-script.global.js",
+      "require": "./dist/theme-script.global.js",
+      "types": "./dist/theme-script.global.ts"
     }
   },
   "files": [
