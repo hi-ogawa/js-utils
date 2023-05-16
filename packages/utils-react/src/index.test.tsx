@@ -279,6 +279,17 @@ describe("toArraySetState", () => {
         0,
       ]
     `);
+
+    act(() => {
+      result.current.setArrayState.set(1, (prev) => prev! * 2);
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      [
+        3,
+        10,
+        0,
+      ]
+    `);
   });
 });
 

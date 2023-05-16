@@ -72,6 +72,19 @@ export function toArraySetState<T>(
       toggleArray as typeof toggleArray<T>,
       copy
     ),
+    set: toImmutableSetState(
+      setState,
+      function set(
+        this: T[],
+        i: number,
+        next: T | ((prev: T | undefined) => T)
+      ) {
+        const prev = this[i];
+        // need "any" since T might be a function itself
+        this[i] = typeof next === "function" ? (next as any)(prev) : next;
+      },
+      copy
+    ),
   };
 }
 
