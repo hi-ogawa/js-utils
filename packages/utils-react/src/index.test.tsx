@@ -30,28 +30,34 @@ describe("Debug", () => {
 
 describe("Compose", () => {
   it("basic", () => {
-    function Wrapper(props: JSX.IntrinsicElements["div"]) {
-      return <div {...props}>{props.children}</div>;
-    }
-
     const el = (
       <Compose
         elements={[
-          <Wrapper className="wrapper-1" />,
-          <Wrapper className="wrapper-2" />,
-          <button>inner</button>,
+          <div className="div-1" />,
+          <div className="div-2">
+            <span>not-ok-span</span>
+          </div>,
+          <div className="div-3" />,
         ]}
-      />
+      >
+        <span>ok-span</span>
+      </Compose>
     );
 
     expect(renderToJson(el)).toMatchInlineSnapshot(`
       <div
-        className="wrapper-1"
+        className="div-1"
       >
         <div
-          className="wrapper-2"
+          className="div-2"
         >
-          <button />
+          <div
+            className="div-3"
+          >
+            <span>
+              ok-span
+            </span>
+          </div>
         </div>
       </div>
     `);
