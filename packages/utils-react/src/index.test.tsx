@@ -35,12 +35,12 @@ describe("Compose", () => {
         elements={[
           <div className="div-1" />,
           <div className="div-2">
-            <span>not-ok-span</span>
+            <span>not-ok</span>
           </div>,
           <div className="div-3" />,
         ]}
       >
-        <span>ok-span</span>
+        <span>ok</span>
       </Compose>
     );
 
@@ -55,7 +55,7 @@ describe("Compose", () => {
             className="div-3"
           >
             <span>
-              ok-span
+              ok
             </span>
           </div>
         </div>
