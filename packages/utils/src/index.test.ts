@@ -5,6 +5,7 @@ import { groupBy, range } from "./lodash";
 import { assertUnreachable, typedBoolean } from "./misc";
 import { mapOption } from "./option";
 import { newPromiseWithResolvers } from "./promise";
+import { regExpRaw } from "./regexp";
 import { Err, Ok, Result, okToOption, wrapError, wrapPromise } from "./result";
 import { tinyassert } from "./tinyassert";
 
@@ -429,5 +430,23 @@ describe(assertUnreachable.name, () => {
     tinyassert(result.value instanceof Error);
     expect(result.value).toMatchInlineSnapshot("[Error: assertUnreachable]");
     expect(result.value.cause).toMatchInlineSnapshot('"b"');
+  });
+});
+
+describe(regExpRaw.name, () => {
+  it("basci", () => {
+    const re = regExpRaw`/username/${/\w+/}/profile`;
+    expect(re).toMatchInlineSnapshot(
+      "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
+    );
+    expect(re.source).toMatchInlineSnapshot(
+      '"\\\\/username\\\\/\\\\w+\\\\/profile"'
+    );
+    expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
+      [
+        "/username/hey/profile",
+      ]
+    `);
+    expect("/username/he y/profile".match(re)).toMatchInlineSnapshot("null");
   });
 });
