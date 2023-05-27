@@ -8,16 +8,18 @@ import { tinyassert } from "./tinyassert";
  */
 export function regExpRaw(
   { raw }: TemplateStringsArray,
-  ...params: (string | RegExp)[]
+  ...params: RegExp[]
 ): RegExp {
   tinyassert(raw.length === params.length + 1);
   return new RegExp(
-    [...zip(raw, params.map(regExpRawInner)), raw.slice(-1)].flat().join("")
+    [
+      ...zip(
+        raw,
+        params.map((p) => p.source)
+      ),
+      raw.slice(-1),
+    ]
+      .flat()
+      .join("")
   );
-}
-
-function regExpRawInner(s: string | RegExp): string {
-  return s instanceof RegExp
-    ? s.source
-    : s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
