@@ -7,3 +7,4 @@ export * from "./lodash";
 export * from "./promise";
 export * from "./misc";
 export * from "./hash";
+export * from "./regexp";
