@@ -5,7 +5,7 @@ import { groupBy, range } from "./lodash";
 import { assertUnreachable, typedBoolean } from "./misc";
 import { mapOption } from "./option";
 import { newPromiseWithResolvers } from "./promise";
-import { regExpRaw } from "./regexp";
+import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
 import { Err, Ok, Result, okToOption, wrapError, wrapPromise } from "./result";
 import { tinyassert } from "./tinyassert";
 
@@ -434,7 +434,7 @@ describe(assertUnreachable.name, () => {
 });
 
 describe(regExpRaw.name, () => {
-  it("basci", () => {
+  it("basic", () => {
     const re = regExpRaw`/username/${/\w+/}/profile`;
     expect(re).toMatchInlineSnapshot(
       "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
@@ -448,5 +448,45 @@ describe(regExpRaw.name, () => {
       ]
     `);
     expect("/username/he y/profile".match(re)).toMatchInlineSnapshot("null");
+  });
+});
+
+describe(escapeRegExp.name, () => {
+  it("basic", () => {
+    const re = escapeRegExp("/remix/$id/hello.ts");
+    expect(re).toMatchInlineSnapshot(
+      '"\\\\/remix\\\\/\\\\$id\\\\/hello\\\\.ts"'
+    );
+    expect("/remix/$id/hello.ts".match(re)).toMatchInlineSnapshot(`
+      [
+        "/remix/$id/hello.ts",
+      ]
+    `);
+    expect("/remix/$id/helloxts".match(re)).toMatchInlineSnapshot("null");
+  });
+});
+
+describe(mapRegExp.name, () => {
+  it("basic", () => {
+    function transform(input: string): string {
+      let output = "";
+      mapRegExp(
+        input,
+        /{{(.*?)}}/g,
+        (match) => {
+          output += String(eval(match[1]));
+        },
+        (other) => {
+          output += other;
+        }
+      );
+      return output;
+    }
+
+    expect(transform("hello")).toMatchInlineSnapshot('"hello"');
+    expect(transform("x = {{ 1 + 2 }}")).toMatchInlineSnapshot('"x = 3"');
+    expect(transform("x = {{ 1 + 2 }}, y = {{ 4 * 5 }}")).toMatchInlineSnapshot(
+      '"x = 3, y = 20"'
+    );
   });
 });
