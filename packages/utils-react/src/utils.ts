@@ -1,3 +1,4 @@
+import { debounce } from "@hiogawa/utils";
 import React from "react";
 
 export function usePrevious<T>(value: T): T {
@@ -52,4 +53,21 @@ export function useRefCallbackEffect<T>(
   };
 
   return React.useCallback(refCallback, []);
+}
+
+export function useDebounce<F extends (...args: any[]) => void>(
+  f: F,
+  ms: number
+) {
+  const [isPending, setIsPending] = React.useState(false);
+
+  const debounced = React.useCallback(
+    debounce(f, ms, {
+      onStart: () => setIsPending(true),
+      onFinish: () => setIsPending(false),
+    }),
+    [ms]
+  );
+
+  return [debounced, { isPending }];
 }

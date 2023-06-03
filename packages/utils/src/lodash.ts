@@ -112,6 +112,28 @@ export function once<F extends (...args: any[]) => any>(f: F): F {
   return wrapper as F;
 }
 
+export function debounce<F extends (...args: any[]) => void>(
+  f: F,
+  ms: number,
+  options?: { onStart?: () => void; onFinish?: () => void } // extra callback to manage e.g. pending state (cf. useDebounce in utils-react)
+): F {
+  let subscription: any;
+
+  function wrapper(this: unknown, ...args: unknown[]) {
+    if (typeof subscription !== "undefined") {
+      clearTimeout(subscription);
+    }
+    subscription = setTimeout(() => {
+      f.apply(this, args);
+      options?.onFinish?.();
+      subscription = undefined;
+    }, ms);
+    options?.onStart?.();
+  }
+
+  return wrapper as any;
+}
+
 //
 // unsafe but convenient plain object key manipulation
 // https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
