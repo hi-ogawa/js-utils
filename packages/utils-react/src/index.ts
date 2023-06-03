@@ -4,4 +4,4 @@ export * from "./utils";
 export * from "./request-animation-frame";
 export * from "./set-state";
 export * from "./match-media";
-export * from "./use-debounce";
+export * from "./timer";
