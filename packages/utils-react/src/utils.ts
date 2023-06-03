@@ -58,7 +58,7 @@ export function useRefCallbackEffect<T>(
 export function useDebounce<F extends (...args: any[]) => void>(
   f: F,
   ms: number
-) {
+): [F, { isPending: boolean }] {
   const [isPending, setIsPending] = React.useState(false);
 
   const debounced = React.useCallback(

@@ -2,6 +2,7 @@
   "name": "@hiogawa/utils-monorepo",
   "private": true,
   "scripts": {
+    "clean": "rm -rf packages/*/dist",
     "dev": "run-p dev:*",
     "build": "pnpm -r build",
     "tsc": "tsc -b",
