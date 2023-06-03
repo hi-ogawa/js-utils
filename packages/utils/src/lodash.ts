@@ -119,23 +119,56 @@ declare function clearTimeout(subscription: number): number;
 export function debounce<F extends (...args: any[]) => void>(
   f: F,
   ms: number,
-  options?: { onStart?: () => void; onFinish?: () => void } // extra callback to manage e.g. pending state (cf. useDebounce in utils-react)
-): F {
+  options?: {
+    // extra callback to implement pending state (cf. useDebounce in utils-react)
+    onStart?: () => void;
+    onFinish?: () => void;
+  }
+): F & { cancel: () => void } {
   let subscription: number | undefined;
 
   function wrapper(this: unknown, ...args: unknown[]) {
-    if (typeof subscription !== "undefined") {
-      clearTimeout(subscription);
-    }
+    cancel();
     subscription = setTimeout(() => {
+      subscription = undefined;
       f.apply(this, args);
       options?.onFinish?.();
-      subscription = undefined;
     }, ms);
     options?.onStart?.();
   }
 
-  return wrapper as any;
+  function cancel() {
+    if (typeof subscription !== "undefined") {
+      clearTimeout(subscription);
+      subscription = undefined;
+    }
+  }
+
+  return Object.assign(wrapper, { cancel }) as any;
+}
+
+export function delay<F extends (...args: any[]) => void>(
+  f: F,
+  ms: number
+): F & { cancel: () => void } {
+  const subscriptions = new Set<number>();
+
+  function wrapper(this: unknown, ...args: unknown[]) {
+    const sub = setTimeout(() => {
+      subscriptions.delete(sub);
+      f.apply(this, args);
+    }, ms);
+    subscriptions.add(sub);
+  }
+
+  function cancel() {
+    for (const sub of subscriptions) {
+      clearTimeout(sub);
+    }
+    subscriptions.clear();
+  }
+
+  return Object.assign(wrapper, { cancel }) as any;
 }
 
 //

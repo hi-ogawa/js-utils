@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   capitalize,
   debounce,
+  delay,
   difference,
   groupBy,
   isNil,
@@ -472,6 +473,78 @@ describe(debounce.name, () => {
     expect(calls).toMatchInlineSnapshot(`
       [
         1,
+        3,
+      ]
+    `);
+
+    g(4);
+    g(5);
+    g.cancel();
+    vi.runAllTimers();
+    expect(calls).toMatchInlineSnapshot(`
+      [
+        1,
+        3,
+      ]
+    `);
+  });
+});
+
+describe(delay.name, () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it("basic", () => {
+    const calls: any[] = [];
+    const g = delay((x: number) => calls.push(x), 100);
+
+    g(0);
+    expect(calls).toMatchInlineSnapshot("[]");
+
+    g(1);
+    expect(calls).toMatchInlineSnapshot("[]");
+
+    vi.runAllTimers();
+    expect(calls).toMatchInlineSnapshot(`
+      [
+        0,
+        1,
+      ]
+    `);
+
+    g(2);
+    g(3);
+    expect(calls).toMatchInlineSnapshot(`
+      [
+        0,
+        1,
+      ]
+    `);
+
+    vi.runAllTimers();
+    expect(calls).toMatchInlineSnapshot(`
+      [
+        0,
+        1,
+        2,
+        3,
+      ]
+    `);
+
+    g(4);
+    g(5);
+    g.cancel();
+    vi.runAllTimers();
+    expect(calls).toMatchInlineSnapshot(`
+      [
+        0,
+        1,
+        2,
         3,
       ]
     `);
