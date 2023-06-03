@@ -120,9 +120,10 @@ export function debounce<F extends (...args: any[]) => void>(
   f: F,
   ms: number,
   options?: {
-    // extra callback to implement pending state (cf. useDebounce in utils-react)
+    // extra callback to easily implement pending state (cf. useDebounce in utils-react)
     onStart?: () => void;
     onFinish?: () => void;
+    onCancel?: () => void;
   }
 ): F & { cancel: () => void } {
   let subscription: number | undefined;
@@ -142,6 +143,7 @@ export function debounce<F extends (...args: any[]) => void>(
       clearTimeout(subscription);
       subscription = undefined;
     }
+    options?.onCancel?.();
   }
 
   return Object.assign(wrapper, { cancel }) as any;
