@@ -1,6 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   capitalize,
+  debounce,
   difference,
   groupBy,
   isNil,
@@ -430,5 +431,49 @@ describe(capitalize.name, () => {
     expect(capitalize("abc")).toMatchInlineSnapshot('"Abc"');
     expect(capitalize("Abc")).toMatchInlineSnapshot('"Abc"');
     expect(capitalize("abc def")).toMatchInlineSnapshot('"Abc def"');
+  });
+});
+
+describe(debounce.name, () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it("basic", () => {
+    const calls: any[] = [];
+    const g = debounce((x: number) => calls.push(x), 100);
+
+    g(0);
+    expect(calls).toMatchInlineSnapshot("[]");
+
+    g(1);
+    expect(calls).toMatchInlineSnapshot("[]");
+
+    vi.runAllTimers();
+    expect(calls).toMatchInlineSnapshot(`
+      [
+        1,
+      ]
+    `);
+
+    g(2);
+    g(3);
+    expect(calls).toMatchInlineSnapshot(`
+      [
+        1,
+      ]
+    `);
+
+    vi.runAllTimers();
+    expect(calls).toMatchInlineSnapshot(`
+      [
+        1,
+        3,
+      ]
+    `);
   });
 });
