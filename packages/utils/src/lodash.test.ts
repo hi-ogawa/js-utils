@@ -495,10 +495,6 @@ describe(delay.name, () => {
     vi.useFakeTimers();
   });
 
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
-
   it("basic", () => {
     const calls: any[] = [];
     const g = delay((x: number) => calls.push(x), 100);

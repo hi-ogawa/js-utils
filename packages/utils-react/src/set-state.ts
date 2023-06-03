@@ -4,6 +4,7 @@ import React from "react";
 // setState enhancement
 //
 
+// TOOD: remove
 export function toDelayedSetState<T>(
   setState: React.Dispatch<React.SetStateAction<T>>
 ) {
