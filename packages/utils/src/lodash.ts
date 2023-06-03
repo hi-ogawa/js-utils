@@ -112,12 +112,15 @@ export function once<F extends (...args: any[]) => any>(f: F): F {
   return wrapper as F;
 }
 
+declare function setTimeout(callback: () => void, timeout: number): number;
+declare function clearTimeout(subscription: number): number;
+
 export function debounce<F extends (...args: any[]) => void>(
   f: F,
   ms: number,
   options?: { onStart?: () => void; onFinish?: () => void } // extra callback to manage e.g. pending state (cf. useDebounce in utils-react)
 ): F {
-  let subscription: any;
+  let subscription: number | undefined;
 
   function wrapper(this: unknown, ...args: unknown[]) {
     if (typeof subscription !== "undefined") {
