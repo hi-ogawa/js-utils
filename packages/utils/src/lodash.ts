@@ -112,6 +112,7 @@ export function once<F extends (...args: any[]) => any>(f: F): F {
   return wrapper as F;
 }
 
+// utils is not supposed to depend on whole lib.dom or @types/node. so for now we manual add required typings.
 declare function setTimeout(callback: () => void, timeout: number): number;
 declare function clearTimeout(subscription: number): number;
 
