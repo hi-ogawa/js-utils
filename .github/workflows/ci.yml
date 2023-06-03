@@ -14,7 +14,7 @@ jobs:
           node-version: 18
       - run: pnpm i --frozen-lockfile
       - run: pnpm lint-check
+      - run: pnpm build
       - run: pnpm tsc
       - run: pnpm test
-      - run: pnpm build
       - run: npx typedoc
