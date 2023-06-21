@@ -1,3 +1,7 @@
+//
+// lodash-like utilities
+//
+
 export function range(start: number, end?: number): number[] {
   if (typeof end === "undefined") {
     return Array.from(Array(start), (_, i) => i);
@@ -82,8 +86,16 @@ export function zip<T1, T2>(
 }
 
 export function difference<T>(ls1: readonly T[], ls2: readonly T[]): T[] {
-  const exclude = new Set(ls2);
-  return ls1.filter((e) => !exclude.has(e));
+  const set2 = new Set(ls2);
+  return ls1.filter((e) => !set2.has(e));
+}
+
+export function intersection<T>(ls1: readonly T[], ls2: readonly T[]): T[] {
+  if (ls1.length > ls2.length) {
+    [ls1, ls2] = [ls2, ls1];
+  }
+  const set2 = new Set(ls2);
+  return ls1.filter((e) => set2.has(e));
 }
 
 export function capitalize(s: string): string {
