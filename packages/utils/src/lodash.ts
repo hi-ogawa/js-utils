@@ -98,8 +98,28 @@ export function intersection<T>(ls1: readonly T[], ls2: readonly T[]): T[] {
   return ls1.filter((e) => set2.has(e));
 }
 
+//
+// string
+//
+
 export function capitalize(s: string): string {
   return s.slice(0, 1).toUpperCase() + s.slice(1);
+}
+
+export function splitFirst(s: string, sep: string): [string, string] {
+  let i = s.indexOf(sep);
+  if (i === -1) {
+    i = s.length;
+  }
+  return [s.slice(0, i), s.slice(i + sep.length)];
+}
+
+export function splitLast(s: string, sep: string): [string, string] {
+  let i = s.lastIndexOf(sep);
+  if (i === -1) {
+    i = s.length;
+  }
+  return [s.slice(0, i), s.slice(i + sep.length)];
 }
 
 export function isNil<T>(value: T): value is T & (null | undefined) {
