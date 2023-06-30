@@ -1,11 +1,11 @@
 import { MutationOptions, QueryClient } from "@tanstack/query-core";
 import { describe, expect, it } from "vitest";
-import { createFnRecordQueryProxy } from "./record";
+import { FnRecord, createFnRecordQueryProxy } from "./record";
 
 describe(createFnRecordQueryProxy.name, () => {
   it("example", async () => {
     //
-    // FnRecord "service"
+    // define "FnRecord service"
     //
 
     let counter = 0;
@@ -19,7 +19,7 @@ describe(createFnRecordQueryProxy.name, () => {
         counter += delta;
         return counter;
       },
-    };
+    } satisfies FnRecord;
 
     //
     // use Service via QueryClient

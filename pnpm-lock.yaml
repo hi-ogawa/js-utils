@@ -44,9 +44,15 @@ importers:
       '@tanstack/query-core':
         specifier: ^4.29.14
         version: 4.29.19
+      '@trpc/client':
+        specifier: ^10.33.0
+        version: 10.33.0(@trpc/server@10.33.0)
       '@trpc/server':
         specifier: ^10.33.0
         version: 10.33.0
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
 
   packages/utils: {}
 
@@ -1104,6 +1110,14 @@ packages:
   /@tootallnate/once@2.0.0:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
+    dev: true
+
+  /@trpc/client@10.33.0(@trpc/server@10.33.0):
+    resolution: {integrity: sha512-gHKe/5MEdoi1HEF7gsviFdHC7IyVRYjS39C0uXYHlM9rJ9It+KQpz8+wu9XkORte/lbBCScOGOPLNqb5IvSF/g==}
+    peerDependencies:
+      '@trpc/server': 10.33.0
+    dependencies:
+      '@trpc/server': 10.33.0
     dev: true
 
   /@trpc/server@10.33.0:
@@ -4581,4 +4595,8 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    dev: true
+
+  /zod@3.21.4:
+    resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: true

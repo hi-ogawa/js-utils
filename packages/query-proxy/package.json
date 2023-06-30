@@ -33,7 +33,9 @@
   },
   "devDependencies": {
     "@tanstack/query-core": "^4.29.14",
-    "@trpc/server": "^10.33.0"
+    "@trpc/client": "^10.33.0",
+    "@trpc/server": "^10.33.0",
+    "zod": "^3.21.4"
   },
   "peerDependencies": {
     "@tanstack/query-core": "*",
