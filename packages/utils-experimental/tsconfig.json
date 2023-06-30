@@ -1,15 +1,4 @@
 {
-  "extends": "@tsconfig/strictest/tsconfig.json",
-  "include": ["src"],
-  "compilerOptions": {
-    "outDir": "dist/tsc",
-    "noEmit": true,
-    "declaration": true,
-    "noUncheckedIndexedAccess": false,
-    "moduleResolution": "Node",
-    "module": "ESNext",
-    "target": "ESNext",
-    "lib": ["ESNext", "DOM"],
-    "types": []
-  }
+  "extends": "../../tsconfig.base.json",
+  "include": ["src"]
 }
