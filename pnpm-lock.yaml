@@ -54,6 +54,12 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
 
+  packages/tiny-rpc:
+    devDependencies:
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+
   packages/utils: {}
 
   packages/utils-experimental: {}
