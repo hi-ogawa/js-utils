@@ -4,8 +4,7 @@ import { tinyassert } from "@hiogawa/utils";
 // server
 //
 
-// TODO: restrict to zero or one argument?
-export type TinyRpcRoutes = Record<string, (...args: any[]) => any>;
+export type TinyRpcRoutes = Record<string, (() => any) | ((input: any) => any)>;
 
 export function createTinyRpcHandler({
   endpoint,
