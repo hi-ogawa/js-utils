@@ -10,4 +10,5 @@ super simplified version of `tRPC`.
 
 ## todo
 
-- support `GET` endpoint? e.g. by "path" name convention?
+- support `GET` endpoint?
+- error handling convention?
