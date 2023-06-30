@@ -1,6 +1,6 @@
-import { MutationOptions, QueryClient } from "@tanstack/query-core";
+import { type MutationOptions, QueryClient } from "@tanstack/query-core";
 import { describe, expect, it } from "vitest";
-import { FnRecord, createFnRecordQueryProxy } from "./record";
+import { type FnRecord, createFnRecordQueryProxy } from "./record";
 
 describe(createFnRecordQueryProxy.name, () => {
   it("example", async () => {
