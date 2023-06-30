@@ -22,10 +22,9 @@ export function createTinyRpcHandler({
     const fn = routes[path];
     tinyassert(fn);
 
-    const requestJson: unknown = await request.json();
+    const requestJson = await request.json();
     tinyassert(requestJson);
     tinyassert(typeof requestJson === "object");
-    tinyassert("input" in requestJson);
 
     const output = await fn(requestJson.input);
     return new Response(JSON.stringify({ output }), {
@@ -71,7 +70,6 @@ export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
           const responseJson = await response.json();
           tinyassert(responseJson);
           tinyassert(typeof responseJson === "object");
-          tinyassert("output" in responseJson);
 
           return responseJson.output;
         };

@@ -32,6 +32,8 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
+    "@hattip/adapter-node": "^0.0.34",
+    "@hattip/compose": "^0.0.34",
     "@hiogawa/utils": "workspace:*"
   }
 }
