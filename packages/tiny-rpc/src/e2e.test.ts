@@ -14,6 +14,8 @@ import { zodFn } from "./zod";
 // example rpc
 //
 
+// TODO: async context example
+
 function defineExampleRpc() {
   let counter = 0;
 
