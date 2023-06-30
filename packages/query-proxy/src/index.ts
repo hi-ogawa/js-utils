@@ -1,2 +1,2 @@
-export {} from "./record";
-export {} from "./trpc";
+export * from "./record";
+export * from "./trpc";

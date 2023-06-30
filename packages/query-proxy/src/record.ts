@@ -14,7 +14,7 @@ export type FnRecordToAsync<R extends FnRecord> = {
 type FnIn<F extends FnAny> = Parameters<F> extends [infer I] ? I : void;
 type FnOut<F extends FnAny> = Awaited<ReturnType<F>>;
 
-export type FnRecordReactQueryProxy<T extends FnRecord> = {
+export type FnRecordQueryProxy<T extends FnRecord> = {
   [K in keyof T]: {
     queryKey: unknown[];
     queryOptions: (input: FnIn<T[K]>) => {
@@ -40,9 +40,9 @@ export type FnRecordReactQueryProxy<T extends FnRecord> = {
   };
 };
 
-export function createFnRecordReactQueryProxy<T extends FnRecord>(
+export function createFnRecordQueryProxy<T extends FnRecord>(
   fnRecord: T
-): FnRecordReactQueryProxy<T> {
+): FnRecordQueryProxy<T> {
   return createGetterProxy((k) =>
     createGetterProxy((prop) => {
       if (prop === "queryKey" || prop === "mutationKey") {

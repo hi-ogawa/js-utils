@@ -1,8 +1,8 @@
 import { MutationOptions, QueryClient } from "@tanstack/query-core";
 import { describe, expect, it } from "vitest";
-import { createFnRecordReactQueryProxy } from "./record";
+import { createFnRecordQueryProxy } from "./record";
 
-describe(createFnRecordReactQueryProxy.name, () => {
+describe(createFnRecordQueryProxy.name, () => {
   it("example", async () => {
     //
     // FnRecord "service"
@@ -24,7 +24,7 @@ describe(createFnRecordReactQueryProxy.name, () => {
     //
     // use Service via QueryClient
     //
-    const fnRecordQuery = createFnRecordReactQueryProxy(fnRecord);
+    const fnRecordQuery = createFnRecordQueryProxy(fnRecord);
 
     // type-check
     fnRecordQuery.checkId.queryOptions satisfies (id: string) => {

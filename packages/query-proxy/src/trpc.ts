@@ -6,7 +6,7 @@ import type {
 } from "@trpc/server";
 import { createGetterProxy } from "./utils";
 
-export type TrpcClientReactQueryProxy<
+export type TrpcClientQueryProxy<
   Router extends AnyRouter,
   I = inferRouterInputs<Router>,
   O = inferRouterOutputs<Router>
@@ -37,9 +37,9 @@ export type TrpcClientReactQueryProxy<
   };
 };
 
-export function createTrpcClientReactQueryProxy<Router extends AnyRouter>(
+export function createTrpcClientQueryProxy<Router extends AnyRouter>(
   client: any
-): TrpcClientReactQueryProxy<Router> {
+): TrpcClientQueryProxy<Router> {
   return createGetterProxy((k) =>
     createGetterProxy((prop) => {
       if (prop === "queryOptions") {
