@@ -8,6 +8,7 @@ import {
   createTinyRpcClientProxy,
   createTinyRpcHandler,
 } from ".";
+import { zodFn } from "./zod";
 
 //
 // example rpc
@@ -17,29 +18,20 @@ function defineExampleRpc() {
   let counter = 0;
 
   return {
+    // define as a bare function
     checkId: (id: string) => id === "good",
 
     getCounter: () => counter,
 
+    // define with zod validation + input type inference
     incrementCounter: zodFn(z.object({ delta: z.number().default(1) }))(
       (input) => {
+        input satisfies { delta: number };
         counter += input.delta;
         return counter;
       }
     ),
   } satisfies TinyRpcRoutes;
-}
-
-// define function with arguments validated by zod
-// TODO: export with optional peer dep?
-function zodFn<Schema extends z.ZodType>(schema: Schema) {
-  return function decorate<Out>(
-    fn: (input: z.output<Schema>) => Out
-  ): (input: z.input<Schema>) => Out {
-    return function wrapper(input) {
-      return fn(schema.parse(input));
-    };
-  };
 }
 
 //
