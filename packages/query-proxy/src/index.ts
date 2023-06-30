@@ -3,6 +3,7 @@
 //
 
 // TODO: manage peer dependency
+// TODO: test with actual react-query runtime
 
 type FnAny = (...args: any[]) => any;
 type FnAnyToAsync<F extends FnAny> = (
