@@ -2,6 +2,7 @@ import { createServer } from "@hattip/adapter-node";
 import { compose } from "@hattip/compose";
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 import {
   type TinyRpcRoutes,
   createTinyRpcClientProxy,
@@ -20,11 +21,24 @@ function defineExampleRpc() {
 
     getCounter: () => counter,
 
-    updateCounter: (delta: number) => {
-      counter += delta;
-      return counter;
-    },
+    incrementCounter: zodFn(z.object({ delta: z.number().default(1) }))(
+      (input) => {
+        counter += input.delta;
+        return counter;
+      }
+    ),
   } satisfies TinyRpcRoutes;
+}
+
+// define function with arguments validated by zod
+function zodFn<Schema extends z.ZodType>(schema: Schema) {
+  return function decorate<Out>(
+    fn: (input: z.output<Schema>) => Out
+  ): (input: z.input<Schema>) => Out {
+    return function wrapper(input) {
+      return fn(schema.parse(input));
+    };
+  };
 }
 
 //
@@ -49,8 +63,12 @@ describe("e2e", () => {
     expect(await client.checkId("bad")).toMatchInlineSnapshot("false");
 
     expect(await client.getCounter()).toMatchInlineSnapshot("0");
-    expect(await client.updateCounter(1)).toMatchInlineSnapshot("1");
+    expect(await client.incrementCounter({})).toMatchInlineSnapshot("1");
     expect(await client.getCounter()).toMatchInlineSnapshot("1");
+    expect(await client.incrementCounter({ delta: 2 })).toMatchInlineSnapshot(
+      "3"
+    );
+    expect(await client.getCounter()).toMatchInlineSnapshot("3");
 
     server.close();
   });
