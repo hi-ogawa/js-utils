@@ -9,9 +9,11 @@ export type TinyRpcRoutes = Record<string, (() => any) | ((input: any) => any)>;
 export function createTinyRpcHandler({
   endpoint,
   routes,
+  transformer = jsonTransformer,
 }: {
   endpoint: string;
   routes: TinyRpcRoutes;
+  transformer?: Transformer;
 }) {
   return async ({ url, request }: { url: URL; request: Request }) => {
     tinyassert(url.pathname.startsWith(endpoint));
@@ -21,16 +23,12 @@ export function createTinyRpcHandler({
     const fn = routes[path];
     tinyassert(fn);
 
-    const requestJson = await request.json();
+    const requestJson = transformer.deserialize(await request.text());
     tinyassert(requestJson);
     tinyassert(typeof requestJson === "object");
 
     const output = await fn(requestJson.input);
-    return new Response(JSON.stringify({ output }), {
-      headers: {
-        "content-type": "application/json",
-      },
-    });
+    return new Response(transformer.serialize({ output }));
   };
 }
 
@@ -46,8 +44,10 @@ type TinyRpcRoutesAsync<R extends TinyRpcRoutes> = {
 
 export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
   endpoint,
+  transformer = jsonTransformer,
 }: {
   endpoint: string;
+  transformer?: Transformer;
 }): TinyRpcRoutesAsync<R> {
   return new Proxy(
     {},
@@ -59,14 +59,11 @@ export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
           const url = [endpoint, path].join("/");
           const response = await fetch(url, {
             method: "POST",
-            body: JSON.stringify({ input }),
-            headers: {
-              "content-type": "application/json",
-            },
+            body: transformer.serialize({ input }),
           });
           tinyassert(response.ok);
 
-          const responseJson = await response.json();
+          const responseJson = transformer.deserialize(await response.text());
           tinyassert(responseJson);
           tinyassert(typeof responseJson === "object");
 
@@ -76,3 +73,17 @@ export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
     }
   ) as any;
 }
+
+//
+// common
+//
+
+interface Transformer {
+  serialize: (v: any) => any;
+  deserialize: (v: any) => any;
+}
+
+const jsonTransformer: Transformer = {
+  serialize: JSON.stringify,
+  deserialize: JSON.parse,
+};
