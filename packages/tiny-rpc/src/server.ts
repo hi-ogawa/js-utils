@@ -16,7 +16,7 @@ export function createServerHandler({
     const fn = fnRecord[path];
     tinyassert(fn);
 
-    const requestJson: unknown = JSON.parse(await request.json());
+    const requestJson: unknown = await request.json();
     tinyassert(requestJson);
     tinyassert(typeof requestJson === "object");
     tinyassert("input" in requestJson);
