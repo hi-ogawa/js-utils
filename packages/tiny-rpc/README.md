@@ -12,3 +12,4 @@ super simplified version of `tRPC`.
 
 - support `GET` endpoint?
 - error handling convention?
+- suport custom input/output transformer? (e.g. https://github.com/brillout/json-serializer)

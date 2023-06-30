@@ -31,6 +31,7 @@ function defineExampleRpc() {
 }
 
 // define function with arguments validated by zod
+// TODO: export with optional peer dep?
 function zodFn<Schema extends z.ZodType>(schema: Schema) {
   return function decorate<Out>(
     fn: (input: z.output<Schema>) => Out
