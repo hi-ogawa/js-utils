@@ -27,7 +27,7 @@ export function createTinyRpcHandler({
     tinyassert(requestJson);
     tinyassert(typeof requestJson === "object");
 
-    const output = await fn(requestJson.input);
+    const output = await fn((requestJson as any).input);
     return new Response(transformer.serialize({ output }));
   };
 }
@@ -67,7 +67,7 @@ export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
           tinyassert(responseJson);
           tinyassert(typeof responseJson === "object");
 
-          return responseJson.output;
+          return (responseJson as any).output;
         };
       },
     }
@@ -79,8 +79,8 @@ export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
 //
 
 interface Transformer {
-  serialize: (v: any) => any;
-  deserialize: (v: any) => any;
+  serialize: (v: unknown) => string;
+  deserialize: (v: string) => unknown;
 }
 
 const jsonTransformer: Transformer = {
