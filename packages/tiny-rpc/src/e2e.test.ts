@@ -1,32 +1,40 @@
 import { describe, expect, it } from "vitest";
-import { createTinyRpcClientProxy } from "./client";
-import { createTinyRpcHandler } from "./server";
+import {
+  type TinyRpcRoutes,
+  createTinyRpcClientProxy,
+  createTinyRpcHandler,
+} from ".";
 
 describe("e2e", () => {
   it("basic", () => {
     const endpoint = "/rpc";
 
-    //
-    // define rpc routes
-    //
-    let counter = 0;
-    const routes = {
-      checkId: (id: string) => id === "good",
+    // define example rpc
+    const routes = defineExampleRpc();
 
-      getCounter: () => counter,
-
-      updateCounter: (delta: number) => {
-        counter += delta;
-        return counter;
-      },
-    };
-
-    const client = createTinyRpcClientProxy<typeof routes>({ endpoint });
-    client.getCounter();
-
+    // server
     const handler = createTinyRpcHandler({ endpoint, routes });
     handler;
+
+    // client
+    const client = createTinyRpcClientProxy<typeof routes>({ endpoint });
+    client;
 
     expect;
   });
 });
+
+function defineExampleRpc() {
+  let counter = 0;
+
+  return {
+    checkId: (id: string) => id === "good",
+
+    getCounter: () => counter,
+
+    updateCounter: (delta: number) => {
+      counter += delta;
+      return counter;
+    },
+  } satisfies TinyRpcRoutes;
+}
