@@ -45,9 +45,13 @@ type TinyRpcRoutesAsync<R extends TinyRpcRoutes> = {
 export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
   endpoint,
   transformer = jsonTransformer,
+  headers,
+  fetch: fetchImpl = fetch,
 }: {
   endpoint: string;
   transformer?: Transformer;
+  headers?: () => Record<string, string>;
+  fetch?: typeof fetch;
 }): TinyRpcRoutesAsync<R> {
   return new Proxy(
     {},
@@ -57,9 +61,10 @@ export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
 
         return async (input: unknown) => {
           const url = [endpoint, path].join("/");
-          const response = await fetch(url, {
+          const response = await fetchImpl(url, {
             method: "POST",
             body: transformer.serialize({ input }),
+            headers: headers?.() ?? {},
           });
           tinyassert(response.ok);
 

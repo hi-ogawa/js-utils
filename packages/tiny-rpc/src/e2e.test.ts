@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { createServer } from "@hattip/adapter-node";
-import { compose } from "@hattip/compose";
+import { type RequestHandler, compose } from "@hattip/compose";
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
@@ -23,6 +23,8 @@ function defineExampleRpc() {
 
   //
   // context
+  // (implicit input e.g. request session etc...)
+  // (it can be scoped by request using AsyncLocalStorage and middleware)
   //
   interface RpcContext {
     request: Request;
@@ -34,6 +36,13 @@ function defineExampleRpc() {
     const ctx = contextStorage.getStore();
     tinyassert(ctx);
     return ctx;
+  }
+
+  function contextProviderHandler(): RequestHandler {
+    // middleware to initialize context scoped by request
+    return async (ctx) => {
+      return contextStorage.run({ request: ctx.request }, () => ctx.next());
+    };
   }
 
   //
@@ -54,14 +63,14 @@ function defineExampleRpc() {
       }
     ),
 
-    // access context (implicit input e.g. request session etc...)
+    // access context
     checkAuth: () => {
       const { request } = useContext();
       return request.headers.get("x-auth") === "good";
     },
   } satisfies TinyRpcRoutes;
 
-  return { routes, contextStorage };
+  return { routes, contextProviderHandler };
 }
 
 //
@@ -72,16 +81,26 @@ describe("e2e", () => {
   it("basic", async () => {
     // define example rpc
     const endpoint = "/rpc";
-    const { routes, contextStorage } = defineExampleRpc();
-    contextStorage;
+    const { routes, contextProviderHandler } = defineExampleRpc();
 
+    //
     // server
-    const handler = createTinyRpcHandler({ endpoint, routes });
-    const { server, url } = await startTestServer(handler);
+    //
+    const server = createServer(
+      compose(
+        contextProviderHandler(),
+        createTinyRpcHandler({ endpoint, routes })
+      )
+    );
+    const { url } = await startTestServer(server);
 
+    //
     // client
+    //
+    const headers: Record<string, string> = {}; // inject headers to demonstrate context
     const client = createTinyRpcClientProxy<typeof routes>({
       endpoint: url + endpoint,
+      headers: () => headers,
     });
     expect(await client.checkId("good")).toMatchInlineSnapshot("true");
     expect(await client.checkId("bad")).toMatchInlineSnapshot("false");
@@ -103,15 +122,17 @@ describe("e2e", () => {
     ).rejects.toMatchInlineSnapshot("[Error]");
     expect(await client.getCounter()).toMatchInlineSnapshot("3");
 
+    // context
+    headers["x-auth"] = "good";
+    expect(await client.checkAuth()).toMatchInlineSnapshot("true");
+    headers["x-auth"] = "bad";
+    expect(await client.checkAuth()).toMatchInlineSnapshot("false");
+
     server.close();
   });
 });
 
-async function startTestServer(
-  handler: ReturnType<typeof createTinyRpcHandler>
-) {
-  // start server
-  const server = createServer(compose(handler));
+async function startTestServer(server: ReturnType<typeof createServer>) {
   await new Promise<void>((resolve) => server.listen(() => resolve()));
 
   // get address
