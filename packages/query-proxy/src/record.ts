@@ -54,6 +54,14 @@ export function createFnRecordQueryProxy<T extends FnRecord>(
           queryFn: async () => (fnRecord as any)[k](input),
         });
       }
+      if (prop === "infiniteQueryOptions") {
+        return (input: unknown, options: any) => ({
+          queryKey: [k, input],
+          queryFn: ({ pageParam }: any) =>
+            (fnRecord as any)[k](options.setPageParam(input, pageParam)),
+          getNextPageParam: options.getNextPageParam,
+        });
+      }
       if (prop === "mutationOptions") {
         return () => ({
           mutationKey: [k],
