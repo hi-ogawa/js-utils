@@ -2,6 +2,12 @@
   "include": [],
   "references": [
     {
+      "path": "packages/query-proxy"
+    },
+    {
+      "path": "packages/tiny-rpc"
+    },
+    {
       "path": "packages/utils"
     },
     {

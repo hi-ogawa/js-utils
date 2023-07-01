@@ -1,12 +1,7 @@
 {
-  "extends": "@tsconfig/strictest/tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "include": ["src"],
   "compilerOptions": {
-    "noEmit": true,
-    "moduleResolution": "Node",
-    "module": "ESNext",
-    "target": "ESNext",
-    "lib": ["ESNext", "DOM"],
     // react-jsx would require tricky workaround in old react https://github.com/hi-ogawa/js-utils/issues/19
     "jsx": "react"
   }

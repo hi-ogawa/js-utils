@@ -120,4 +120,12 @@ describe(hashString.name, () => {
       ]
     `);
   });
+
+  it("collision", () => {
+    const pair = [
+      "solar:shield-minus-linear",
+      "fluent:select-all-on-20-regular",
+    ];
+    expect(hashString(pair[0])).toBe(hashString(pair[1]));
+  });
 });

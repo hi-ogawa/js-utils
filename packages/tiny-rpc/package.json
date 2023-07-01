@@ -1,6 +1,6 @@
 {
-  "name": "@hiogawa/utils-react",
-  "version": "1.2.1-pre.6",
+  "name": "@hiogawa/tiny-rpc",
+  "version": "0.1.4",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -10,6 +10,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
+    },
+    "./dist/zod": {
+      "import": "./dist/zod.js",
+      "require": "./dist/zod.cjs",
+      "types": "./dist/zod.d.ts"
     }
   },
   "files": [
@@ -19,10 +24,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/utils-react"
+    "directory": "packages/tiny-rpc"
   },
   "typedoc": {
-    "displayName": "@hiogawa/utils-react",
+    "displayName": "@hiogawa/tiny-rpc",
     "readmeFile": "./README.md",
     "entryPoint": "./src/index.ts"
   },
@@ -32,19 +37,17 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
+    "@hattip/adapter-node": "^0.0.34",
+    "@hattip/compose": "^0.0.34",
     "@hiogawa/utils": "workspace:*",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.4.3",
-    "@types/react": "^18.2.14",
-    "@types/react-test-renderer": "^18.0.0",
-    "@vitejs/plugin-react": "^4.0.1",
-    "jsdom": "^22.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-test-renderer": "^18.2.0"
+    "zod": "^3.21.4"
   },
   "peerDependencies": {
-    "react": "*"
+    "zod": "*"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   }
 }
