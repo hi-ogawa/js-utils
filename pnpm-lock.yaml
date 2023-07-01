@@ -54,6 +54,21 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
 
+  packages/tiny-rpc:
+    devDependencies:
+      '@hattip/adapter-node':
+        specifier: ^0.0.34
+        version: 0.0.34
+      '@hattip/compose':
+        specifier: ^0.0.34
+        version: 0.0.34
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
+
   packages/utils: {}
 
   packages/utils-experimental: {}
@@ -911,6 +926,30 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@hattip/adapter-node@0.0.34:
+    resolution: {integrity: sha512-saEmf4Wh0KwXTm44sjvTcBOe8znPHBGtKhQOJVfafUgZ9OkXGTd9A8wdi6cO9b9HZFJm+JkQu/UVb4p0vccRmQ==}
+    dependencies:
+      '@hattip/core': 0.0.34
+      '@hattip/polyfills': 0.0.34
+    dev: true
+
+  /@hattip/compose@0.0.34:
+    resolution: {integrity: sha512-faW5gIvyDmut3/lUWslHitH2+rrtkM9IQvBOmdTjS7r9vaADVh2t/M+MgitTzsSavfQUbP+uCbTPQ+ffrUhceA==}
+    dependencies:
+      '@hattip/core': 0.0.34
+    dev: true
+
+  /@hattip/core@0.0.34:
+    resolution: {integrity: sha512-L9MRB5fVgW8vd2wKDbD1pIhsM4UloRCdsXn3x9us2Xp1jeynS83T3gHGLdUvPclgGvQZapwBgUkkn9paS+bjDg==}
+    dev: true
+
+  /@hattip/polyfills@0.0.34:
+    resolution: {integrity: sha512-zD0BemBQ4iqwKyX0jNu7YTSZtG4zH7sOB3XIBa5FkxRHZEjEc1dtKHsQpWhNqZW9+h5c8TWS9EiTMstqbtL2SQ==}
+    dependencies:
+      '@hattip/core': 0.0.34
+      node-fetch-native: 1.2.0
+    dev: true
 
   /@hiogawa/isort-ts@1.0.2-pre.1(prettier@2.8.8)(typescript@5.1.6):
     resolution: {integrity: sha512-b7UnS5rxTkyNbdVkfKjDLRffl3Ut2OmYm41lPa+TwxR2jtAuE1lxTj9x16GH26FUik5VSb/uiY6W7zWBcQT71Q==}
@@ -3024,6 +3063,10 @@ packages:
 
   /nice-try@1.0.5:
     resolution: {integrity: sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==}
+    dev: true
+
+  /node-fetch-native@1.2.0:
+    resolution: {integrity: sha512-5IAMBTl9p6PaAjYCnMv5FmqIF6GcZnawAVnzaCG0rX2aYZJ4CxEkZNtVPuTRug7fL7wyM5BQYTlAzcyMPi6oTQ==}
     dev: true
 
   /node-releases@2.0.12:
