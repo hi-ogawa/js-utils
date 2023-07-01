@@ -6,7 +6,14 @@ import { assertUnreachable, typedBoolean } from "./misc";
 import { mapOption } from "./option";
 import { newPromiseWithResolvers } from "./promise";
 import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
-import { Err, Ok, Result, okToOption, wrapError, wrapPromise } from "./result";
+import {
+  Err,
+  Ok,
+  type Result,
+  okToOption,
+  wrapError,
+  wrapPromise,
+} from "./result";
 import { tinyassert } from "./tinyassert";
 
 describe("typedBoolean", () => {
