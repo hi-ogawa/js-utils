@@ -16,12 +16,12 @@ export function createTinyRpcHandler({
   transformer?: Transformer;
 }) {
   const inner = async ({ url, request }: { url: URL; request: Request }) => {
-    assertCode(url.pathname.startsWith(endpoint), "NOT_FOUND");
-    assertCode(request.method === "POST", "METHOD_NOT_SUPPORTED");
+    assertByCode(url.pathname.startsWith(endpoint), "NOT_FOUND");
+    assertByCode(request.method === "POST", "METHOD_NOT_SUPPORTED");
 
     const path = url.pathname.slice(endpoint.length + 1);
     const fn = routes[path];
-    assertCode(fn, "NOT_FOUND");
+    assertByCode(fn, "NOT_FOUND");
 
     const requestJson = transformer.deserialize(await request.text());
     tinyassert(requestJson);
@@ -119,34 +119,35 @@ const ERROR_STATUS_MAP = {
 
 export class TinyRpcError extends Error {
   public status = 500;
-}
 
-function errorByCode(code: keyof typeof ERROR_STATUS_MAP) {
-  const e = new TinyRpcError(code);
-  e.status = ERROR_STATUS_MAP[code];
-  return e;
-}
-
-function assertCode<T>(
-  value: T,
-  code: keyof typeof ERROR_STATUS_MAP
-): asserts value {
-  if (!value) {
-    throw errorByCode(code);
+  static fromCode(code: keyof typeof ERROR_STATUS_MAP) {
+    const e = new TinyRpcError(code);
+    e.status = ERROR_STATUS_MAP[code];
+    return e;
   }
-}
 
-function createErrorResponse(eRaw: unknown) {
-  let e: TinyRpcError;
-  if (eRaw instanceof TinyRpcError) {
-    e = eRaw;
-  } else {
-    e = errorByCode("INTERNAL_SERVER_ERROR");
+  static fromUnknown(eRaw: unknown) {
+    const e = TinyRpcError.fromCode("INTERNAL_SERVER_ERROR");
     e.cause = eRaw;
     if (eRaw instanceof Error) {
       e.message = eRaw.message;
     }
+    return e;
   }
+}
+
+function assertByCode<T>(
+  value: T,
+  code: keyof typeof ERROR_STATUS_MAP
+): asserts value {
+  if (!value) {
+    throw TinyRpcError.fromCode(code);
+  }
+}
+
+function createErrorResponse(eRaw: unknown) {
+  const e =
+    eRaw instanceof TinyRpcError ? eRaw : TinyRpcError.fromUnknown(eRaw);
   const { message, status, cause } = e;
   return new Response(
     JSON.stringify({
