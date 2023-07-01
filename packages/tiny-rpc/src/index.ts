@@ -121,14 +121,18 @@ export class TinyRpcError extends Error {
   public status = 500;
 }
 
+function errorByCode(code: keyof typeof ERROR_STATUS_MAP) {
+  const e = new TinyRpcError(code);
+  e.status = ERROR_STATUS_MAP[code];
+  return e;
+}
+
 function assertCode<T>(
   value: T,
   code: keyof typeof ERROR_STATUS_MAP
 ): asserts value {
   if (!value) {
-    const e = new TinyRpcError(code);
-    e.status = ERROR_STATUS_MAP[code];
-    throw e;
+    throw errorByCode(code);
   }
 }
 
@@ -137,9 +141,11 @@ function createErrorResponse(eRaw: unknown) {
   if (eRaw instanceof TinyRpcError) {
     e = eRaw;
   } else {
-    e = new TinyRpcError();
-    e.message = eRaw instanceof Error ? eRaw.message : "INTERNAL_SERVER_ERROR";
+    e = errorByCode("INTERNAL_SERVER_ERROR");
     e.cause = eRaw;
+    if (eRaw instanceof Error) {
+      e.message = eRaw.message;
+    }
   }
   const { message, status, cause } = e;
   return new Response(
