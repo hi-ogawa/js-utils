@@ -144,6 +144,67 @@ export function once<F extends (...args: any[]) => any>(f: F): F {
   return wrapper as F;
 }
 
+// utils is not supposed to depend on lib.dom or @types/node. so for now we manual add required typings.
+declare function setTimeout(callback: () => void, timeout: number): number;
+declare function clearTimeout(subscription: number): number;
+
+export function debounce<F extends (...args: any[]) => void>(
+  f: F,
+  ms: number,
+  options?: {
+    // extra callback to easily implement pending state (cf. useDebounce in utils-react)
+    onStart?: () => void;
+    onFinish?: () => void;
+    onCancel?: () => void;
+  }
+): F & { cancel: () => void } {
+  let subscription: number | undefined;
+
+  function wrapper(this: unknown, ...args: unknown[]) {
+    cancel();
+    subscription = setTimeout(() => {
+      subscription = undefined;
+      f.apply(this, args);
+      options?.onFinish?.();
+    }, ms);
+    options?.onStart?.();
+  }
+
+  function cancel() {
+    if (typeof subscription !== "undefined") {
+      clearTimeout(subscription);
+      subscription = undefined;
+    }
+    options?.onCancel?.();
+  }
+
+  return Object.assign(wrapper, { cancel }) as any;
+}
+
+export function delay<F extends (...args: any[]) => void>(
+  f: F,
+  ms: number
+): F & { cancel: () => void } {
+  const subscriptions = new Set<number>();
+
+  function wrapper(this: unknown, ...args: unknown[]) {
+    const sub = setTimeout(() => {
+      subscriptions.delete(sub);
+      f.apply(this, args);
+    }, ms);
+    subscriptions.add(sub);
+  }
+
+  function cancel() {
+    for (const sub of subscriptions) {
+      clearTimeout(sub);
+    }
+    subscriptions.clear();
+  }
+
+  return Object.assign(wrapper, { cancel }) as any;
+}
+
 //
 // unsafe but convenient plain object key manipulation
 // https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
