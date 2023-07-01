@@ -12,3 +12,4 @@ extremely simple alternative for `tRPC`.
 - support `GET` endpoint?
   - everything is `POST`, which makes it not possible to utilize `GET` based http caching.
 - error handling convention?
+  - https://trpc.io/docs/server/error-handling
