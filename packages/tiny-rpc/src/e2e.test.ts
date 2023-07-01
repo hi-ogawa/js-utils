@@ -94,7 +94,8 @@ describe("e2e", () => {
     const server = createServer(
       compose(
         contextProviderHandler(),
-        createTinyRpcHandler({ endpoint, routes })
+        createTinyRpcHandler({ endpoint, routes }),
+        () => new Response("tiny-rpc-skipped")
       )
     );
     const { url } = await startTestServer(server);
@@ -171,6 +172,11 @@ describe("e2e", () => {
       expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
       return true;
     });
+
+    // ignore non-endpoint
+    expect(
+      await fetch(url + "/non-endpoint").then((res) => res.text())
+    ).toMatchInlineSnapshot('"tiny-rpc-skipped"');
 
     server.close();
   });

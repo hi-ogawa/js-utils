@@ -6,6 +6,13 @@ import { tinyassert } from "@hiogawa/utils";
 
 export type TinyRpcRoutes = Record<string, (() => any) | ((input: any) => any)>;
 
+// compatible with hattip's RequestHandler
+// it returns `undefined` when `url.pathname` doesn't match `endpoint`
+type TinyRpcHandler = (ctx: {
+  url: URL;
+  request: Request;
+}) => Promise<Response | undefined>;
+
 export function createTinyRpcHandler({
   endpoint,
   routes,
@@ -16,11 +23,12 @@ export function createTinyRpcHandler({
   routes: TinyRpcRoutes;
   transformer?: Transformer;
   onError?: (e: unknown) => void;
-}) {
-  const inner = async ({ url, request }: { url: URL; request: Request }) => {
-    assertByCode(url.pathname.startsWith(endpoint), "NOT_FOUND");
+}): TinyRpcHandler {
+  const inner: TinyRpcHandler = async ({ url, request }) => {
+    if (!url.pathname.startsWith(endpoint)) {
+      return;
+    }
     assertByCode(request.method === "POST", "METHOD_NOT_SUPPORTED");
-
     const path = url.pathname.slice(endpoint.length + 1);
     const fn = routes[path];
     assertByCode(fn, "NOT_FOUND");
