@@ -4,8 +4,9 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Compose } from "./compose";
 import { Debug } from "./debug";
-import { toArraySetState, toDelayedSetState, toSetSetState } from "./set-state";
+import { toArraySetState, toSetSetState } from "./set-state";
 import { renderToJson } from "./test/helper";
+import { useDebounce, useDelay } from "./timer";
 import { usePrevious, useRefCallbackEffect, useStableCallback } from "./utils";
 
 describe("Debug", () => {
@@ -341,7 +342,7 @@ describe("toSetSetState", () => {
   });
 });
 
-describe("toDelayedSetState", () => {
+describe(useDelay.name, () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -349,35 +350,117 @@ describe("toDelayedSetState", () => {
   it("basic", async () => {
     const { result } = renderHook(() => {
       const [state, setState] = React.useState(false);
-      const [setStateDelayed, reset, pending] = toDelayedSetState(setState);
-      return { state, setState, setStateDelayed, reset, pending };
+      const setStateDelayed = useDelay(setState, 100);
+      return { state, setState, setStateDelayed };
     });
 
     expect(result.current.state).toMatchInlineSnapshot("false");
-    expect(result.current.pending).toMatchInlineSnapshot("false");
 
     act(() => {
       result.current.setState(true);
     });
     expect(result.current.state).toMatchInlineSnapshot("true");
-    expect(result.current.pending).toMatchInlineSnapshot("false");
 
     act(() => {
-      result.current.setStateDelayed(false, 100);
+      result.current.setStateDelayed(false);
     });
     expect(result.current.state).toMatchInlineSnapshot("true");
-    expect(result.current.pending).toMatchInlineSnapshot("true");
 
     act(() => {
       vi.advanceTimersByTime(80);
     });
     expect(result.current.state).toMatchInlineSnapshot("true");
-    expect(result.current.pending).toMatchInlineSnapshot("true");
 
     act(() => {
       vi.advanceTimersByTime(80);
     });
     expect(result.current.state).toMatchInlineSnapshot("false");
-    expect(result.current.pending).toMatchInlineSnapshot("false");
+  });
+});
+
+// TODO: test effect cleanup
+describe(useDebounce.name, () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  it("basic", async () => {
+    const { result, unmount } = renderHook(() => {
+      const [state, setState] = React.useState<number[]>([]);
+      const { push } = toArraySetState(setState);
+      const [debounced, { isPending }] = useDebounce(push, 100);
+      return { result: { state, isPending }, push, debounced };
+    });
+
+    expect(result.current.result).toMatchInlineSnapshot(`
+      {
+        "isPending": false,
+        "state": [],
+      }
+    `);
+
+    act(() => {
+      result.current.push(0);
+    });
+    expect(result.current.result).toMatchInlineSnapshot(`
+      {
+        "isPending": false,
+        "state": [
+          0,
+        ],
+      }
+    `);
+
+    act(() => {
+      result.current.debounced(1);
+    });
+    expect(result.current.result).toMatchInlineSnapshot(`
+      {
+        "isPending": true,
+        "state": [
+          0,
+        ],
+      }
+    `);
+
+    act(() => {
+      vi.advanceTimersByTime(80);
+    });
+    expect(result.current.result).toMatchInlineSnapshot(`
+      {
+        "isPending": true,
+        "state": [
+          0,
+        ],
+      }
+    `);
+
+    act(() => {
+      vi.advanceTimersByTime(80);
+    });
+    expect(result.current.result).toMatchInlineSnapshot(`
+      {
+        "isPending": false,
+        "state": [
+          0,
+          1,
+        ],
+      }
+    `);
+
+    act(() => {
+      result.current.debounced(2);
+      unmount();
+      vi.runAllTimers();
+    });
+    expect(result.current.result).toMatchInlineSnapshot(`
+      {
+        "isPending": false,
+        "state": [
+          0,
+          1,
+        ],
+      }
+    `);
   });
 });
