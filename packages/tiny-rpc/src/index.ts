@@ -10,10 +10,12 @@ export function createTinyRpcHandler({
   endpoint,
   routes,
   transformer = jsonTransformer,
+  onError,
 }: {
   endpoint: string;
   routes: TinyRpcRoutes;
   transformer?: Transformer;
+  onError?: (e: unknown) => void;
 }) {
   const inner = async ({ url, request }: { url: URL; request: Request }) => {
     assertByCode(url.pathname.startsWith(endpoint), "NOT_FOUND");
@@ -36,6 +38,7 @@ export function createTinyRpcHandler({
     try {
       return await inner(...args);
     } catch (e) {
+      onError?.(e);
       return createErrorResponse(e);
     }
   };
