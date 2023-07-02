@@ -16,7 +16,7 @@ type TinyRpcHandler = (ctx: {
 export function createTinyRpcHandler({
   endpoint,
   routes,
-  transformer = jsonTransformer,
+  transformer = noopTransformer,
   onError,
 }: {
   endpoint: string;
@@ -33,13 +33,17 @@ export function createTinyRpcHandler({
     const fn = routes[path];
     assertByCode(fn, "NOT_FOUND");
 
-    const requestJson = transformer.deserialize(await request.text());
+    const requestJson = transformer.deserialize(await request.json());
     tinyassert(requestJson);
     tinyassert(typeof requestJson === "object");
 
     // TODO: helper to integrate zod error? (currently 500 but it should be 400?)
     const output = await fn((requestJson as any).input);
-    return new Response(transformer.serialize({ output }));
+    return new Response(JSON.stringify(transformer.serialize({ output })), {
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+      },
+    });
   };
 
   const wrapper: typeof inner = async (...args) => {
@@ -65,7 +69,7 @@ type TinyRpcRoutesAsync<R extends TinyRpcRoutes> = {
 
 export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
   endpoint,
-  transformer = jsonTransformer,
+  transformer = noopTransformer,
   headers,
   fetch: fetchImpl = fetch,
 }: {
@@ -84,14 +88,17 @@ export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
           const url = [endpoint, path].join("/");
           const response = await fetchImpl(url, {
             method: "POST",
-            body: transformer.serialize({ input }),
-            headers: headers?.(),
+            body: JSON.stringify(transformer.serialize({ input })),
+            headers: {
+              "content-type": "application/json; charset=utf-8",
+              ...headers?.(),
+            },
           });
           if (!response.ok) {
             await throwErrorResponse(response);
           }
 
-          const responseJson = transformer.deserialize(await response.text());
+          const responseJson = transformer.deserialize(await response.json());
           tinyassert(responseJson);
           tinyassert(typeof responseJson === "object");
 
@@ -107,13 +114,13 @@ export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
 //
 
 interface Transformer {
-  serialize: (v: unknown) => string;
-  deserialize: (v: string) => unknown;
+  serialize: (v: unknown) => any;
+  deserialize: (v: any) => unknown;
 }
 
-const jsonTransformer: Transformer = {
-  serialize: JSON.stringify,
-  deserialize: JSON.parse,
+const noopTransformer: Transformer = {
+  serialize: (v) => v,
+  deserialize: (v) => v,
 };
 
 //
@@ -165,7 +172,7 @@ function createErrorResponse(eRaw: unknown) {
       message,
       status,
       // TODO: "cause" not necessarily serializable?
-      cause: cause ? "[REDUCTED]" : "",
+      cause,
     }),
     {
       status,

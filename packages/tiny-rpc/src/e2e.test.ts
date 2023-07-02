@@ -138,7 +138,22 @@ describe("e2e", () => {
     ).rejects.toSatisfy((e) => {
       tinyassert(e instanceof TinyRpcError);
       expect(e.status).toMatchInlineSnapshot("500");
-      expect(e.cause).toMatchInlineSnapshot('"[REDUCTED]"');
+      expect(e.cause).toMatchInlineSnapshot(`
+        {
+          "issues": [
+            {
+              "code": "invalid_type",
+              "expected": "number",
+              "message": "Expected number, received string",
+              "path": [
+                "delta",
+              ],
+              "received": "string",
+            },
+          ],
+          "name": "ZodError",
+        }
+      `);
       expect(e).toMatchInlineSnapshot(`
         [Error: [
           {
