@@ -114,8 +114,8 @@ export function createTinyRpcClientProxy<R extends TinyRpcRoutes>({
 //
 
 interface Transformer {
-  serialize: (v: unknown) => any;
-  deserialize: (v: any) => unknown;
+  serialize: (v: unknown) => unknown;
+  deserialize: (v: unknown) => unknown;
 }
 
 const noopTransformer: Transformer = {
