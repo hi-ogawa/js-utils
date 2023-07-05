@@ -3,8 +3,7 @@
 
 // compatible with hattip's RequestHandler
 export type LoggerMiddleware = (ctx: {
-  url: Pick<URL, "pathname">;
-  request: Pick<Request, "method">;
+  request: Pick<Request, "method" | "url">;
   next: () => Promise<Response>;
 }) => Promise<Response>;
 
@@ -14,8 +13,9 @@ export function loggerMiddleware(options?: {
   const log = options?.log ?? console.log;
 
   return async (ctx) => {
+    const url = new URL(ctx.request.url, "https://dummy.local");
+    const pathname = url.pathname;
     const method = ctx.request.method;
-    const pathname = ctx.url.pathname;
 
     const startTime = Date.now();
     log(`  --> ${method} ${pathname}`);
