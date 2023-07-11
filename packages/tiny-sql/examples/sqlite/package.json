@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "scripts": {
+    "repl": "tsx -r './src/repl.ts'",
+    "migrate": "tsx ./src/migrate.ts"
+  },
+  "devDependencies": {
+    "@hiogawa/tiny-sql": "workspace:*",
+    "@hiogawa/utils": "workspace:*",
+    "@types/better-sqlite3": "^7.6.4",
+    "better-sqlite3": "^8.4.0",
+    "consola": "^3.2.3",
+    "tsx": "^3.12.7"
+  }
+}
