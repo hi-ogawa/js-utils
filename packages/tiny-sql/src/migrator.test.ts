@@ -272,5 +272,39 @@ describe(Migrator.name, () => {
         "up:create-profile",
       ]
     `);
+
+    vi.setSystemTime(nextTime());
+    expect(await migrator.down()).toMatchInlineSnapshot(`
+      {
+        "results": [
+          {
+            "direction": "down",
+            "name": "create-profile",
+            "status": "success",
+          },
+        ],
+      }
+    `);
+    expect(table).toMatchInlineSnapshot(`
+      [
+        {
+          "executedAt": "1970-01-01T00:00:01.000Z",
+          "name": "create-user",
+        },
+        {
+          "executedAt": "1970-01-01T00:00:04.000Z",
+          "name": "up-only",
+        },
+      ]
+    `);
+    expect(executed).toMatchInlineSnapshot(`
+      [
+        "up:create-user",
+        "up:up-only",
+        "up:up-only",
+        "up:create-profile",
+        "down:create-profile",
+      ]
+    `);
   });
 });
