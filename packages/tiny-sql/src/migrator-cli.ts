@@ -4,11 +4,7 @@ export class MigratorCli {
   constructor(private migrator: Migrator) {}
 
   async parseAndRun(args: string[]) {
-    let command = args[0];
-    if (!command) {
-      throw new Error("command required");
-    }
-
+    let command = args[0] ?? "";
     if (command === "init-latest") {
       await this.migrator.init();
       command = "latest";
@@ -40,14 +36,9 @@ export class MigratorCli {
         }
         return;
       }
-      case "-h":
-      case "help": {
-        console.log(
-          "[migrator] available commands: init, status, up, down, latest, init-latest"
-        );
-        return;
-      }
     }
-    throw new Error(`unknown command '${command}'`);
+    throw new Error(
+      `unknown command '${command}' (supported commands: 'init', 'status', 'up', 'down', 'latest', 'init-latest')`
+    );
   }
 }

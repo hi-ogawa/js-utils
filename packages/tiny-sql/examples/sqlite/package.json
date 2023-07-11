@@ -1,6 +1,7 @@
 {
   "type": "module",
   "scripts": {
+    "clean": "rm -f dev.sqlite3",
     "repl": "tsx -r './src/repl.ts'",
     "migrate": "tsx ./src/migrate.ts"
   },
