@@ -7,7 +7,7 @@
     "build": "pnpm -r build",
     "tsc": "tsc -b",
     "dev:tsc": "pnpm tsc --watch --preserveWatchOutput",
-    "test": "pnpm -r test run",
+    "test": "pnpm -r --seq test run",
     "lint": "run-s lint:*",
     "lint-check": "run-s lint-check:*",
     "lint:isort": "pnpm lint-check:isort --fix",
