@@ -5,7 +5,7 @@ import {
   rawSqlMigrationDriver,
   rawSqlMigrationProvider,
 } from "@hiogawa/tiny-sql";
-import { collectErrorCause } from "@hiogawa/utils";
+import { flattenErrorCauses } from "@hiogawa/utils";
 import { consola } from "consola";
 import { db, finializeDb, initializeDb } from "./db";
 
@@ -40,7 +40,7 @@ async function mainWrapper() {
     initializeDb();
     await main();
   } catch (error) {
-    for (const e of collectErrorCause(error)) {
+    for (const e of flattenErrorCauses(error)) {
       consola.error(e);
     }
     process.exitCode = 1;

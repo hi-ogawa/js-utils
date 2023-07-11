@@ -8,7 +8,7 @@ export const typedBoolean = Boolean as unknown as <T>(
 ) => value is Exclude<T, false | 0 | "" | null | undefined>;
 
 // traverse Error.cause chain
-export function collectErrorCause(e: unknown): unknown[] {
+export function flattenErrorCauses(e: unknown): unknown[] {
   let errors: unknown[] = [e];
   for (let i = 0; ; i++) {
     if (i > 100) throw new Error("bound loop just in case");
