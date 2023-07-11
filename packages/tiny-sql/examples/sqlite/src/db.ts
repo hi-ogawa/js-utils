@@ -34,6 +34,7 @@ export function sql<T = Record<string, unknown>>(
   const query = strings.raw.join("?");
   const stmt = db.prepare(query).bind(...values);
   const self = {
+    // async is not needed for better-sqlite3 but that should be minority as db driver
     all: async (): Promise<T[]> => {
       if (stmt.reader) {
         return stmt.all() as T[];
