@@ -65,7 +65,7 @@ export class Migrator<T = unknown> {
 
   async down(): Promise<MigrationResultSet> {
     const { completed } = await this.getRequestStateMap();
-    return this.runMany(completed.reverse(), "down");
+    return this.runMany(completed.slice(-1), "down");
   }
 
   async latest(): Promise<MigrationResultSet> {

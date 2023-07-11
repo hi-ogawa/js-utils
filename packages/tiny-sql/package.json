@@ -28,7 +28,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "__todo-test": "vitest",
+    "test": "vitest",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
