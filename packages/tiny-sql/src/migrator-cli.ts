@@ -13,11 +13,12 @@ export class MigratorCli {
     switch (command) {
       case "init": {
         await this.migrator.init();
+        console.log("[migration-init] success");
         return;
       }
       case "status": {
         const result = await this.migrator.status();
-        console.log("[migrator] migration status");
+        console.log("[migration-status]");
         for (const [name, e] of result.map) {
           console.log(name, ":", e.state?.executedAt ?? "(pending)");
         }
@@ -27,7 +28,7 @@ export class MigratorCli {
       case "down":
       case "latest": {
         const result = await this.migrator[command]();
-        console.log("[migrator] executed migrations");
+        console.log("[executed-migrations]");
         for (const r of result.results) {
           console.log(r.name, ":", r.status, "-", r.direction);
         }

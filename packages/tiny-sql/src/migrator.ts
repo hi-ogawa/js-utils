@@ -88,7 +88,7 @@ export class Migrator<T = unknown> {
     const missings = states.filter((s) => !map.has(s.name));
     if (missings.length > 0) {
       console.error(
-        "[WARNING] already applied migrations are not found:\n" +
+        "[WARNING] cannot find applied migrations:\n" +
           missings.map((s) => s.name).join("\n")
       );
     }
