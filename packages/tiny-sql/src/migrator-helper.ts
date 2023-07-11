@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import type {
   MigrationRequest,
   MigrationState,
@@ -14,6 +12,10 @@ export function rawSqlMigrationProvider(options: {
   directory: string;
 }): MigratorOptions<string>["provider"] {
   return async () => {
+    // dynamic import so that bundle is platform agnostic
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
     const requests: MigrationRequest<string>[] = [];
 
     const nameDirs = await fs.promises.readdir(options.directory, {
