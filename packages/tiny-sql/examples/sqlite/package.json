@@ -1,0 +1,17 @@
+{
+  "type": "module",
+  "scripts": {
+    "clean": "rm -f dev.sqlite3",
+    "repl": "tsx -r './src/repl.ts'",
+    "migrate": "tsx ./src/migrate.ts",
+    "test": "bash misc/test.sh"
+  },
+  "devDependencies": {
+    "@hiogawa/tiny-sql": "workspace:*",
+    "@hiogawa/utils": "workspace:*",
+    "@types/better-sqlite3": "^7.6.4",
+    "better-sqlite3": "^8.4.0",
+    "consola": "^3.2.3",
+    "tsx": "^3.12.7"
+  }
+}
