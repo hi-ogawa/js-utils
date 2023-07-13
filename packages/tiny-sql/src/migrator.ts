@@ -15,6 +15,7 @@ export type MigratorOptions<I> = {
     delete: (result: Pick<MigrationState, "name">) => Promise<void>;
     run: (input: I) => Promise<void>;
   };
+  logger?: (v: string) => void;
 };
 
 export type MigrationRequest<I> = {
@@ -49,6 +50,10 @@ export interface MigrationResultSet {
 
 export class Migrator<T = unknown> {
   constructor(private options: MigratorOptions<T>) {}
+
+  get logger() {
+    return this.options.logger ?? console.error;
+  }
 
   async init() {
     await this.options.driver.init();
@@ -88,9 +93,9 @@ export class Migrator<T = unknown> {
     // check if applied migrations are all provided
     const missings = states.filter((s) => !map.has(s.name));
     if (missings.length > 0) {
-      console.error(
-        "[warning:migrator] already applied migrations are not provided:\n" +
-          missings.map((s) => s.name).join("\n")
+      this.logger(
+        "[warning:migrator] already applied migrations are not provided: " +
+          missings.map((s) => s.name).join(", ")
       );
     }
 
@@ -100,7 +105,7 @@ export class Migrator<T = unknown> {
       const e1 = pairs[i];
       const e2 = pairs[i + 1];
       if (!e1.state && e2.state) {
-        console.error(
+        this.logger(
           `[warning:migrator] you have unapplied migration '${e1.request.name}' before applied migration '${e2.request.name}'`
         );
         break;
