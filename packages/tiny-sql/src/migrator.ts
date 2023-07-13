@@ -74,6 +74,7 @@ export class Migrator<T = unknown> {
   }
 
   private async getRequestStateMap() {
+    // migration order is decided by `provider`
     const requests = await this.options.provider();
     const states = await this.options.driver.select();
     const map: MigrationRequestStateMap<T> = new Map();
@@ -84,25 +85,30 @@ export class Migrator<T = unknown> {
       });
     }
 
-    // check missing request
+    // check if applied migrations are all provided
     const missings = states.filter((s) => !map.has(s.name));
     if (missings.length > 0) {
       console.error(
-        "[WARNING] cannot find applied migrations:\n" +
+        "[warning:migrator] already applied migrations are not provided:\n" +
           missings.map((s) => s.name).join("\n")
       );
     }
 
-    const pending = [...map.values()]
-      .filter((e) => !e.state)
-      .map((e) => e.request);
+    // check if there are unapplied migrations before applied migrations
+    const pairs = [...map.values()];
+    for (let i = 0; i < pairs.length - 1; i++) {
+      const e1 = pairs[i];
+      const e2 = pairs[i + 1];
+      if (!e1.state && e2.state) {
+        console.error(
+          `[warning:migrator] you have unapplied migration '${e1.request.name}' before applied migration '${e2.request.name}'`
+        );
+        break;
+      }
+    }
 
-    // order by `executedAt` instead of `name` (similar to knex's `id` ordering)
-    const completed = [...map.values()]
-      .filter((e) => e.state)
-      .sort((l, r) => l.state!.executedAt.localeCompare(r.state!.executedAt))
-      .map((e) => e.request);
-
+    const pending = pairs.filter((e) => !e.state).map((e) => e.request);
+    const completed = pairs.filter((e) => e.state).map((e) => e.request);
     return { map, pending, completed };
   }
 
