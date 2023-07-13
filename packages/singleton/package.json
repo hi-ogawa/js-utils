@@ -1,0 +1,37 @@
+{
+  "name": "@hiogawa/singleton",
+  "version": "0.2.2",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/singleton",
+    "directory": "packages/singleton"
+  },
+  "typedoc": {
+    "displayName": "@hiogawa/singleton",
+    "readmeFile": "./README.md",
+    "entryPoint": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "release": "pnpm publish --no-git-checks --access public"
+  },
+  "devDependencies": {},
+  "peerDependencies": {},
+  "peerDependenciesMeta": {}
+}
