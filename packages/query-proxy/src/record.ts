@@ -1,4 +1,3 @@
-import type { GetNextPageParamFunction } from "@tanstack/query-core";
 import { createGetterProxy } from "./utils";
 
 type FnAny = (...args: any[]) => any;
@@ -22,15 +21,13 @@ export type FnRecordQueryProxy<T extends FnRecord> = {
       queryFn: () => Promise<FnOut<T[K]>>;
     };
     infiniteQueryOptions: (
-      input: FnIn<T[K]>,
-      options: {
-        getNextPageParam: GetNextPageParamFunction<FnOut<T[K]>>;
-        setPageParam: (input: FnIn<T[K]>, pageParam: unknown) => FnIn<T[K]>;
-      }
+      // `context` is supposed to be `import("@tanstack/query-core").QueryFunctionContext`
+      // but we don't exactly specify the type to avoid restricting tanstack query version.
+      // Assuming the use case of infinite query is limited, having "unknown" here won't degrade DX so bad.
+      inputFn: (context?: unknown) => FnIn<T[K]>
     ) => {
       queryKey: unknown[];
       queryFn: (context: unknown) => Promise<FnOut<T[K]>>;
-      getNextPageParam: any;
     };
     mutationKey: unknown[];
     mutationOptions: () => {
@@ -55,11 +52,9 @@ export function createFnRecordQueryProxy<T extends FnRecord>(
         });
       }
       if (prop === "infiniteQueryOptions") {
-        return (input: unknown, options: any) => ({
-          queryKey: [k, input],
-          queryFn: ({ pageParam }: any) =>
-            (fnRecord as any)[k](options.setPageParam(input, pageParam)),
-          getNextPageParam: options.getNextPageParam,
+        return (inputFn: any) => ({
+          queryKey: [k, inputFn()],
+          queryFn: (context: any) => (fnRecord as any)[k](inputFn(context)),
         });
       }
       if (prop === "mutationOptions") {

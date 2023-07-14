@@ -39,7 +39,6 @@
     "zod": "^3.21.4"
   },
   "peerDependencies": {
-    "@tanstack/query-core": "*",
     "@trpc/server": "*"
   },
   "peerDependenciesMeta": {
