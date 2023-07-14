@@ -42,7 +42,7 @@ importers:
   packages/query-proxy:
     devDependencies:
       '@hiogawa/utils':
-        specifier: workspace:1.4.2-pre.13
+        specifier: workspace:*
         version: link:../utils
       '@tanstack/query-core':
         specifier: ^4.29.14
