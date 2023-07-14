@@ -32,6 +32,7 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
+    "@hiogawa/utils": "workspace:*",
     "@tanstack/query-core": "^4.29.14",
     "@trpc/client": "^10.33.0",
     "@trpc/server": "^10.33.0",
