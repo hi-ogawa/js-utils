@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/query-proxy",
-  "version": "0.1.1-pre.1",
+  "version": "0.1.1-pre.3",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

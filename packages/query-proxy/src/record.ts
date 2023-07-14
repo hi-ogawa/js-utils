@@ -22,9 +22,10 @@ export type FnRecordQueryProxy<T extends FnRecord> = {
     };
     infiniteQueryOptions: (
       // `context` is supposed to be `import("@tanstack/query-core").QueryFunctionContext`
-      // but we don't exactly specify the type to avoid restricting tanstack query version.
-      // Assuming the use case of infinite query is limited, having "unknown" here won't degrade DX so bad.
-      inputFn: (context?: unknown) => FnIn<T[K]>
+      // but we don't exactly specify the type to avoid peer-deps and restricting tanstack query version.
+      // for most of the case, having `pageParam` is enough.
+      // if full type is needed, then users can still resort to `any`.
+      inputFn: (context?: { pageParam: unknown }) => FnIn<T[K]>
     ) => {
       queryKey: unknown[];
       queryFn: (context: unknown) => Promise<FnOut<T[K]>>;

@@ -72,9 +72,9 @@ describe(createFnRecordQueryProxy.name, () => {
     //
 
     const infiniteQueryObserver = new InfiniteQueryObserver(queryClient, {
-      ...fnRecordQuery.getPage.infiniteQueryOptions((context: any) => ({
+      ...fnRecordQuery.getPage.infiniteQueryOptions((context) => ({
         limit: 5,
-        cursor: context?.pageParam,
+        cursor: context?.pageParam as any,
       })),
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     });
