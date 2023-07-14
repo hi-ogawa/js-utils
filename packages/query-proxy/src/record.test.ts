@@ -71,21 +71,13 @@ describe(createFnRecordQueryProxy.name, () => {
     // infinite query
     //
 
-    const infiniteQueryObserver = new InfiniteQueryObserver(
-      queryClient,
-      fnRecordQuery.getPage.infiniteQueryOptions(
-        {
-          limit: 5,
-        },
-        {
-          getNextPageParam: (lastPage) => lastPage.nextCursor,
-          setPageParam: (input, pageParam) => ({
-            ...input,
-            cursor: pageParam as any,
-          }),
-        }
-      )
-    );
+    const infiniteQueryObserver = new InfiniteQueryObserver(queryClient, {
+      ...fnRecordQuery.getPage.infiniteQueryOptions((context: any) => ({
+        limit: 5,
+        cursor: context?.pageParam,
+      })),
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    });
 
     expect((await infiniteQueryObserver.fetchNextPage()).data)
       .toMatchInlineSnapshot(`
@@ -248,6 +240,7 @@ describe(createFnRecordQueryProxy.name, () => {
           "queryKey": [
             "getPage",
             {
+              "cursor": undefined,
               "limit": 5,
             },
           ],

@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/query-proxy",
-  "version": "0.1.1-pre.0",
+  "version": "0.1.1-pre.1",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -39,7 +39,6 @@
     "zod": "^3.21.4"
   },
   "peerDependencies": {
-    "@tanstack/query-core": "*",
     "@trpc/server": "*"
   },
   "peerDependenciesMeta": {
