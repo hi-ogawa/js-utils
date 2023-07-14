@@ -1,4 +1,9 @@
-import { type MutationOptions, QueryClient } from "@tanstack/query-core";
+import { range } from "@hiogawa/utils";
+import {
+  InfiniteQueryObserver,
+  MutationObserver,
+  QueryClient,
+} from "@tanstack/query-core";
 import { describe, expect, it } from "vitest";
 import { type FnRecord, createFnRecordQueryProxy } from "./record";
 
@@ -9,6 +14,7 @@ describe(createFnRecordQueryProxy.name, () => {
     //
 
     let counter = 0;
+    const pageAll = range(12);
 
     const fnRecord = {
       checkId: (id: string) => id === "good",
@@ -19,25 +25,35 @@ describe(createFnRecordQueryProxy.name, () => {
         counter += delta;
         return counter;
       },
+
+      getPage: ({ limit = 5, cursor }: { limit?: number; cursor?: number }) => {
+        let results = pageAll.slice();
+        if (typeof cursor !== "undefined") {
+          results = results.slice(cursor + 1);
+        }
+        results = results.slice(0, limit);
+        return {
+          results,
+          nextCursor: results.at(-1),
+        };
+      },
     } satisfies FnRecord;
 
     //
     // use Service via QueryClient
     //
     const fnRecordQuery = createFnRecordQueryProxy(fnRecord);
+    const queryClient = new QueryClient();
+
+    //
+    // query
+    //
 
     // type-check
     fnRecordQuery.checkId.queryOptions satisfies (id: string) => {
       queryKey: unknown[];
       queryFn: (id: string) => Promise<boolean>;
     };
-
-    fnRecordQuery.updateCounter.mutationOptions satisfies () => {
-      mutationKey: unknown[];
-      mutationFn: (delta: number) => Promise<number>;
-    };
-
-    const queryClient = new QueryClient();
 
     expect(
       await queryClient.fetchQuery(fnRecordQuery.checkId.queryOptions("bad"))
@@ -46,6 +62,123 @@ describe(createFnRecordQueryProxy.name, () => {
     expect(
       await queryClient.fetchQuery(fnRecordQuery.checkId.queryOptions("good"))
     ).toMatchInlineSnapshot("true");
+
+    expect(
+      await queryClient.fetchQuery(fnRecordQuery.getCounter.queryOptions())
+    ).toMatchInlineSnapshot("0");
+
+    //
+    // infinite query
+    //
+
+    const infiniteQueryObserver = new InfiniteQueryObserver(
+      queryClient,
+      fnRecordQuery.getPage.infiniteQueryOptions(
+        {
+          limit: 5,
+        },
+        {
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+          setPageParam: (input, pageParam) => ({
+            ...input,
+            cursor: pageParam as any,
+          }),
+        }
+      )
+    );
+
+    expect((await infiniteQueryObserver.fetchNextPage()).data)
+      .toMatchInlineSnapshot(`
+      {
+        "pageParams": [
+          undefined,
+        ],
+        "pages": [
+          {
+            "nextCursor": 4,
+            "results": [
+              0,
+              1,
+              2,
+              3,
+              4,
+            ],
+          },
+        ],
+      }
+    `);
+
+    expect((await infiniteQueryObserver.fetchNextPage()).data)
+      .toMatchInlineSnapshot(`
+      {
+        "pageParams": [
+          undefined,
+          4,
+        ],
+        "pages": [
+          {
+            "nextCursor": 4,
+            "results": [
+              0,
+              1,
+              2,
+              3,
+              4,
+            ],
+          },
+          {
+            "nextCursor": 9,
+            "results": [
+              5,
+              6,
+              7,
+              8,
+              9,
+            ],
+          },
+        ],
+      }
+    `);
+
+    expect((await infiniteQueryObserver.fetchNextPage()).data)
+      .toMatchInlineSnapshot(`
+      {
+        "pageParams": [
+          undefined,
+          4,
+          9,
+        ],
+        "pages": [
+          {
+            "nextCursor": 4,
+            "results": [
+              0,
+              1,
+              2,
+              3,
+              4,
+            ],
+          },
+          {
+            "nextCursor": 9,
+            "results": [
+              5,
+              6,
+              7,
+              8,
+              9,
+            ],
+          },
+          {
+            "nextCursor": 11,
+            "results": [
+              10,
+              11,
+            ],
+          },
+        ],
+      }
+    `);
 
     expect(
       queryClient
@@ -68,30 +201,78 @@ describe(createFnRecordQueryProxy.name, () => {
             "good",
           ],
         },
+        {
+          "data": 0,
+          "queryKey": [
+            "getCounter",
+            undefined,
+          ],
+        },
+        {
+          "data": {
+            "pageParams": [
+              undefined,
+              4,
+              9,
+            ],
+            "pages": [
+              {
+                "nextCursor": 4,
+                "results": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                ],
+              },
+              {
+                "nextCursor": 9,
+                "results": [
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                ],
+              },
+              {
+                "nextCursor": 11,
+                "results": [
+                  10,
+                  11,
+                ],
+              },
+            ],
+          },
+          "queryKey": [
+            "getPage",
+            {
+              "limit": 5,
+            },
+          ],
+        },
       ]
     `);
 
-    expect(
-      await queryClient.fetchQuery(fnRecordQuery.getCounter.queryOptions())
-    ).toMatchInlineSnapshot("0");
+    //
+    // mutation
+    //
 
-    expect(
-      await executeMutation(queryClient, {
-        ...fnRecordQuery.updateCounter.mutationOptions(),
-        variables: +1,
-      })
-    ).toMatchInlineSnapshot("1");
+    // type check
+    fnRecordQuery.updateCounter.mutationOptions satisfies () => {
+      mutationKey: unknown[];
+      mutationFn: (delta: number) => Promise<number>;
+    };
+
+    const mutationObserver = new MutationObserver(
+      queryClient,
+      fnRecordQuery.updateCounter.mutationOptions()
+    );
+    expect(await mutationObserver.mutate(1)).toMatchInlineSnapshot("1");
 
     expect(
       await queryClient.fetchQuery(fnRecordQuery.getCounter.queryOptions())
     ).toMatchInlineSnapshot("1");
   });
 });
-
-// https://github.com/TanStack/query/blob/9b48048a61bfc50483e4a7e16fa28ac23626896d/packages/query-core/src/tests/utils.ts#L57-L62
-function executeMutation(
-  queryClient: QueryClient,
-  options: MutationOptions<any, any, any, any>
-) {
-  return queryClient.getMutationCache().build(queryClient, options).execute();
-}

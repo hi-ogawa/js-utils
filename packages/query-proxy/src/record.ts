@@ -50,7 +50,7 @@ export function createFnRecordQueryProxy<T extends FnRecord>(
       }
       if (prop === "queryOptions") {
         return (input: unknown) => ({
-          queryKey: [k, input],
+          queryKey: [k, input], // TODO: maybe strip if `input = undefined`?
           queryFn: async () => (fnRecord as any)[k](input),
         });
       }
