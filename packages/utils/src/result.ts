@@ -18,10 +18,23 @@ export function wrapError<T>(getValue: () => T): Result<T, unknown> {
   }
 }
 
+export async function wrapErrorAsync<T>(
+  getValue: () => Promise<T>
+): Promise<Result<T, unknown>> {
+  try {
+    return Ok(await getValue());
+  } catch (e) {
+    return Err(e);
+  }
+}
+
 export function okToOption<T>(result: Result<T, unknown>): T | undefined {
   return result.ok ? result.value : undefined;
 }
 
+/**
+ * @deprecated use `wrapErrorAsync` instead
+ */
 export async function wrapPromise<T>(
   value: Promise<T>
 ): Promise<Result<T, unknown>> {
