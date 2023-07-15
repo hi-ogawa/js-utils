@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/utils",
-  "version": "1.4.2-pre.13",
+  "version": "1.4.2-pre.14",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
