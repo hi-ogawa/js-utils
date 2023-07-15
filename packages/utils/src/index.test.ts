@@ -12,7 +12,7 @@ import {
   type Result,
   okToOption,
   wrapError,
-  wrapPromise,
+  wrapErrorAsync,
 } from "./result";
 import { tinyassert } from "./tinyassert";
 
@@ -333,7 +333,7 @@ describe("Result", () => {
     });
   });
 
-  describe("wrapPromise", async () => {
+  describe(wrapErrorAsync, async () => {
     async function boom(value: boolean) {
       if (value) {
         throw new Error("boom");
@@ -342,7 +342,7 @@ describe("Result", () => {
     }
 
     it("success", async () => {
-      const result = await wrapPromise(boom(false));
+      const result = await wrapErrorAsync(() => boom(false));
       result satisfies Result<number, unknown>;
       expect(result).toMatchInlineSnapshot(`
         {
@@ -353,7 +353,7 @@ describe("Result", () => {
     });
 
     it("error", async () => {
-      const result = await wrapPromise(boom(true));
+      const result = await wrapErrorAsync(() => boom(true));
       result satisfies Result<number, unknown>;
       expect(result).toMatchInlineSnapshot(`
         {
@@ -386,7 +386,7 @@ describe("newPromiseWithResolvers", () => {
   it("resolve", async () => {
     const { promise, resolve } = newPromiseWithResolvers<number>();
     resolve(123);
-    const result = await wrapPromise(promise);
+    const result = await wrapErrorAsync(() => promise);
     expect(result).toMatchInlineSnapshot(`
       {
         "ok": true,
@@ -398,7 +398,7 @@ describe("newPromiseWithResolvers", () => {
   it("reject", async () => {
     const { promise, reject } = newPromiseWithResolvers<number>();
     reject(123);
-    const result = await wrapPromise(promise);
+    const result = await wrapErrorAsync(() => promise);
     expect(result).toMatchInlineSnapshot(`
       {
         "ok": false,
