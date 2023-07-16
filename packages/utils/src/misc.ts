@@ -21,3 +21,16 @@ export function flattenErrorCauses(e: unknown): unknown[] {
   }
   return errors;
 }
+
+// similar convenience as z.enum but supports any key (number | string | symbol)
+// cf. https://github.com/colinhacks/zod/blob/cfbc7b3f6714ced250dd4053822faf472bf1828e/src/types.ts#L3958
+export function arrayToEnum<
+  T extends keyof any,
+  Ts extends Readonly<[T, ...T[]]>
+>(
+  values: Ts
+): {
+  [K in Ts[number]]: K;
+} {
+  return Object.fromEntries(values.map((v) => [v, v])) as any;
+}
