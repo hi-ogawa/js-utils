@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
-import { assertUnreachable, typedBoolean } from "./misc";
+import { arrayToEnum, assertUnreachable, typedBoolean } from "./misc";
 import { mapOption } from "./option";
 import { newPromiseWithResolvers } from "./promise";
 import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
@@ -31,6 +31,80 @@ describe("typedBoolean", () => {
     const result1 = someArray.filter(Boolean);
     const result2 = someArray.filter(typedBoolean) satisfies { x: number }[];
     expect(result1).toEqual(result2);
+  });
+});
+
+describe(arrayToEnum, () => {
+  it("basic", () => {
+    const e = arrayToEnum(["x", "y"]);
+    e satisfies {
+      x: "x";
+      y: "y";
+    };
+    expect(e).toMatchInlineSnapshot(`
+      {
+        "x": "x",
+        "y": "y",
+      }
+    `);
+  });
+
+  it("const", () => {
+    const src = ["x", "y"] as const;
+    const e = arrayToEnum(src);
+    e satisfies {
+      x: "x";
+      y: "y";
+    };
+    expect(e).toMatchInlineSnapshot(`
+      {
+        "x": "x",
+        "y": "y",
+      }
+    `);
+  });
+
+  it("destructure", () => {
+    const src = ["x", "y"] as const;
+    const e = arrayToEnum(["w", ...src, "z"]);
+    e satisfies {
+      w: "w";
+      x: "x";
+      y: "y";
+      z: "z";
+    };
+    expect(e).toMatchInlineSnapshot(`
+      {
+        "w": "w",
+        "x": "x",
+        "y": "y",
+        "z": "z",
+      }
+    `);
+  });
+
+  it("number", () => {
+    const s = Symbol("s");
+    const e = arrayToEnum([0, 1, "x", "y", s]);
+    e satisfies {
+      0: 0;
+      1: 1;
+      x: "x";
+      y: "y";
+      [s]: typeof s;
+    };
+    expect(e).toMatchInlineSnapshot(`
+      {
+        "0": 0,
+        "1": 1,
+        "x": "x",
+        "y": "y",
+        Symbol(s): Symbol(s),
+      }
+    `);
+    expect(e[0]).toMatchInlineSnapshot("0");
+    expect(e.x).toMatchInlineSnapshot('"x"');
+    expect(e[s]).toMatchInlineSnapshot("Symbol(s)");
   });
 });
 
