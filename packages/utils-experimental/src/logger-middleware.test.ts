@@ -16,8 +16,7 @@ describe(loggerMiddleware, () => {
 
     vi.setSystemTime(new Date("2020-02-02T00:00:00.000Z"));
     await logger({
-      url: { pathname: "/test" },
-      request: { method: "GET" },
+      request: { url: "http://dummy.local/test", method: "GET" },
       next: async () => {
         vi.setSystemTime(new Date("2020-02-02T00:00:00.123Z"));
         return new Response(null, { status: 200 });
@@ -33,8 +32,7 @@ describe(loggerMiddleware, () => {
 
     vi.setSystemTime(new Date("2020-02-02T00:00:00.000Z"));
     await logger({
-      url: { pathname: "/test2" },
-      request: { method: "POST" },
+      request: { url: "http://dummy.local/test2", method: "POST" },
       next: async () => {
         vi.setSystemTime(new Date("2020-02-02T00:00:01.230Z"));
         return new Response(null, { status: 302 });
