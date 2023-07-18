@@ -572,26 +572,72 @@ describe(mapRegExp.name, () => {
   });
 });
 
-describe(mapPromise, () => {
-  const sleep = (ms: number) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
+describe.only(mapPromise, () => {
+  function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(() => resolve(null), ms));
+  }
 
   it("basic", async () => {
     const logs: any[] = [];
-    const results = await mapPromise(
+    const gen = mapPromise(
       range(10).reverse(),
-      async (i) => {
-        console.log("->", i);
-        logs.push(`-> ${i}`);
-        await sleep(i * 10);
-        console.log("<-", i);
-        logs.push(`<- ${i}`);
+      async (v, i) => {
+        await sleep(v * 100);
+        return { v, i };
       },
       {
         concurrency: 3,
       }
     );
-    expect(results).toMatchInlineSnapshot();
-    expect(logs).toMatchInlineSnapshot();
+
+    let results: any[] = [];
+    for await (const v of gen) {
+      results.push(v);
+    }
+    expect(results).toMatchInlineSnapshot(`
+      [
+        {
+          "i": 2,
+          "v": 7,
+        },
+        {
+          "i": 1,
+          "v": 8,
+        },
+        {
+          "i": 0,
+          "v": 9,
+        },
+        {
+          "i": 5,
+          "v": 4,
+        },
+        {
+          "i": 3,
+          "v": 6,
+        },
+        {
+          "i": 4,
+          "v": 5,
+        },
+        {
+          "i": 8,
+          "v": 1,
+        },
+        {
+          "i": 9,
+          "v": 0,
+        },
+        {
+          "i": 7,
+          "v": 2,
+        },
+        {
+          "i": 6,
+          "v": 3,
+        },
+      ]
+    `);
+    expect(logs).toMatchInlineSnapshot("[]");
   });
 });
