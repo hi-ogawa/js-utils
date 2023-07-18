@@ -14,30 +14,25 @@ export async function* mapPromise<T1, T2>(
   f: (value: T1, index: number) => PromiseLike<T2>,
   { concurrency }: { concurrency: number }
 ): AsyncGenerator<T2> {
-  const pendings = new Map<number, Promise<[number, T2]>>();
-
-  async function consumePending() {
-    const [key, result] = await Promise.race(pendings.values());
-    pendings.delete(key);
-    return result;
-  }
+  const pendings: Promise<T2>[] = [];
 
   let index = 0;
   for (const value of values) {
-    if (pendings.size >= concurrency) {
-      yield await consumePending();
+    if (pendings.length >= concurrency) {
+      yield await Promise.race(pendings);
     }
-    const key = index++;
-    pendings.set(
-      key,
-      (async () => {
-        const result = await f(value, key);
-        return [key, result];
-      })()
-    );
+
+    const promise = (async () => {
+      const result = await f(value, index++);
+      // `await f(...)` allows ticks for `pendings.push`
+      // TODO: is this guaranteed by ecmascript spec? or implementation dependent?
+      pendings.splice(pendings.indexOf(promise!), 1);
+      return result;
+    })();
+    pendings.push(promise);
   }
 
-  while (pendings.size > 0) {
-    yield await consumePending();
+  while (pendings.length > 0) {
+    yield await Promise.race(pendings);
   }
 }

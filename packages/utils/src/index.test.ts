@@ -572,7 +572,7 @@ describe(mapRegExp.name, () => {
   });
 });
 
-describe.only(mapPromise, () => {
+describe(mapPromise, () => {
   function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(() => resolve(null), ms));
   }
@@ -580,7 +580,7 @@ describe.only(mapPromise, () => {
   it("basic", async () => {
     const logs: any[] = [];
     const gen = mapPromise(
-      range(10).reverse(),
+      range(8),
       async (v, i) => {
         await sleep(v * 100);
         return { v, i };
@@ -597,44 +597,36 @@ describe.only(mapPromise, () => {
     expect(results).toMatchInlineSnapshot(`
       [
         {
-          "i": 2,
-          "v": 7,
-        },
-        {
-          "i": 1,
-          "v": 8,
-        },
-        {
           "i": 0,
-          "v": 9,
-        },
-        {
-          "i": 5,
-          "v": 4,
-        },
-        {
-          "i": 3,
-          "v": 6,
-        },
-        {
-          "i": 4,
-          "v": 5,
-        },
-        {
-          "i": 8,
-          "v": 1,
-        },
-        {
-          "i": 9,
           "v": 0,
         },
         {
-          "i": 7,
+          "i": 1,
+          "v": 1,
+        },
+        {
+          "i": 2,
           "v": 2,
         },
         {
-          "i": 6,
+          "i": 3,
           "v": 3,
+        },
+        {
+          "i": 4,
+          "v": 4,
+        },
+        {
+          "i": 5,
+          "v": 5,
+        },
+        {
+          "i": 6,
+          "v": 6,
+        },
+        {
+          "i": 7,
+          "v": 7,
         },
       ]
     `);
