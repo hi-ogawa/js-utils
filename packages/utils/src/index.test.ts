@@ -4,7 +4,7 @@ import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
 import { arrayToEnum, assertUnreachable, typedBoolean } from "./misc";
 import { mapOption } from "./option";
-import { newPromiseWithResolvers } from "./promise";
+import { mapPromise, newPromiseWithResolvers } from "./promise";
 import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
 import {
   Err,
@@ -569,5 +569,29 @@ describe(mapRegExp.name, () => {
     expect(transform("x = {{ 1 + 2 }}, y = {{ 4 * 5 }}")).toMatchInlineSnapshot(
       '"x = 3, y = 20"'
     );
+  });
+});
+
+describe(mapPromise, () => {
+  const sleep = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  it("basic", async () => {
+    const logs: any[] = [];
+    const results = await mapPromise(
+      range(10).reverse(),
+      async (i) => {
+        console.log("->", i);
+        logs.push(`-> ${i}`);
+        await sleep(i * 10);
+        console.log("<-", i);
+        logs.push(`<- ${i}`);
+      },
+      {
+        concurrency: 3,
+      }
+    );
+    expect(results).toMatchInlineSnapshot();
+    expect(logs).toMatchInlineSnapshot();
   });
 });
