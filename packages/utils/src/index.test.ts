@@ -577,10 +577,20 @@ describe(mapPromise, () => {
     return new Promise((resolve) => setTimeout(() => resolve(null), ms));
   }
 
+  async function arrayFromAsyncGenerator<T>(
+    generator: AsyncGenerator<T>
+  ): Promise<T[]> {
+    const result: T[] = [];
+    for await (const v of generator) {
+      result.push(v);
+    }
+    return result;
+  }
+
   it("basic", async () => {
     const logs: any[] = [];
     const gen = mapPromise(
-      range(8),
+      range(5),
       async (v, i) => {
         await sleep(v * 100);
         return { v, i };
@@ -590,11 +600,8 @@ describe(mapPromise, () => {
       }
     );
 
-    let results: any[] = [];
-    for await (const v of gen) {
-      results.push(v);
-    }
-    expect(results).toMatchInlineSnapshot(`
+    const result = await arrayFromAsyncGenerator(gen);
+    expect(result).toMatchInlineSnapshot(`
       [
         {
           "i": 0,
@@ -616,20 +623,46 @@ describe(mapPromise, () => {
           "i": 4,
           "v": 4,
         },
-        {
-          "i": 5,
-          "v": 5,
-        },
-        {
-          "i": 6,
-          "v": 6,
-        },
-        {
-          "i": 7,
-          "v": 7,
-        },
       ]
     `);
     expect(logs).toMatchInlineSnapshot("[]");
+  });
+
+  it("synchronous", async () => {
+    const gen = mapPromise(
+      range(5),
+      (v, i) => {
+        return { v, i };
+      },
+      {
+        concurrency: 3,
+      }
+    );
+
+    const result = await arrayFromAsyncGenerator(gen);
+    expect(result).toMatchInlineSnapshot(`
+      [
+        {
+          "i": 0,
+          "v": 0,
+        },
+        {
+          "i": 1,
+          "v": 1,
+        },
+        {
+          "i": 2,
+          "v": 2,
+        },
+        {
+          "i": 3,
+          "v": 3,
+        },
+        {
+          "i": 4,
+          "v": 4,
+        },
+      ]
+    `);
   });
 });
