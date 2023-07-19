@@ -25,7 +25,7 @@ export async function* mapPromise<T1, T2>(
     const promise = (async () => {
       const result = await f(value, index++);
       return () => {
-        // cleanup itself and get result
+        // synchronously cleanup itself then return
         pendings.splice(pendings.indexOf(promise), 1);
         return result;
       };

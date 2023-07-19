@@ -588,11 +588,10 @@ describe(mapPromise, () => {
   }
 
   it("basic", async () => {
-    const logs: any[] = [];
-    const gen = mapPromise(
-      range(5),
+    const generator = mapPromise(
+      range(5).reverse(),
       async (v, i) => {
-        await sleep(v * 100);
+        await sleep(50);
         return { v, i };
       },
       {
@@ -600,16 +599,16 @@ describe(mapPromise, () => {
       }
     );
 
-    const result = await arrayFromAsyncGenerator(gen);
+    const result = await arrayFromAsyncGenerator(generator);
     expect(result).toMatchInlineSnapshot(`
       [
         {
           "i": 0,
-          "v": 0,
+          "v": 4,
         },
         {
           "i": 1,
-          "v": 1,
+          "v": 3,
         },
         {
           "i": 2,
@@ -617,20 +616,19 @@ describe(mapPromise, () => {
         },
         {
           "i": 3,
-          "v": 3,
+          "v": 1,
         },
         {
           "i": 4,
-          "v": 4,
+          "v": 0,
         },
       ]
     `);
-    expect(logs).toMatchInlineSnapshot("[]");
   });
 
   it("synchronous", async () => {
-    const gen = mapPromise(
-      range(5),
+    const generator = mapPromise(
+      range(5).reverse(),
       (v, i) => {
         return { v, i };
       },
@@ -639,16 +637,16 @@ describe(mapPromise, () => {
       }
     );
 
-    const result = await arrayFromAsyncGenerator(gen);
+    const result = await arrayFromAsyncGenerator(generator);
     expect(result).toMatchInlineSnapshot(`
       [
         {
           "i": 0,
-          "v": 0,
+          "v": 4,
         },
         {
           "i": 1,
-          "v": 1,
+          "v": 3,
         },
         {
           "i": 2,
@@ -656,12 +654,80 @@ describe(mapPromise, () => {
         },
         {
           "i": 3,
-          "v": 3,
+          "v": 1,
         },
         {
           "i": 4,
-          "v": 4,
+          "v": 0,
         },
+      ]
+    `);
+  });
+
+  it("error", async () => {
+    const generator = mapPromise(
+      range(5),
+      async (v) => {
+        await sleep(50);
+        if (v === 3) {
+          throw new Error(`thrown ${v}`);
+        }
+        return v;
+      },
+      {
+        concurrency: 3,
+      }
+    );
+
+    let generated: unknown[] = [];
+    const result = await wrapErrorAsync(async () => {
+      for await (const x of generator) {
+        generated.push(x);
+      }
+    });
+
+    expect(generated).toMatchInlineSnapshot(`
+      [
+        0,
+        1,
+        2,
+      ]
+    `);
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "ok": false,
+        "value": [Error: thrown 3],
+      }
+    `);
+  });
+
+  it("sequential", async () => {
+    // can easily simulate Promise.all like ordering
+    // by storing the result externally with index
+
+    const result: unknown[] = [];
+
+    const generator = mapPromise(
+      range(5).reverse(),
+      async (v, i) => {
+        sleep(v * 30);
+        result[i] = v;
+      },
+      {
+        concurrency: 3,
+      }
+    );
+
+    for await (const _ of generator) {
+    }
+
+    expect(result).toMatchInlineSnapshot(`
+      [
+        4,
+        3,
+        2,
+        1,
+        0,
       ]
     `);
   });
