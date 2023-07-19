@@ -4,7 +4,7 @@ import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
 import { arrayToEnum, assertUnreachable, typedBoolean } from "./misc";
 import { mapOption } from "./option";
-import { mapPromise, newPromiseWithResolvers } from "./promise";
+import { mapToAsyncGenerator, newPromiseWithResolvers } from "./promise";
 import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
 import {
   Err,
@@ -572,7 +572,7 @@ describe(mapRegExp.name, () => {
   });
 });
 
-describe(mapPromise, () => {
+describe(mapToAsyncGenerator, () => {
   function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(() => resolve(null), ms));
   }
@@ -588,7 +588,7 @@ describe(mapPromise, () => {
   }
 
   it("basic", async () => {
-    const generator = mapPromise(
+    const generator = mapToAsyncGenerator(
       range(5).reverse(),
       async (v, i) => {
         await sleep(50);
@@ -627,7 +627,7 @@ describe(mapPromise, () => {
   });
 
   it("synchronous", async () => {
-    const generator = mapPromise(
+    const generator = mapToAsyncGenerator(
       range(5).reverse(),
       (v, i) => {
         return { v, i };
@@ -665,7 +665,7 @@ describe(mapPromise, () => {
   });
 
   it("error", async () => {
-    const generator = mapPromise(
+    const generator = mapToAsyncGenerator(
       range(5),
       async (v) => {
         await sleep(50);
@@ -707,7 +707,7 @@ describe(mapPromise, () => {
 
     const result: unknown[] = [];
 
-    const generator = mapPromise(
+    const generator = mapToAsyncGenerator(
       range(5).reverse(),
       async (v, i) => {
         sleep(v * 30);

@@ -8,8 +8,8 @@ export function newPromiseWithResolvers<T>() {
   return { promise, resolve, reject };
 }
 
-// similar to http://bluebirdjs.com/docs/api/promise.map.html
-export async function* mapPromise<T1, T2>(
+// somewhat more flexible variant of http://bluebirdjs.com/docs/api/promise.map.html
+export async function* mapToAsyncGenerator<T1, T2>(
   values: Iterable<T1>,
   f: (value: T1, index: number) => T2 | PromiseLike<T2>,
   { concurrency }: { concurrency: number }
