@@ -19,6 +19,7 @@ export async function* mapToAsyncGenerator<T1, T2>(
   let index = 0;
   for (const value of values) {
     if (pendings.length >= concurrency) {
+      // TODO: find and yield other resolved promises after Promise.race?
       yield (await Promise.race(pendings))();
     }
 

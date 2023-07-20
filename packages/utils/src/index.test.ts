@@ -710,7 +710,7 @@ describe(mapToAsyncGenerator, () => {
     const generator = mapToAsyncGenerator(
       range(5).reverse(),
       async (v, i) => {
-        sleep(v * 30);
+        await sleep(v * 30);
         result[i] = v;
       },
       {
@@ -718,8 +718,7 @@ describe(mapToAsyncGenerator, () => {
       }
     );
 
-    for await (const _ of generator) {
-    }
+    await arrayFromAsyncGenerator(generator);
 
     expect(result).toMatchInlineSnapshot(`
       [
@@ -730,5 +729,47 @@ describe(mapToAsyncGenerator, () => {
         0,
       ]
     `);
+  });
+
+  it("random", async () => {
+    const result: unknown[] = [];
+
+    const generator = mapToAsyncGenerator(
+      range(100),
+      async (v, i) => {
+        await sleep(Math.random() * 100);
+        result[i] = v;
+      },
+      {
+        concurrency: 20,
+      }
+    );
+
+    await arrayFromAsyncGenerator(generator);
+
+    expect(result).toEqual(range(100));
+  });
+
+  it("concurrency", async () => {
+    let inflight = 0;
+    const inflightCounts: number[] = [inflight];
+
+    const generator = mapToAsyncGenerator(
+      range(100),
+      async () => {
+        inflightCounts.push(++inflight);
+        await sleep(Math.random() * 100);
+        inflightCounts.push(--inflight);
+      },
+      {
+        concurrency: 20,
+      }
+    );
+
+    await arrayFromAsyncGenerator(generator);
+
+    expect(inflightCounts.join(",")).toMatchInlineSnapshot(
+      '"0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0"'
+    );
   });
 });
