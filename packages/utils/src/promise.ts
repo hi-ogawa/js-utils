@@ -37,3 +37,13 @@ export async function* mapToAsyncGenerator<T1, T2>(
     yield (await Promise.race(pendings))();
   }
 }
+
+export async function arrayFromAsyncGenerator<T>(
+  generator: AsyncGenerator<T>
+): Promise<T[]> {
+  const result: T[] = [];
+  for await (const v of generator) {
+    result.push(v);
+  }
+  return result;
+}
