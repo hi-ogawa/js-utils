@@ -30,7 +30,7 @@ export class Singleton {
   resolve<T>(ctor: new () => T): T {
     // detect cycle
     if (this.stack.includes(ctor)) {
-      throw new Error("Singleton.resolve detected cyclic dependency", {
+      throw new Error("'Singleton.resolve' detected cyclic dependency", {
         cause: ctor,
       });
     }

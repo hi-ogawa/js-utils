@@ -160,7 +160,7 @@ describe(Singleton, () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "ok": false,
-        "value": [Error: Singleton.resolve detected cyclic dependency],
+        "value": [Error: 'Singleton.resolve' detected cyclic dependency],
       }
     `);
     expect((result.value as any).cause).toMatchInlineSnapshot('"[class X]"');
