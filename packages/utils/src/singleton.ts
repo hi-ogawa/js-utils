@@ -7,6 +7,10 @@ import { tinyassert } from "./tinyassert";
 // - it doesn't rely on typescript decorator metadata
 // - it provides dependency graph (e.g. to implement per-module async init/deinit hooks)
 
+// references
+// - https://github.com/microsoft/tsyringe
+// - https://docs.nestjs.com/fundamentals/lifecycle-events
+
 type InstanceKey = new () => unknown;
 type Instance = unknown;
 
