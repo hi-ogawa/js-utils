@@ -15,39 +15,27 @@ export async function* mapToAsyncGenerator<T1, T2>(
   { concurrency }: { concurrency: number }
 ): AsyncGenerator<T2> {
   const pendings: Promise<() => T2>[] = [];
-  const ready: Promise<() => T2>[] = [];
 
   let index = 0;
   for (const value of values) {
     if (pendings.length >= concurrency) {
+      // TODO: find and yield other resolved promises after Promise.race?
       yield (await Promise.race(pendings))();
-
-      // also flush "ready" promises
-      for (const res of await Promise.all(ready)) {
-        yield res();
-      }
     }
 
-    const { promise, resolve, reject } = newPromiseWithResolvers<() => T2>();
-    (async () => {
+    const promise = (async () => {
       const result = await f(value, index++);
-      ready.push(promise); // TODO: would this help slight optimization?
       return () => {
         // synchronously cleanup itself then return
         pendings.splice(pendings.indexOf(promise), 1);
-        ready.splice(ready.indexOf(promise), 1);
         return result;
       };
-    })().then(resolve, reject);
+    })();
     pendings.push(promise);
   }
 
   while (pendings.length > 0) {
     yield (await Promise.race(pendings))();
-
-    for (const res of await Promise.all(ready)) {
-      yield res();
-    }
   }
 }
 
