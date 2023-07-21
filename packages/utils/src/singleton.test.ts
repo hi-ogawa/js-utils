@@ -22,6 +22,10 @@ describe(Singleton, () => {
       async deinit() {
         logs.push("App.deinit");
       }
+
+      async doSomething() {
+        logs.push("App.doSomething");
+      }
     }
 
     class Database implements SingletonHooks {
@@ -54,7 +58,6 @@ describe(Singleton, () => {
 
     // resolve top module
     const app = singleton.resolve(App);
-    app;
 
     // check internal
     expect(singleton.stack).toMatchInlineSnapshot("[]");
@@ -124,6 +127,19 @@ describe(Singleton, () => {
       ]
     `);
 
+    app.doSomething();
+    expect(logs).toMatchInlineSnapshot(`
+      [
+        "Config.constructor",
+        "Database.constructor",
+        "App.constructor",
+        "Config.init",
+        "Database.init",
+        "App.init",
+        "App.doSomething",
+      ]
+    `);
+
     await singleton.deinit();
     expect(logs).toMatchInlineSnapshot(`
       [
@@ -133,6 +149,7 @@ describe(Singleton, () => {
         "Config.init",
         "Database.init",
         "App.init",
+        "App.doSomething",
         "Database.deinit",
         "App.deinit",
       ]
