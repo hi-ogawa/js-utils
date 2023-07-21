@@ -24,27 +24,28 @@ export class Singleton {
   deps: [InstanceKey, InstanceKey][] = [];
 
   resolve<T>(ctor: new () => T): T {
-    // add dependency
-    const parent = this.stack.at(-1);
-    if (parent) {
-      this.deps.push([parent, ctor]);
-    }
-
+    // detect cycle
     if (this.stack.includes(ctor)) {
       throw new Error("Singleton.resolve detected cyclic dependency", {
         cause: ctor,
       });
     }
 
-    // instantiate within new stack
-    this.stack.push(ctor);
-
-    let instance = this.instances.get(ctor) as T;
-    if (!instance) {
-      instance = new ctor();
-      this.instances.set(ctor, instance);
+    // add dependency
+    const parent = this.stack.at(-1);
+    if (parent) {
+      this.deps.push([parent, ctor]);
     }
 
+    // skip already instantiated
+    if (this.instances.has(ctor)) {
+      return this.instances.get(ctor) as T;
+    }
+
+    // instantiate within new stack
+    this.stack.push(ctor);
+    const instance = new ctor();
+    this.instances.set(ctor, instance);
     this.stack.pop();
 
     return instance as T;
