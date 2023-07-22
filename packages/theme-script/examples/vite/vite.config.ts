@@ -1,13 +1,14 @@
 import { THEME_SCRIPT } from "@hiogawa/theme-script";
+import react from "@vitejs/plugin-react";
 import unocss from "unocss/vite";
 import { Plugin, defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [unocss(), injectThemeScriptPlugin()],
+  plugins: [unocss(), react(), injectThemeScriptPlugin()],
   clearScreen: false,
 });
 
-// inject theme initialization script
+// inject raw script into html head to initialize style as early as possible
 function injectThemeScriptPlugin(): Plugin {
   return {
     name: "local:" + injectThemeScriptPlugin.name,

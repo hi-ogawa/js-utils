@@ -6,7 +6,11 @@
     "@hiogawa/theme-script": "workspace:*",
     "@hiogawa/unocss-preset-antd": "2.2.1-pre.3",
     "@iconify-json/ri": "^1.1.10",
-    "preact": "^10.16.0",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "unocss": "^0.53.6",
     "vite": "^4.4.6"
   }
