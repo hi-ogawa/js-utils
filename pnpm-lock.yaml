@@ -83,9 +83,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.0.1
         version: 4.0.1(vite@4.4.6)
-      preact:
-        specifier: ^10.16.0
-        version: 10.16.0
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -3933,10 +3930,6 @@ packages:
       nanoid: 3.3.6
       picocolors: 1.0.0
       source-map-js: 1.0.2
-    dev: true
-
-  /preact@10.16.0:
-    resolution: {integrity: sha512-XTSj3dJ4roKIC93pald6rWuB2qQJO9gO2iLLyTe87MrjQN+HklueLsmskbywEWqCHlclgz3/M4YLL2iBr9UmMA==}
     dev: true
 
   /prebuild-install@7.1.1:
