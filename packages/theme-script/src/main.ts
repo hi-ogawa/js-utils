@@ -1,4 +1,4 @@
-// TODO: better api?
+// TODO: this api is too awkward...
 const themeApi = window as unknown as {
   // user config
   __themeStorageKey?: string;
