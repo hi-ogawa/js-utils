@@ -1,0 +1,29 @@
+{
+  "name": "@hiogawa/theme-script",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./dist/index.global.js",
+  "module": "./dist/index.global.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.global.js",
+      "require": "./dist/index.global.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/theme-script"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "release": "pnpm publish --no-git-checks --access public"
+  }
+}

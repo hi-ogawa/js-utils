@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>theme-script vite demo</title>
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml;base64,CiAgICAgIDxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPgogICAgICAgIDxzdHlsZT4KICAgICAgICAgIDpyb290IHsgY29sb3I6IGJsYWNrIH0KICAgICAgICAgIEBtZWRpYSAocHJlZmVycy1jb2xvci1zY2hlbWU6IGRhcmspIHsKICAgICAgICAgICAgOnJvb3QgeyBjb2xvcjogd2hpdGUgfQogICAgICAgICAgfQogICAgICAgIDwvc3R5bGU+CiAgICAgICAgPHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNNSA4VjIwSDlWOEg1Wk0zIDdMNyAyTDExIDdWMjJIM1Y3Wk0xOSAxNlYxNEgxNlYxMkgxOVYxMEgxN1Y4SDE5VjZIMTVWMjBIMTlWMThIMTdWMTZIMTlaTTE0IDRIMjBDMjAuNTUyMyA0IDIxIDQuNDQ3NzIgMjEgNVYyMUMyMSAyMS41NTIzIDIwLjU1MjMgMjIgMjAgMjJIMTRDMTMuNDQ3NyAyMiAxMyAyMS41NTIzIDEzIDIxVjVDMTMgNC40NDc3MiAxMy40NDc3IDQgMTQgNFoiPjwvcGF0aD4KICAgICAgPC9zdmc+CiAgICAgIA=="
+    />
+    <style>
+      html,
+      body,
+      #root {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import "virtual:uno.css";
+    </script>
+    <div id="root" class="flex items-center justify-center p-4">
+      <div class="w-[350px] max-w-full flex flex-col gap-2">
+        <div class="flex justify-between">
+          Theme
+          <span
+            class="[.light_&]:i-ri-sun-line [.dark_&]:i-ri-moon-line !w-5 !h-5"
+          ></span>
+        </div>
+        <div id="theme-buttons" class="flex gap-2">
+          <button
+            class="flex-1 antd-btn antd-btn-default px-2 [[data-theme=system]_&]:(text-colorPrimaryActive border-colorPrimaryActive)"
+            onclick="__themeSet('system')"
+          >
+            System
+          </button>
+          <button
+            class="flex-1 antd-btn antd-btn-default px-2 [[data-theme=light]_&]:(text-colorPrimaryActive border-colorPrimaryActive)"
+            onclick="__themeSet('light')"
+          >
+            Light
+          </button>
+          <button
+            class="flex-1 antd-btn antd-btn-default px-2 [[data-theme=dark]_&]:(text-colorPrimaryActive border-colorPrimaryActive)"
+            onclick="__themeSet('dark')"
+          >
+            Dark
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
