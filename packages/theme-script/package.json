@@ -28,7 +28,6 @@
   },
   "scripts": {
     "build": "BUILD_STEP=0 tsup && BUILD_STEP=1 tsup",
-    "test": "vitest",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
