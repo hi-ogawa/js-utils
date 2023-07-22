@@ -15,6 +15,10 @@
       "import": "./dist/main.js",
       "require": "./dist/main.cjs",
       "types": "./dist/main.d.ts"
+    },
+    "./dist/main.global.js": {
+      "import": "./dist/main.global.js",
+      "require": "./dist/main.global.js"
     }
   },
   "files": [
