@@ -74,6 +74,9 @@ importers:
       '@iconify-json/ri':
         specifier: ^1.1.10
         version: 1.1.10
+      preact:
+        specifier: ^10.16.0
+        version: 10.16.0
       unocss:
         specifier: ^0.53.6
         version: 0.53.6(postcss@8.4.27)(vite@4.4.6)
@@ -3915,6 +3918,10 @@ packages:
       nanoid: 3.3.6
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
+
+  /preact@10.16.0:
+    resolution: {integrity: sha512-XTSj3dJ4roKIC93pald6rWuB2qQJO9gO2iLLyTe87MrjQN+HklueLsmskbywEWqCHlclgz3/M4YLL2iBr9UmMA==}
     dev: true
 
   /prebuild-install@7.1.1:

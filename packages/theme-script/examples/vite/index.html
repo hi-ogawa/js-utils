@@ -21,38 +21,49 @@
     </style>
   </head>
   <body>
-    <script type="module">
-      import "virtual:uno.css";
-    </script>
     <div id="root" class="flex items-center justify-center p-4">
       <div class="w-[350px] max-w-full flex flex-col gap-2">
         <div class="flex justify-between">
           Theme
           <span
-            class="[.light_&]:i-ri-sun-line [.dark_&]:i-ri-moon-line !w-5 !h-5"
+            class="light:i-ri-sun-line dark:i-ri-moon-line !w-5 !h-5"
           ></span>
         </div>
-        <div id="theme-buttons" class="flex gap-2">
-          <button
-            class="flex-1 antd-btn antd-btn-default px-2 [[data-theme=system]_&]:(text-colorPrimaryActive border-colorPrimaryActive)"
-            onclick="__themeSet('system')"
-          >
-            System
-          </button>
-          <button
-            class="flex-1 antd-btn antd-btn-default px-2 [[data-theme=light]_&]:(text-colorPrimaryActive border-colorPrimaryActive)"
-            onclick="__themeSet('light')"
-          >
-            Light
-          </button>
-          <button
-            class="flex-1 antd-btn antd-btn-default px-2 [[data-theme=dark]_&]:(text-colorPrimaryActive border-colorPrimaryActive)"
-            onclick="__themeSet('dark')"
-          >
-            Dark
-          </button>
-        </div>
+        <div id="theme-select"></div>
       </div>
     </div>
+    <script type="module">
+      import "virtual:uno.css";
+      import { h, render, Fragment } from "preact";
+      import { useReducer } from "preact/hooks";
+
+      render(h(ThemeSelect), document.getElementById("theme-select"));
+
+      function ThemeSelect() {
+        const rerender = useReducer((prev) => prev ^ 1, 0)[1];
+
+        return h(
+          "div",
+          { class: "flex gap-2" },
+          ["system", "light", "dark"].map((theme) =>
+            h(
+              "button",
+              {
+                class: `
+                  flex-1 antd-btn antd-btn-default capitalize
+                  aria-selected:(text-colorPrimaryActive border-colorPrimaryActive)
+                `,
+                "aria-selected": __themeGet() === theme,
+                onClick: () => {
+                  __themeSet(theme);
+                  rerender();
+                },
+              },
+              theme
+            )
+          )
+        );
+      }
+    </script>
   </body>
 </html>
