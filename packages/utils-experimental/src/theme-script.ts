@@ -1,3 +1,5 @@
+// TODO: this is obsolete. see packages/theme-script
+
 const themeApi = globalThis as unknown as {
   // user config
   __themeStorageKey?: string;
