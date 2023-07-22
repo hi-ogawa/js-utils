@@ -57,7 +57,11 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
 
-  packages/theme-script: {}
+  packages/theme-script:
+    devDependencies:
+      '@types/node':
+        specifier: ^18
+        version: 18.16.20
 
   packages/theme-script/examples/vite:
     devDependencies:
@@ -1346,6 +1350,10 @@ packages:
 
   /@types/node@12.20.55:
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
+    dev: true
+
+  /@types/node@18.16.20:
+    resolution: {integrity: sha512-nL54VfDjThdP2UXJXZao5wp76CDiDw4zSRO8d4Tk7UgDqNKGKVEQB0/t3ti63NS+YNNkIQDvwEAF04BO+WYu7Q==}
     dev: true
 
   /@types/node@20.4.1:

@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import { THEME_SCRIPT } from "@hiogawa/theme-script";
 import unocss from "unocss/vite";
 import { Plugin, defineConfig } from "vite";
 
@@ -9,12 +9,6 @@ export default defineConfig({
 
 // inject theme initialization script
 function injectThemeScriptPlugin(): Plugin {
-  const script = fs.readFileSync(
-    // need to prevent vite/esbuild from statically analyzing `require.resolve`
-    // TODO: what if `"type": "module"` in package.json?
-    require["resolve"]("@hiogawa/theme-script"),
-    "utf-8"
-  );
   return {
     name: "local:" + injectThemeScriptPlugin.name,
     transformIndexHtml() {
@@ -23,7 +17,7 @@ function injectThemeScriptPlugin(): Plugin {
           tag: "script",
           children: `
             globalThis.__themeStorageKey = "theme-script-vite:theme";
-            ${script}
+            ${THEME_SCRIPT}
           `,
         },
       ];
