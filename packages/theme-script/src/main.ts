@@ -45,7 +45,7 @@ function disableTransitions(callback: () => void) {
 
 function initTheme() {
   applyTheme();
-  prefersDarkQuery.addEventListener("change", applyTheme);
+  prefersDarkQuery.addEventListener("change", () => applyTheme());
   themeApi.__themeGet = getTheme;
   themeApi.__themeSet = setTheme;
 }
