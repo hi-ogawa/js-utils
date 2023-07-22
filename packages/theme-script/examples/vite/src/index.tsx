@@ -1,7 +1,5 @@
-/// <reference types="@hiogawa/theme-script/types" />
-// above "types" reference exposes __themeGet and __themeSet
-
 import "virtual:uno.css";
+import { getTheme, setTheme } from "@hiogawa/theme-script";
 import React from "react";
 import { createRoot } from "react-dom/client";
 
@@ -36,9 +34,9 @@ function ThemeSelect() {
         <button
           key={theme}
           className="flex-1 antd-btn antd-btn-default capitalize aria-selected:(text-colorPrimaryActive border-colorPrimaryActive)"
-          aria-selected={__themeGet() === theme}
+          aria-selected={getTheme() === theme}
           onClick={() => {
-            __themeSet(theme);
+            setTheme(theme);
             rerender();
           }}
         >

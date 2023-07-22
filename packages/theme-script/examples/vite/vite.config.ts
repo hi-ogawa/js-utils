@@ -17,7 +17,7 @@ function injectThemeScriptPlugin(): Plugin {
         {
           tag: "script",
           children: `
-            globalThis.__themeStorageKey = "theme-script-vite:theme";
+            window.THEME_SCRIPT_STORAGE_KEY = "theme-script-vite:theme";
             ${THEME_SCRIPT}
           `,
         },

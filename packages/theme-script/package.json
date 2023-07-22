@@ -10,23 +10,10 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
-    },
-    "./types": {
-      "types": "./types.d.ts"
-    },
-    "./dist/main": {
-      "import": "./dist/main.js",
-      "require": "./dist/main.cjs",
-      "types": "./dist/main.d.ts"
-    },
-    "./dist/main.global.js": {
-      "import": "./dist/main.global.js",
-      "require": "./dist/main.global.js"
     }
   },
   "files": [
-    "dist",
-    "types.d.ts"
+    "dist"
   ],
   "license": "MIT",
   "repository": {
