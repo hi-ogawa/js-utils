@@ -173,15 +173,15 @@ describe(Singleton, () => {
     const singleton = new Singleton();
 
     class X {
-      config = singleton.resolve(Y);
+      y = singleton.resolve(Y);
     }
 
     class Y {
-      config = singleton.resolve(Z);
+      z = singleton.resolve(Z);
     }
 
     class Z {
-      config = singleton.resolve(X);
+      x = singleton.resolve(X);
     }
 
     const result = wrapError(() => singleton.resolve(X));
@@ -192,5 +192,56 @@ describe(Singleton, () => {
       }
     `);
     expect((result.value as any).cause).toMatchInlineSnapshot("[class X]");
+  });
+
+  it("mocking", () => {
+    const singleton = new Singleton();
+    const logs: unknown[] = [];
+
+    class X {
+      y = singleton.resolve(Y);
+      z = singleton.resolve(Z);
+
+      hey() {
+        logs.push("x.hoy");
+        this.y.hee();
+        this.z.hoy();
+      }
+    }
+
+    class Y {
+      z = singleton.resolve(Z);
+
+      hee() {
+        logs.push("y.hoy");
+        this.z.hoy();
+      }
+    }
+
+    class Z {
+      hoy() {
+        logs.push("z.hoy");
+      }
+    }
+
+    const zMock: Z = {
+      hoy() {
+        logs.push("zMock.hoy");
+      },
+    };
+
+    singleton.instances.set(Z, zMock);
+
+    const x = singleton.resolve(X);
+    x.hey();
+
+    expect(logs).toMatchInlineSnapshot(`
+      [
+        "x.hoy",
+        "y.hoy",
+        "zMock.hoy",
+        "zMock.hoy",
+      ]
+    `);
   });
 });
