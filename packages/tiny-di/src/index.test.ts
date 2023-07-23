@@ -1,6 +1,6 @@
 import { wrapError } from "@hiogawa/utils";
 import { beforeAll, describe, expect, it } from "vitest";
-import { Singleton } from ".";
+import { TinyDi } from ".";
 
 beforeAll(() => {
   // pretty print class
@@ -14,14 +14,14 @@ beforeAll(() => {
   });
 });
 
-describe(Singleton, () => {
+describe(TinyDi, () => {
   it("basic", async () => {
-    const singleton = new Singleton();
+    const tinyDi = new TinyDi();
     const logs: any[] = [];
 
     class App {
-      config = singleton.resolve(Config);
-      database = singleton.resolve(Database);
+      config = tinyDi.resolve(Config);
+      database = tinyDi.resolve(Database);
 
       constructor() {
         logs.push("App.constructor");
@@ -41,7 +41,7 @@ describe(Singleton, () => {
     }
 
     class Database {
-      config = singleton.resolve(Config);
+      config = tinyDi.resolve(Config);
 
       constructor() {
         logs.push("Database.constructor");
@@ -67,11 +67,11 @@ describe(Singleton, () => {
     }
 
     // resolve top module
-    const app = singleton.resolve(App);
+    const app = tinyDi.resolve(App);
 
     // check internal
-    expect(singleton.stack).toMatchInlineSnapshot("[]");
-    expect(singleton.deps).toMatchInlineSnapshot(`
+    expect(tinyDi.stack).toMatchInlineSnapshot("[]");
+    expect(tinyDi.deps).toMatchInlineSnapshot(`
       [
         [
           [class App],
@@ -87,7 +87,7 @@ describe(Singleton, () => {
         ],
       ]
     `);
-    expect(singleton.instances).toMatchInlineSnapshot(`
+    expect(tinyDi.instances).toMatchInlineSnapshot(`
       Map {
         [class Config] => Config {},
         [class Database] => Database {
@@ -101,7 +101,7 @@ describe(Singleton, () => {
         },
       }
     `);
-    expect(singleton.sortDeps()).toMatchInlineSnapshot(`
+    expect(tinyDi.sortDeps()).toMatchInlineSnapshot(`
       [
         Config {},
         Database {
@@ -124,7 +124,7 @@ describe(Singleton, () => {
     `);
 
     // check init/deinit calls
-    for (const mod of singleton.sortDeps()) {
+    for (const mod of tinyDi.sortDeps()) {
       await (mod as any).init?.();
     }
     expect(logs).toMatchInlineSnapshot(`
@@ -151,7 +151,7 @@ describe(Singleton, () => {
       ]
     `);
 
-    for (const mod of singleton.sortDeps().reverse()) {
+    for (const mod of tinyDi.sortDeps().reverse()) {
       await (mod as any).deinit?.();
     }
     expect(logs).toMatchInlineSnapshot(`
@@ -170,37 +170,37 @@ describe(Singleton, () => {
   });
 
   it("error-cyclic-deps", () => {
-    const singleton = new Singleton();
+    const tinyDi = new TinyDi();
 
     class X {
-      y = singleton.resolve(Y);
+      y = tinyDi.resolve(Y);
     }
 
     class Y {
-      z = singleton.resolve(Z);
+      z = tinyDi.resolve(Z);
     }
 
     class Z {
-      x = singleton.resolve(X);
+      x = tinyDi.resolve(X);
     }
 
-    const result = wrapError(() => singleton.resolve(X));
+    const result = wrapError(() => tinyDi.resolve(X));
     expect(result).toMatchInlineSnapshot(`
       {
         "ok": false,
-        "value": [Error: 'Singleton.resolve' detected cyclic dependency],
+        "value": [Error: 'TinyDi.resolve' detected cyclic dependency],
       }
     `);
     expect((result.value as any).cause).toMatchInlineSnapshot("[class X]");
   });
 
   it("mocking", () => {
-    const singleton = new Singleton();
+    const tinyDi = new TinyDi();
     const logs: unknown[] = [];
 
     class X {
-      y = singleton.resolve(Y);
-      z = singleton.resolve(Z);
+      y = tinyDi.resolve(Y);
+      z = tinyDi.resolve(Z);
 
       hey() {
         logs.push("x.hoy");
@@ -210,7 +210,7 @@ describe(Singleton, () => {
     }
 
     class Y {
-      z = singleton.resolve(Z);
+      z = tinyDi.resolve(Z);
 
       hee() {
         logs.push("y.hoy");
@@ -230,9 +230,9 @@ describe(Singleton, () => {
       },
     };
 
-    singleton.instances.set(Z, zMock);
+    tinyDi.instances.set(Z, zMock);
 
-    const x = singleton.resolve(X);
+    const x = tinyDi.resolve(X);
     x.hey();
 
     expect(logs).toMatchInlineSnapshot(`

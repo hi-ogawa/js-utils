@@ -3,7 +3,7 @@ import { range, tinyassert } from "@hiogawa/utils";
 type InstanceKey = new () => unknown;
 type Instance = unknown;
 
-export class Singleton {
+export class TinyDi {
   instances = new Map<InstanceKey, Instance>();
 
   // manage `resolve` call stack to create module dependency graph
@@ -14,7 +14,7 @@ export class Singleton {
   resolve<T>(ctor: new () => T): T {
     // detect cycle
     if (this.stack.includes(ctor)) {
-      throw new Error("'Singleton.resolve' detected cyclic dependency", {
+      throw new Error("'TinyDi.resolve' detected cyclic dependency", {
         cause: ctor,
       });
     }
