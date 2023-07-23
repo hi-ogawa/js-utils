@@ -14,11 +14,6 @@ import { tinyassert } from "./tinyassert";
 type InstanceKey = new () => unknown;
 type Instance = unknown;
 
-export interface SingletonHooks {
-  init: () => void | Promise<void>;
-  deinit: () => void | Promise<void>;
-}
-
 export class Singleton {
   instances = new Map<InstanceKey, Instance>();
 
@@ -53,19 +48,6 @@ export class Singleton {
     this.stack.pop();
 
     return instance as T;
-  }
-
-  async init(): Promise<void> {
-    for (const instance of this.sortDeps()) {
-      await (instance as Partial<SingletonHooks>).init?.();
-    }
-  }
-
-  async deinit(): Promise<void> {
-    // TODO: shouldn't it be reversed?
-    for (const instance of this.sortDeps()) {
-      await (instance as Partial<SingletonHooks>).deinit?.();
-    }
   }
 
   sortDeps(): Instance[] {

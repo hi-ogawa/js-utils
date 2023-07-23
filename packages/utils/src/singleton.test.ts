@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { wrapError } from "./result";
-import { Singleton, type SingletonHooks } from "./singleton";
+import { Singleton } from "./singleton";
 
 beforeAll(() => {
   // pretty print class
@@ -19,7 +19,7 @@ describe(Singleton, () => {
     const singleton = new Singleton();
     const logs: any[] = [];
 
-    class App implements SingletonHooks {
+    class App {
       config = singleton.resolve(Config);
       database = singleton.resolve(Database);
 
@@ -40,7 +40,7 @@ describe(Singleton, () => {
       }
     }
 
-    class Database implements SingletonHooks {
+    class Database {
       config = singleton.resolve(Config);
 
       constructor() {
@@ -56,7 +56,7 @@ describe(Singleton, () => {
       }
     }
 
-    class Config implements Pick<SingletonHooks, "init"> {
+    class Config {
       constructor() {
         logs.push("Config.constructor");
       }
@@ -115,8 +115,6 @@ describe(Singleton, () => {
         },
       ]
     `);
-
-    // check init/deinit calls
     expect(logs).toMatchInlineSnapshot(`
       [
         "Config.constructor",
@@ -125,7 +123,10 @@ describe(Singleton, () => {
       ]
     `);
 
-    await singleton.init();
+    // check init/deinit calls
+    for (const mod of singleton.sortDeps()) {
+      await (mod as any).init?.();
+    }
     expect(logs).toMatchInlineSnapshot(`
       [
         "Config.constructor",
@@ -150,7 +151,9 @@ describe(Singleton, () => {
       ]
     `);
 
-    await singleton.deinit();
+    for (const mod of singleton.sortDeps().reverse()) {
+      await (mod as any).deinit?.();
+    }
     expect(logs).toMatchInlineSnapshot(`
       [
         "Config.constructor",
@@ -160,8 +163,8 @@ describe(Singleton, () => {
         "Database.init",
         "App.init",
         "App.doSomething",
-        "Database.deinit",
         "App.deinit",
+        "Database.deinit",
       ]
     `);
   });
