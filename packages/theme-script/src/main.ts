@@ -1,24 +1,26 @@
-// TODO: this is obsolete. see packages/theme-script
-
-const themeApi = globalThis as unknown as {
-  // user config
-  __themeStorageKey?: string;
-  __themeDefault?: string;
-  // exposed api
-  __themeSet: (theme: string) => void;
-  __themeGet: () => string;
+const themeApi = window as any as {
+  THEME_SCRIPT_STORAGE_KEY: string;
+  THEME_SCRIPT_DEFAULT: string;
+  THEME_SCRIPT_SET: (theme: string) => void;
+  THEME_SCRIPT_GET: () => string;
 };
 
-const key = themeApi.__themeStorageKey ?? "theme-script";
-const defaultTheme = themeApi.__themeDefault ?? "system";
+themeApi.THEME_SCRIPT_STORAGE_KEY ??= "theme";
+themeApi.THEME_SCRIPT_DEFAULT ??= "system";
+themeApi.THEME_SCRIPT_GET = getTheme;
+themeApi.THEME_SCRIPT_SET = setTheme;
+
 const prefersDarkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
 function getTheme() {
-  return window.localStorage.getItem(key) || defaultTheme;
+  return (
+    window.localStorage.getItem(themeApi.THEME_SCRIPT_STORAGE_KEY) ||
+    themeApi.THEME_SCRIPT_DEFAULT
+  );
 }
 
 function setTheme(theme: string) {
-  window.localStorage.setItem(key, theme);
+  window.localStorage.setItem(themeApi.THEME_SCRIPT_STORAGE_KEY, theme);
   applyTheme();
 }
 
@@ -29,6 +31,8 @@ function applyTheme() {
   disableTransitions(() => {
     document.documentElement.classList.remove("dark", "light");
     document.documentElement.classList.add(derived);
+    document.documentElement.dataset["theme"] = theme;
+    document.documentElement.dataset["themeDerived"] = derived;
   });
 }
 
@@ -42,11 +46,9 @@ function disableTransitions(callback: () => void) {
   document.head.removeChild(el);
 }
 
-function initTheme() {
+function main() {
   applyTheme();
-  prefersDarkQuery.addEventListener("change", applyTheme);
-  themeApi.__themeGet = getTheme;
-  themeApi.__themeSet = setTheme;
+  prefersDarkQuery.addEventListener("change", () => applyTheme());
 }
 
-initTheme();
+main();

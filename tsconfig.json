@@ -8,6 +8,18 @@
       "path": "packages/tiny-rpc"
     },
     {
+      "path": "packages/tiny-sql"
+    },
+    {
+      "path": "packages/tiny-sql/examples/sqlite"
+    },
+    {
+      "path": "packages/theme-script"
+    },
+    {
+      "path": "packages/theme-script/examples/vite"
+    },
+    {
       "path": "packages/utils"
     },
     {
