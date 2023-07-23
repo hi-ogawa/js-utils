@@ -1,3 +1,4 @@
 packages:
   - packages/*
   - packages/tiny-sql/examples/*
+  - packages/theme-script/examples/*
