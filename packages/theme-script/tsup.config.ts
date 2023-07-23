@@ -11,9 +11,10 @@ export default [
     dts: true,
   })),
   defineConfig(() => ({
-    entry: ["src/index.ts"],
+    entry: ["src/index.ts", "src/vite.ts"],
     format: ["esm", "cjs"],
     dts: true,
+    splitting: false,
     define: {
       __DEFINE_MAIN_CODE: JSON.stringify(
         fs.readFileSync("./dist/main.global.js", "utf-8")
