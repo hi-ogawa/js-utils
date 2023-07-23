@@ -1,6 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { wrapError } from "./result";
 import { Singleton, type SingletonHooks } from "./singleton";
+
+beforeAll(() => {
+  // pretty print class
+  expect.addSnapshotSerializer({
+    test(val) {
+      return typeof val === "function" && val.toString().startsWith("class ");
+    },
+    serialize(val, _config, _indentation, _depth, _refs, _printer) {
+      return `[class ${val.name}]`;
+    },
+  });
+});
 
 describe(Singleton, () => {
   it("basic", async () => {
@@ -54,8 +66,6 @@ describe(Singleton, () => {
       }
     }
 
-    prettyPrintClasses([App, Database, Config]);
-
     // resolve top module
     const app = singleton.resolve(App);
 
@@ -64,26 +74,26 @@ describe(Singleton, () => {
     expect(singleton.deps).toMatchInlineSnapshot(`
       [
         [
-          "[class App]",
-          "[class Config]",
+          [class App],
+          [class Config],
         ],
         [
-          "[class App]",
-          "[class Database]",
+          [class App],
+          [class Database],
         ],
         [
-          "[class Database]",
-          "[class Config]",
+          [class Database],
+          [class Config],
         ],
       ]
     `);
     expect(singleton.instances).toMatchInlineSnapshot(`
       Map {
-        "[class Config]" => Config {},
-        "[class Database]" => Database {
+        [class Config] => Config {},
+        [class Database] => Database {
           "config": Config {},
         },
-        "[class App]" => App {
+        [class App] => App {
           "config": Config {},
           "database": Database {
             "config": Config {},
@@ -171,8 +181,6 @@ describe(Singleton, () => {
       config = singleton.resolve(X);
     }
 
-    prettyPrintClasses([X, Y, Z]);
-
     const result = wrapError(() => singleton.resolve(X));
     expect(result).toMatchInlineSnapshot(`
       {
@@ -180,17 +188,6 @@ describe(Singleton, () => {
         "value": [Error: 'Singleton.resolve' detected cyclic dependency],
       }
     `);
-    expect((result.value as any).cause).toMatchInlineSnapshot('"[class X]"');
+    expect((result.value as any).cause).toMatchInlineSnapshot("[class X]");
   });
 });
-
-function prettyPrintClasses(klasses: unknown[]) {
-  expect.addSnapshotSerializer({
-    test(val) {
-      return klasses.includes(val);
-    },
-    serialize(val, config, indentation, depth, refs, printer) {
-      return printer(`[class ${val.name}]`, config, indentation, depth, refs);
-    },
-  });
-}
