@@ -1,15 +1,4 @@
-import { range } from "./lodash";
-import { tinyassert } from "./tinyassert";
-
-// tsyringe-like idea https://github.com/microsoft/tsyringe
-// but with following benefits
-// - extreme simplicity
-// - it doesn't rely on typescript decorator metadata
-// - it provides dependency graph (e.g. to implement per-module async init/deinit hooks)
-
-// references
-// - https://github.com/microsoft/tsyringe
-// - https://docs.nestjs.com/fundamentals/lifecycle-events
+import { range, tinyassert } from "@hiogawa/utils";
 
 type InstanceKey = new () => unknown;
 type Instance = unknown;

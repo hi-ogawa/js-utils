@@ -1,6 +1,6 @@
+import { wrapError } from "@hiogawa/utils";
 import { beforeAll, describe, expect, it } from "vitest";
-import { wrapError } from "./result";
-import { Singleton } from "./singleton";
+import { Singleton } from ".";
 
 beforeAll(() => {
   // pretty print class
