@@ -1,7 +1,12 @@
-import { execFileSync } from "node:child_process";
+import { Buffer } from "node:buffer";
 import crypto from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { fromBase64, toBase64 } from "./base64";
+import {
+  base64FromBase64url,
+  base64ToBase64url,
+  fromBase64,
+  toBase64,
+} from "./base64";
 import { range } from "./lodash";
 
 describe("base64", () => {
@@ -92,16 +97,29 @@ describe("base64", () => {
   });
 
   it("reference-fuzz", () => {
-    for (const _ of range(100)) {
-      const len = crypto.randomInt(0, 100);
+    const textDecoder = new TextDecoder();
+    for (const _ of range(1000)) {
+      const len = crypto.randomInt(0, 1000);
       const input = new Uint8Array(crypto.randomBytes(len));
       const output = toBase64(input);
-      const outputReference = reference(input);
-      expect(output).toEqual(outputReference);
+      expect(textDecoder.decode(output)).toEqual(
+        Buffer.from(input).toString("base64")
+      );
     }
   });
 });
 
-function reference(input: Uint8Array) {
-  return new Uint8Array(execFileSync("base64", ["-w", "0"], { input }));
-}
+describe("base64url", () => {
+  it("basic", () => {
+    const textDecoder = new TextDecoder();
+    const input = new Uint8Array([0, 0, 62, 0, 0, 63, 0]);
+    const output = textDecoder.decode(toBase64(input));
+    expect(output).toMatchInlineSnapshot('"AAA+AAA/AA=="');
+
+    const outputUrl = base64ToBase64url(output);
+    expect(outputUrl).toMatchInlineSnapshot('"AAA-AAA_AA"');
+
+    const output2 = base64FromBase64url(outputUrl);
+    expect(output2).toEqual(output);
+  });
+});
