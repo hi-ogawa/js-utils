@@ -24,19 +24,19 @@ describe("base64", () => {
     const base64Bin = toBase64(dataBin);
     expect(base64Bin).toMatchInlineSnapshot(`
       Uint8Array [
-        111,
+        97,
+        71,
         86,
-        71,
-        98,
         115,
-        57,
+        98,
         71,
+        56,
         61,
       ]
     `);
 
     const base64 = textDecoder.decode(base64Bin);
-    expect(base64).toMatchInlineSnapshot('"oVGbs9G="');
+    expect(base64).toMatchInlineSnapshot('"aGVsbG8="');
 
     const dataBin2 = fromBase64(base64Bin);
     expect(dataBin2).toMatchInlineSnapshot(`
@@ -91,19 +91,9 @@ describe("base64", () => {
     }
   });
 
-  it.fails("reference-fuzz-small", () => {
-    for (const _ of range(1000)) {
-      const len = crypto.randomInt(0, 10);
-      const input = new Uint8Array(crypto.randomBytes(len));
-      const output = toBase64(input);
-      const outputReference = reference(input);
-      expect(output).toEqual(outputReference);
-    }
-  });
-
-  it.fails("reference-fuzz-big", () => {
-    for (const _ of range(10)) {
-      const len = crypto.randomInt(0, 1000);
+  it("reference-fuzz", () => {
+    for (const _ of range(100)) {
+      const len = crypto.randomInt(0, 100);
       const input = new Uint8Array(crypto.randomBytes(len));
       const output = toBase64(input);
       const outputReference = reference(input);

@@ -52,29 +52,29 @@ export function toBase64(xs: Uint8Array): Uint8Array {
 
   // encode complete chunks
   for (let i = 0; i < chunkLen; i++) {
-    const c = xs[3 * i] | (xs[3 * i + 1] << 8) | (xs[3 * i + 2] << 16);
-    ys[4 * i] = ENC[c & 0b111111];
-    ys[4 * i + 1] = ENC[(c >> 6) & 0b111111];
-    ys[4 * i + 2] = ENC[(c >> 12) & 0b111111];
-    ys[4 * i + 3] = ENC[(c >> 18) & 0b111111];
+    const c = (xs[3 * i + 0] << 16) | (xs[3 * i + 1] << 8) | xs[3 * i + 2];
+    ys[4 * i + 0] = ENC[(c >> 18) & 0b111111];
+    ys[4 * i + 1] = ENC[(c >> 12) & 0b111111];
+    ys[4 * i + 2] = ENC[(c >> 6) & 0b111111];
+    ys[4 * i + 3] = ENC[(c >> 0) & 0b111111];
   }
 
   // encode partial chunk with padding
   const i = chunkLen;
   switch (xLen % 3) {
     case 1: {
-      const c = xs[3 * i];
-      ys[4 * i] = ENC[c & 0b111111];
-      ys[4 * i + 1] = ENC[(c >> 6) & 0b111111];
+      const c = xs[3 * i + 0] << 16;
+      ys[4 * i + 0] = ENC[(c >> 18) & 0b111111];
+      ys[4 * i + 1] = ENC[(c >> 12) & 0b111111];
       ys[4 * i + 2] = ENC_PAD;
       ys[4 * i + 3] = ENC_PAD;
       break;
     }
     case 2: {
-      const c = xs[3 * i] | (xs[3 * i + 1] << 8);
-      ys[4 * i] = ENC[c & 0b111111];
-      ys[4 * i + 1] = ENC[(c >> 6) & 0b111111];
-      ys[4 * i + 2] = ENC[(c >> 12) & 0b111111];
+      const c = (xs[3 * i + 0] << 16) | (xs[3 * i + 1] << 8);
+      ys[4 * i + 0] = ENC[(c >> 18) & 0b111111];
+      ys[4 * i + 1] = ENC[(c >> 12) & 0b111111];
+      ys[4 * i + 2] = ENC[(c >> 6) & 0b111111];
       ys[4 * i + 3] = ENC_PAD;
       break;
     }
@@ -116,27 +116,29 @@ export function fromBase64(ys: Uint8Array): Uint8Array {
   // decode complete chunks
   for (let i = 0; i < chunkLen; i++) {
     const c =
-      DEC[ys[4 * i]] |
-      (DEC[ys[4 * i + 1]] << 6) |
-      (DEC[ys[4 * i + 2]] << 12) |
-      (DEC[ys[4 * i + 3]] << 18);
-    xs[3 * i] = c & 0xff;
+      (DEC[ys[4 * i + 0]] << 18) |
+      (DEC[ys[4 * i + 1]] << 12) |
+      (DEC[ys[4 * i + 2]] << 6) |
+      (DEC[ys[4 * i + 3]] << 0);
+    xs[3 * i] = (c >> 16) & 0xff;
     xs[3 * i + 1] = (c >> 8) & 0xff;
-    xs[3 * i + 2] = (c >> 16) & 0xff;
+    xs[3 * i + 2] = (c >> 0) & 0xff;
   }
 
   // decode partial chunk
   const i = chunkLen;
   switch (xLen % 3) {
     case 1: {
-      const c = DEC[ys[4 * i]] | (DEC[ys[4 * i + 1]] << 6);
-      xs[3 * i] = c & 0xff;
+      const c = (DEC[ys[4 * i + 0]] << 18) | (DEC[ys[4 * i + 1]] << 12);
+      xs[3 * i] = (c >> 16) & 0xff;
       break;
     }
     case 2: {
       const c =
-        DEC[ys[4 * i]] | (DEC[ys[4 * i + 1]] << 6) | (DEC[ys[4 * i + 2]] << 12);
-      xs[3 * i] = c & 0xff;
+        (DEC[ys[4 * i + 0]] << 18) |
+        (DEC[ys[4 * i + 1]] << 12) |
+        (DEC[ys[4 * i + 2]] << 6);
+      xs[3 * i] = (c >> 16) & 0xff;
       xs[3 * i + 1] = (c >> 8) & 0xff;
       break;
     }
