@@ -1,4 +1,4 @@
-import "./polyfill.node";
+import "./polyfill-node";
 import process from "node:process";
 import { tinyassert } from "@hiogawa/utils";
 
