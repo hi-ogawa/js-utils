@@ -27,6 +27,33 @@ describe("jws", () => {
     `);
   });
 
+  it("jwk-HS256", async () => {
+    const key = {
+      "kty": "oct",
+      "k": "eIlE_krFljjdMaGOEUHqTkvBgknkEQK_Q3VjMHDagJlde-36x1YXfjowvKs8mTSH6gJyml6HvW1qLhG75HOW_g",
+      "alg": "HS256"
+    };
+    const token = await jwsSign({
+      header: { alg: "HS256" },
+      payload: { hey: "you" },
+      key
+    });
+    expect(token).toMatchInlineSnapshot(
+      '"eyJhbGciOiJIUzI1NiJ9.eyJoZXkiOiJ5b3UifQ.zwCZQg-jtThm6JYlG8myyCBI0dKqkiiUEoljqBntTPs"'
+    );
+    const verified = await jwsVerify({ token, key, algorithms: ["HS256"] });
+    expect(verified).toMatchInlineSnapshot(`
+      {
+        "header": {
+          "alg": "HS256",
+        },
+        "payload": {
+          "hey": "you",
+        },
+      }
+    `);
+  });
+
   it("asymmetric", async () => {
     // pnpm -C packages/tiny-jwt cli keygen ES256
     const privateKey = {
