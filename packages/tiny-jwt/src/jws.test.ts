@@ -29,14 +29,14 @@ describe("jws", () => {
 
   it("jwk-HS256", async () => {
     const key = {
-      "kty": "oct",
-      "k": "eIlE_krFljjdMaGOEUHqTkvBgknkEQK_Q3VjMHDagJlde-36x1YXfjowvKs8mTSH6gJyml6HvW1qLhG75HOW_g",
-      "alg": "HS256"
+      kty: "oct",
+      k: "eIlE_krFljjdMaGOEUHqTkvBgknkEQK_Q3VjMHDagJlde-36x1YXfjowvKs8mTSH6gJyml6HvW1qLhG75HOW_g",
+      alg: "HS256",
     };
     const token = await jwsSign({
       header: { alg: "HS256" },
       payload: { hey: "you" },
-      key
+      key,
     });
     expect(token).toMatchInlineSnapshot(
       '"eyJhbGciOiJIUzI1NiJ9.eyJoZXkiOiJ5b3UifQ.zwCZQg-jtThm6JYlG8myyCBI0dKqkiiUEoljqBntTPs"'
