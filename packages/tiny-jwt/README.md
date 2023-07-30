@@ -9,9 +9,9 @@ pnpm release
 
 ## todo
 
-- [ ] JWS (json web signature)
-  - [x] HMAC/SHA-256 (alg = HS256)
-  - [ ] asymmetric key
+- [x] JWS (json web signature)
+  - [x] HMAC (alg = HS256)
+  - [x] ECDSA (alg = ES256)
 - [ ] JWE (json web encryption)
   - [ ] AES-GCM (alg = dir, enc = A128GCM)
 - [ ] support `exp` and `ist`

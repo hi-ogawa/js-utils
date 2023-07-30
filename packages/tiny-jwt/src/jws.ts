@@ -17,7 +17,18 @@ import {
 // https://github.com/panva/jose/blob/e2836e6aaaddecde053018884abb040908f186fd/src/runtime/browser/sign.ts
 //
 
-const ALGORITHM_MAP = new Map([["HS256", { name: "HMAC", hash: "SHA-256" }]]);
+// https://datatracker.ietf.org/doc/html/rfc7518#section-3.1
+// prettier-ignore
+const ALGORITHM_MAP = new Map<string, AlgorithmParams>([
+  ["HS256", { name: "HMAC", hash: "SHA-256" }],
+  ["ES256", { name: "ECDSA", hash: "SHA-256", namedCurve: "P-256" }],
+  ["RS256", { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }],
+]);
+
+type AlgorithmParams =
+  | HmacImportParams
+  | (EcKeyImportParams & EcdsaParams)
+  | RsaHashedImportParams;
 
 export async function jwsSign({
   header,
@@ -26,7 +37,7 @@ export async function jwsSign({
 }: {
   header: { alg: string };
   payload: unknown;
-  key: string;
+  key: string | JsonWebKey;
 }) {
   const algorithm = ALGORITHM_MAP.get(header.alg);
   tinyassert(algorithm, "unsupported 'alg'");
@@ -39,7 +50,7 @@ export async function jwsSign({
   // sign
   const signature = await cryptoSign({
     data: encodeUtf8(dataString),
-    keyData: encodeUtf8(key),
+    keyData: key,
     algorithm,
   });
   const signatureString = encodeBase64url(signature);
@@ -55,7 +66,7 @@ export async function jwsVerify({
   algorithms,
 }: {
   token: string;
-  key: string;
+  key: string | JsonWebKey;
   algorithms: string[];
 }) {
   const {
@@ -86,7 +97,7 @@ export async function jwsVerify({
   const dataString = `${headerString}.${payloadString}`;
   const isValid = cryptoVerify({
     data: encodeUtf8(dataString),
-    keyData: encodeUtf8(key),
+    keyData: key,
     signature: decodeBase64url(signatureString),
     algorithm,
   });
@@ -107,13 +118,11 @@ async function cryptoSign({
   algorithm,
 }: {
   data: Uint8Array;
-  keyData: Uint8Array;
-  algorithm: HmacImportParams;
+  keyData: string | JsonWebKey;
+  algorithm: AlgorithmParams;
 }): Promise<Uint8Array> {
-  const key = await crypto.subtle.importKey("raw", keyData, algorithm, false, [
-    "sign",
-  ]);
-  const signature = await crypto.subtle.sign(key.algorithm.name, key, data);
+  const key = await cryptoImportKey({ keyData, algorithm, usages: ["sign"] });
+  const signature = await crypto.subtle.sign(algorithm, key, data);
   return new Uint8Array(signature);
 }
 
@@ -125,11 +134,30 @@ async function cryptoVerify({
 }: {
   data: Uint8Array;
   signature: Uint8Array;
-  keyData: Uint8Array;
-  algorithm: HmacImportParams;
+  keyData: string | JsonWebKey;
+  algorithm: AlgorithmParams;
 }): Promise<boolean> {
-  const key = await crypto.subtle.importKey("raw", keyData, algorithm, false, [
-    "verify",
-  ]);
-  return await crypto.subtle.verify(key.algorithm.name, key, signature, data);
+  const key = await cryptoImportKey({ keyData, algorithm, usages: ["verify"] });
+  return await crypto.subtle.verify(algorithm, key, signature, data);
+}
+
+function cryptoImportKey({
+  keyData,
+  algorithm,
+  usages,
+}: {
+  keyData: string | JsonWebKey;
+  algorithm: AlgorithmParams;
+  usages: KeyUsage[];
+}): Promise<CryptoKey> {
+  if (typeof keyData === "string") {
+    return crypto.subtle.importKey(
+      "raw",
+      encodeUtf8(keyData),
+      algorithm,
+      false,
+      usages
+    );
+  }
+  return crypto.subtle.importKey("jwk", keyData, algorithm, false, usages);
 }
