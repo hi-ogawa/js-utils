@@ -1,6 +1,6 @@
 # tiny-jwt
 
-Simple JWT library base on [`WebCrypto`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) API.
+Minimal JWT library base on [`WebCrypto`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) API.
 
 See tests `./src/*.test.ts` for the usage.
 
