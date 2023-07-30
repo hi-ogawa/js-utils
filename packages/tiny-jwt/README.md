@@ -2,6 +2,10 @@
 
 Simple JWT library base on [`WebCrypto`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) API.
 
+See `./src/jws.test.ts` for the usage.
+
+## development
+
 ```sh
 pnpm build
 pnpm release
@@ -21,3 +25,5 @@ pnpm release
 - https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
 - https://nodejs.org/docs/latest-v18.x/api/webcrypto.html
 - https://developers.cloudflare.com/workers/runtime-apis/web-crypto/
+- https://github.com/panva/jose
+- https://github.com/hattipjs/hattip/blob/0001d4023eebb27cd6e127952a3ff00a2fdf425b/packages/middleware/session/src/crypto.ts
