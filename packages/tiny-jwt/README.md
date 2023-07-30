@@ -2,14 +2,7 @@
 
 Simple JWT library base on [`WebCrypto`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) API.
 
-See `./src/jws.test.ts` for the usage.
-
-## development
-
-```sh
-pnpm build
-pnpm release
-```
+See tests `./src/*.test.ts` for the usage.
 
 ## todo
 
@@ -19,6 +12,7 @@ pnpm release
 - [ ] JWE (json web encryption)
   - [ ] AES-GCM (alg = dir, enc = A128GCM)
 - [ ] support `exp` and `ist`
+- [ ] more tests
 
 ## references
 
