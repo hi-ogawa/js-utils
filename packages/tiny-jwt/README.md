@@ -36,6 +36,7 @@ tiny-jwt keygen HS256
 - JWS https://datatracker.ietf.org/doc/html/rfc7515
 - JWE https://datatracker.ietf.org/doc/html/rfc7516
 - JWA https://datatracker.ietf.org/doc/html/rfc7518
+- JWK https://datatracker.ietf.org/doc/html/rfc7517
 - https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
 - https://nodejs.org/docs/latest-v18.x/api/webcrypto.html
 - https://developers.cloudflare.com/workers/runtime-apis/web-crypto/
