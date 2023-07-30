@@ -2,7 +2,7 @@
 // JWE (json web encryption) https://datatracker.ietf.org/doc/html/rfc7516
 //
 
-import { tinyassert, wrapError } from "@hiogawa/utils";
+import { tinyassert } from "@hiogawa/utils";
 import {
   decodeBase64url,
   decodeJson,
@@ -36,19 +36,18 @@ export async function jweEncrypt({
 }: {
   header: { alg: "dir"; enc: typeof JWE_ENC; [extra: string]: unknown };
   payload: unknown;
-  key: string;
+  key: JsonWebKey;
 }) {
   // encode json
   const headerString = encodeJson(header);
   const payloadString = encodeJson(payload);
 
   // encrypt
-  const keyData = processKey(key);
   const encryptedKeyString = ""; // empty for alg = "dir"
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const { ciphertext, tag } = await cryptoEncrypt({
     data: encodeUtf8(payloadString),
-    keyData,
+    keyData: key,
     additionalData: encodeUtf8(headerString),
     iv,
   });
@@ -73,7 +72,7 @@ export async function jweDecrypt({
   key,
 }: {
   token: string;
-  key: string;
+  key: JsonWebKey;
 }) {
   // parse token
   const {
@@ -88,14 +87,13 @@ export async function jweDecrypt({
   tinyassert(encryptedKeyString.length === 0, "'encrypted key' must be empty");
 
   // decrypt
-  const keyData = processKey(key);
   const iv = decodeBase64url(ivString);
   const ciphertext = decodeBase64url(ciphertextString);
   const tag = decodeBase64url(tagString);
   const data = await cryptoDecrypt({
     ciphertext,
     tag,
-    keyData,
+    keyData: key,
     additionalData: encodeUtf8(headerString),
     iv,
   });
@@ -104,19 +102,6 @@ export async function jweDecrypt({
   const header = decodeJson(headerString);
   const payload = decodeJson(decodeUtf8(data));
   return { header, payload };
-}
-
-function processKey(key: string) {
-  const keyData = wrapError(() => {
-    const keyData = decodeBase64url(key);
-    tinyassert(keyData.byteLength === 256 / 8);
-    return keyData;
-  });
-  tinyassert(
-    keyData.ok,
-    "'key' must be base64url-encoded and 256 bits (32 bytes)"
-  );
-  return keyData.value;
 }
 
 //
@@ -130,28 +115,27 @@ async function cryptoEncrypt({
   additionalData,
 }: {
   data: BufferSource;
-  keyData: BufferSource;
+  keyData: JsonWebKey;
   iv: BufferSource;
   additionalData: BufferSource;
 }) {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    keyData,
-    CRYPTO_ALGORITHM,
-    false,
-    ["encrypt"]
-  );
-
   const encryptParam = {
     ...CRYPTO_ENCRYPTION_PARAM,
     iv,
     additionalData,
   } satisfies AesGcmParams;
 
+  const key = await crypto.subtle.importKey(
+    "jwk",
+    keyData,
+    CRYPTO_ALGORITHM,
+    false,
+    ["encrypt"]
+  );
   const encrypted = await crypto.subtle.encrypt(encryptParam, key, data);
 
   // split out tag
-  const tagLength = encryptParam.tagLength / 8;
+  const tagLength = CRYPTO_ENCRYPTION_PARAM.tagLength / 8;
   const ciphertext = encrypted.slice(0, -tagLength);
   const tag = encrypted.slice(-tagLength);
   return { ciphertext, tag };
@@ -166,18 +150,10 @@ async function cryptoDecrypt({
 }: {
   ciphertext: Uint8Array;
   tag: Uint8Array;
-  keyData: BufferSource;
+  keyData: JsonWebKey;
   iv: BufferSource;
   additionalData: BufferSource;
 }) {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    keyData,
-    CRYPTO_ALGORITHM,
-    false,
-    ["decrypt"]
-  );
-
   const encryptParam = {
     ...CRYPTO_ENCRYPTION_PARAM,
     iv,
@@ -191,6 +167,13 @@ async function cryptoDecrypt({
   data.set(ciphertext, 0);
   data.set(tag, ciphertext.byteLength);
 
+  const key = await crypto.subtle.importKey(
+    "jwk",
+    keyData,
+    CRYPTO_ALGORITHM,
+    false,
+    ["decrypt"]
+  );
   const decrypted = await crypto.subtle.decrypt(encryptParam, key, data);
   return decrypted;
 }

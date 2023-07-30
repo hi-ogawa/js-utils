@@ -18,7 +18,13 @@ beforeAll(() => {
 describe("jwe", () => {
   it("basic", async () => {
     // pnpm -C packages/tiny-jwt cli keygen A256GCM
-    const key = "vc43dP6oKb7nnjt-YFgLbZ1R3ItaJLvPicVasAGwOPA";
+    const key = {
+      key_ops: ["encrypt", "decrypt"],
+      ext: true,
+      kty: "oct",
+      k: "vc43dP6oKb7nnjt-YFgLbZ1R3ItaJLvPicVasAGwOPA",
+      alg: "A256GCM",
+    };
     const header = { alg: "dir", enc: "A256GCM" } as const;
     const payload = { hey: "you".repeat(5) };
 
@@ -32,6 +38,8 @@ describe("jwe", () => {
       payload,
       key,
     });
+
+    // each token should be different due to "iv" (initialization vector)
     expect(token).toMatchInlineSnapshot(
       '"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..AAAAAAAAAAAAAAAA.3o6Vw6RfwfDV89a5cQmApxsS52iPP4ZxnNqjpgSMJchoWA.9cWxaNtVez7PpfzFkLexnQ"'
     );
