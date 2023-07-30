@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/tiny-jwt",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -32,6 +32,7 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
-    "@hiogawa/utils": "workspace:*"
+    "@hiogawa/utils": "workspace:*",
+    "@types/node": "^18.17.1"
   }
 }
