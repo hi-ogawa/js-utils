@@ -1,3 +1,7 @@
+//
+// JWS (json web signature) https://datatracker.ietf.org/doc/html/rfc7515
+//
+
 import { tinyassert } from "@hiogawa/utils";
 import {
   decodeBase64url,
@@ -7,17 +11,7 @@ import {
   encodeUtf8,
 } from "./utils";
 
-//
-// jws (json web signature)
-//
-// cf.
-// https://datatracker.ietf.org/doc/html/rfc7515
-// https://github.com/remix-run/remix/blob/100ecd3ea686eeec14f17fa908116b74aebdb91c/packages/remix-cloudflare/crypto.ts#L14-L21
-// https://github.com/auth0/node-jws/blob/b9fb8d30e9c009ade6379f308590f1b0703eefc3/lib/sign-stream.js
-// https://github.com/panva/jose/blob/e2836e6aaaddecde053018884abb040908f186fd/src/runtime/browser/sign.ts
-//
-
-// https://datatracker.ietf.org/doc/html/rfc7518#section-3.1
+// JWK https://datatracker.ietf.org/doc/html/rfc7518#section-3.1
 // prettier-ignore
 const ALGORITHM_MAP = new Map<string, AlgorithmParams>([
   ["HS256", { name: "HMAC", hash: "SHA-256" }],
@@ -35,14 +29,14 @@ export async function jwsSign({
   payload,
   key,
 }: {
-  header: { alg: string };
+  header: { alg: string; [extra: string]: unknown };
   payload: unknown;
   key: string | JsonWebKey;
 }) {
   const algorithm = ALGORITHM_MAP.get(header.alg);
   tinyassert(algorithm, "unsupported 'alg'");
 
-  // encode data
+  // encode json
   const headerString = encodeJson(header);
   const payloadString = encodeJson(payload);
   const dataString = `${headerString}.${payloadString}`;
@@ -55,7 +49,7 @@ export async function jwsSign({
   });
   const signatureString = encodeBase64url(signature);
 
-  // return token
+  // format token
   const token = `${dataString}.${signatureString}`;
   return token;
 }
@@ -69,16 +63,14 @@ export async function jwsVerify({
   key: string | JsonWebKey;
   algorithms: string[];
 }) {
+  // parse token
   const {
     0: headerString,
     1: payloadString,
     2: signatureString,
     length,
   } = token.split(".");
-  tinyassert(
-    headerString && payloadString && signatureString && length === 3,
-    "invalid token format"
-  );
+  tinyassert(length === 3, "invalid token format");
 
   // check header.alg
   const header = decodeJson(headerString);
@@ -138,7 +130,7 @@ async function cryptoVerify({
   algorithm: AlgorithmParams;
 }): Promise<boolean> {
   const key = await cryptoImportKey({ keyData, algorithm, usages: ["verify"] });
-  return await crypto.subtle.verify(algorithm, key, signature, data);
+  return crypto.subtle.verify(algorithm, key, signature, data);
 }
 
 function cryptoImportKey({

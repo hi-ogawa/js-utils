@@ -20,5 +20,7 @@ See tests `./src/*.test.ts` for the usage.
 - https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
 - https://nodejs.org/docs/latest-v18.x/api/webcrypto.html
 - https://developers.cloudflare.com/workers/runtime-apis/web-crypto/
-- https://github.com/panva/jose
 - https://github.com/hattipjs/hattip/blob/0001d4023eebb27cd6e127952a3ff00a2fdf425b/packages/middleware/session/src/crypto.ts
+- https://github.com/remix-run/remix/blob/100ecd3ea686eeec14f17fa908116b74aebdb91c/packages/remix-cloudflare/crypto.ts
+- https://github.com/auth0/node-jws/blob/b9fb8d30e9c009ade6379f308590f1b0703eefc3/lib/sign-stream.js
+- https://github.com/panva/jose/blob/e2836e6aaaddecde053018884abb040908f186fd/src/runtime/browser/sign.ts
