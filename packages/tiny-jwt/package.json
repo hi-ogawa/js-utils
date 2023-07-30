@@ -29,6 +29,7 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest",
+    "cli": "tsx ./src/cli.node.ts",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
