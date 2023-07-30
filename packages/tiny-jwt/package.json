@@ -27,6 +27,7 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
-    "@hiogawa/utils": "workspace:*"
+    "@hiogawa/utils": "workspace:*",
+    "@types/node": "^18"
   }
 }
