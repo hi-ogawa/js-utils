@@ -9,8 +9,8 @@ See tests `./src/*.test.ts` for the usage.
 - [x] JWS (json web signature)
   - [x] HMAC (alg = HS256)
   - [x] ECDSA (alg = ES256)
-- [ ] JWE (json web encryption)
-  - [ ] AES-GCM (alg = dir, enc = A128GCM)
+- [x] JWE (json web encryption)
+  - [x] AES-GCM (alg = dir, enc = A256GCM)
 - [ ] support `exp` and `ist`
 - [ ] more tests
 - [ ] demo frontend
