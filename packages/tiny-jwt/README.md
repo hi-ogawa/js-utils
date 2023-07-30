@@ -1,11 +1,20 @@
 # tiny-jwt
 
-Simple JWT utils base on [`WebCrypto`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) API.
+Simple JWT library base on [`WebCrypto`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) API.
 
 ```sh
 pnpm build
 pnpm release
 ```
+
+## todo
+
+- [ ] JWS (json web signature)
+  - [x] HMAC/SHA-256 (alg = HS256)
+  - [ ] asymmetric key
+- [ ] JWE (json web encryption)
+  - [ ] AES-GCM (alg = dir, enc = A128GCM)
+- [ ] support `exp` and `ist`
 
 ## references
 
