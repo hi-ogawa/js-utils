@@ -10,6 +10,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
+    },
+    "./dist/polyfill-node": {
+      "import": "./dist/polyfill-node.js",
+      "require": "./dist/polyfill-node.cjs",
+      "types": "./dist/polyfill-node.d.ts"
     }
   },
   "files": [
