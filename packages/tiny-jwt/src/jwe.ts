@@ -12,7 +12,7 @@ import {
   encodeUtf8,
 } from "./utils";
 
-// JWK https://datatracker.ietf.org/doc/html/rfc7518#section-5.1
+// JWA https://datatracker.ietf.org/doc/html/rfc7518#section-5.1
 // support only A256GCM for starter
 
 const JWE_ENC = "A256GCM" as const;

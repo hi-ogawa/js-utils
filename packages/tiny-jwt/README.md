@@ -18,6 +18,9 @@ See tests `./src/*.test.ts` for the usage.
 
 ## references
 
+- JWS https://datatracker.ietf.org/doc/html/rfc7515
+- JWE https://datatracker.ietf.org/doc/html/rfc7516
+- JWA https://datatracker.ietf.org/doc/html/rfc7518
 - https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
 - https://nodejs.org/docs/latest-v18.x/api/webcrypto.html
 - https://developers.cloudflare.com/workers/runtime-apis/web-crypto/

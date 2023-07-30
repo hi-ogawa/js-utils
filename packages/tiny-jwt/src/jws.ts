@@ -11,7 +11,7 @@ import {
   encodeUtf8,
 } from "./utils";
 
-// JWK https://datatracker.ietf.org/doc/html/rfc7518#section-3.1
+// JWA https://datatracker.ietf.org/doc/html/rfc7518#section-3.1
 // prettier-ignore
 const ALGORITHM_MAP = new Map<string, AlgorithmParams>([
   ["HS256", { name: "HMAC", hash: "SHA-256" }],
