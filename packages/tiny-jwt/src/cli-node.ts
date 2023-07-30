@@ -36,13 +36,15 @@ const commands: Record<string, () => Promise<unknown>> = {
 };
 
 async function main() {
-  const [algorithm] = process.argv.slice(2);
-  const commandFn = algorithm && commands[algorithm];
+  const [command, algorithm] = process.argv.slice(2);
+  tinyassert(command === "keygen", "supported command: keygen");
+
+  const keygenFn = algorithm && commands[algorithm];
   tinyassert(
-    commandFn,
+    keygenFn,
     "supported algorithm: " + Object.keys(commands).join(", ")
   );
-  const result = await commandFn();
+  const result = await keygenFn();
   console.log(JSON.stringify(result, null, 2));
 }
 

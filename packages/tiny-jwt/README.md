@@ -4,6 +4,21 @@ Minimal JWT library base on [`WebCrypto`](https://developer.mozilla.org/en-US/do
 
 See tests `./src/*.test.ts` for the usage.
 
+```sh
+# generate key in JWK format
+tiny-jwt keygen HS256
+{
+  "key_ops": [
+    "sign",
+    "verify"
+  ],
+  "ext": true,
+  "kty": "oct",
+  "k": "eIlE_krFljjdMaGOEUHqTkvBgknkEQK_Q3VjMHDagJlde-36x1YXfjowvKs8mTSH6gJyml6HvW1qLhG75HOW_g",
+  "alg": "HS256"
+}
+```
+
 ## todo
 
 - [x] JWS (json web signature)
@@ -13,7 +28,7 @@ See tests `./src/*.test.ts` for the usage.
   - [x] AES-GCM (alg = dir, enc = A256GCM)
 - [ ] support `exp` and `ist`
 - [ ] more tests
-- [ ] demo cli (key generation, etc...)
+- [x] demo cli (key generation, etc...)
 - [ ] demo frontend
 
 ## references
