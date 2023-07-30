@@ -13,6 +13,7 @@ See tests `./src/*.test.ts` for the usage.
   - [x] AES-GCM (alg = dir, enc = A256GCM)
 - [ ] support `exp` and `ist`
 - [ ] more tests
+- [ ] demo cli (key generation, etc...)
 - [ ] demo frontend
 
 ## references

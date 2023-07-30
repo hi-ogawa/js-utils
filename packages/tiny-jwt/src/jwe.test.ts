@@ -1,5 +1,19 @@
-import { describe, expect, it } from "vitest";
+import { tinyassert } from "@hiogawa/utils";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { jweDecrypt, jweEncrypt } from "./jwe";
+
+beforeAll(() => {
+  // deterministic "iv" (initialization vector)
+  let i = 0;
+  vi.spyOn(crypto, "getRandomValues").mockImplementation((arr) => {
+    tinyassert(arr);
+    new Uint8Array(arr.buffer).fill(i++);
+    return arr;
+  });
+  return () => {
+    vi.restoreAllMocks();
+  };
+});
 
 describe("jwe", () => {
   it("basic", async () => {
@@ -20,9 +34,8 @@ describe("jwe", () => {
     }
     */
     const key = "vc43dP6oKb7nnjt-YFgLbZ1R3ItaJLvPicVasAGwOPA";
-
     const header = { alg: "dir", enc: "A256GCM" } as const;
-    const payload = { hey: "you" };
+    const payload = { hey: "you".repeat(5) };
 
     const token = await jweEncrypt({
       header,
@@ -34,8 +47,12 @@ describe("jwe", () => {
       payload,
       key,
     });
-    // every token is different for "iv" (initialization vector)
-    expect(token).not.toEqual(token2);
+    expect(token).toMatchInlineSnapshot(
+      '"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..AAAAAAAAAAAAAAAA.3o6Vw6RfwfDV89a5cQmApxsS52iPP4ZxnNqjpgSMJchoWA.9cWxaNtVez7PpfzFkLexnQ"'
+    );
+    expect(token2).toMatchInlineSnapshot(
+      '"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..AQEBAQEBAQEBAQEB.O9Mhj210k_ROwP3woiC2jrhWFlEf_ZlR2g1xkTccDKcH7g.dDcdAnisfjLMWBwy4P3eAg"'
+    );
 
     const decrypted = await jweDecrypt({
       token,
@@ -48,7 +65,7 @@ describe("jwe", () => {
           "enc": "A256GCM",
         },
         "payload": {
-          "hey": "you",
+          "hey": "youyouyouyouyou",
         },
       }
     `);

@@ -151,8 +151,9 @@ async function cryptoEncrypt({
   const encrypted = await crypto.subtle.encrypt(encryptParam, key, data);
 
   // split out tag
-  const ciphertext = encrypted.slice(0, -encryptParam.tagLength);
-  const tag = encrypted.slice(-encryptParam.tagLength);
+  const tagLength = encryptParam.tagLength / 8;
+  const ciphertext = encrypted.slice(0, -tagLength);
+  const tag = encrypted.slice(-tagLength);
   return { ciphertext, tag };
 }
 
@@ -183,7 +184,9 @@ async function cryptoDecrypt({
     additionalData,
   } satisfies AesGcmParams;
 
-  // prepend tag
+  // concat tag
+  const tagLength = encryptParam.tagLength / 8;
+  tinyassert(tag.length === tagLength, "invalid 'tag' length");
   const data = new Uint8Array(ciphertext.byteLength + tag.byteLength);
   data.set(ciphertext, 0);
   data.set(tag, ciphertext.byteLength);
