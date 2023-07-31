@@ -122,7 +122,7 @@ describe(includesGuard, () => {
       input satisfies "a" | "b";
     }
 
-    // @ts-expect-error Array.includes requires argument type
+    // @ts-expect-error `Array.prototype.includes` checks argument type
     ls.includes(input);
   });
 
