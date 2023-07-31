@@ -33,6 +33,7 @@ tiny-jwt keygen HS256
 
 ## references
 
+- JWT https://datatracker.ietf.org/doc/html/rfc7519
 - JWS https://datatracker.ietf.org/doc/html/rfc7515
 - JWE https://datatracker.ietf.org/doc/html/rfc7516
 - JWA https://datatracker.ietf.org/doc/html/rfc7518
