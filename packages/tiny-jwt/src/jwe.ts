@@ -118,7 +118,7 @@ async function cryptoEncrypt({
   keyData: JsonWebKey;
   iv: BufferSource;
   additionalData: BufferSource;
-}) {
+}): Promise<{ ciphertext: ArrayBuffer; tag: ArrayBuffer }> {
   const encryptParam = {
     ...CRYPTO_ENCRYPTION_PARAM,
     iv,
@@ -153,7 +153,7 @@ async function cryptoDecrypt({
   keyData: JsonWebKey;
   iv: BufferSource;
   additionalData: BufferSource;
-}) {
+}): Promise<ArrayBuffer> {
   const encryptParam = {
     ...CRYPTO_ENCRYPTION_PARAM,
     iv,
@@ -174,6 +174,5 @@ async function cryptoDecrypt({
     false,
     ["decrypt"]
   );
-  const decrypted = await crypto.subtle.decrypt(encryptParam, key, data);
-  return decrypted;
+  return crypto.subtle.decrypt(encryptParam, key, data);
 }

@@ -34,22 +34,24 @@ describe("jws", () => {
 
   it("ES256", async () => {
     // pnpm -C packages/tiny-jwt cli keygen ES256
-    const privateKey = {
-      key_ops: ["sign"],
-      ext: true,
-      kty: "EC",
-      x: "f91i57vK_SaXgPzCLTFmHgivjyO1QUlGlh080UVIer4",
-      y: "wdwbAyOBvxuvdZ5uBOqJqucJYZ5uYPUgh2YYmSSI0Q8",
-      crv: "P-256",
-      d: "FB4GANwIzRg96QxuFkJziid0j31dxN0r5Vj2ZhflEjE",
-    };
-    const publicKey = {
-      key_ops: ["verify"],
-      ext: true,
-      kty: "EC",
-      x: "f91i57vK_SaXgPzCLTFmHgivjyO1QUlGlh080UVIer4",
-      y: "wdwbAyOBvxuvdZ5uBOqJqucJYZ5uYPUgh2YYmSSI0Q8",
-      crv: "P-256",
+    const keyPair = {
+      privateKey: {
+        key_ops: ["sign"],
+        ext: true,
+        kty: "EC",
+        x: "9kt7B8n3bZd75-TDaolIZX8TAYX01ZoYb8--elqkmAE",
+        y: "dORjOTold2oujeyBo1FF9mDHEX8f3j68hcd64DhMHpQ",
+        crv: "P-256",
+        d: "yZPwEOZwEyyB7F_drblZ9QqdXHRT1-rrUfC7GzSMFvk",
+      },
+      publicKey: {
+        key_ops: ["verify"],
+        ext: true,
+        kty: "EC",
+        x: "9kt7B8n3bZd75-TDaolIZX8TAYX01ZoYb8--elqkmAE",
+        y: "dORjOTold2oujeyBo1FF9mDHEX8f3j68hcd64DhMHpQ",
+        crv: "P-256",
+      },
     };
 
     const payload = { hey: "you" };
@@ -57,13 +59,13 @@ describe("jws", () => {
     const token = await jwsSign({
       header: { alg: "ES256" },
       payload,
-      key: privateKey,
+      key: keyPair.privateKey,
     });
 
     const token2 = await jwsSign({
       header: { alg: "ES256" },
       payload,
-      key: privateKey,
+      key: keyPair.privateKey,
     });
 
     // ECDSA relies on random number internally and thus not deterministic
@@ -72,7 +74,7 @@ describe("jws", () => {
 
     const verified = await jwsVerify({
       token,
-      key: publicKey,
+      key: keyPair.publicKey,
       algorithms: ["ES256"],
     });
     expect(verified).toMatchInlineSnapshot(`

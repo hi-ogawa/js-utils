@@ -47,7 +47,7 @@ export async function jwsSign({
     keyData: key,
     algorithm,
   });
-  const signatureString = encodeBase64url(signature);
+  const signatureString = encodeBase64url(new Uint8Array(signature));
 
   // format token
   const token = `${dataString}.${signatureString}`;
@@ -112,12 +112,11 @@ async function cryptoSign({
   data: Uint8Array;
   keyData: JsonWebKey;
   algorithm: AlgorithmParams;
-}): Promise<Uint8Array> {
+}): Promise<ArrayBuffer> {
   const key = await crypto.subtle.importKey("jwk", keyData, algorithm, false, [
     "sign",
   ]);
-  const signature = await crypto.subtle.sign(algorithm, key, data);
-  return new Uint8Array(signature);
+  return crypto.subtle.sign(algorithm, key, data);
 }
 
 async function cryptoVerify({
