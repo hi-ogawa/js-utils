@@ -37,5 +37,5 @@ export function arrayToEnum<
 
 // `Array.prototype.includes` checks argument type and doesn't function as type guard
 export function includesGuard<T>(ls: readonly T[], v: unknown): v is T {
-  return ls.includes(v as any);
+  return ls.includes(v as T);
 }
