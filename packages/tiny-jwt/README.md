@@ -26,7 +26,7 @@ tiny-jwt keygen HS256
   - [x] ECDSA (alg = ES256)
 - [x] JWE (json web encryption)
   - [x] AES-GCM (alg = dir, enc = A256GCM)
-- [ ] support `exp` and `ist`
+- [x] support `exp`
 - [ ] more tests
 - [x] demo cli (key generation, etc...)
 - [ ] demo frontend
