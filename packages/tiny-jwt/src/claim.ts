@@ -1,9 +1,8 @@
 import { tinyassert } from "@hiogawa/utils";
 
 // https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4
-export function setExpirationTime(expiresInSecond: number) {
-  const exp = Math.ceil(Date.now() / 1000 + expiresInSecond);
-  return { exp };
+export function setExpirationTime(expiresInSeconds: number) {
+  return { exp: Math.ceil(Date.now() / 1000 + expiresInSeconds) };
 }
 
 // TODO: allow clock skew?
