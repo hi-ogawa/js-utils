@@ -2,7 +2,7 @@
 // JWS (json web signature) https://datatracker.ietf.org/doc/html/rfc7515
 //
 
-import { tinyassert, unionIncludes } from "@hiogawa/utils";
+import { includesGuard, tinyassert } from "@hiogawa/utils";
 import {
   decodeBase64url,
   decodeJson,
@@ -82,7 +82,7 @@ export async function jwsVerify({
     "invalid header 'alg'"
   );
   const algorithm = ALGORITHM_MAP.get(header.alg);
-  tinyassert(unionIncludes(algorithms, header.alg), "disallowed 'alg'");
+  tinyassert(includesGuard(algorithms, header.alg), "disallowed 'alg'");
   tinyassert(algorithm, "unsupported 'alg'");
 
   // verify signature

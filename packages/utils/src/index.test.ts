@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
-import { arrayToEnum, assertUnreachable, typedBoolean } from "./misc";
+import {
+  arrayToEnum,
+  assertUnreachable,
+  includesGuard,
+  typedBoolean,
+} from "./misc";
 import { mapOption } from "./option";
 import { mapToAsyncGenerator, newPromiseWithResolvers } from "./promise";
 import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
@@ -105,6 +110,34 @@ describe(arrayToEnum, () => {
     expect(e[0]).toMatchInlineSnapshot("0");
     expect(e.x).toMatchInlineSnapshot('"x"');
     expect(e[s]).toMatchInlineSnapshot("Symbol(s)");
+  });
+});
+
+describe(includesGuard, () => {
+  const input: unknown = {};
+
+  it("const", () => {
+    const ls = ["a", "b"] as const;
+    if (includesGuard(ls, input)) {
+      input satisfies "a" | "b";
+    }
+
+    // @ts-expect-error Array.includes requires argument type
+    ls.includes(input);
+  });
+
+  it("union", () => {
+    const ls: ("a" | "b")[] = [];
+    if (includesGuard(ls, input)) {
+      input satisfies "a" | "b";
+    }
+  });
+
+  it("non-literal", () => {
+    const ls: string[] = [];
+    if (includesGuard(ls, input)) {
+      input satisfies string;
+    }
   });
 });
 
