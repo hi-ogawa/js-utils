@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/tiny-jwt",
-  "version": "0.2.3-pre.4",
+  "version": "0.2.4",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
