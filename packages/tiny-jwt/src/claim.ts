@@ -1,8 +1,12 @@
 import { tinyassert } from "@hiogawa/utils";
 
-// https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4
-export function setExpirationTime(expiresInSeconds: number) {
-  return { exp: Math.ceil(Date.now() / 1000 + expiresInSeconds) };
+// "exp" claim https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4
+
+/**
+ * @param maxAge similar to cookie "Max-Age" https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#max-agenumber
+ */
+export function setExpirationTime(maxAge: number) {
+  return { exp: Math.ceil(Date.now() / 1000 + maxAge) };
 }
 
 // TODO: allow clock skew?
