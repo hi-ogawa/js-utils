@@ -2,7 +2,7 @@
 // JWS (json web signature) https://datatracker.ietf.org/doc/html/rfc7515
 //
 
-import { tinyassert } from "@hiogawa/utils";
+import { includesGuard, tinyassert } from "@hiogawa/utils";
 import {
   decodeBase64url,
   decodeJson,
@@ -12,26 +12,26 @@ import {
 } from "./utils";
 
 // JWA https://datatracker.ietf.org/doc/html/rfc7518#section-3.1
-// prettier-ignore
+// support only one symmetric and one asymmetric for starter
+const JWS_ALGORITHMS = ["HS256", "ES256"] as const;
+
+type JwsAlg = (typeof JWS_ALGORITHMS)[number];
+
+type AlgorithmParams = HmacImportParams | (EcKeyImportParams & EcdsaParams);
+
 const ALGORITHM_MAP = new Map<string, AlgorithmParams>([
   ["HS256", { name: "HMAC", hash: "SHA-256" }],
   ["ES256", { name: "ECDSA", hash: "SHA-256", namedCurve: "P-256" }],
-  ["RS256", { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }],
 ]);
-
-type AlgorithmParams =
-  | HmacImportParams
-  | (EcKeyImportParams & EcdsaParams)
-  | RsaHashedImportParams;
 
 export async function jwsSign({
   header,
   payload,
   key,
 }: {
-  header: { alg: string; [extra: string]: unknown };
+  header: { alg: JwsAlg; [extra: string]: unknown };
   payload: unknown;
-  key: string | JsonWebKey; // TODO: drop "raw string" support? (i.e. enforce jwk?)
+  key: JsonWebKey;
 }) {
   const algorithm = ALGORITHM_MAP.get(header.alg);
   tinyassert(algorithm, "unsupported 'alg'");
@@ -47,7 +47,7 @@ export async function jwsSign({
     keyData: key,
     algorithm,
   });
-  const signatureString = encodeBase64url(signature);
+  const signatureString = encodeBase64url(new Uint8Array(signature));
 
   // format token
   const token = `${dataString}.${signatureString}`;
@@ -60,8 +60,8 @@ export async function jwsVerify({
   algorithms,
 }: {
   token: string;
-  key: string | JsonWebKey;
-  algorithms: string[];
+  key: JsonWebKey;
+  algorithms: JwsAlg[];
 }) {
   // parse token
   const {
@@ -82,7 +82,7 @@ export async function jwsVerify({
     "invalid header 'alg'"
   );
   const algorithm = ALGORITHM_MAP.get(header.alg);
-  tinyassert(algorithms.includes(header.alg), "disallowed 'alg'");
+  tinyassert(includesGuard(algorithms, header.alg), "disallowed 'alg'");
   tinyassert(algorithm, "unsupported 'alg'");
 
   // verify signature
@@ -110,12 +110,13 @@ async function cryptoSign({
   algorithm,
 }: {
   data: Uint8Array;
-  keyData: string | JsonWebKey;
+  keyData: JsonWebKey;
   algorithm: AlgorithmParams;
-}): Promise<Uint8Array> {
-  const key = await cryptoImportKey({ keyData, algorithm, usages: ["sign"] });
-  const signature = await crypto.subtle.sign(algorithm, key, data);
-  return new Uint8Array(signature);
+}): Promise<ArrayBuffer> {
+  const key = await crypto.subtle.importKey("jwk", keyData, algorithm, false, [
+    "sign",
+  ]);
+  return crypto.subtle.sign(algorithm, key, data);
 }
 
 async function cryptoVerify({
@@ -126,30 +127,11 @@ async function cryptoVerify({
 }: {
   data: Uint8Array;
   signature: Uint8Array;
-  keyData: string | JsonWebKey;
+  keyData: JsonWebKey;
   algorithm: AlgorithmParams;
 }): Promise<boolean> {
-  const key = await cryptoImportKey({ keyData, algorithm, usages: ["verify"] });
+  const key = await crypto.subtle.importKey("jwk", keyData, algorithm, false, [
+    "verify",
+  ]);
   return crypto.subtle.verify(algorithm, key, signature, data);
-}
-
-function cryptoImportKey({
-  keyData,
-  algorithm,
-  usages,
-}: {
-  keyData: string | JsonWebKey;
-  algorithm: AlgorithmParams;
-  usages: KeyUsage[];
-}): Promise<CryptoKey> {
-  if (typeof keyData === "string") {
-    return crypto.subtle.importKey(
-      "raw",
-      encodeUtf8(keyData),
-      algorithm,
-      false,
-      usages
-    );
-  }
-  return crypto.subtle.importKey("jwk", keyData, algorithm, false, usages);
 }
