@@ -29,6 +29,9 @@ importers:
       tsup:
         specifier: ^7.1.0
         version: 7.1.0(typescript@5.1.6)
+      tsx:
+        specifier: ^3.12.7
+        version: 3.12.7
       typedoc:
         specifier: ^0.24.8
         version: 0.24.8(typescript@5.1.6)

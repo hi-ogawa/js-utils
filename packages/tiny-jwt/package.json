@@ -1,10 +1,11 @@
 {
   "name": "@hiogawa/tiny-jwt",
-  "version": "0.0.1",
+  "version": "0.0.2-pre.1",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": "./dist/cli-node.js",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -29,6 +30,7 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest",
+    "cli": "tsx ./src/cli-node.ts",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
