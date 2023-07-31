@@ -29,9 +29,9 @@ export async function jwsSign({
   payload,
   key,
 }: {
-  header: { alg: string; [extra: string]: unknown };
+  header: { alg: string; [extra: string]: unknown }; // TODO: type "alg" literals
   payload: unknown;
-  key: string | JsonWebKey; // TODO: drop "raw string" support? (i.e. enforce jwk?)
+  key: JsonWebKey;
 }) {
   const algorithm = ALGORITHM_MAP.get(header.alg);
   tinyassert(algorithm, "unsupported 'alg'");
@@ -60,7 +60,7 @@ export async function jwsVerify({
   algorithms,
 }: {
   token: string;
-  key: string | JsonWebKey;
+  key: JsonWebKey;
   algorithms: string[];
 }) {
   // parse token
@@ -110,10 +110,12 @@ async function cryptoSign({
   algorithm,
 }: {
   data: Uint8Array;
-  keyData: string | JsonWebKey;
+  keyData: JsonWebKey;
   algorithm: AlgorithmParams;
 }): Promise<Uint8Array> {
-  const key = await cryptoImportKey({ keyData, algorithm, usages: ["sign"] });
+  const key = await crypto.subtle.importKey("jwk", keyData, algorithm, false, [
+    "sign",
+  ]);
   const signature = await crypto.subtle.sign(algorithm, key, data);
   return new Uint8Array(signature);
 }
@@ -126,30 +128,11 @@ async function cryptoVerify({
 }: {
   data: Uint8Array;
   signature: Uint8Array;
-  keyData: string | JsonWebKey;
+  keyData: JsonWebKey;
   algorithm: AlgorithmParams;
 }): Promise<boolean> {
-  const key = await cryptoImportKey({ keyData, algorithm, usages: ["verify"] });
+  const key = await crypto.subtle.importKey("jwk", keyData, algorithm, false, [
+    "verify",
+  ]);
   return crypto.subtle.verify(algorithm, key, signature, data);
-}
-
-function cryptoImportKey({
-  keyData,
-  algorithm,
-  usages,
-}: {
-  keyData: string | JsonWebKey;
-  algorithm: AlgorithmParams;
-  usages: KeyUsage[];
-}): Promise<CryptoKey> {
-  if (typeof keyData === "string") {
-    return crypto.subtle.importKey(
-      "raw",
-      encodeUtf8(keyData),
-      algorithm,
-      false,
-      usages
-    );
-  }
-  return crypto.subtle.importKey("jwk", keyData, algorithm, false, usages);
 }
