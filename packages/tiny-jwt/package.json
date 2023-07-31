@@ -1,11 +1,11 @@
 {
   "name": "@hiogawa/tiny-jwt",
-  "version": "0.2.2",
+  "version": "0.2.3-pre.4",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "bin": "./dist/cli-node.js",
+  "bin": "./bin/cli.js",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -19,6 +19,7 @@
     }
   },
   "files": [
+    "bin",
     "dist"
   ],
   "license": "MIT",
