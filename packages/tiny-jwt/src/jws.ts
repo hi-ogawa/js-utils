@@ -12,7 +12,7 @@ import {
 } from "./utils";
 
 // JWA https://datatracker.ietf.org/doc/html/rfc7518#section-3.1
-// support only one symmetric and one assymmetric for starter
+// support only one symmetric and one asymmetric for starter
 const JWS_ALGORITHMS = ["HS256", "ES256"] as const;
 
 type JwsAlg = (typeof JWS_ALGORITHMS)[number];
