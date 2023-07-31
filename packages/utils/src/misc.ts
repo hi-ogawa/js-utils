@@ -34,3 +34,14 @@ export function arrayToEnum<
 } {
   return Object.fromEntries(values.map((v) => [v, v])) as any;
 }
+
+export function constIncludes<T, Ts extends Readonly<[T, ...T[]]>>(
+  ls: Ts,
+  v: unknown
+): v is Ts[number] {
+  return ls.includes(v as any);
+}
+
+export function unionIncludes<T>(ls: T[], v: unknown): v is T {
+  return ls.includes(v as any);
+}

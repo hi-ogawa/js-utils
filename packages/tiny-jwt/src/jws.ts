@@ -2,7 +2,7 @@
 // JWS (json web signature) https://datatracker.ietf.org/doc/html/rfc7515
 //
 
-import { tinyassert } from "@hiogawa/utils";
+import { tinyassert, unionIncludes } from "@hiogawa/utils";
 import {
   decodeBase64url,
   decodeJson,
@@ -12,24 +12,24 @@ import {
 } from "./utils";
 
 // JWA https://datatracker.ietf.org/doc/html/rfc7518#section-3.1
-// prettier-ignore
+// support only one symmetric and one assymmetric for starter
+const JWS_ALGORITHMS = ["HS256", "ES256"] as const;
+
+type JwsAlg = (typeof JWS_ALGORITHMS)[number];
+
+type AlgorithmParams = HmacImportParams | (EcKeyImportParams & EcdsaParams);
+
 const ALGORITHM_MAP = new Map<string, AlgorithmParams>([
   ["HS256", { name: "HMAC", hash: "SHA-256" }],
   ["ES256", { name: "ECDSA", hash: "SHA-256", namedCurve: "P-256" }],
-  ["RS256", { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }],
 ]);
-
-type AlgorithmParams =
-  | HmacImportParams
-  | (EcKeyImportParams & EcdsaParams)
-  | RsaHashedImportParams;
 
 export async function jwsSign({
   header,
   payload,
   key,
 }: {
-  header: { alg: string; [extra: string]: unknown }; // TODO: type "alg" literals
+  header: { alg: JwsAlg; [extra: string]: unknown };
   payload: unknown;
   key: JsonWebKey;
 }) {
@@ -61,7 +61,7 @@ export async function jwsVerify({
 }: {
   token: string;
   key: JsonWebKey;
-  algorithms: string[];
+  algorithms: JwsAlg[];
 }) {
   // parse token
   const {
@@ -82,7 +82,7 @@ export async function jwsVerify({
     "invalid header 'alg'"
   );
   const algorithm = ALGORITHM_MAP.get(header.alg);
-  tinyassert(algorithms.includes(header.alg), "disallowed 'alg'");
+  tinyassert(unionIncludes(algorithms, header.alg), "disallowed 'alg'");
   tinyassert(algorithm, "unsupported 'alg'");
 
   // verify signature
