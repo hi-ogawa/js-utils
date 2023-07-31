@@ -31,7 +31,7 @@ export async function jwsSign({
 }: {
   header: { alg: string; [extra: string]: unknown };
   payload: unknown;
-  key: string | JsonWebKey;
+  key: string | JsonWebKey; // TODO: drop "raw string" support? (i.e. enforce jwk?)
 }) {
   const algorithm = ALGORITHM_MAP.get(header.alg);
   tinyassert(algorithm, "unsupported 'alg'");

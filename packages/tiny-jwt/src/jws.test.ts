@@ -28,7 +28,10 @@ describe("jws", () => {
   });
 
   it("jwk-HS256", async () => {
+    // pnpm -C packages/tiny-jwt cli keygen HS256
     const key = {
+      key_ops: ["sign", "verify"],
+      ext: true,
       kty: "oct",
       k: "eIlE_krFljjdMaGOEUHqTkvBgknkEQK_Q3VjMHDagJlde-36x1YXfjowvKs8mTSH6gJyml6HvW1qLhG75HOW_g",
       alg: "HS256",
