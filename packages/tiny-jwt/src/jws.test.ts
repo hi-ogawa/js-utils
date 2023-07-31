@@ -13,11 +13,11 @@ describe("jws", () => {
     };
     const token = await jwsSign({
       header: { alg: "HS256" },
-      payload: { hey: "you", utf: "콘솔🐈" },
+      payload: { hello: "world", utf: "콘솔🐈" },
       key,
     });
     expect(token).toMatchInlineSnapshot(
-      '"eyJhbGciOiJIUzI1NiJ9.eyJoZXkiOiJ5b3UifQ.zwCZQg-jtThm6JYlG8myyCBI0dKqkiiUEoljqBntTPs"'
+      '"eyJhbGciOiJIUzI1NiJ9.eyJoZWxsbyI6IndvcmxkIiwidXRmIjoi7L2Y7IaU8J-QiCJ9.z4iDuntu12oPP1N9LheUyXWmjn11EE4pDQFCMlB1Uok"'
     );
     const verified = await jwsVerify({ token, key, algorithms: ["HS256"] });
     expect(verified).toMatchInlineSnapshot(`
@@ -26,7 +26,8 @@ describe("jws", () => {
           "alg": "HS256",
         },
         "payload": {
-          "hey": "you",
+          "hello": "world",
+          "utf": "콘솔🐈",
         },
       }
     `);
