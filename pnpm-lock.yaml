@@ -97,7 +97,7 @@ importers:
         version: 0.53.6(postcss@8.4.27)(vite@4.4.6)
       vite:
         specifier: ^4.4.6
-        version: 4.4.6(@types/node@20.4.1)
+        version: 4.4.6(@types/node@18.16.20)
 
   packages/tiny-rpc:
     devDependencies:
@@ -145,6 +145,21 @@ importers:
         version: 3.12.7
 
   packages/utils: {}
+
+  packages/utils-cli:
+    devDependencies:
+      '@hattip/adapter-node':
+        specifier: ^0.0.34
+        version: 0.0.34
+      '@hattip/compose':
+        specifier: ^0.0.34
+        version: 0.0.34
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
 
   packages/utils-experimental: {}
 
