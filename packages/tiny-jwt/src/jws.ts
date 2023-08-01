@@ -2,7 +2,7 @@
 // JWS (json web signature) https://datatracker.ietf.org/doc/html/rfc7515
 //
 
-import { includesGuard, tinyassert } from "@hiogawa/utils";
+import { tinyassert } from "@hiogawa/utils";
 import {
   decodeBase64url,
   decodeJson,
@@ -57,12 +57,15 @@ export async function jwsSign({
 export async function jwsVerify({
   token,
   key,
-  algorithms,
 }: {
   token: string;
-  key: JsonWebKey;
-  algorithms: JwsAlg[];
+  key: JsonWebKey; // jwt-set to support multiple keys?
 }) {
+  // derive algorithm from key.alg
+  tinyassert(key.alg, "missing key 'alg'");
+  const algorithm = ALGORITHM_MAP.get(key.alg);
+  tinyassert(algorithm, "unsupported key 'alg'");
+
   // parse token
   const {
     0: headerString,
@@ -72,7 +75,7 @@ export async function jwsVerify({
   } = token.split(".");
   tinyassert(length === 3, "invalid token format");
 
-  // check header.alg
+  // check header.alg === key.lag
   const header = decodeJson(headerString);
   tinyassert(
     header &&
@@ -81,9 +84,7 @@ export async function jwsVerify({
       typeof header.alg === "string",
     "invalid header 'alg'"
   );
-  const algorithm = ALGORITHM_MAP.get(header.alg);
-  tinyassert(includesGuard(algorithms, header.alg), "disallowed 'alg'");
-  tinyassert(algorithm, "unsupported 'alg'");
+  tinyassert(header.alg === key.alg, "header 'alg' must match key 'alg'");
 
   // verify signature
   const dataString = `${headerString}.${payloadString}`;

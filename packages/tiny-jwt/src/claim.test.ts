@@ -14,6 +14,7 @@ describe("token expiration", () => {
     const key = {
       kty: "oct",
       k: "eIlE_krFljjdMaGOEUHqTkvBgknkEQK_Q3VjMHDagJlde-36x1YXfjowvKs8mTSH6gJyml6HvW1qLhG75HOW_g",
+      alg: "HS256",
     };
 
     // expires in 15 min
@@ -30,7 +31,6 @@ describe("token expiration", () => {
     const verified = await jwsVerify({
       token,
       key,
-      algorithms: ["HS256"],
     });
     expect(verified).toMatchInlineSnapshot(`
       {

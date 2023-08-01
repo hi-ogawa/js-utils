@@ -4,7 +4,7 @@ import { jwsSign, jwsVerify } from "./jws";
 describe("jws", () => {
   it("HS256", async () => {
     // pnpm -C packages/tiny-jwt cli keygen HS256
-    const key = {
+    const key: JsonWebKey = {
       key_ops: ["sign", "verify"],
       ext: true,
       kty: "oct",
@@ -19,7 +19,7 @@ describe("jws", () => {
     expect(token).toMatchInlineSnapshot(
       '"eyJhbGciOiJIUzI1NiJ9.eyJoZWxsbyI6IndvcmxkIiwidXRmIjoi7L2Y7IaU8J-QiCJ9.z4iDuntu12oPP1N9LheUyXWmjn11EE4pDQFCMlB1Uok"'
     );
-    const verified = await jwsVerify({ token, key, algorithms: ["HS256"] });
+    const verified = await jwsVerify({ token, key });
     expect(verified).toMatchInlineSnapshot(`
       {
         "header": {
@@ -53,7 +53,7 @@ describe("jws", () => {
         y: "dORjOTold2oujeyBo1FF9mDHEX8f3j68hcd64DhMHpQ",
         crv: "P-256",
       },
-    };
+    } satisfies Record<string, JsonWebKey>;
 
     const payload = { hey: "you" };
 
@@ -76,7 +76,6 @@ describe("jws", () => {
     const verified = await jwsVerify({
       token,
       key: keyPair.publicKey,
-      algorithms: ["ES256"],
     });
     expect(verified).toMatchInlineSnapshot(`
       {
