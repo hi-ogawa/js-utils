@@ -61,7 +61,7 @@ export async function jwsVerify({
 }: {
   token: string;
   key: JsonWebKey;
-  algorithms: JwsAlg[];
+  algorithms: JwsAlg[]; // TODO: could we use `key.alg` to verify expected algorithm? however, "ES256" for example doesn't seem to include "alg" property when exported from SubtleCrypto.
 }) {
   // parse token
   const {

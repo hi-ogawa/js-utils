@@ -13,6 +13,48 @@ import {
 } from "./utils";
 
 // JWA https://datatracker.ietf.org/doc/html/rfc7518#section-5.1
+const ENCRYPTION_ALGORITHMS = ["A128CBC-HS256", "A256GCM"] as const;
+
+type EncryptionAlgorithm = (typeof ENCRYPTION_ALGORITHMS)[number];
+
+type TagParam =
+  | {
+      type: "GCM";
+      length: 128;
+    }
+  | {
+      type: "CBC";
+    };
+
+const ALGORITHM_PARAMS = new Map([
+  // https://datatracker.ietf.org/doc/html/rfc7518#section-5.2.3
+  [
+    "A128CBC-HS256",
+    {
+      name: "AES-CBC",
+      length: 256,
+      ivLength: 128,
+      tag: {
+        name: "HMAC",
+        hash: "SHA-256",
+      },
+    },
+  ],
+  // https://datatracker.ietf.org/doc/html/rfc7518#section-5.3
+  [
+    "A256GCM",
+    {
+      name: "AES-GCM",
+      length: 256,
+      ivLength: 96,
+      tag: {
+        length: 128,
+      },
+    },
+  ],
+]);
+
+// JWA https://datatracker.ietf.org/doc/html/rfc7518#section-5.1
 // support only A256GCM for starter
 
 const JWE_ENC = "A256GCM" as const;

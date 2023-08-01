@@ -33,6 +33,16 @@ const commands: Record<string, () => Promise<unknown>> = {
     const jwk = await crypto.subtle.exportKey("jwk", key);
     return jwk;
   },
+
+  "A128CBC-HS256": async () => {
+    const key = await crypto.subtle.generateKey(
+      { name: "AES-CBC", length: 256 },
+      true,
+      ["encrypt", "decrypt"]
+    );
+    const jwk = await crypto.subtle.exportKey("jwk", key);
+    return jwk;
+  },
 };
 
 async function main() {
