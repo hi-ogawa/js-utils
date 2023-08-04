@@ -7,6 +7,7 @@ type ArgSchema<T> = {
   // describe?: string; // TODO
   positional?: true;
   // variadic?: true; // TODO
+  // optional?: true; // TODO for help?
   flag?: true;
   parse: (token?: string) => T; // can use ZodType.parse directly
 };
@@ -110,7 +111,24 @@ export function createCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   }
 
   function help(): string {
-    return "todo";
+    const positionals = schemaByType.positionals.map((e) => `<${e[0]}>`);
+    const options = schemaKeyValues.map(
+      (e) => `--${e[0]}${e[1].flag ? "" : "=..."}`
+    );
+
+    let result = `\
+Usage:
+  PROGRAM ${options.length > 0 ? "[options]" : ""} ${positionals.join(" ")}
+`;
+
+    if (options.length > 0) {
+      result += `\
+
+Options
+${options.map((s) => "  " + s).join("\n")}
+`;
+    }
+    return result;
   }
 
   return {

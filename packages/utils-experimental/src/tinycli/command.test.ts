@@ -34,7 +34,18 @@ describe(createCommand, () => {
       }
     );
 
-    expect(example.help()).toMatchInlineSnapshot('"todo"');
+    expect(example.help()).toMatchInlineSnapshot(`
+      "Usage:
+        PROGRAM [options] <arg> <argOpt>
+
+      Options
+        --num=...
+        --numOpt=...
+        --numOptDefault=...
+        --str=...
+        --boolFlagOpt
+      "
+    `);
 
     expect(example.parseAndRun(["x", "--num", "123", "--str", "hey"]))
       .toMatchInlineSnapshot(`
@@ -60,9 +71,8 @@ describe(createCommand, () => {
       example.parseAndRun(["x", "--hehe", "--hehe"])
     ).toThrowErrorMatchingInlineSnapshot('"duplicate options: hehe"');
 
-    expect(() =>
-      example.parseAndRun(["x"])
-    ).toThrowErrorMatchingInlineSnapshot(`
+    expect(() => example.parseAndRun(["x"]))
+      .toThrowErrorMatchingInlineSnapshot(`
       "[
         {
           \\"code\\": \\"invalid_type\\",
