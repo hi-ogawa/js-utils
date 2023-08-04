@@ -60,8 +60,9 @@ export function parseArgs(
   return parsed;
 }
 
-// supports key/value option only by "--key=value" form
-// which is similar to what esbuild cli does
+// minimal simpler version just for comparison.
+// it supports key/value option only by "--key=value" form
+// which is somewhat similar to esbuild's cli
 // https://github.com/evanw/esbuild/blob/0b48edaac1b92da4d14d300252304c44821dd2f2/pkg/cli/cli_impl.go
 export function simpleParseArgs(args: string[]): ParsedArgs {
   const parsed: ParsedArgs = {
