@@ -1,7 +1,7 @@
 import { difference, groupBy, pickBy, zip } from "@hiogawa/utils";
 import { parseArgs } from "./utils";
 
-// TODO: disjoin union?
+// TODO: disjoint union?
 type ArgSchema<T> = {
   // alias?: string[]; // TODO
   // describe?: string; // TODO
