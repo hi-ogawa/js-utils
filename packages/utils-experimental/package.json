@@ -39,5 +39,13 @@
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",
     "zod": "^3.21.4"
+  },
+  "peerDependencies": {
+    "zod": "*"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   }
 }

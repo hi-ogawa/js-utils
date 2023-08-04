@@ -6,7 +6,7 @@ import { range, splitFirst } from "@hiogawa/utils";
 
 export interface ParsedArgs {
   positionals: string[];
-  keyValues: [string, unknown][];
+  keyValues: [string, string][];
   flags: string[];
 }
 
@@ -27,16 +27,16 @@ export function parseArgs(
     if (arg.startsWith("--")) {
       const flag = arg.slice(2);
 
+      // handle "config.flags"
+      if (config?.flags.includes(flag)) {
+        parsed.flags.push(flag);
+        continue;
+      }
+
       // handle "--key=value"
       if (flag.includes("=")) {
         const [key, value] = splitFirst(flag, "=");
         parsed.keyValues.push([key, value]);
-        continue;
-      }
-
-      // if given as "config.keyOnly" then don't lookup next
-      if (config?.flags.includes(flag)) {
-        parsed.flags.push(flag);
         continue;
       }
 

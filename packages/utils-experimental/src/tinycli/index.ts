@@ -1,2 +1,2 @@
-export { parseArgs as parseArgs } from "./utils";
-export {} from "./cli";
+export { parseArgs } from "./utils";
+export { createCommand, defineArg } from "./command";
