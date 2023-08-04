@@ -38,7 +38,6 @@ export function createCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
     flags: entries.filter((e) => e[1].flag),
   };
   const schemaKeyValues = [...schemaByType.keyValues, ...schemaByType.flags];
-  schemaKeyValues.map((e) => e[0]);
 
   function parse(rawArgs: string[]): TypedParsedArgs<ArgSchemaRecord> {
     //
