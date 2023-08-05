@@ -85,6 +85,13 @@ export function zip<T1, T2>(
   return range(Math.min(ls1.length, ls2.length)).map((i) => [ls1[i], ls2[i]]);
 }
 
+export function zipMax<T1, T2>(
+  ls1: readonly T1[],
+  ls2: readonly T2[]
+): [T1 | undefined, T2 | undefined][] {
+  return range(Math.max(ls1.length, ls2.length)).map((i) => [ls1[i], ls2[i]]);
+}
+
 export function difference<T>(ls1: readonly T[], ls2: readonly T[]): T[] {
   const set2 = new Set(ls2);
   return ls1.filter((e) => !set2.has(e));
