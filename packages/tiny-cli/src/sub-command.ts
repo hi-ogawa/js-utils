@@ -1,5 +1,6 @@
 import {
   type Command,
+  DEFAULT_PROGRAM,
   type HelpConfig,
   ParseError,
   formatTable,
@@ -10,9 +11,11 @@ export function defineSubCommands(
     commands: Record<string, Command>;
   } & HelpConfig
 ) {
+  const program = config.program ?? DEFAULT_PROGRAM;
+
   // override subcommands help
   for (const [name, command] of Object.entries(config.commands)) {
-    command.config.program = [config.program, name].join(" ");
+    command.config.program = [program, name].join(" ");
     command.config.autoHelp = config.autoHelp;
     command.config.autoHelpLog = config.autoHelpLog;
   }
@@ -47,7 +50,7 @@ export function defineSubCommands(
 
     let result = `\
 usage:
-  $ ${config?.program ?? "PROGRAM"} <command>
+  $ ${program} <command>
 `;
 
     if (config.help) {

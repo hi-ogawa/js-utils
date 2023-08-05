@@ -183,7 +183,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
     ]);
 
     const usage = [
-      config.program ?? "PROGRAM",
+      config.program ?? DEFAULT_PROGRAM,
       optionsHelp.length > 0 && "[options]",
       ...schemaByType.positionals.map(
         (e) => `<${e[0]}${e[1].variadic ? "..." : ""}>`
@@ -263,3 +263,5 @@ function padColumns(rows: string[][]): string[][] {
 function formatIndent(ls: string[], n: number): string {
   return ls.map((v) => " ".repeat(n) + v).join("\n");
 }
+
+export const DEFAULT_PROGRAM = "(cli)";

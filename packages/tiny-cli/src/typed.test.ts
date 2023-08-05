@@ -150,7 +150,7 @@ describe(defineCommand, () => {
 
       expect(example.help()).toMatchInlineSnapshot(`
         "usage:
-          $ PROGRAM [options] <files...>
+          $ (cli) [options] <files...>
 
         positional arguments:
           files    input files
