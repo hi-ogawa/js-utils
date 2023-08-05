@@ -1,17 +1,17 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { z } from "zod";
 import { defineCommand } from "./typed";
-import { setupZodExtendArg, zodArgs } from "./zod";
+import { setupZodArg, zodArgObject } from "./zod";
 
 beforeAll(() => {
-  return setupZodExtendArg(z);
+  return setupZodArg(z);
 });
 
-describe(zodArgs, () => {
+describe(zodArgObject, () => {
   it("basic", () => {
     const example = defineCommand(
       {
-        args: zodArgs(
+        args: zodArgObject(
           z.object({
             files: z
               .string()

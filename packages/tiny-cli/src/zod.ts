@@ -21,7 +21,7 @@ declare module "zod" {
   }
 }
 
-export function setupZodExtendArg(zod: typeof z) {
+export function setupZodArg(zod: typeof z) {
   zod.ZodSchema.prototype.asArg = function (this, argMeta) {
     this[ARG_META] = argMeta;
     return this;
@@ -41,9 +41,10 @@ export function zodArg<Schema extends z.ZodType>(
   };
 }
 
-export function zodArgs<Schema extends z.SomeZodObject, T = z.infer<Schema>>(
-  schema: Schema
-): { [K in keyof T]: ArgSchema<T[K]> } {
+export function zodArgObject<
+  Schema extends z.SomeZodObject,
+  T = z.infer<Schema>
+>(schema: Schema): { [K in keyof T]: ArgSchema<T[K]> } {
   let result: any = {};
   for (const [k, v] of Object.entries(schema.shape)) {
     result[k] = zodArg(v);
