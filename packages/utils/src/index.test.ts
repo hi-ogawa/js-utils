@@ -5,6 +5,7 @@ import { groupBy, range } from "./lodash";
 import {
   arrayToEnum,
   assertUnreachable,
+  enumerate,
   includesGuard,
   typedBoolean,
 } from "./misc";
@@ -804,5 +805,32 @@ describe(mapToAsyncGenerator, () => {
     expect(inflightCounts.join(",")).toMatchInlineSnapshot(
       '"0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0"'
     );
+  });
+});
+
+describe(enumerate, () => {
+  it("basic", () => {
+    const iter = enumerate(range(3).map((i) => "a".repeat(i)));
+    const result: unknown[] = [];
+    for (const e of iter) {
+      e satisfies [number, string];
+      result.push(e);
+    }
+    expect(result).toMatchInlineSnapshot(`
+      [
+        [
+          0,
+          "",
+        ],
+        [
+          1,
+          "a",
+        ],
+        [
+          2,
+          "aa",
+        ],
+      ]
+    `);
   });
 });

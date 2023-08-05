@@ -39,3 +39,10 @@ export function arrayToEnum<
 export function includesGuard<T>(ls: readonly T[], v: unknown): v is T {
   return ls.includes(v as T);
 }
+
+export function* enumerate<T>(ls: Iterable<T>): Generator<[number, T]> {
+  let i = 0;
+  for (const v of ls) {
+    yield [i++, v];
+  }
+}
