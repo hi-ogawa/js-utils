@@ -85,5 +85,82 @@ describe(defineCommand, () => {
     );
   });
 
-  it("variadic", () => {});
+  describe("variadic", () => {
+    it("basic", () => {
+      const example = defineCommand(
+        {
+          files: defineArg(z.string().array().parse, {
+            positional: true,
+            variadic: true,
+            describe: "input files",
+          }),
+          fix: defineArg(z.coerce.boolean().default(false).parse, {
+            flag: true,
+            describe: "fix files in-place",
+          }),
+        },
+        ({ args }) => {
+          args satisfies {
+            files: string[];
+            fix: boolean;
+          };
+          return args;
+        }
+      );
+
+      expect(example.help()).toMatchInlineSnapshot(`
+        "usage:
+          program [options] <files...>
+
+        positional arguments:
+          files    input files
+
+        options:
+          --fix    fix files in-place
+        "
+      `);
+
+      expect(example.parse([])).toMatchInlineSnapshot(`
+        {
+          "files": [],
+          "fix": false,
+        }
+      `);
+      expect(example.parse(["x", "--fix", "y", "z"])).toMatchInlineSnapshot(`
+        {
+          "files": [
+            "x",
+            "y",
+            "z",
+          ],
+          "fix": true,
+        }
+      `);
+    });
+
+    it("unsupported", () => {
+      const example = () =>
+        defineCommand(
+          {
+            first: defineArg(z.string().parse, {
+              positional: true,
+            }),
+            rest: defineArg(z.string().array().parse, {
+              positional: true,
+              variadic: true,
+            }),
+          },
+          ({ args }) => {
+            args satisfies {
+              first: string;
+              rest: string[];
+            };
+            return args;
+          }
+        );
+      expect(() => example()).toThrowErrorMatchingInlineSnapshot(
+        '"variadic command with multiple positionals are unsupported"'
+      );
+    });
+  });
 });

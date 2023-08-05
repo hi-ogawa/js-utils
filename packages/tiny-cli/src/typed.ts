@@ -5,15 +5,15 @@ import { parseRawArgsToUntyped } from "./untyped";
 // defineArg
 //
 
-// TODO: disjoint union?
+// TODO: disjoint union? (e.g. type?: "positional" | "key-value" | "flag")
 type ArgSchema<T> = {
   // alias?: string[]; // TODO
   describe?: string;
   positional?: true;
-  // variadic?: true; // TODO
+  variadic?: true;
   // optional?: true; // TODO not needed if `parse` can takes care of it?
   flag?: true;
-  parse: (token?: string) => T; // can use ZodType.parse directly
+  parse: (value?: unknown) => T; // can use ZodType.parse directly
 };
 
 // tiny DX helper to define ArgSchema
@@ -48,10 +48,21 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   const schemaKeyValues = [...schemaByType.keyValues, ...schemaByType.flags];
 
   //
+  // validate unsupported usage (which cannot be caught by typing)
+  //
+
+  // support only single "positional.variadic" for now
+  const variadic = schemaByType.positionals.find((e) => e[1].variadic);
+  if (variadic && schemaByType.positionals.length >= 2) {
+    throw new Error(
+      "variadic command with multiple positionals are unsupported"
+    );
+  }
+
+  //
   // parse to TypedArgs
   //
 
-  // TODO: wrap parse error?
   function parseOnly(rawArgs: string[]): TypedArgs<ArgSchemaRecord> {
     //
     // parse untyped
@@ -95,7 +106,10 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
     }
 
     // check unused positionals (TODO: support variadic)
-    if (untypedArgs.positionals.length > schemaByType.positionals.length) {
+    if (
+      !variadic &&
+      untypedArgs.positionals.length > schemaByType.positionals.length
+    ) {
       throw new ParseError(
         "too many arguments: " + untypedArgs.positionals.join(", ")
       );
@@ -107,13 +121,21 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
 
     const typedArgs: Record<string, unknown> = {};
 
-    for (const [[key, schema], value] of zip(
-      schemaByType.positionals,
-      untypedArgs.positionals
-    )) {
-      typedArgs[key] = ParseError.wrapFn(`failed to parse <${key}>`, () =>
+    if (variadic) {
+      const [key, schema] = variadic;
+      const value = untypedArgs.positionals;
+      typedArgs[key] = ParseError.wrapFn(`failed to parse <${key}...>`, () =>
         schema.parse(value)
       );
+    } else {
+      for (const [[key, schema], value] of zip(
+        schemaByType.positionals,
+        untypedArgs.positionals
+      )) {
+        typedArgs[key] = ParseError.wrapFn(`failed to parse <${key}>`, () =>
+          schema.parse(value)
+        );
+      }
     }
 
     const untypedKeyValuesMap = new Map(untypedKeyValues);
@@ -152,7 +174,9 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
     const usage = [
       "program",
       optionsHelp.length > 0 && "[options]",
-      ...schemaByType.positionals.map((e) => `<${e[0]}>`),
+      ...schemaByType.positionals.map(
+        (e) => `<${e[0]}${e[1].variadic ? "..." : ""}>`
+      ),
     ].filter(Boolean);
 
     let result = `\
