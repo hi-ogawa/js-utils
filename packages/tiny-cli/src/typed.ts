@@ -1,11 +1,4 @@
-import {
-  difference,
-  groupBy,
-  pickBy,
-  range,
-  tinyassert,
-  zip,
-} from "@hiogawa/utils";
+import { difference, groupBy, pickBy, range, zip } from "@hiogawa/utils";
 import { parseRawArgsToUntyped } from "./untyped";
 
 //
@@ -18,54 +11,6 @@ export type ArgSchema<T> = {
   describe?: string;
   parse: (value?: unknown) => T; // can use ZodType.parse directly
   // alias?: string[]; // TODO maybe later, but it doesn't seem to be absolutely necessarily
-};
-
-// builtin schema
-export const defineArg = {
-  variadic: (
-    extra?: Omit<ArgSchema<unknown>, "parse">
-  ): ArgSchema<string[]> => ({
-    parse: (v) => parser.array(v, parser.string),
-    type: "positional",
-    variadic: true,
-    ...extra,
-  }),
-
-  string: (extra?: Omit<ArgSchema<unknown>, "parse">): ArgSchema<string> => ({
-    parse: parser.string,
-    ...extra,
-  }),
-
-  number: (extra?: Omit<ArgSchema<unknown>, "parse">): ArgSchema<number> => ({
-    parse: parser.number,
-    ...extra,
-  }),
-
-  flag: (extra?: Omit<ArgSchema<unknown>, "parse">): ArgSchema<boolean> => ({
-    parse: parser.boolean,
-    type: "flag",
-    ...extra,
-  }),
-};
-
-export const parser = {
-  string: (v: unknown) => {
-    tinyassert(typeof v === "string");
-    return v;
-  },
-
-  number: (v: unknown) => {
-    const n = Number(v);
-    tinyassert(!Number.isNaN(n));
-    return n;
-  },
-
-  boolean: (v: unknown) => Boolean(v),
-
-  array: <T>(v: unknown, forEachFn: (e: unknown) => T): T[] => {
-    tinyassert(Array.isArray(v));
-    return v.map((e) => forEachFn(e));
-  },
 };
 
 //
