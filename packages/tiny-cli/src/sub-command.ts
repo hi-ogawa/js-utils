@@ -5,12 +5,8 @@ import {
   formatTable,
 } from "./typed";
 
-// TODO
-// sub-sub-command?
-
 export function defineSubCommands(
   config: {
-    // defaultCommand?: string; // TODO
     commands: Record<string, Command>;
   } & HelpConfig
 ) {
@@ -30,7 +26,6 @@ export function defineSubCommands(
     if (!command) {
       throw new ParseError(`invalid command: '${name}'`);
     }
-    // TODO: how to let sub command help include `name`?
     return { name, args, command };
   }
 

@@ -110,7 +110,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
       );
     }
 
-    // check unused positionals (TODO: support variadic)
+    // check unused positionals
     if (
       !variadic &&
       untypedArgs.positionals.length > schemaByType.positionals.length
