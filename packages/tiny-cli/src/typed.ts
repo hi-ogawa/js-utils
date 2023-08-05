@@ -4,7 +4,6 @@ import {
   pickBy,
   range,
   tinyassert,
-  zip,
   zipMax,
 } from "@hiogawa/utils";
 import { parseRawArgsToUntyped } from "./untyped";
