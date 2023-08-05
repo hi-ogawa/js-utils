@@ -6,27 +6,29 @@ describe(defineCommand, () => {
   it("basic", () => {
     const example = defineCommand(
       {
-        arg: {
-          type: "positional",
-          parse: z.string().parse,
-          describe: "this is required arg",
-        },
-        argOpt: {
-          type: "positional",
-          parse: z.string().optional().parse,
-          describe: "this is not required",
-        },
-        num: { parse: z.coerce.number().parse },
-        numOpt: { parse: z.coerce.number().optional().parse },
-        numOptDefault: {
-          parse: z.coerce.number().default(10).parse,
-          describe: "optional and default 10",
-        },
-        str: { parse: z.string().parse },
-        boolFlag: {
-          type: "flag",
-          parse: z.coerce.boolean().default(false).parse,
-          describe: "some toggle",
+        args: {
+          arg: {
+            type: "positional",
+            parse: z.string().parse,
+            describe: "this is required arg",
+          },
+          argOpt: {
+            type: "positional",
+            parse: z.string().optional().parse,
+            describe: "this is not required",
+          },
+          num: { parse: z.coerce.number().parse },
+          numOpt: { parse: z.coerce.number().optional().parse },
+          numOptDefault: {
+            parse: z.coerce.number().default(10).parse,
+            describe: "optional and default 10",
+          },
+          str: { parse: z.string().parse },
+          boolFlag: {
+            type: "flag",
+            parse: z.coerce.boolean().default(false).parse,
+            describe: "some toggle",
+          },
         },
       },
       ({ args }) => {
@@ -93,16 +95,18 @@ describe(defineCommand, () => {
     it("basic", () => {
       const example = defineCommand(
         {
-          files: {
-            type: "positional",
-            variadic: true,
-            describe: "input files",
-            parse: z.string().array().parse,
-          },
-          fix: {
-            type: "flag",
-            describe: "fix files in-place",
-            parse: z.coerce.boolean().default(false).parse,
+          args: {
+            files: {
+              type: "positional",
+              variadic: true,
+              describe: "input files",
+              parse: z.string().array().parse,
+            },
+            fix: {
+              type: "flag",
+              describe: "fix files in-place",
+              parse: z.coerce.boolean().default(false).parse,
+            },
           },
         },
         ({ args }) => {
@@ -148,14 +152,16 @@ describe(defineCommand, () => {
       const example = () =>
         defineCommand(
           {
-            first: {
-              type: "positional",
-              parse: z.string().parse,
-            },
-            rest: {
-              type: "positional",
-              variadic: true,
-              parse: z.string().array().parse,
+            args: {
+              first: {
+                type: "positional",
+                parse: z.string().parse,
+              },
+              rest: {
+                type: "positional",
+                variadic: true,
+                parse: z.string().array().parse,
+              },
             },
           },
           ({ args }) => {

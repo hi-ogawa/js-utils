@@ -26,10 +26,13 @@ type TypedArgs<R extends ArgSchemaRecordBase> = {
 export type Command = ReturnType<typeof defineCommand>;
 
 export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
-  schemaRecord: ArgSchemaRecord,
+  config: {
+    describe?: string;
+    args: ArgSchemaRecord;
+  },
   action: ({ args }: { args: TypedArgs<ArgSchemaRecord> }) => unknown
 ) {
-  const entries = Object.entries(schemaRecord);
+  const entries = Object.entries(config.args);
 
   const schemaByType = {
     positionals: entries.filter((e) => e[1].type === "positional"),
@@ -196,6 +199,7 @@ ${formatTable(optionsHelp)}
   }
 
   return {
+    config,
     help,
     parseOnly,
     parse,

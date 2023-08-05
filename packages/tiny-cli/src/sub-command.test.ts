@@ -6,30 +6,38 @@ import { defineCommand } from "./typed";
 describe(defineSubCommands, () => {
   it("basic", () => {
     const example = defineSubCommands({
-      dev: defineCommand(
-        {
-          port: {
-            parse: z.coerce.number().default(5172).parse,
+      commands: {
+        dev: defineCommand(
+          {
+            describe: "start dev server",
+            args: {
+              port: {
+                parse: z.coerce.number().default(5172).parse,
+              },
+            },
           },
-        },
-        ({ args }) => {
-          return args;
-        }
-      ),
-      build: defineCommand(
-        {
-          file: {
-            type: "positional",
-            parse: z.string().optional().parse,
+          ({ args }) => {
+            return args;
+          }
+        ),
+        build: defineCommand(
+          {
+            describe: "build for production",
+            args: {
+              file: {
+                type: "positional",
+                parse: z.string().optional().parse,
+              },
+              outDir: {
+                parse: z.string().default("./dist").parse,
+              },
+            },
           },
-          outDir: {
-            parse: z.string().default("./dist").parse,
-          },
-        },
-        ({ args }) => {
-          return args;
-        }
-      ),
+          ({ args }) => {
+            return args;
+          }
+        ),
+      },
     });
 
     expect(example.help()).toMatchInlineSnapshot(`
@@ -37,8 +45,8 @@ describe(defineSubCommands, () => {
         $ program <command> ...
 
       commands:
-        dev
-        build
+        dev      start dev server
+        build    build for production
       "
     `);
 
