@@ -6,6 +6,7 @@ import { defineCommand } from "./typed";
 describe(defineSubCommands, () => {
   it("basic", () => {
     const example = defineSubCommands({
+      describe: "This is a sample cli program.",
       commands: {
         dev: defineCommand(
           {
@@ -16,9 +17,7 @@ describe(defineSubCommands, () => {
               },
             },
           },
-          ({ args }) => {
-            return args;
-          }
+          ({ args }) => args
         ),
         build: defineCommand(
           {
@@ -33,9 +32,7 @@ describe(defineSubCommands, () => {
               },
             },
           },
-          ({ args }) => {
-            return args;
-          }
+          ({ args }) => args
         ),
       },
     });
@@ -43,6 +40,8 @@ describe(defineSubCommands, () => {
     expect(example.help()).toMatchInlineSnapshot(`
       "usage:
         $ program <command> ...
+
+      This is a sample cli program.
 
       commands:
         dev      start dev server

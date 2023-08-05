@@ -31,13 +31,25 @@ export function defineSubCommands(config: {
       v.config.describe ?? "",
     ]);
 
-    return `\
+    let result = `\
 usage:
   $ program <command> ...
+`;
 
+    if (config.describe) {
+      result += `
+${config.describe}
+`;
+    }
+
+    if (commandsHelp.length > 0) {
+      result += `
 commands:
 ${formatTable(commandsHelp)}
 `;
+    }
+
+    return result;
   }
 
   return {
