@@ -1,13 +1,13 @@
-import { difference, groupBy, pickBy, zip } from "@hiogawa/utils";
+import { difference, groupBy, pickBy, range, zip } from "@hiogawa/utils";
 import { parseArgs } from "./utils";
 
 // TODO: disjoint union?
 type ArgSchema<T> = {
   // alias?: string[]; // TODO
-  // describe?: string; // TODO
+  describe?: string;
   positional?: true;
   // variadic?: true; // TODO
-  // optional?: true; // TODO for help?
+  // optional?: true; // TODO not needed if `parse` can takes care of it?
   flag?: true;
   parse: (token?: string) => T; // can use ZodType.parse directly
 };
@@ -110,21 +110,38 @@ export function createCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   }
 
   function help(): string {
-    const positionals = schemaByType.positionals.map((e) => `<${e[0]}>`);
-    const options = schemaKeyValues.map(
-      (e) => `--${e[0]}${e[1].flag ? "" : "=..."}`
-    );
+    const positionalsHelp = schemaByType.positionals.map((e) => [
+      e[0],
+      e[1].describe ?? "",
+    ]);
+
+    const optionsHelp = schemaKeyValues.map((e) => [
+      `--${e[0]}${e[1].flag ? "" : "=..."}`,
+      e[1].describe ?? "",
+    ]);
+
+    const usage = [
+      "program",
+      optionsHelp.length > 0 && "[options]",
+      ...schemaByType.positionals.map((e) => `<${e[0]}>`),
+    ].filter(Boolean);
 
     let result = `\
-Usage:
-  PROGRAM ${options.length > 0 ? "[options]" : ""} ${positionals.join(" ")}
+usage:
+  ${usage.join(" ")}
 `;
 
-    if (options.length > 0) {
-      result += `\
+    if (positionalsHelp.length > 0) {
+      result += `
+positional arguments:
+${formatTable(positionalsHelp)}
+`;
+    }
 
-Options
-${options.map((s) => "  " + s).join("\n")}
+    if (optionsHelp.length > 0) {
+      result += `
+options:
+${formatTable(optionsHelp)}
 `;
     }
     return result;
@@ -137,26 +154,34 @@ ${options.map((s) => "  " + s).join("\n")}
   };
 }
 
-//
-// TODO: multi command (aka sub command)
-//
+function formatTable(rows: string[][]) {
+  return formatIndent(
+    padColumns(rows).map((row) => row.join(" ".repeat(4)).trimEnd()),
+    2
+  );
+}
 
-// export function createMultiCommand() {}
+function padColumns(rows: string[][]): string[][] {
+  if (rows.length === 0) {
+    return rows;
+  }
+  const ncol = Math.max(...rows.map((row) => row.length));
+  const widths = range(ncol).map((c) =>
+    Math.max(...rows.map((row) => row[c]?.length ?? 0))
+  );
+  const newRows = rows.map((row) =>
+    row.map((v, i) => v.padEnd(widths[i], " "))
+  );
+  return newRows;
+}
 
-//
-// builtin schema
-//
+function formatIndent(ls: string[], n: number): string {
+  return ls.map((v) => " ".repeat(n) + v).join("\n");
+}
 
-// function argSchema<T>(extra?: ArgSchema<T>): ArgSchema<T> {
-//   // TODO
-//   extra;
-//   return {};
-// }
-
-// function stringOption(): ArgSchema<string> {
-//   return {};
-// }
-
-// function numberArg() {}
-
-// function booleanArg() {}
+function* enumerate<T>(ls: Iterable<T>): Generator<[number, T]> {
+  let i = 0;
+  for (const v of ls) {
+    yield [i++, v];
+  }
+}
