@@ -147,7 +147,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   }
 
   //
-  // parse and run action (unfortunately this seems standard cli library api in js)
+  // parse and run action
   //
 
   function parse(rawArgs: string[]): unknown {
@@ -205,7 +205,7 @@ ${formatTable(optionsHelp)}
   }
 
   return {
-    config,
+    config, // expose so that `defineSubCommands` can use `config.describe` etc...
     help,
     parseOnly,
     parse,
