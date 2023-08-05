@@ -16,6 +16,7 @@ export function defineSubCommands(config: {
     if (!command) {
       throw new ParseError(`invalid command: '${name}'`);
     }
+    // TODO: how to let sub command help include `name`?
     return { name, args, command };
   }
 

@@ -182,6 +182,12 @@ usage:
   ${usage.join(" ")}
 `;
 
+    if (config.describe) {
+      result += `
+${config.describe}
+`;
+    }
+
     if (positionalsHelp.length > 0) {
       result += `
 positional arguments:

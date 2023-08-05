@@ -6,6 +6,7 @@ describe(defineCommand, () => {
   it("basic", () => {
     const example = defineCommand(
       {
+        describe: "This is a command line program to do something.",
         args: {
           arg: {
             type: "positional",
@@ -48,6 +49,8 @@ describe(defineCommand, () => {
     expect(example.help()).toMatchInlineSnapshot(`
       "usage:
         $ program [options] <arg> <argOpt>
+
+      This is a command line program to do something.
 
       positional arguments:
         arg       this is required arg
