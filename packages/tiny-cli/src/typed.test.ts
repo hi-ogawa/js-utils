@@ -4,10 +4,13 @@ import { defineCommand } from "./typed";
 
 describe(defineCommand, () => {
   it("basic", () => {
+    let autoHelpLog: unknown[] = [];
     const example = defineCommand(
       {
         program: "basic.js",
         describe: "This is a command line program to do something.",
+        autoHelp: true,
+        autoHelpLog: (v) => autoHelpLog.push(v),
         args: {
           arg: {
             type: "positional",
@@ -93,6 +96,29 @@ describe(defineCommand, () => {
     expect(() => example.parse(["x"])).toThrowErrorMatchingInlineSnapshot(
       '"failed to parse --num"'
     );
+
+    expect(autoHelpLog).toMatchInlineSnapshot("[]");
+    expect(example.parse(["--help"])).toMatchInlineSnapshot("undefined");
+    expect(autoHelpLog).toMatchInlineSnapshot(`
+      [
+        "usage:
+        $ basic.js [options] <arg> <argOpt>
+
+      This is a command line program to do something.
+
+      positional arguments:
+        arg       this is required arg
+        argOpt    this is not required
+
+      options:
+        --num=...
+        --numOpt=...
+        --numOptDefault=...    optional and default 10
+        --str=...
+        --boolFlag             some toggle
+      ",
+      ]
+    `);
   });
 
   describe("variadic", () => {

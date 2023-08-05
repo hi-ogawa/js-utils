@@ -29,6 +29,8 @@ export type HelpConfig = {
   program?: string;
   // version?: string;
   describe?: string;
+  autoHelp?: boolean;
+  autoHelpLog?: (v: string) => void; // for testing
 };
 
 export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
@@ -156,6 +158,14 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   //
 
   function parse(rawArgs: string[]): unknown {
+    // intercept -h and --help
+    if (
+      config.autoHelp &&
+      (rawArgs.includes("-h") || rawArgs.includes("--help"))
+    ) {
+      (config.autoHelpLog ?? console.log)(help());
+      return;
+    }
     return action({ args: parseOnly(rawArgs) });
   }
 
@@ -164,7 +174,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   //
 
   // program/version overriden by `defineSubCommands`
-  function help(helpConfig?: HelpConfig): string {
+  function help(): string {
     const positionalsHelp = schemaByType.positionals.map((e) => [
       e[0],
       e[1].describe ?? "",
@@ -176,7 +186,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
     ]);
 
     const usage = [
-      helpConfig?.program ?? config.program ?? "PROGRAM",
+      config.program ?? "PROGRAM",
       optionsHelp.length > 0 && "[options]",
       ...schemaByType.positionals.map(
         (e) => `<${e[0]}${e[1].variadic ? "..." : ""}>`

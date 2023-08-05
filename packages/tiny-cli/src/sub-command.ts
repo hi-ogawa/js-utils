@@ -5,6 +5,9 @@ import {
   formatTable,
 } from "./typed";
 
+// TODO
+// sub-sub-command?
+
 export function defineSubCommands(
   config: {
     // defaultCommand?: string; // TODO
