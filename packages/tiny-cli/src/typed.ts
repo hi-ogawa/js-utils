@@ -10,7 +10,7 @@ type ArgSchema<T> = {
   variadic?: true; // only for "positional"
   describe?: string;
   parse: (value?: unknown) => T; // can use ZodType.parse directly
-  // alias?: string[]; // TODO
+  // alias?: string[]; // TODO maybe later, but it doesn't seem to be absolutely necessarily
 };
 
 //
