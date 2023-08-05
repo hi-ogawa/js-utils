@@ -46,3 +46,12 @@ export function* enumerate<T>(ls: Iterable<T>): Generator<[number, T]> {
     yield [i++, v];
   }
 }
+
+export async function* enumerateAsync<T>(
+  ls: AsyncIterable<T>
+): AsyncGenerator<[number, T]> {
+  let i = 0;
+  for await (const v of ls) {
+    yield [i++, v];
+  }
+}

@@ -6,6 +6,7 @@ import {
   arrayToEnum,
   assertUnreachable,
   enumerate,
+  enumerateAsync,
   includesGuard,
   typedBoolean,
 } from "./misc";
@@ -627,6 +628,37 @@ describe(enumerate, () => {
         [
           2,
           "aa",
+        ],
+      ]
+    `);
+  });
+});
+
+describe(enumerateAsync, () => {
+  it("basic", async () => {
+    async function* generator() {
+      yield "a";
+      yield "b";
+      yield "c";
+    }
+    const result: unknown[] = [];
+    for await (const e of enumerateAsync(generator())) {
+      e satisfies [number, string];
+      result.push(e);
+    }
+    expect(result).toMatchInlineSnapshot(`
+      [
+        [
+          0,
+          "a",
+        ],
+        [
+          1,
+          "b",
+        ],
+        [
+          2,
+          "c",
         ],
       ]
     `);
