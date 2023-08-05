@@ -22,6 +22,7 @@ import {
   sortBy,
   uniqBy,
   zip,
+  zipMax,
 } from "./lodash";
 
 describe("range", () => {
@@ -397,6 +398,53 @@ describe("zip", () => {
         [
           4,
           "12",
+        ],
+      ]
+    `);
+  });
+});
+
+describe(zipMax, () => {
+  it("basic", () => {
+    const ls1 = range(2, 4);
+    const ls2 = range(10, 14).map(String);
+    expect(zipMax(ls1, ls2)).toMatchInlineSnapshot(`
+      [
+        [
+          2,
+          "10",
+        ],
+        [
+          3,
+          "11",
+        ],
+        [
+          undefined,
+          "12",
+        ],
+        [
+          undefined,
+          "13",
+        ],
+      ]
+    `);
+    expect(zipMax(ls2, ls1)).toMatchInlineSnapshot(`
+      [
+        [
+          "10",
+          2,
+        ],
+        [
+          "11",
+          3,
+        ],
+        [
+          "12",
+          undefined,
+        ],
+        [
+          "13",
+          undefined,
         ],
       ]
     `);
