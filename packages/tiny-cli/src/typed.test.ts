@@ -45,7 +45,7 @@ describe(defineCommand, () => {
 
     expect(example.help()).toMatchInlineSnapshot(`
       "usage:
-        program [options] <arg> <argOpt>
+        $ program [options] <arg> <argOpt>
 
       positional arguments:
         arg       this is required arg
@@ -116,7 +116,7 @@ describe(defineCommand, () => {
 
       expect(example.help()).toMatchInlineSnapshot(`
         "usage:
-          program [options] <files...>
+          $ program [options] <files...>
 
         positional arguments:
           files    input files

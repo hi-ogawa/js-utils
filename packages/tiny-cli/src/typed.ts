@@ -23,6 +23,8 @@ type TypedArgs<R extends ArgSchemaRecordBase> = {
   [K in keyof R]: R[K] extends ArgSchema<infer T> ? T : never;
 };
 
+export type Command = ReturnType<typeof defineCommand>;
+
 export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   schemaRecord: ArgSchemaRecord,
   action: ({ args }: { args: TypedArgs<ArgSchemaRecord> }) => unknown
@@ -165,7 +167,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
     ]);
 
     const usage = [
-      "program",
+      "$ program",
       optionsHelp.length > 0 && "[options]",
       ...schemaByType.positionals.map(
         (e) => `<${e[0]}${e[1].variadic ? "..." : ""}>`
@@ -214,7 +216,7 @@ export class ParseError extends Error {
 // help formatting
 //
 
-function formatTable(rows: string[][]) {
+export function formatTable(rows: string[][]) {
   return formatIndent(
     padColumns(rows).map((row) => row.join(" ".repeat(4)).trimEnd()),
     2
