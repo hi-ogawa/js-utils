@@ -1,5 +1,14 @@
 # @hiogawa/utils-react
 
+## 1.3.0
+
+### Minor Changes
+
+- c31a8a6: feat: add useMatchMedia and useRerender
+- cc76c0b: feat: add useStableCallback
+- cc76c0b: feat: add useRefCallbackEffect
+- 8c3ebae: feat: support children props for Compose
+
 ## 1.2.0
 
 ### Minor Changes
