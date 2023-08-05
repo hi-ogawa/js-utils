@@ -9,7 +9,7 @@ import {
   typedBoolean,
 } from "./misc";
 import { mapOption } from "./option";
-import { mapToAsyncGenerator, newPromiseWithResolvers } from "./promise";
+import { newPromiseWithResolvers } from "./promise";
 import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
 import {
   Err,
