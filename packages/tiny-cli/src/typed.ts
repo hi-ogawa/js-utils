@@ -47,7 +47,11 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   };
   const schemaKeyValues = [...schemaByType.keyValues, ...schemaByType.flags];
 
-  function parse(rawArgs: string[]): TypedArgs<ArgSchemaRecord> {
+  //
+  // parse to TypedArgs
+  //
+
+  function parseOnly(rawArgs: string[]): TypedArgs<ArgSchemaRecord> {
     //
     // parse untyped
     //
@@ -113,9 +117,17 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
     return typedArgs as any;
   }
 
-  function parseAndRun(rawArgs: string[]): unknown {
-    return action({ args: parse(rawArgs) });
+  //
+  // parse and run action (unfortunately this seems standard cli library api in js)
+  //
+
+  function parse(rawArgs: string[]): unknown {
+    return action({ args: parseOnly(rawArgs) });
   }
+
+  //
+  // help
+  //
 
   function help(): string {
     const positionalsHelp = schemaByType.positionals.map((e) => [
@@ -157,8 +169,8 @@ ${formatTable(optionsHelp)}
 
   return {
     help,
+    parseOnly,
     parse,
-    parseAndRun,
   };
 }
 

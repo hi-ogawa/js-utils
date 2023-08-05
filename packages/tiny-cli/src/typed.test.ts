@@ -56,9 +56,8 @@ describe(defineCommand, () => {
       "
     `);
 
-    expect(
-      example.parseAndRun(["x", "--boolFlag", "--num", "123", "--str", "hey"])
-    ).toMatchInlineSnapshot(`
+    expect(example.parse(["x", "--boolFlag", "--num", "123", "--str", "hey"]))
+      .toMatchInlineSnapshot(`
       {
         "arg": "x",
         "boolFlag": true,
@@ -70,19 +69,18 @@ describe(defineCommand, () => {
     `);
 
     expect(() =>
-      example.parseAndRun(["x", "y", "z"])
+      example.parse(["x", "y", "z"])
     ).toThrowErrorMatchingInlineSnapshot('"too many arguments: x, y, z"');
 
     expect(() =>
-      example.parseAndRun(["x", "--hehe", "he", "--foo"])
+      example.parse(["x", "--hehe", "he", "--foo"])
     ).toThrowErrorMatchingInlineSnapshot('"unknown options: hehe, foo"');
 
     expect(() =>
-      example.parseAndRun(["x", "--hehe", "--hehe"])
+      example.parse(["x", "--hehe", "--hehe"])
     ).toThrowErrorMatchingInlineSnapshot('"duplicate options: hehe"');
 
-    expect(() => example.parseAndRun(["x"]))
-      .toThrowErrorMatchingInlineSnapshot(`
+    expect(() => example.parse(["x"])).toThrowErrorMatchingInlineSnapshot(`
       "[
         {
           \\"code\\": \\"invalid_type\\",
