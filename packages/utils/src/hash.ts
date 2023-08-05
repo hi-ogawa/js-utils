@@ -26,6 +26,7 @@ export class HashRng {
   }
 }
 
+/** @deprecated this is only a toy ideaa and shouldn't be used... */
 export function hashString(input: string): string {
   // iterate on 32 bits x 4
   const xs = new Uint32Array(range(4).map((i) => hashInt32(i + 1)));
