@@ -4,24 +4,24 @@ import { range, splitFirst } from "@hiogawa/utils";
 // un-typed raw argument parsing
 //
 
-export interface ParsedArgs {
+export interface UntypedArgs {
   positionals: string[];
   keyValues: [string, string][];
   flags: string[];
 }
 
-export function parseArgs(
-  args: string[],
+export function parseRawArgsToUntyped(
+  rawArgs: string[],
   config?: { flags: string[] }
-): ParsedArgs {
-  const parsed: ParsedArgs = {
+): UntypedArgs {
+  const result: UntypedArgs = {
     positionals: [],
     keyValues: [],
     flags: [],
   };
 
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
+  for (let i = 0; i < rawArgs.length; i++) {
+    const arg = rawArgs[i];
 
     // handle flag "--key"
     if (arg.startsWith("--")) {
@@ -29,43 +29,43 @@ export function parseArgs(
 
       // handle "config.flags"
       if (config?.flags.includes(flag)) {
-        parsed.flags.push(flag);
+        result.flags.push(flag);
         continue;
       }
 
       // handle "--key=value"
       if (flag.includes("=")) {
         const [key, value] = splitFirst(flag, "=");
-        parsed.keyValues.push([key, value]);
+        result.keyValues.push([key, value]);
         continue;
       }
 
       // handle "--key value"
-      const nextArg = args.at(i + 1);
+      const nextArg = rawArgs.at(i + 1);
       if (typeof nextArg === "string" && !nextArg.startsWith("--")) {
-        parsed.keyValues.push([flag, nextArg]);
+        result.keyValues.push([flag, nextArg]);
         i++;
         continue;
       }
 
       // otherwise "key only"
-      parsed.flags.push(flag);
+      result.flags.push(flag);
       continue;
     }
 
     // otherwise positional
-    parsed.positionals.push(arg);
+    result.positionals.push(arg);
   }
 
-  return parsed;
+  return result;
 }
 
 // minimal simpler version just for comparison.
 // it supports key/value option only by "--key=value" form
 // which is somewhat similar to esbuild's cli
 // https://github.com/evanw/esbuild/blob/0b48edaac1b92da4d14d300252304c44821dd2f2/pkg/cli/cli_impl.go
-export function simpleParseArgs(args: string[]): ParsedArgs {
-  const parsed: ParsedArgs = {
+export function parseRawArgsToUntypedSimple(args: string[]): UntypedArgs {
+  const result: UntypedArgs = {
     positionals: [],
     keyValues: [],
     flags: [],
@@ -77,14 +77,14 @@ export function simpleParseArgs(args: string[]): ParsedArgs {
       const flag = arg.slice(2);
       if (flag.includes("=")) {
         const [key, value] = splitFirst(flag, "=");
-        parsed.keyValues.push([key, value]);
+        result.keyValues.push([key, value]);
       } else {
-        parsed.flags.push(flag);
+        result.flags.push(flag);
       }
     } else {
-      parsed.positionals.push(arg);
+      result.positionals.push(arg);
     }
   }
 
-  return parsed;
+  return result;
 }

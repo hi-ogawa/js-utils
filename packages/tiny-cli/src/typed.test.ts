@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { createCommand, defineArg } from "./command";
+import { createCommand, defineArg } from "./typed";
 
 describe(createCommand, () => {
   it("basic", () => {

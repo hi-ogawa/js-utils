@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseArgs, simpleParseArgs } from "./utils";
+import { parseRawArgsToUntyped, parseRawArgsToUntypedSimple } from "./untyped";
 
-describe(simpleParseArgs, () => {
+describe(parseRawArgsToUntypedSimple, () => {
   it("basic", () => {
-    expect(simpleParseArgs([])).toMatchInlineSnapshot(`
+    expect(parseRawArgsToUntypedSimple([])).toMatchInlineSnapshot(`
       {
         "flags": [],
         "keyValues": [],
@@ -12,7 +12,8 @@ describe(simpleParseArgs, () => {
     `);
 
     const input = "a --k1 --k2 b --k3=x --k4=y -c d";
-    expect(simpleParseArgs(input.split(" "))).toMatchInlineSnapshot(`
+    expect(parseRawArgsToUntypedSimple(input.split(" ")))
+      .toMatchInlineSnapshot(`
       {
         "flags": [
           "k1",
@@ -39,9 +40,9 @@ describe(simpleParseArgs, () => {
   });
 });
 
-describe(parseArgs, () => {
+describe(parseRawArgsToUntyped, () => {
   it("basic", () => {
-    expect(parseArgs([])).toMatchInlineSnapshot(`
+    expect(parseRawArgsToUntyped([])).toMatchInlineSnapshot(`
       {
         "flags": [],
         "keyValues": [],
@@ -50,7 +51,7 @@ describe(parseArgs, () => {
     `);
 
     const input = "a --k1 --k2 b --k3=x --k4=y -c d";
-    expect(parseArgs(input.split(" "))).toMatchInlineSnapshot(`
+    expect(parseRawArgsToUntyped(input.split(" "))).toMatchInlineSnapshot(`
       {
         "flags": [
           "k1",
@@ -80,7 +81,7 @@ describe(parseArgs, () => {
 
   it("flags", () => {
     const input = "a --k1 --k2 b --k3=x --k4=y -c d";
-    expect(parseArgs(input.split(" "), { flags: ["k2"] }))
+    expect(parseRawArgsToUntyped(input.split(" "), { flags: ["k2"] }))
       .toMatchInlineSnapshot(`
       {
         "flags": [

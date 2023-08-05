@@ -1,5 +1,5 @@
 import { difference, groupBy, pickBy, range, zip } from "@hiogawa/utils";
-import { parseArgs } from "./utils";
+import { parseRawArgsToUntyped } from "./untyped";
 
 // TODO: disjoint union?
 type ArgSchema<T> = {
@@ -22,13 +22,13 @@ export function defineArg<T>(
 
 type ArgSchemaRecordBase = Record<string, ArgSchema<unknown>>;
 
-type TypedParsedArgs<R extends ArgSchemaRecordBase> = {
+type TypedArgs<R extends ArgSchemaRecordBase> = {
   [K in keyof R]: R[K] extends ArgSchema<infer T> ? T : never;
 };
 
 export function createCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   schemaRecord: ArgSchemaRecord,
-  action: ({ args }: { args: TypedParsedArgs<ArgSchemaRecord> }) => unknown
+  action: ({ args }: { args: TypedArgs<ArgSchemaRecord> }) => unknown
 ) {
   const entries = Object.entries(schemaRecord);
 
@@ -39,12 +39,12 @@ export function createCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   };
   const schemaKeyValues = [...schemaByType.keyValues, ...schemaByType.flags];
 
-  function parse(rawArgs: string[]): TypedParsedArgs<ArgSchemaRecord> {
+  function parse(rawArgs: string[]): TypedArgs<ArgSchemaRecord> {
     //
     // parse untyped
     //
 
-    const untypedArgs = parseArgs(rawArgs, {
+    const untypedArgs = parseRawArgsToUntyped(rawArgs, {
       flags: schemaByType.flags.map((e) => e[0]),
     });
 
@@ -154,6 +154,10 @@ ${formatTable(optionsHelp)}
   };
 }
 
+//
+// help formatting
+//
+
 function formatTable(rows: string[][]) {
   return formatIndent(
     padColumns(rows).map((row) => row.join(" ".repeat(4)).trimEnd()),
@@ -177,11 +181,4 @@ function padColumns(rows: string[][]): string[][] {
 
 function formatIndent(ls: string[], n: number): string {
   return ls.map((v) => " ".repeat(n) + v).join("\n");
-}
-
-function* enumerate<T>(ls: Iterable<T>): Generator<[number, T]> {
-  let i = 0;
-  for (const v of ls) {
-    yield [i++, v];
-  }
 }
