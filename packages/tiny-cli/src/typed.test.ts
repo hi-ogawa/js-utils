@@ -6,6 +6,7 @@ describe(defineCommand, () => {
   it("basic", () => {
     const example = defineCommand(
       {
+        program: "basic.js",
         describe: "This is a command line program to do something.",
         args: {
           arg: {
@@ -48,7 +49,7 @@ describe(defineCommand, () => {
 
     expect(example.help()).toMatchInlineSnapshot(`
       "usage:
-        $ program [options] <arg> <argOpt>
+        $ basic.js [options] <arg> <argOpt>
 
       This is a command line program to do something.
 
@@ -123,7 +124,7 @@ describe(defineCommand, () => {
 
       expect(example.help()).toMatchInlineSnapshot(`
         "usage:
-          $ program [options] <files...>
+          $ PROGRAM [options] <files...>
 
         positional arguments:
           files    input files

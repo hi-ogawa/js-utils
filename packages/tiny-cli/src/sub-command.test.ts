@@ -6,6 +6,7 @@ import { defineCommand } from "./typed";
 describe(defineSubCommands, () => {
   it("basic", () => {
     const example = defineSubCommands({
+      program: "tiny-cli.js",
       describe: "This is a sample cli program.",
       commands: {
         dev: defineCommand(
@@ -39,7 +40,7 @@ describe(defineSubCommands, () => {
 
     expect(example.help()).toMatchInlineSnapshot(`
       "usage:
-        $ program <command> ...
+        $ tiny-cli.js <command>
 
       This is a sample cli program.
 

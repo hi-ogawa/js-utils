@@ -1,12 +1,16 @@
-import { type Command, ParseError, formatTable } from "./typed";
+import {
+  type Command,
+  type HelpConfig,
+  ParseError,
+  formatTable,
+} from "./typed";
 
-// TODO
-// - default sub command?
-
-export function defineSubCommands(config: {
-  describe?: string;
-  commands: Record<string, Command>;
-}) {
+export function defineSubCommands(
+  config: {
+    // defaultCommand?: string; // TODO
+    commands: Record<string, Command>;
+  } & HelpConfig
+) {
   function parseOnly(rawArgs: string[]) {
     const [name, ...args] = rawArgs;
     if (!name) {
@@ -33,7 +37,7 @@ export function defineSubCommands(config: {
 
     let result = `\
 usage:
-  $ program <command> ...
+  $ ${config?.program ?? "PROGRAM"} <command>
 `;
 
     if (config.describe) {

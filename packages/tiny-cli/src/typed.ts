@@ -25,11 +25,16 @@ type TypedArgs<R extends ArgSchemaRecordBase> = {
 
 export type Command = ReturnType<typeof defineCommand>;
 
+export type HelpConfig = {
+  program?: string;
+  // version?: string;
+  describe?: string;
+};
+
 export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   config: {
-    describe?: string;
     args: ArgSchemaRecord;
-  },
+  } & HelpConfig,
   action: ({ args }: { args: TypedArgs<ArgSchemaRecord> }) => unknown
 ) {
   const entries = Object.entries(config.args);
@@ -158,7 +163,8 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   // help
   //
 
-  function help(): string {
+  // program/version overriden by `defineSubCommands`
+  function help(helpConfig?: HelpConfig): string {
     const positionalsHelp = schemaByType.positionals.map((e) => [
       e[0],
       e[1].describe ?? "",
@@ -170,7 +176,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
     ]);
 
     const usage = [
-      "$ program",
+      helpConfig?.program ?? config.program ?? "PROGRAM",
       optionsHelp.length > 0 && "[options]",
       ...schemaByType.positionals.map(
         (e) => `<${e[0]}${e[1].variadic ? "..." : ""}>`
@@ -179,7 +185,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
 
     let result = `\
 usage:
-  ${usage.join(" ")}
+  $ ${usage.join(" ")}
 `;
 
     if (config.describe) {
