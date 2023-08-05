@@ -2,7 +2,7 @@
 
 type-safe command line argument parsing library
 
-## references
+## inspirations
 
 - https://github.com/evanw/esbuild/blob/0b48edaac1b92da4d14d300252304c44821dd2f2/pkg/cli/cli_impl.go
 - https://github.com/lukeed/mri/
