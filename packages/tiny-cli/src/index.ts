@@ -1,3 +1,3 @@
-export { parseRawArgsToUntyped } from "./untyped";
-export { defineCommand } from "./typed";
-export { defineSubCommands } from "./sub-command";
+export * from "./untyped";
+export * from "./typed";
+export * from "./sub-command";

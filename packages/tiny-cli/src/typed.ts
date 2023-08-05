@@ -5,7 +5,7 @@ import { parseRawArgsToUntyped } from "./untyped";
 // defineArg
 //
 
-type ArgSchema<T> = {
+export type ArgSchema<T> = {
   type?: "positional" | "key-value" | "flag"; // default key-value
   variadic?: true; // only for "positional"
   describe?: string;
@@ -17,9 +17,9 @@ type ArgSchema<T> = {
 // defineCommand
 //
 
-type ArgSchemaRecordBase = Record<string, ArgSchema<unknown>>;
+export type ArgSchemaRecordBase = Record<string, ArgSchema<unknown>>;
 
-type TypedArgs<R extends ArgSchemaRecordBase> = {
+export type TypedArgs<R extends ArgSchemaRecordBase> = {
   [K in keyof R]: R[K] extends ArgSchema<infer T> ? T : never;
 };
 
