@@ -42,7 +42,7 @@ export function defineSubCommands(
   function help() {
     const commandsHelp = Object.entries(config.commands).map(([k, v]) => [
       k,
-      v.config.describe ?? "",
+      v.config.help ?? "",
     ]);
 
     let result = `\
@@ -50,9 +50,9 @@ usage:
   $ ${config?.program ?? "PROGRAM"} <command>
 `;
 
-    if (config.describe) {
+    if (config.help) {
       result += `
-${config.describe}
+${config.help}
 `;
     }
 
