@@ -119,6 +119,7 @@ describe(defineSubCommands, () => {
     // build
     expect(example.parse(["build"])).toMatchInlineSnapshot(`
       {
+        "file": undefined,
         "outDir": "./dist",
       }
     `);

@@ -73,6 +73,7 @@ describe(defineCommand, () => {
       .toMatchInlineSnapshot(`
         {
           "arg": "x",
+          "argOpt": undefined,
           "boolFlag": true,
           "num": 123,
           "numOpt": undefined,
@@ -206,5 +207,23 @@ describe(defineCommand, () => {
         '"variadic command with multiple positionals are unsupported"'
       );
     });
+  });
+
+  it("positional", () => {
+    const command = defineCommand(
+      {
+        args: {
+          arg: {
+            type: "positional",
+            parse: z.string().parse,
+          },
+        },
+      },
+      ({ args }) => args
+    );
+
+    expect(() => command.parse([])).toThrowErrorMatchingInlineSnapshot(
+      '"failed to parse <arg>"'
+    );
   });
 });

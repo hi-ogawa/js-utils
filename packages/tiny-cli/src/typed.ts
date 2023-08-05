@@ -1,4 +1,12 @@
-import { difference, groupBy, pickBy, range, zip } from "@hiogawa/utils";
+import {
+  difference,
+  groupBy,
+  pickBy,
+  range,
+  tinyassert,
+  zip,
+  zipMax,
+} from "@hiogawa/utils";
 import { parseRawArgsToUntyped } from "./untyped";
 
 //
@@ -133,10 +141,12 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
         schema.parse(value)
       );
     } else {
-      for (const [[key, schema], value] of zip(
+      for (const [e, value] of zipMax(
         schemaByType.positionals,
         untypedArgs.positionals
       )) {
+        tinyassert(e);
+        const [key, schema] = e;
         typedArgs[key] = ParseError.wrapFn(`failed to parse <${key}>`, () =>
           schema.parse(value)
         );
