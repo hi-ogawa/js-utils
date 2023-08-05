@@ -1,29 +1,33 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { defineArg, defineCommand } from "./typed";
+import { defineCommand } from "./typed";
 
 describe(defineCommand, () => {
   it("basic", () => {
     const example = defineCommand(
       {
-        arg: defineArg(z.string().parse, {
-          positional: true,
+        arg: {
+          type: "positional",
+          parse: z.string().parse,
           describe: "this is required arg",
-        }),
-        argOpt: defineArg(z.string().optional().parse, {
-          positional: true,
+        },
+        argOpt: {
+          type: "positional",
+          parse: z.string().optional().parse,
           describe: "this is not required",
-        }),
-        num: defineArg(z.coerce.number().parse),
-        numOpt: defineArg(z.coerce.number().optional().parse),
-        numOptDefault: defineArg(z.coerce.number().default(10).parse, {
+        },
+        num: { parse: z.coerce.number().parse },
+        numOpt: { parse: z.coerce.number().optional().parse },
+        numOptDefault: {
+          parse: z.coerce.number().default(10).parse,
           describe: "optional and default 10",
-        }),
-        str: defineArg(z.string().parse),
-        boolFlag: defineArg(z.coerce.boolean().default(false).parse, {
-          flag: true,
+        },
+        str: { parse: z.string().parse },
+        boolFlag: {
+          type: "flag",
+          parse: z.coerce.boolean().default(false).parse,
           describe: "some toggle",
-        }),
+        },
       },
       ({ args }) => {
         args satisfies {
@@ -89,15 +93,17 @@ describe(defineCommand, () => {
     it("basic", () => {
       const example = defineCommand(
         {
-          files: defineArg(z.string().array().parse, {
-            positional: true,
+          files: {
+            type: "positional",
             variadic: true,
             describe: "input files",
-          }),
-          fix: defineArg(z.coerce.boolean().default(false).parse, {
-            flag: true,
+            parse: z.string().array().parse,
+          },
+          fix: {
+            type: "flag",
             describe: "fix files in-place",
-          }),
+            parse: z.coerce.boolean().default(false).parse,
+          },
         },
         ({ args }) => {
           args satisfies {
@@ -142,13 +148,15 @@ describe(defineCommand, () => {
       const example = () =>
         defineCommand(
           {
-            first: defineArg(z.string().parse, {
-              positional: true,
-            }),
-            rest: defineArg(z.string().array().parse, {
-              positional: true,
+            first: {
+              type: "positional",
+              parse: z.string().parse,
+            },
+            rest: {
+              type: "positional",
               variadic: true,
-            }),
+              parse: z.string().array().parse,
+            },
           },
           ({ args }) => {
             args satisfies {

@@ -5,24 +5,13 @@ import { parseRawArgsToUntyped } from "./untyped";
 // defineArg
 //
 
-// TODO: disjoint union? (e.g. type?: "positional" | "key-value" | "flag")
 type ArgSchema<T> = {
-  // alias?: string[]; // TODO
+  type?: "positional" | "key-value" | "flag"; // default key-value
+  variadic?: true; // only for "positional"
   describe?: string;
-  positional?: true;
-  variadic?: true;
-  // optional?: true; // TODO not needed if `parse` can takes care of it?
-  flag?: true;
   parse: (value?: unknown) => T; // can use ZodType.parse directly
+  // alias?: string[]; // TODO
 };
-
-// tiny DX helper to define ArgSchema
-export function defineArg<T>(
-  parse: ArgSchema<T>["parse"],
-  other?: Omit<ArgSchema<T>, "parse">
-): ArgSchema<T> {
-  return { parse, ...other };
-}
 
 //
 // defineCommand
@@ -41,9 +30,9 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   const entries = Object.entries(schemaRecord);
 
   const schemaByType = {
-    positionals: entries.filter((e) => e[1].positional),
-    keyValues: entries.filter((e) => !e[1].positional && !e[1].flag),
-    flags: entries.filter((e) => e[1].flag),
+    positionals: entries.filter((e) => e[1].type === "positional"),
+    keyValues: entries.filter((e) => !e[1].type || e[1].type === "key-value"),
+    flags: entries.filter((e) => e[1].type === "flag"),
   };
   const schemaKeyValues = [...schemaByType.keyValues, ...schemaByType.flags];
 
@@ -52,7 +41,11 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   //
 
   // support only single "positional.variadic" for now
-  const variadic = schemaByType.positionals.find((e) => e[1].variadic);
+  const variadics = entries.filter((e) => e[1].variadic);
+  if (variadics.some((e) => e[1].type !== "positional")) {
+    throw new Error("variadic supported only for 'positional'");
+  }
+  const variadic = variadics[0];
   if (variadic && schemaByType.positionals.length >= 2) {
     throw new Error(
       "variadic command with multiple positionals are unsupported"
@@ -167,7 +160,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
     ]);
 
     const optionsHelp = schemaKeyValues.map((e) => [
-      `--${e[0]}${e[1].flag ? "" : "=..."}`,
+      `--${e[0]}${e[1].type === "flag" ? "" : "=..."}`,
       e[1].describe ?? "",
     ]);
 
