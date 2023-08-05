@@ -1,13 +1,6 @@
 # tiny-cli
 
-## todo
-
-- [ ] sub commands
-- [ ] help
-  - command description
-  - per-option description
-  - example
-- [ ] simple zod alternative for primitives number/string/boolean
+type-safe command line argument parsing library
 
 ## references
 

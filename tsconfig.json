@@ -5,6 +5,9 @@
       "path": "packages/query-proxy"
     },
     {
+      "path": "packages/tiny-cli"
+    },
+    {
       "path": "packages/tiny-rpc"
     },
     {
