@@ -1,4 +1,6 @@
 {
+  "name": "theme-script-examples-vite",
+  "private": true,
   "scripts": {
     "dev": "vite dev"
   },

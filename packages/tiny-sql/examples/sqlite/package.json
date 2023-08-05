@@ -1,4 +1,6 @@
 {
+  "name": "tiny-sql-examples-sqlite",
+  "private": true,
   "type": "module",
   "scripts": {
     "clean": "rm -f dev.sqlite3",
