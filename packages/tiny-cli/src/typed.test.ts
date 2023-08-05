@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { defineCommand } from "./typed";
+import { defineArg, defineCommand } from "./typed";
 
 describe(defineCommand, () => {
   it("basic", () => {
     const autoHelpLog: unknown[] = [];
+    defineArg.flag;
     const example = defineCommand(
       {
         program: "basic.js",
@@ -29,11 +30,12 @@ describe(defineCommand, () => {
             describe: "optional and default 10",
           },
           str: { parse: z.string().parse },
-          boolFlag: {
-            type: "flag",
-            parse: z.coerce.boolean().default(false).parse,
-            describe: "some toggle",
-          },
+          boolFlag: defineArg.flag({ describe: "some toggle" }),
+          // boolFlag: {
+          //   type: "flag",
+          //   parse: z.coerce.boolean().default(false).parse,
+          //   describe: "some toggle",
+          // },
         },
       },
       ({ args }) => {
