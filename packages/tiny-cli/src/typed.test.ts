@@ -4,7 +4,7 @@ import { defineCommand } from "./typed";
 
 describe(defineCommand, () => {
   it("basic", () => {
-    let autoHelpLog: unknown[] = [];
+    const autoHelpLog: unknown[] = [];
     const example = defineCommand(
       {
         program: "basic.js",

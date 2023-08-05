@@ -5,9 +5,12 @@ import { defineCommand } from "./typed";
 
 describe(defineSubCommands, () => {
   it("basic", () => {
+    const autoHelpLog: unknown[] = [];
     const example = defineSubCommands({
       program: "tiny-cli.js",
       describe: "This is a sample cli program.",
+      autoHelp: true,
+      autoHelpLog: (v) => autoHelpLog.push(v),
       commands: {
         dev: defineCommand(
           {
@@ -48,6 +51,45 @@ describe(defineSubCommands, () => {
         dev      start dev server
         build    build for production
       "
+    `);
+
+    // help
+    expect(autoHelpLog).toMatchInlineSnapshot("[]");
+    expect(example.parse(["-h"])).toMatchInlineSnapshot("undefined");
+    expect(autoHelpLog).toMatchInlineSnapshot(`
+      [
+        "usage:
+        $ tiny-cli.js <command>
+
+      This is a sample cli program.
+
+      commands:
+        dev      start dev server
+        build    build for production
+      ",
+      ]
+    `);
+    expect(example.parse(["dev", "-h"])).toMatchInlineSnapshot("undefined");
+    expect(autoHelpLog).toMatchInlineSnapshot(`
+      [
+        "usage:
+        $ tiny-cli.js <command>
+
+      This is a sample cli program.
+
+      commands:
+        dev      start dev server
+        build    build for production
+      ",
+        "usage:
+        $ tiny-cli.js dev [options]
+
+      start dev server
+
+      options:
+        --port=...
+      ",
+      ]
     `);
 
     // error command

@@ -14,6 +14,13 @@ export function defineSubCommands(
     commands: Record<string, Command>;
   } & HelpConfig
 ) {
+  // override subcommands help
+  for (const [name, command] of Object.entries(config.commands)) {
+    command.config.program = [config.program, name].join(" ");
+    command.config.autoHelp = config.autoHelp;
+    command.config.autoHelpLog = config.autoHelpLog;
+  }
+
   function parseOnly(rawArgs: string[]) {
     const [name, ...args] = rawArgs;
     if (!name) {
@@ -28,6 +35,11 @@ export function defineSubCommands(
   }
 
   function parse(rawArgs: string[]) {
+    // intercept -h and --help
+    if (config.autoHelp && ["-h", "--help"].includes(rawArgs[0])) {
+      (config.autoHelpLog ?? console.log)(help());
+      return;
+    }
     const { args, command } = parseOnly(rawArgs);
     return command.parse(args);
   }

@@ -159,10 +159,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
 
   function parse(rawArgs: string[]): unknown {
     // intercept -h and --help
-    if (
-      config.autoHelp &&
-      (rawArgs.includes("-h") || rawArgs.includes("--help"))
-    ) {
+    if (config.autoHelp && ["-h", "--help"].includes(rawArgs[0])) {
       (config.autoHelpLog ?? console.log)(help());
       return;
     }
