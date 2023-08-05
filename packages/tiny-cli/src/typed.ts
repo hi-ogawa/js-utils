@@ -1,4 +1,11 @@
-import { difference, groupBy, pickBy, range, zip } from "@hiogawa/utils";
+import {
+  difference,
+  groupBy,
+  pickBy,
+  range,
+  wrapError,
+  zip,
+} from "@hiogawa/utils";
 import { parseRawArgsToUntyped } from "./untyped";
 
 //
@@ -51,6 +58,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   // parse to TypedArgs
   //
 
+  // TODO: wrap parse error?
   function parseOnly(rawArgs: string[]): TypedArgs<ArgSchemaRecord> {
     //
     // parse untyped
@@ -77,7 +85,9 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
       ).keys(),
     ];
     if (dupKeys.length > 0) {
-      throw new Error("duplicate options: " + dupKeys.join(", "));
+      throw new ParseError(
+        "duplicate options: " + dupKeys.map((k) => "--" + k).join(", ")
+      );
     }
 
     // check unknown keys
@@ -86,12 +96,14 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
       schemaKeyValues.map((e) => e[0])
     );
     if (unusedKeys.length > 0) {
-      throw new Error("unknown options: " + unusedKeys.join(", "));
+      throw new ParseError(
+        "unknown options: " + unusedKeys.map((k) => "--" + k).join(", ")
+      );
     }
 
     // check unused positionals (TODO: support variadic)
     if (untypedArgs.positionals.length > schemaByType.positionals.length) {
-      throw new Error(
+      throw new ParseError(
         "too many arguments: " + untypedArgs.positionals.join(", ")
       );
     }
@@ -106,12 +118,16 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
       schemaByType.positionals,
       untypedArgs.positionals
     )) {
-      typedArgs[key] = schema.parse(value);
+      typedArgs[key] = ParseError.wrapFn(`failed to parse <${key}>`, () =>
+        schema.parse(value)
+      );
     }
 
     const untypedKeyValuesMap = new Map(untypedKeyValues);
     for (const [key, schema] of new Map(schemaKeyValues)) {
-      typedArgs[key] = schema.parse(untypedKeyValuesMap.get(key));
+      typedArgs[key] = ParseError.wrapFn(`failed to parse --${key}`, () =>
+        schema.parse(untypedKeyValuesMap.get(key))
+      );
     }
 
     return typedArgs as any;
@@ -172,6 +188,16 @@ ${formatTable(optionsHelp)}
     parseOnly,
     parse,
   };
+}
+
+export class ParseError extends Error {
+  static wrapFn<T>(message: string, f: () => T): T {
+    try {
+      return f();
+    } catch (e) {
+      throw new ParseError(message, { cause: e });
+    }
+  }
 }
 
 //

@@ -58,15 +58,15 @@ describe(defineCommand, () => {
 
     expect(example.parse(["x", "--boolFlag", "--num", "123", "--str", "hey"]))
       .toMatchInlineSnapshot(`
-      {
-        "arg": "x",
-        "boolFlag": true,
-        "num": 123,
-        "numOpt": undefined,
-        "numOptDefault": 10,
-        "str": "hey",
-      }
-    `);
+        {
+          "arg": "x",
+          "boolFlag": true,
+          "num": 123,
+          "numOpt": undefined,
+          "numOptDefault": 10,
+          "str": "hey",
+        }
+      `);
 
     expect(() =>
       example.parse(["x", "y", "z"])
@@ -74,22 +74,16 @@ describe(defineCommand, () => {
 
     expect(() =>
       example.parse(["x", "--hehe", "he", "--foo"])
-    ).toThrowErrorMatchingInlineSnapshot('"unknown options: hehe, foo"');
+    ).toThrowErrorMatchingInlineSnapshot('"unknown options: --hehe, --foo"');
 
     expect(() =>
       example.parse(["x", "--hehe", "--hehe"])
-    ).toThrowErrorMatchingInlineSnapshot('"duplicate options: hehe"');
+    ).toThrowErrorMatchingInlineSnapshot('"duplicate options: --hehe"');
 
-    expect(() => example.parse(["x"])).toThrowErrorMatchingInlineSnapshot(`
-      "[
-        {
-          \\"code\\": \\"invalid_type\\",
-          \\"expected\\": \\"number\\",
-          \\"received\\": \\"nan\\",
-          \\"path\\": [],
-          \\"message\\": \\"Expected number, received nan\\"
-        }
-      ]"
-    `);
+    expect(() => example.parse(["x"])).toThrowErrorMatchingInlineSnapshot(
+      '"failed to parse --num"'
+    );
   });
+
+  it("variadic", () => {});
 });
