@@ -8,7 +8,7 @@ import { parseRawArgsToUntyped } from "./untyped";
 export type ArgSchema<T> = {
   type?: "positional" | "key-value" | "flag"; // default key-value
   variadic?: true; // only for "positional"
-  describe?: string;
+  describe?: string; // TODO: rename to `description`?
   parse: (value?: unknown) => T; // can use ZodType.parse directly
   // alias?: string[]; // TODO maybe later, but it doesn't seem to be absolutely necessarily
 };
