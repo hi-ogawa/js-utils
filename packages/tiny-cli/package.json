@@ -10,6 +10,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
+    },
+    "./dist/zod": {
+      "import": "./dist/zod.js",
+      "require": "./dist/zod.cjs",
+      "types": "./dist/zod.d.ts"
     }
   },
   "files": [
