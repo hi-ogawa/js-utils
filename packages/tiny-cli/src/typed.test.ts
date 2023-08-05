@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { createCommand, defineArg } from "./typed";
+import { defineArg, defineCommand } from "./typed";
 
-describe(createCommand, () => {
+describe(defineCommand, () => {
   it("basic", () => {
-    const example = createCommand(
+    const example = defineCommand(
       {
         arg: defineArg(z.string().parse, {
           positional: true,

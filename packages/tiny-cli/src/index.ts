@@ -1,2 +1,2 @@
 export { parseRawArgsToUntyped } from "./untyped";
-export { createCommand, defineArg } from "./typed";
+export { defineCommand as createCommand, defineArg } from "./typed";

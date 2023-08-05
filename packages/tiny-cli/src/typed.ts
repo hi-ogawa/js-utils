@@ -1,6 +1,10 @@
 import { difference, groupBy, pickBy, range, zip } from "@hiogawa/utils";
 import { parseRawArgsToUntyped } from "./untyped";
 
+//
+// defineArg
+//
+
 // TODO: disjoint union?
 type ArgSchema<T> = {
   // alias?: string[]; // TODO
@@ -20,13 +24,17 @@ export function defineArg<T>(
   return { parse, ...other };
 }
 
+//
+// defineCommand
+//
+
 type ArgSchemaRecordBase = Record<string, ArgSchema<unknown>>;
 
 type TypedArgs<R extends ArgSchemaRecordBase> = {
   [K in keyof R]: R[K] extends ArgSchema<infer T> ? T : never;
 };
 
-export function createCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
+export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   schemaRecord: ArgSchemaRecord,
   action: ({ args }: { args: TypedArgs<ArgSchemaRecord> }) => unknown
 ) {
