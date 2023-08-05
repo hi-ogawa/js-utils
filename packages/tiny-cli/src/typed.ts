@@ -1,11 +1,4 @@
-import {
-  difference,
-  groupBy,
-  pickBy,
-  range,
-  wrapError,
-  zip,
-} from "@hiogawa/utils";
+import { difference, groupBy, pickBy, range, zip } from "@hiogawa/utils";
 import { parseRawArgsToUntyped } from "./untyped";
 
 //
