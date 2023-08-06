@@ -56,12 +56,14 @@ describe(zArg, () => {
           files: zArg(z.string().array(), {
             type: "positional",
             variadic: true,
-            help: "input files",
+            description: "input files",
           }),
           fix: zArg(z.coerce.boolean(), {
             type: "flag",
-            help: "fix files in-place",
+            description: "fix files in-place",
           }),
+          // TODO: could this fail in some strict tsc mode?
+          mode: z.coerce.number().default(123).describe("some setting"),
         },
       },
       ({ args }) => {
@@ -82,7 +84,8 @@ describe(zArg, () => {
         files    input files
 
       options:
-        --fix    fix files in-place
+        --mode=...    some setting
+        --fix         fix files in-place
       "
     `);
   });

@@ -8,13 +8,13 @@ describe(defineSubCommands, () => {
     const autoHelpLog: unknown[] = [];
     const example = defineSubCommands({
       program: "tiny-cli.js",
-      help: "This is a sample cli program.",
+      description: "This is a sample cli program.",
       autoHelp: true,
       autoHelpLog: (v) => autoHelpLog.push(v),
       commands: {
         dev: defineCommand(
           {
-            help: "start dev server",
+            description: "start dev server",
             args: {
               port: {
                 parse: z.coerce.number().default(5172).parse,
@@ -25,7 +25,7 @@ describe(defineSubCommands, () => {
         ),
         build: defineCommand(
           {
-            help: "build for production",
+            description: "build for production",
             args: {
               file: {
                 type: "positional",

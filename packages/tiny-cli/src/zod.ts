@@ -36,7 +36,7 @@ export function zodArg<Schema extends z.ZodType>(
 ): ArgSchema<z.infer<Schema>> {
   return {
     parse: schema.parse,
-    help: schema.description,
+    description: schema.description,
     ...schema[ARG_META],
   };
 }
@@ -48,7 +48,7 @@ export function zArg<Schema extends z.ZodType>(
 ): ArgSchema<z.infer<Schema>> {
   return {
     parse: schema.parse,
-    help: schema.description,
+    description: schema.description,
     ...meta,
   };
 }

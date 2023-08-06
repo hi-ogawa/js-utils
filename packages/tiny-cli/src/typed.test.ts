@@ -8,31 +8,31 @@ describe(defineCommand, () => {
     const example = defineCommand(
       {
         program: "basic.js",
-        help: "This is a command line program to do something.",
+        description: "This is a command line program to do something.",
         autoHelp: true,
         autoHelpLog: (v) => autoHelpLog.push(v),
         args: {
           arg: {
             type: "positional",
             parse: z.string().parse,
-            help: "this is required arg",
+            description: "this is required arg",
           },
           argOpt: {
             type: "positional",
             parse: z.string().optional().parse,
-            help: "this is not required",
+            description: "this is not required",
           },
           num: { parse: z.coerce.number().parse },
           numOpt: { parse: z.coerce.number().optional().parse },
           numOptDefault: {
             parse: z.coerce.number().default(10).parse,
-            help: "optional and default 10",
+            description: "optional and default 10",
           },
           str: { parse: z.string().parse },
           boolFlag: {
             type: "flag",
             parse: z.coerce.boolean().parse,
-            help: "some toggle",
+            description: "some toggle",
           },
         },
       },
@@ -130,12 +130,12 @@ describe(defineCommand, () => {
             files: {
               type: "positional",
               variadic: true,
-              help: "input files",
+              description: "input files",
               parse: z.string().array().parse,
             },
             fix: {
               type: "flag",
-              help: "fix files in-place",
+              description: "fix files in-place",
               parse: z.coerce.boolean().default(false).parse,
             },
           },

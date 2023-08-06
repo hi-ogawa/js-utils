@@ -15,7 +15,7 @@ import { parseRawArgsToUntyped } from "./untyped";
 export type ArgSchema<T> = {
   type?: "positional" | "key-value" | "flag"; // default key-value
   variadic?: true; // only for "positional"
-  help?: string;
+  description?: string; // rename back to `description` so that `zod.describe` can be used directly?
   parse: (value?: unknown) => T;
   // alias?: string[]; // TODO maybe later, but it doesn't seem to be absolutely necessarily
 };
@@ -35,7 +35,7 @@ export type Command = ReturnType<typeof defineCommand>;
 export type HelpConfig = {
   program?: string;
   // version?: string;
-  help?: string;
+  description?: string;
   autoHelp?: boolean;
   autoHelpLog?: (v: string) => void; // for testing
 };
@@ -183,12 +183,12 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   function help(): string {
     const positionalsHelp = schemaByType.positionals.map((e) => [
       e[0],
-      e[1].help ?? "",
+      e[1].description ?? "",
     ]);
 
     const optionsHelp = schemaKeyValues.map((e) => [
       `--${e[0]}${e[1].type === "flag" ? "" : "=..."}`,
-      e[1].help ?? "",
+      e[1].description ?? "",
     ]);
 
     const usage = [
@@ -204,9 +204,9 @@ usage:
   $ ${usage.join(" ")}
 `;
 
-    if (config.help) {
+    if (config.description) {
       result += `
-${config.help}
+${config.description}
 `;
     }
 
