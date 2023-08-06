@@ -6,6 +6,8 @@ import {
   formatTable,
 } from "./typed";
 
+// TODO: refactor similar logic from `definedCommand`
+
 export function defineSubCommands(
   config: {
     commands: Record<string, Command>;
