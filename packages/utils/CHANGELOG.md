@@ -1,5 +1,12 @@
 # @hiogawa/utils
 
+## 1.6.0
+
+### Minor Changes
+
+- fc9cf5d: feat: add `zipMax`
+- a7a9e87: feat: add `formatError`
+
 ## 1.5.0
 
 ### Major Changes
