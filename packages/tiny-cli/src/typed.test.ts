@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { arg } from "./presets";
-import { defineArg, defineCommand } from "./typed";
+import { defineCommand } from "./typed";
+import { zArg } from "./zod";
 
 describe(defineCommand, () => {
   it("basic", () => {
@@ -217,17 +218,17 @@ describe(defineCommand, () => {
   });
 });
 
-describe(defineArg, () => {
+describe(zArg, () => {
   it("basic", () => {
     const example = defineCommand(
       {
         args: {
-          files: defineArg(z.string().array(), {
+          files: zArg(z.string().array(), {
             type: "positional",
             variadic: true,
             description: "input files",
           }),
-          fix: defineArg(z.coerce.boolean(), {
+          fix: zArg(z.coerce.boolean(), {
             type: "flag",
             description: "fix files in-place",
           }),

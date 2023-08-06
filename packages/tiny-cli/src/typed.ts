@@ -16,26 +16,12 @@ import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
 // TODO: does it still work for most strict tsc config? (e.g. exactOptionalPropertyTypes)
 export type ArgSchema<T> = {
   parse: (value?: unknown) => T;
+  // TODO: rename this back to `positional: boolean` and `flag: boolean` so that it's close to presets api.
   type?: "positional" | "key-value" | "flag"; // default key-value
   variadic?: true; // only for "positional"
   description?: string | undefined;
   // alias?: string[]; // TODO maybe later, but it doesn't seem to be absolutely necessarily
 };
-
-// DX helper
-export function defineArg<T>(
-  schema: {
-    parse: (value?: unknown) => T;
-    description?: string | undefined;
-  },
-  meta?: Omit<ArgSchema<unknown>, "parse">
-): ArgSchema<T> {
-  return {
-    parse: schema.parse,
-    description: schema.description,
-    ...meta,
-  };
-}
 
 //
 // defineCommand
