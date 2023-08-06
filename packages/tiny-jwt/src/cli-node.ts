@@ -1,8 +1,13 @@
 import "./polyfill-node";
 import process from "node:process";
+import { arg, defineCommand, defineSubCommands } from "@hiogawa/tiny-cli";
 import { tinyassert } from "@hiogawa/utils";
 
-const commands: Record<string, () => Promise<unknown>> = {
+//
+// keygen
+//
+
+const keygenFns: Record<string, () => Promise<unknown>> = {
   HS256: async () => {
     const key = await crypto.subtle.generateKey(
       { name: "HMAC", hash: "SHA-256" },
@@ -35,17 +40,41 @@ const commands: Record<string, () => Promise<unknown>> = {
   },
 };
 
-async function main() {
-  const [command, algorithm] = process.argv.slice(2);
-  tinyassert(command === "keygen", "supported command: keygen");
+const keygenCommand = defineCommand(
+  {
+    args: {
+      algorithm: arg.string(Object.keys(keygenFns).join(", "), {
+        positional: true,
+      }),
+    },
+  },
+  async ({ args }) => {
+    const keygenFn = keygenFns[args.algorithm];
+    tinyassert(keygenFn, "unsupported algorithm: " + args.algorithm);
+    const result = await keygenFn();
+    console.log(JSON.stringify(result, null, 2));
+  }
+);
 
-  const keygenFn = algorithm && commands[algorithm];
-  tinyassert(
-    keygenFn,
-    "supported algorithm: " + Object.keys(commands).join(", ")
-  );
-  const result = await keygenFn();
-  console.log(JSON.stringify(result, null, 2));
+//
+// main
+//
+
+const mainCommand = defineSubCommands({
+  program: "tiny-jwt",
+  autoHelp: true,
+  commands: {
+    keygen: keygenCommand,
+  },
+});
+
+async function main() {
+  try {
+    await mainCommand.parse(process.argv.slice(2));
+  } catch (e) {
+    // TODO: check ParseError then show help?
+    console.log(e);
+  }
 }
 
 main();

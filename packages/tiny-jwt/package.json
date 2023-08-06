@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",
+    "@hiogawa/tiny-cli": "workspace:*",
     "@types/node": "^18.17.1"
   }
 }

@@ -113,6 +113,9 @@ importers:
 
   packages/tiny-jwt:
     devDependencies:
+      '@hiogawa/tiny-cli':
+        specifier: workspace:*
+        version: link:../tiny-cli
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../utils
