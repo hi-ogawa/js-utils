@@ -21,7 +21,7 @@ describe(consoleErrorPretty, () => {
   it("basic", () => {
     const e1 = new Error("e1", { cause: "just-string" });
     const e2 = new Error("e2", { cause: e1 });
-    consoleErrorPretty(e2);
+    consoleErrorPretty(e2, { noColor: true });
     expect(consoleErrorHistory).toMatchInlineSnapshot(`
       [
         "
@@ -37,6 +37,7 @@ describe(consoleErrorPretty, () => {
           at (reducted)
           at (reducted)
           at (reducted)
+
       ",
         "
       [ERROR:CAUSE] e1
@@ -51,9 +52,54 @@ describe(consoleErrorPretty, () => {
           at (reducted)
           at (reducted)
           at (reducted)
+
       ",
         "
       [ERROR:CAUSE:2] just-string
+
+      ",
+      ]
+    `);
+  });
+
+  it("noColor", () => {
+    const e1 = new Error("e1", { cause: "just-string" });
+    const e2 = new Error("e2", { cause: e1 });
+    consoleErrorPretty(e2);
+    expect(consoleErrorHistory).toMatchInlineSnapshot(`
+      [
+        "
+      [41m ERROR [49m e2
+
+      [36m    at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+
+      ",
+        "
+      [41m ERROR:CAUSE [49m e1
+
+      [36m    at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+          at (reducted)
+
+      ",
+        "
+      [41m ERROR:CAUSE:2 [49m just-string
 
       ",
       ]

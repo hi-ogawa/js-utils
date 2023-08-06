@@ -19,7 +19,7 @@ export function flattenErrorCauses(e: unknown): unknown[] {
  * something like consola.error + flattenErrorCauses,
  * which can be useful, for example, to quickly provide good-enough error log for cli.
  */
-export function consoleErrorPretty(v: unknown) {
+export function consoleErrorPretty(v: unknown, config?: { noColor?: boolean }) {
   const errors = flattenErrorCauses(v);
   for (let i = 0; i < errors.length; i++) {
     const e = errors[i];
@@ -31,7 +31,7 @@ export function consoleErrorPretty(v: unknown) {
       }
     }
     const e2 = e instanceof Error ? e : { message: String(e) };
-    console.error(formatErrorPretty(label, e2));
+    console.error(formatErrorPretty(label, e2, !config?.noColor));
   }
 }
 
@@ -39,20 +39,23 @@ export function consoleErrorPretty(v: unknown) {
 // https://github.com/unjs/consola/blob/e4a37c1cd2c8d96b5f30d8c13ff2df32244baa6a/src/utils/color.ts#L93
 // https://github.com/unjs/consola/blob/e4a37c1cd2c8d96b5f30d8c13ff2df32244baa6a/src/reporters/fancy.ts#L49
 // https://github.com/unjs/consola/blob/e4a37c1cd2c8d96b5f30d8c13ff2df32244baa6a/src/reporters/fancy.ts#L64-L65
-function formatErrorPretty(label: string, e: Pick<Error, "message" | "stack">) {
-  // TODO: color?
-  // `\u001B[41m ${label} \u001B[49m`;
-  // `\u001B[36m${stack}\u001B[39m`;
+function formatErrorPretty(
+  label: string,
+  e: Pick<Error, "message" | "stack">,
+  color?: boolean
+) {
+  let stack = e.stack?.split("\n").slice(1).join("\n") ?? "";
 
-  let result = `\
-
-[${label}] ${e.message}
-
-`;
-  if (e.stack) {
-    result += `\
-${e.stack.split("\n").slice(1).join("\n")}
-`;
+  if (color) {
+    label = `\u001B[41m ${label} \u001B[49m`;
+    stack = stack && `\u001B[36m${stack}\u001B[39m`;
+  } else {
+    label = `[${label}]`;
   }
-  return result;
+
+  return `\
+
+${label} ${e.message}
+
+${stack && stack + "\n"}`;
 }
