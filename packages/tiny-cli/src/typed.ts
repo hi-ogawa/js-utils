@@ -16,11 +16,11 @@ import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
 // TODO: does it still work for most strict tsc config? (e.g. exactOptionalPropertyTypes)
 export type ArgSchema<T> = {
   parse: (value?: unknown) => T;
-  // TODO: rename this back to `positional: boolean` and `flag: boolean` so that it's close to presets api.
-  type?: "positional" | "key-value" | "flag"; // default key-value
-  variadic?: true; // only for "positional"
+  // either one of "position", "flag", "key-value" where "key-value" is assumed by default
+  positional?: boolean;
+  flag?: boolean;
+  variadic?: true; // only for "positional: true"
   description?: string | undefined;
-  // alias?: string[]; // TODO maybe later, but it doesn't seem to be absolutely necessarily
 };
 
 //
@@ -52,9 +52,9 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   const entries = Object.entries(config.args);
 
   const schemaByType = {
-    positionals: entries.filter((e) => e[1].type === "positional"),
-    keyValues: entries.filter((e) => !e[1].type || e[1].type === "key-value"),
-    flags: entries.filter((e) => e[1].type === "flag"),
+    positionals: entries.filter((e) => e[1].positional),
+    keyValues: entries.filter((e) => !e[1].flag && !e[1].positional),
+    flags: entries.filter((e) => e[1].flag),
   };
   const schemaKeyValues = [...schemaByType.keyValues, ...schemaByType.flags];
 
@@ -64,7 +64,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
 
   // support only single "positional.variadic" for now
   const variadics = entries.filter((e) => e[1].variadic);
-  if (variadics.some((e) => e[1].type !== "positional")) {
+  if (variadics.some((e) => !e[1].positional)) {
     throw new Error("variadic supported only for 'positional'");
   }
   const variadic = variadics[0];
@@ -190,7 +190,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
     ]);
 
     const optionsHelp = schemaKeyValues.map((e) => [
-      `--${e[0]}${e[1].type === "flag" ? "" : "=..."}`,
+      `--${e[0]}${e[1].flag ? "" : "=..."}`,
       e[1].description ?? "",
     ]);
 

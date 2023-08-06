@@ -28,7 +28,7 @@ describe(defineSubCommands, () => {
             description: "build for production",
             args: {
               file: {
-                type: "positional",
+                positional: true,
                 parse: z.string().optional().parse,
               },
               outDir: {

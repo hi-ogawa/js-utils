@@ -8,7 +8,7 @@ import { ParseError } from "./utils";
 
 export const arg = {
   boolean: (description?: string): ArgSchema<boolean> => ({
-    type: "flag",
+    flag: true,
     description,
     parse: (v) => Boolean(v), // z.coerce.boolean()
   }),
@@ -20,7 +20,7 @@ export const arg = {
     description?: string,
     config?: { positional?: boolean; optional?: Optional; default?: Default }
   ): ArgSchema<InferParse<string, Optional, Default>> => ({
-    type: config?.positional ? "positional" : "key-value",
+    positional: config?.positional,
     description,
     parse: (v) => {
       if (typeof v === "undefined") {
@@ -43,7 +43,7 @@ export const arg = {
     description?: string,
     config?: { positional?: boolean; optional?: Optional; default?: Default }
   ): ArgSchema<InferParse<number, Optional, Default>> => ({
-    type: config?.positional ? "positional" : "key-value",
+    positional: config?.positional,
     description,
     parse: (v) => {
       if (typeof v === "undefined") {
@@ -60,14 +60,14 @@ export const arg = {
   }),
 
   stringArray: (description?: string): ArgSchema<string[]> => ({
-    type: "positional",
+    positional: true,
     variadic: true,
     parse: (v) => parser.array(v, parser.string),
     description,
   }),
 
   numberArray: (description?: string): ArgSchema<number[]> => ({
-    type: "positional",
+    positional: true,
     variadic: true,
     parse: (v) => parser.array(v, parser.coerceNumber),
     description,

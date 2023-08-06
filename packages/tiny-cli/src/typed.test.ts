@@ -118,13 +118,13 @@ describe(defineCommand, () => {
         {
           args: {
             files: {
-              type: "positional",
+              positional: true,
               variadic: true,
               description: "input files",
               parse: z.string().array().parse,
             },
             fix: {
-              type: "flag",
+              flag: true,
               description: "fix files in-place",
               parse: z.coerce.boolean().default(false).parse,
             },
@@ -175,11 +175,11 @@ describe(defineCommand, () => {
           {
             args: {
               first: {
-                type: "positional",
+                positional: true,
                 parse: z.string().parse,
               },
               rest: {
-                type: "positional",
+                positional: true,
                 variadic: true,
                 parse: z.string().array().parse,
               },
@@ -204,7 +204,7 @@ describe(defineCommand, () => {
       {
         args: {
           arg: {
-            type: "positional",
+            positional: true,
             parse: z.string().parse,
           },
         },
@@ -224,12 +224,12 @@ describe(zArg, () => {
       {
         args: {
           files: zArg(z.string().array(), {
-            type: "positional",
+            positional: true,
             variadic: true,
             description: "input files",
           }),
           fix: zArg(z.coerce.boolean(), {
-            type: "flag",
+            flag: true,
             description: "fix files in-place",
           }),
           mode: z.coerce.number().default(123).describe("some setting"),
