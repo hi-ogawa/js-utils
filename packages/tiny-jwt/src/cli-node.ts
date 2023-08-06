@@ -1,12 +1,7 @@
 import "./polyfill-node";
 import process from "node:process";
-import {
-  arg,
-  consoleErrorExtra,
-  defineCommand,
-  defineSubCommands,
-} from "@hiogawa/tiny-cli";
-import { tinyassert } from "@hiogawa/utils";
+import { arg, defineCommand, defineSubCommands } from "@hiogawa/tiny-cli";
+import { consoleErrorExtra, tinyassert } from "@hiogawa/utils";
 
 //
 // keygen
