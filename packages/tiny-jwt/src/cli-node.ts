@@ -72,7 +72,7 @@ async function main() {
   try {
     await mainCommand.parse(process.argv.slice(2));
   } catch (e) {
-    consoleErrorPretty(e, { noColor: !process.stdout.isTTY });
+    consoleErrorPretty(e, { noColor: !process.stderr.isTTY });
     process.exit(1);
   }
 }
