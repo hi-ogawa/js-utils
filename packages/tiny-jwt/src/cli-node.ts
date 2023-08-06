@@ -72,8 +72,8 @@ async function main() {
   try {
     await mainCommand.parse(process.argv.slice(2));
   } catch (e) {
-    // TODO: check ParseError then show help?
-    console.log(e);
+    console.error(e);
+    process.exit(1);
   }
 }
 
