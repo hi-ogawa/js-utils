@@ -167,14 +167,7 @@ importers:
 
   packages/utils: {}
 
-  packages/utils-experimental:
-    devDependencies:
-      '@hiogawa/utils':
-        specifier: workspace:*
-        version: link:../utils
-      zod:
-        specifier: ^3.21.4
-        version: 3.21.4
+  packages/utils-experimental: {}
 
   packages/utils-react:
     devDependencies:
