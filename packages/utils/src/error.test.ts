@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { consoleErrorExtra } from "./error";
+import { consoleErrorExtra, flattenErrorCauses } from "./error";
 
 describe(consoleErrorExtra, () => {
   let consoleErrorHistory: any[];
@@ -53,6 +53,20 @@ describe(consoleErrorExtra, () => {
           at (reducted)
       ",
         "just-string",
+      ]
+    `);
+  });
+});
+
+describe(flattenErrorCauses, () => {
+  it("handle cyclic reference", () => {
+    const e1 = new Error("e1");
+    const e2 = new Error("e2", { cause: e1 });
+    e1.cause = e2;
+    expect(flattenErrorCauses(e1)).toMatchInlineSnapshot(`
+      [
+        [Error: e1],
+        [Error: e2],
       ]
     `);
   });
