@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { defineCommand } from "./typed";
+import { defineArg, defineCommand } from "./typed";
 
 describe(defineCommand, () => {
   it("basic", () => {
@@ -225,5 +225,57 @@ describe(defineCommand, () => {
     expect(() => command.parse([])).toThrowErrorMatchingInlineSnapshot(
       '"failed to parse <arg>"'
     );
+  });
+});
+
+describe(defineArg, () => {
+  it("basic", () => {
+    const example = defineCommand(
+      {
+        args: {
+          files: defineArg(z.string().array(), {
+            type: "positional",
+            variadic: true,
+            description: "input files",
+          }),
+          fix: defineArg(z.coerce.boolean(), {
+            type: "flag",
+            description: "fix files in-place",
+          }),
+          // TODO: could this fail in some strict tsc mode?
+          mode: z.coerce.number().default(123).describe("some setting"),
+        },
+      },
+      ({ args }) => {
+        args satisfies {
+          files: string[];
+          fix: boolean;
+        };
+        args.files;
+        return args;
+      }
+    );
+
+    expect(example.help()).toMatchInlineSnapshot(`
+      "usage:
+        $ (cli) [options] <files...>
+
+      positional arguments:
+        files    input files
+
+      options:
+        --mode=...    some setting
+        --fix         fix files in-place
+      "
+    `);
+    expect(example.parse(["hey"])).toMatchInlineSnapshot(`
+      {
+        "files": [
+          "hey",
+        ],
+        "fix": false,
+        "mode": 123,
+      }
+    `);
   });
 });

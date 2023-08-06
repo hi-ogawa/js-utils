@@ -12,13 +12,29 @@ import { parseRawArgsToUntyped } from "./untyped";
 // ArgSchema
 //
 
+// `parse` and `description` is same as ZodType<T> so zod schema can be reused directly
 export type ArgSchema<T> = {
+  parse: (value?: unknown) => T;
   type?: "positional" | "key-value" | "flag"; // default key-value
   variadic?: true; // only for "positional"
-  description?: string; // rename back to `description` so that `zod.describe` can be used directly?
-  parse: (value?: unknown) => T;
+  description?: string;
   // alias?: string[]; // TODO maybe later, but it doesn't seem to be absolutely necessarily
 };
+
+// DX helper?
+export function defineArg<T>(
+  schema: {
+    parse: (value?: unknown) => T;
+    description?: string;
+  },
+  meta?: Omit<ArgSchema<unknown>, "parse">
+): ArgSchema<T> {
+  return {
+    parse: schema.parse,
+    description: schema.description,
+    ...meta,
+  };
+}
 
 //
 // defineCommand
