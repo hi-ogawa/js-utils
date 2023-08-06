@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { consoleErrorExtra, flattenErrorCauses } from "./error";
+import { consoleErrorPretty, flattenErrorCauses } from "./error";
 
-describe(consoleErrorExtra, () => {
+describe(consoleErrorPretty, () => {
   let consoleErrorHistory: any[];
 
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe(consoleErrorExtra, () => {
   it("basic", () => {
     const e1 = new Error("e1", { cause: "just-string" });
     const e2 = new Error("e2", { cause: e1 });
-    consoleErrorExtra(e2);
+    consoleErrorPretty(e2);
     expect(consoleErrorHistory).toMatchInlineSnapshot(`
       [
         "
@@ -39,7 +39,7 @@ describe(consoleErrorExtra, () => {
           at (reducted)
       ",
         "
-      [ERROR] e1
+      [ERROR:CAUSE] e1
 
           at (reducted)
           at (reducted)
@@ -52,7 +52,10 @@ describe(consoleErrorExtra, () => {
           at (reducted)
           at (reducted)
       ",
-        "just-string",
+        "
+      [ERROR:CAUSE:2] just-string
+
+      ",
       ]
     `);
   });
