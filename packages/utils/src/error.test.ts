@@ -37,7 +37,6 @@ describe(consoleErrorPretty, () => {
           at (reducted)
           at (reducted)
           at (reducted)
-
       ",
         "
       [ERROR:CAUSE] e1
@@ -52,7 +51,6 @@ describe(consoleErrorPretty, () => {
           at (reducted)
           at (reducted)
           at (reducted)
-
       ",
         "
       [ERROR:CAUSE:2] just-string
@@ -81,7 +79,6 @@ describe(consoleErrorPretty, () => {
           at (reducted)
           at (reducted)
           at (reducted)
-
       ",
         "
       [41m ERROR:CAUSE [49m e1
@@ -96,7 +93,6 @@ describe(consoleErrorPretty, () => {
           at (reducted)
           at (reducted)
           at (reducted)
-
       ",
         "
       [41m ERROR:CAUSE:2 [49m just-string
