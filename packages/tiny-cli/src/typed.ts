@@ -13,19 +13,20 @@ import { parseRawArgsToUntyped } from "./untyped";
 //
 
 // `parse` and `description` is same as ZodType<T> so zod schema can be reused directly
+// TODO: does it still work for most strict tsc config? (e.g. exactOptionalPropertyTypes)
 export type ArgSchema<T> = {
   parse: (value?: unknown) => T;
   type?: "positional" | "key-value" | "flag"; // default key-value
   variadic?: true; // only for "positional"
-  description?: string;
+  description?: string | undefined;
   // alias?: string[]; // TODO maybe later, but it doesn't seem to be absolutely necessarily
 };
 
-// DX helper?
+// DX helper
 export function defineArg<T>(
   schema: {
     parse: (value?: unknown) => T;
-    description?: string;
+    description?: string | undefined;
   },
   meta?: Omit<ArgSchema<unknown>, "parse">
 ): ArgSchema<T> {

@@ -242,7 +242,6 @@ describe(defineArg, () => {
             type: "flag",
             description: "fix files in-place",
           }),
-          // TODO: could this fail in some strict tsc mode?
           mode: z.coerce.number().default(123).describe("some setting"),
         },
       },
