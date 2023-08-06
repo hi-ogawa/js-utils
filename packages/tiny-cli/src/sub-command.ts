@@ -29,6 +29,7 @@ export function defineSubCommands(
     return { name, args, command };
   }
 
+  // TODO: persist matched command so that user code can manually show sub-command's help when ParseError
   function parse(rawArgs: string[]) {
     // intercept -h and --help
     if (config.autoHelp && ["-h", "--help"].includes(rawArgs[0])) {
