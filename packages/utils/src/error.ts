@@ -13,26 +13,6 @@ export function flattenErrorCauses(e: unknown): unknown[] {
   return errors;
 }
 
-/**
- * something like consola.error + flattenErrorCauses,
- * which can be useful, for example, to quickly provide good-enough error log for cli.
- */
-export function consoleErrorPretty(v: unknown, config?: { noColor?: boolean }) {
-  const errors = flattenErrorCauses(v);
-  for (let i = 0; i < errors.length; i++) {
-    const e = errors[i];
-    let label = "ERROR";
-    if (i > 0) {
-      label += ":CAUSE";
-      if (i > 1) {
-        label += `:${i}`;
-      }
-    }
-    const e2 = e instanceof Error ? e : { message: String(e) };
-    console.error(formatErrorInner(label, e2, !config?.noColor));
-  }
-}
-
 // simple but effective error printing inspired by consola.error + flattenErrorCauses
 export function formatError(
   v: unknown,
