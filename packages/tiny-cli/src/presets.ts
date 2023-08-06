@@ -3,7 +3,7 @@ import type { ArgSchema } from "./typed";
 import { ParseError } from "./utils";
 
 //
-// defined presets so that zod is not required for the most of common cases
+// define basic presets so that zod is not required for common cases
 //
 
 export const arg = {
