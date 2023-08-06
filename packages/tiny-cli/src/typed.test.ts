@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
+import { arg } from "./presets";
 import { defineArg, defineCommand } from "./typed";
 
 describe(defineCommand, () => {
@@ -12,28 +13,16 @@ describe(defineCommand, () => {
         autoHelp: true,
         autoHelpLog: (v) => autoHelpLog.push(v),
         args: {
-          arg: {
-            type: "positional",
-            parse: z.string().parse,
-            description: "this is required arg",
-          },
-          argOpt: {
-            type: "positional",
-            parse: z.string().optional().parse,
-            description: "this is not required",
-          },
-          num: { parse: z.coerce.number().parse },
-          numOpt: { parse: z.coerce.number().optional().parse },
-          numOptDefault: {
-            parse: z.coerce.number().default(10).parse,
-            description: "optional and default 10",
-          },
-          str: { parse: z.string().parse },
-          boolFlag: {
-            type: "flag",
-            parse: z.coerce.boolean().parse,
-            description: "some toggle",
-          },
+          arg: arg.string("this is required arg", { positional: true }),
+          argOpt: arg.string("this is not required", {
+            positional: true,
+            optional: true,
+          }),
+          num: arg.number(),
+          numOpt: arg.number("", { optional: true }),
+          numOptDefault: arg.number("optional and default 10", { default: 10 }),
+          str: arg.string(),
+          boolFlag: arg.boolean("some toggle"),
         },
       },
       ({ args }) => {
