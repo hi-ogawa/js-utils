@@ -7,7 +7,7 @@ describe(consoleErrorExtra, () => {
   beforeEach(() => {
     consoleErrorHistory = [];
     vi.spyOn(console, "error").mockImplementation((v) => {
-      // wipe stacktrace
+      // wipe stacktrace for reproducibility
       if (typeof v === "string") {
         v = v.replace(/at .*/g, "at (reducted)");
       }
