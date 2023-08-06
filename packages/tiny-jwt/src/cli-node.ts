@@ -1,7 +1,7 @@
 import "./polyfill-node";
 import process from "node:process";
 import { arg, defineCommand, defineSubCommands } from "@hiogawa/tiny-cli";
-import { consoleErrorExtra, tinyassert } from "@hiogawa/utils";
+import { consoleErrorPretty, tinyassert } from "@hiogawa/utils";
 
 //
 // keygen
@@ -72,7 +72,7 @@ async function main() {
   try {
     await mainCommand.parse(process.argv.slice(2));
   } catch (e) {
-    consoleErrorExtra(e);
+    consoleErrorPretty(e);
     process.exit(1);
   }
 }

@@ -2,4 +2,4 @@
 "@hiogawa/utils": minor
 ---
 
-feat: add consoleErrorExtra
+feat: add consoleErrorPretty
