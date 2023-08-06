@@ -1,10 +1,5 @@
-import {
-  type Command,
-  DEFAULT_PROGRAM,
-  type HelpConfig,
-  ParseError,
-  formatTable,
-} from "./typed";
+import { type Command, type HelpConfig } from "./typed";
+import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
 
 // TODO: refactor similar logic from `definedCommand`
 
