@@ -5,8 +5,7 @@ import {
   rawSqlMigrationDriver,
   rawSqlMigrationProvider,
 } from "@hiogawa/tiny-sql";
-import { flattenErrorCauses } from "@hiogawa/utils";
-import { consola } from "consola";
+import { formatError } from "@hiogawa/utils";
 import { db, finializeDb, initializeDb } from "./db";
 
 async function main() {
@@ -40,9 +39,7 @@ async function mainWrapper() {
     initializeDb();
     await main();
   } catch (error) {
-    for (const e of flattenErrorCauses(error)) {
-      consola.error(e);
-    }
+    console.log(formatError(error));
     process.exitCode = 1;
   } finally {
     finializeDb();

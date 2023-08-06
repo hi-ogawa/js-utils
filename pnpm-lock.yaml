@@ -161,9 +161,6 @@ importers:
       better-sqlite3:
         specifier: ^8.4.0
         version: 8.4.0
-      consola:
-        specifier: ^3.2.3
-        version: 3.2.3
       tsx:
         specifier: ^3.12.7
         version: 3.12.7
