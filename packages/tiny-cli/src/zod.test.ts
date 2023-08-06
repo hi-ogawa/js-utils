@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { z } from "zod";
 import { defineCommand } from "./typed";
-import { setupZodArg, zodArgObject } from "./zod";
+import { setupZodArg, zArg, zodArgObject } from "./zod";
 
 beforeAll(() => {
   return setupZodArg(z);
@@ -30,6 +30,46 @@ describe(zodArgObject, () => {
           files: string[];
           fix: boolean;
         };
+        return args;
+      }
+    );
+
+    expect(example.help()).toMatchInlineSnapshot(`
+      "usage:
+        $ (cli) [options] <files...>
+
+      positional arguments:
+        files    input files
+
+      options:
+        --fix    fix files in-place
+      "
+    `);
+  });
+});
+
+describe(zArg, () => {
+  it("basic", () => {
+    const example = defineCommand(
+      {
+        args: {
+          files: zArg(z.string().array(), {
+            type: "positional",
+            variadic: true,
+            help: "input files",
+          }),
+          fix: zArg(z.coerce.boolean(), {
+            type: "flag",
+            help: "fix files in-place",
+          }),
+        },
+      },
+      ({ args }) => {
+        args satisfies {
+          files: string[];
+          fix: boolean;
+        };
+        args.files;
         return args;
       }
     );

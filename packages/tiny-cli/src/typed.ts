@@ -9,7 +9,7 @@ import {
 import { parseRawArgsToUntyped } from "./untyped";
 
 //
-// defineArg
+// ArgSchema
 //
 
 export type ArgSchema<T> = {

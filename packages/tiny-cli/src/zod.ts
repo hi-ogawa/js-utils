@@ -41,12 +41,34 @@ export function zodArg<Schema extends z.ZodType>(
   };
 }
 
+// or trivial non monkey-patching based api...
+export function zArg<Schema extends z.ZodType>(
+  schema: Schema,
+  meta?: Omit<ArgSchema<unknown>, "parse">
+): ArgSchema<z.infer<Schema>> {
+  return {
+    parse: schema.parse,
+    help: schema.description,
+    ...meta,
+  };
+}
+
 export function zodArgObject<
   Schema extends z.SomeZodObject,
   T = z.infer<Schema>
 >(schema: Schema): { [K in keyof T]: ArgSchema<T[K]> } {
   let result: any = {};
   for (const [k, v] of Object.entries(schema.shape)) {
+    result[k] = zodArg(v);
+  }
+  return result;
+}
+
+export function zodShapeArg<Shape extends z.ZodRawShape>(
+  shape: Shape
+): { [K in keyof Shape]: ArgSchema<z.infer<Shape[K]>> } {
+  let result: any = {};
+  for (const [k, v] of Object.entries(shape)) {
     result[k] = zodArg(v);
   }
   return result;
