@@ -1,6 +1,11 @@
 import "./polyfill-node";
 import process from "node:process";
-import { arg, defineCommand, defineSubCommands } from "@hiogawa/tiny-cli";
+import {
+  arg,
+  consoleErrorExtra,
+  defineCommand,
+  defineSubCommands,
+} from "@hiogawa/tiny-cli";
 import { tinyassert } from "@hiogawa/utils";
 
 //
@@ -72,7 +77,7 @@ async function main() {
   try {
     await mainCommand.parse(process.argv.slice(2));
   } catch (e) {
-    console.error(e);
+    consoleErrorExtra(e);
     process.exit(1);
   }
 }
