@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { arg } from "./presets";
 import { defineCommand } from "./typed";
 
-describe("argPresets", () => {
+describe("presets", () => {
   it("basic", () => {
     const example = defineCommand(
       {
