@@ -126,7 +126,7 @@ describe(defineCommand, () => {
             fix: {
               flag: true,
               description: "fix files in-place",
-              parse: z.coerce.boolean().default(false).parse,
+              parse: z.coerce.boolean().parse,
             },
           },
         },
