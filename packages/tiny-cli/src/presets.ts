@@ -6,8 +6,7 @@ import { ParseError } from "./utils";
 // defined presets so that zod is not required for the most of common cases
 //
 
-// TODO: rename?
-export const argPresets = {
+export const arg = {
   boolean: (description?: string): ArgSchema<boolean> => ({
     type: "flag",
     description,

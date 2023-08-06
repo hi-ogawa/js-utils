@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { argPresets } from "./presets";
+import { arg } from "./presets";
 import { defineCommand } from "./typed";
 
 describe("argPresets", () => {
@@ -7,21 +7,21 @@ describe("argPresets", () => {
     const example = defineCommand(
       {
         args: {
-          positionalString: argPresets.string("", { positional: true }),
-          positionalNumberDefault: argPresets.number("", {
+          positionalString: arg.string("", { positional: true }),
+          positionalNumberDefault: arg.number("", {
             positional: true,
             default: 123,
           }),
-          positionalNumberOptional: argPresets.number("", {
+          positionalNumberOptional: arg.number("", {
             positional: true,
             optional: true,
           }),
-          testBoolean: argPresets.boolean("hello boolean"),
-          testString: argPresets.string("hello string"),
-          testStringOpt: argPresets.string("hello optional string", {
+          testBoolean: arg.boolean("hello boolean"),
+          testString: arg.string("hello string"),
+          testStringOpt: arg.string("hello optional string", {
             optional: true,
           }),
-          testStringOptDefault: argPresets.string("hello default string", {
+          testStringOptDefault: arg.string("hello default string", {
             default: "default-string",
           }),
         },
@@ -104,7 +104,7 @@ describe("argPresets", () => {
     const example = defineCommand(
       {
         args: {
-          testArray: argPresets.stringArray("hello array"),
+          testArray: arg.stringArray("hello array"),
         },
       },
       ({ args }) => {
@@ -146,7 +146,7 @@ describe("argPresets", () => {
     const example = defineCommand(
       {
         args: {
-          testArray: argPresets.numberArray("hello array"),
+          testArray: arg.numberArray("hello array"),
         },
       },
       ({ args }) => {
