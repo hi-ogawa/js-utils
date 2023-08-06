@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/tiny-jwt",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",
+    "@hiogawa/tiny-cli": "workspace:*",
     "@types/node": "^18.17.1"
   }
 }
