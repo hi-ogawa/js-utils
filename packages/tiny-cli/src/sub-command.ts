@@ -43,6 +43,7 @@ export function defineSubCommands(
     }
     if (config.version && rawArgs[0] === "--version") {
       (config.autoHelpLog ?? console.log)(config.version);
+      return;
     }
     const { args, command } = parseOnly(rawArgs);
     matchedCommand = command;
