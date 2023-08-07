@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { arg } from "./presets";
 import { defineCommand } from "./typed";
@@ -6,13 +6,13 @@ import { zArg } from "./zod";
 
 describe(defineCommand, () => {
   it("basic", () => {
-    const autoHelpLog: unknown[] = [];
+    const autoHelpLog = vi.fn();
     const example = defineCommand(
       {
         program: "basic.js",
         description: "This is a command line program to do something.",
         autoHelp: true,
-        autoHelpLog: (v) => autoHelpLog.push(v),
+        autoHelpLog,
         args: {
           arg: arg.string("this is required arg", { positional: true }),
           argOpt: arg.string("this is not required", {
@@ -88,11 +88,11 @@ describe(defineCommand, () => {
       '"failed to parse --num"'
     );
 
-    expect(autoHelpLog).toMatchInlineSnapshot("[]");
     expect(example.parse(["--help"])).toMatchInlineSnapshot("undefined");
-    expect(autoHelpLog).toMatchInlineSnapshot(`
+    expect(autoHelpLog.mock.calls).toMatchInlineSnapshot(`
       [
-        "usage:
+        [
+          "usage:
         $ basic.js [options] <arg> <argOpt>
 
       This is a command line program to do something.
@@ -108,6 +108,7 @@ describe(defineCommand, () => {
         --str=...
         --boolFlag             some toggle
       ",
+        ],
       ]
     `);
   });
@@ -215,6 +216,28 @@ describe(defineCommand, () => {
     expect(() => command.parse([])).toThrowErrorMatchingInlineSnapshot(
       '"failed to parse <arg>"'
     );
+  });
+
+  it("version", () => {
+    const autoHelpLog = vi.fn();
+    const command = defineCommand(
+      {
+        version: "1.2.3",
+        autoHelpLog,
+        args: {
+          infile: arg.string(),
+        },
+      },
+      ({ args }) => args
+    );
+    command.parse(["--version"]);
+    expect(autoHelpLog.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "1.2.3",
+        ],
+      ]
+    `);
   });
 });
 

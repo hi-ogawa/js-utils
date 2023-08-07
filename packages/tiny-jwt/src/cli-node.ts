@@ -1,7 +1,13 @@
 import "./polyfill-node";
 import process from "node:process";
-import { arg, defineCommand, defineSubCommands } from "@hiogawa/tiny-cli";
+import {
+  ParseError,
+  arg,
+  defineCommand,
+  defineSubCommands,
+} from "@hiogawa/tiny-cli";
 import { formatError, tinyassert } from "@hiogawa/utils";
+import { version } from "../package.json";
 
 //
 // keygen
@@ -62,6 +68,7 @@ const keygenCommand = defineCommand(
 
 const mainCommand = defineSubCommands({
   program: "tiny-jwt",
+  version,
   autoHelp: true,
   commands: {
     keygen: keygenCommand,
@@ -73,6 +80,11 @@ async function main() {
     await mainCommand.parse(process.argv.slice(2));
   } catch (e) {
     console.log(formatError(e, { noColor: !process.stdout.isTTY }));
+    if (e instanceof ParseError) {
+      console.log(
+        "Please check '--help' for more information.\n\n" + mainCommand.help()
+      );
+    }
     process.exit(1);
   }
 }
