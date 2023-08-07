@@ -171,6 +171,7 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
 
   function parse(rawArgs: string[]): unknown {
     // TODO: refactor this "interception" system? (e.g. throw it and handle in try/catch of user code?)
+    // TODO: how to add these flags in help itself?
     // intercept --help and --version
     if (config.autoHelp && rawArgs[0] === "--help") {
       (config.autoHelpLog ?? console.log)(help());
