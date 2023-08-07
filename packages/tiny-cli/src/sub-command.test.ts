@@ -55,7 +55,7 @@ describe(defineSubCommands, () => {
 
     // help
     expect(autoHelpLog).toMatchInlineSnapshot("[]");
-    expect(example.parse(["-h"])).toMatchInlineSnapshot("undefined");
+    expect(example.parse(["--help"])).toMatchInlineSnapshot("undefined");
     expect(autoHelpLog).toMatchInlineSnapshot(`
       [
         "usage:
@@ -69,7 +69,7 @@ describe(defineSubCommands, () => {
       ",
       ]
     `);
-    expect(example.parse(["dev", "-h"])).toMatchInlineSnapshot("undefined");
+    expect(example.parse(["dev", "--help"])).toMatchInlineSnapshot("undefined");
     expect(autoHelpLog).toMatchInlineSnapshot(`
       [
         "usage:

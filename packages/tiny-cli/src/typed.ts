@@ -37,7 +37,7 @@ export type Command = ReturnType<typeof defineCommand>;
 
 export type HelpConfig = {
   program?: string;
-  // version?: string;
+  version?: string;
   description?: string;
   autoHelp?: boolean;
   autoHelpLog?: (v: string) => void; // for testing
@@ -170,9 +170,14 @@ export function defineCommand<ArgSchemaRecord extends ArgSchemaRecordBase>(
   //
 
   function parse(rawArgs: string[]): unknown {
-    // intercept -h and --help
-    if (config.autoHelp && ["-h", "--help"].includes(rawArgs[0])) {
+    // TODO: refactor this "interception" system? (e.g. throw it and handle in try/catch of user code?)
+    // intercept --help and --version
+    if (config.autoHelp && rawArgs[0] === "--help") {
       (config.autoHelpLog ?? console.log)(help());
+      return;
+    }
+    if (config.version && rawArgs[0] === "--version") {
+      (config.autoHelpLog ?? console.log)(config.version);
       return;
     }
     return action({ args: parseOnly(rawArgs) });
@@ -232,7 +237,6 @@ ${formatTable(optionsHelp)}
   return {
     config, // expose so that `defineSubCommands` can use `config.describe` etc...
     help,
-    parseOnly,
     parse,
   };
 }
