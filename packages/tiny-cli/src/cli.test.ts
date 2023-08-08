@@ -72,7 +72,9 @@ describe(TinyCli, () => {
     expect(cli.parse(["--help"])).toMatchInlineSnapshot("undefined");
     expect(logOverride.mock.lastCall).toMatchInlineSnapshot(`
       [
-        "Usage:
+        "example.js/1.2.3-pre.4
+
+      Usage:
         $ example.js <command>
 
       Some description for CLI

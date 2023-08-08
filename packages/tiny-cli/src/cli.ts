@@ -7,6 +7,10 @@ import {
 } from "./typed";
 import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
 
+// TODO:
+// - single command mode
+// - default command
+
 export class TinyCli {
   private commandMap = new Map<string, Command>();
   private lastMatchedCommand?: Command; // track last sub command for the use of help after parse error
@@ -18,8 +22,6 @@ export class TinyCli {
       description?: string;
       noDefaultOptions?: boolean;
       logOverride?: (v: string) => void;
-      // TODO: support default command
-      // defaultCommand?: string;
     }
   ) {}
 
@@ -93,12 +95,21 @@ export class TinyCli {
       return this.subHelp(this.lastMatchedCommand);
     }
 
+    const title = [
+      this.config?.program ?? DEFAULT_PROGRAM,
+      this.config?.version,
+    ]
+      .filter(Boolean)
+      .join("/");
+
     const commandsHelp = Array.from(this.commandMap.entries(), ([k, v]) => [
       k,
       v.config.description ?? "",
     ]);
 
     let result = `\
+${title}
+
 Usage:
   $ ${this.config?.program ?? DEFAULT_PROGRAM} <command>
 `;
