@@ -153,6 +153,11 @@ export function parseTypedArgs<R extends ArgSchemaRecordBase>(
   return typedArgs as any;
 }
 
+export function helpArgsSchema(argsSchema: ArgSchemaRecordBase): string {
+  argsSchema;
+  return "todo";
+}
+
 //
 // defineCommand
 //
