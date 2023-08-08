@@ -31,7 +31,10 @@ describe(TinyCli, () => {
       {
         name: "build",
         args: {
-          file: arg.string("entry file", { positional: true, optional: true }),
+          file: arg.string("entry file", {
+            positional: true,
+            default: "./index.html",
+          }),
           outDir: arg.string("output directory", { default: "./dist" }),
         },
       },
@@ -138,7 +141,7 @@ describe(TinyCli, () => {
     // build
     expect(cli.parse(["build"])).toMatchInlineSnapshot(`
       {
-        "file": undefined,
+        "file": "./index.html",
         "outDir": "./dist",
       }
     `);

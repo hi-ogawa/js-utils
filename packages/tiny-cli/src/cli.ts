@@ -9,7 +9,7 @@ import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
 
 export class TinyCli {
   private commandMap = new Map<string, Command>();
-  private matchedCommandName?: string;
+  private lastMatchedCommand?: Command; // track last sub command for the use of help after parse error
 
   constructor(
     private config?: {
@@ -62,18 +62,11 @@ export class TinyCli {
     if (!command) {
       throw new ParseError(`invalid command: '${commandName}'`);
     }
-    this.matchedCommandName = commandName;
+    this.lastMatchedCommand = command;
 
     // intercept --help
     if (!this.config?.noDefaultOptions && subRawArgs[0] === "--help") {
-      const log = this.config?.logOverride ?? console.log;
-      log(
-        helpArgsSchema({
-          program: `${this.config?.program ?? DEFAULT_PROGRAM} ${commandName}`,
-          description: command.config.description,
-          args: command.config.args,
-        })
-      );
+      (this.config?.logOverride ?? console.log)(this.subHelp(command));
       return;
     }
 
@@ -82,9 +75,23 @@ export class TinyCli {
     return command.action({ args: typedArgs });
   }
 
-  help() {
-    // TODO: show sub command help for last `parse` call?
-    this.matchedCommandName;
+  subHelp(command: Command) {
+    const program = [
+      this.config?.program ?? DEFAULT_PROGRAM,
+      command.config.name,
+    ].join(" ");
+    return helpArgsSchema({
+      program,
+      description: command.config.description,
+      args: command.config.args,
+    });
+  }
+
+  help(options?: { lastMatched?: boolean }): string {
+    // return sub command help for last `parse` call
+    if (options?.lastMatched && this.lastMatchedCommand) {
+      return this.subHelp(this.lastMatchedCommand);
+    }
 
     const commandsHelp = Array.from(this.commandMap.entries(), ([k, v]) => [
       k,
