@@ -153,9 +153,56 @@ export function parseTypedArgs<R extends ArgSchemaRecordBase>(
   return typedArgs as any;
 }
 
-export function helpArgsSchema(argsSchema: ArgSchemaRecordBase): string {
-  argsSchema;
-  return "todo";
+export function helpArgsSchema(config: {
+  program?: string;
+  description?: string;
+  args: ArgSchemaRecordBase;
+}): string {
+  const normalized = normalizeArgsSchema(config.args);
+
+  const positionalsHelp = normalized.positionals.map((e) => [
+    e[0],
+    e[1].description ?? "",
+  ]);
+
+  const optionsHelp = normalized.keyValueFlags.map((e) => [
+    `--${e[0]}${e[1].flag ? "" : "=..."}`,
+    e[1].description ?? "",
+  ]);
+
+  const usage = [
+    config.program ?? DEFAULT_PROGRAM,
+    optionsHelp.length > 0 && "[options]",
+    ...normalized.positionals.map(
+      (e) => `<${e[0]}${e[1].variadic ? "..." : ""}>`
+    ),
+  ].filter(Boolean);
+
+  let result = `\
+Usage:
+  $ ${usage.join(" ")}
+`;
+
+  if (config.description) {
+    result += `
+${config.description}
+`;
+  }
+
+  if (positionalsHelp.length > 0) {
+    result += `
+Positional arguments:
+${formatTable(positionalsHelp)}
+`;
+  }
+
+  if (optionsHelp.length > 0) {
+    result += `
+Options:
+${formatTable(optionsHelp)}
+`;
+  }
+  return result;
 }
 
 //

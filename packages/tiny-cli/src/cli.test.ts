@@ -17,6 +17,7 @@ describe(TinyCli, () => {
       {
         name: "dev",
         args: {
+          host: arg.string("dev server host", { default: "localhost" }),
           port: arg.number("dev server port", { default: 5172 }),
         },
       },
@@ -83,7 +84,28 @@ describe(TinyCli, () => {
     expect(cli.parse(["dev", "--help"])).toMatchInlineSnapshot("undefined");
     expect(logOverride.mock.lastCall).toMatchInlineSnapshot(`
       [
-        "todo",
+        "Usage:
+        $ example.js dev [options]
+
+      Options:
+        --host=...    dev server host
+        --port=...    dev server port
+      ",
+      ]
+    `);
+
+    expect(cli.parse(["build", "--help"])).toMatchInlineSnapshot("undefined");
+    expect(logOverride.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "Usage:
+        $ example.js build [options] <file>
+
+      Positional arguments:
+        file    entry file
+
+      Options:
+        --outDir=...    output directory
+      ",
       ]
     `);
 
@@ -99,11 +121,13 @@ describe(TinyCli, () => {
     // dev
     expect(cli.parse(["dev"])).toMatchInlineSnapshot(`
       {
+        "host": "localhost",
         "port": 5172,
       }
     `);
     expect(cli.parse(["dev", "--port", "3000"])).toMatchInlineSnapshot(`
       {
+        "host": "localhost",
         "port": 3000,
       }
     `);

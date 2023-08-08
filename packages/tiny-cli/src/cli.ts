@@ -67,7 +67,13 @@ export class TinyCli {
     // intercept --help
     if (!this.config?.noDefaultOptions && subRawArgs[0] === "--help") {
       const log = this.config?.logOverride ?? console.log;
-      log(helpArgsSchema(command.config.args));
+      log(
+        helpArgsSchema({
+          program: `${this.config?.program ?? DEFAULT_PROGRAM} ${commandName}`,
+          description: command.config.description,
+          args: command.config.args,
+        })
+      );
       return;
     }
 
