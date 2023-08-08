@@ -4,13 +4,13 @@ import { arg } from "./presets";
 
 describe(TinyCli, () => {
   it("basic", () => {
-    const logOverride = vi.fn();
+    const mockLog = vi.fn();
 
     const cli = new TinyCli({
       program: "example.js",
       version: "1.2.3-pre.4",
       description: "Some description for CLI",
-      logOverride,
+      log: mockLog,
     });
 
     cli.defineCommand(
@@ -62,7 +62,7 @@ describe(TinyCli, () => {
 
     // version
     expect(cli.parse(["--version"])).toMatchInlineSnapshot("undefined");
-    expect(logOverride.mock.lastCall).toMatchInlineSnapshot(`
+    expect(mockLog.mock.lastCall).toMatchInlineSnapshot(`
       [
         "1.2.3-pre.4",
       ]
@@ -70,7 +70,7 @@ describe(TinyCli, () => {
 
     // help
     expect(cli.parse(["--help"])).toMatchInlineSnapshot("undefined");
-    expect(logOverride.mock.lastCall).toMatchInlineSnapshot(`
+    expect(mockLog.mock.lastCall).toMatchInlineSnapshot(`
       [
         "example.js/1.2.3-pre.4
 
@@ -87,7 +87,7 @@ describe(TinyCli, () => {
     `);
 
     expect(cli.parse(["dev", "--help"])).toMatchInlineSnapshot("undefined");
-    expect(logOverride.mock.lastCall).toMatchInlineSnapshot(`
+    expect(mockLog.mock.lastCall).toMatchInlineSnapshot(`
       [
         "Usage:
         $ example.js dev [options]
@@ -100,7 +100,7 @@ describe(TinyCli, () => {
     `);
 
     expect(cli.parse(["build", "--help"])).toMatchInlineSnapshot("undefined");
-    expect(logOverride.mock.lastCall).toMatchInlineSnapshot(`
+    expect(mockLog.mock.lastCall).toMatchInlineSnapshot(`
       [
         "Usage:
         $ example.js build [options] <file>

@@ -11,21 +11,38 @@ import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
 // - single command mode
 // - default command
 
+function initConfig(config?: {
+  program?: string;
+  version?: string;
+  description?: string;
+  noDefaultOptions?: boolean;
+  log?: (v: string) => void;
+}) {
+  return {
+    ...config,
+    program: config?.program ?? DEFAULT_PROGRAM,
+    log: config?.log ?? console.log,
+  };
+}
+
+type Command = {
+  config: {
+    name: string;
+    description?: string;
+    args: ArgSchemaRecordBase;
+  };
+  action: TypedArgsAction<any>;
+};
+
 export class TinyCli {
+  private config: ReturnType<typeof initConfig>;
   private commandMap = new Map<string, Command>();
   private lastMatchedCommand?: Command; // track last sub command for the use of help after parse error
 
-  constructor(
-    private config?: {
-      program?: string;
-      version?: string;
-      description?: string;
-      noDefaultOptions?: boolean;
-      logOverride?: (v: string) => void;
-    }
-  ) {}
+  constructor(configIn?: Parameters<typeof initConfig>[0]) {
+    this.config = initConfig(configIn);
+  }
 
-  // per-command description
   defineCommand<R extends ArgSchemaRecordBase>(
     config: {
       name: string;
@@ -43,14 +60,13 @@ export class TinyCli {
 
   parse(rawArgs: string[]) {
     // intercept --help and --version
-    if (!this.config?.noDefaultOptions) {
-      const log = this.config?.logOverride ?? console.log;
+    if (!this.config.noDefaultOptions) {
       if (rawArgs[0] === "--help") {
-        log(this.help());
+        this.config.log(this.help());
         return;
       }
-      if (this.config?.version && rawArgs[0] === "--version") {
-        log(this.config.version);
+      if (this.config.version && rawArgs[0] === "--version") {
+        this.config.log(this.config.version);
         return;
       }
     }
@@ -67,8 +83,8 @@ export class TinyCli {
     this.lastMatchedCommand = command;
 
     // intercept --help
-    if (!this.config?.noDefaultOptions && subRawArgs[0] === "--help") {
-      (this.config?.logOverride ?? console.log)(this.subHelp(command));
+    if (!this.config.noDefaultOptions && subRawArgs[0] === "--help") {
+      this.config.log(this.subHelp(command));
       return;
     }
 
@@ -78,10 +94,7 @@ export class TinyCli {
   }
 
   subHelp(command: Command) {
-    const program = [
-      this.config?.program ?? DEFAULT_PROGRAM,
-      command.config.name,
-    ].join(" ");
+    const program = [this.config.program, command.config.name].join(" ");
     return helpArgsSchema({
       program,
       description: command.config.description,
@@ -95,10 +108,7 @@ export class TinyCli {
       return this.subHelp(this.lastMatchedCommand);
     }
 
-    const title = [
-      this.config?.program ?? DEFAULT_PROGRAM,
-      this.config?.version,
-    ]
+    const title = [this.config.program, this.config.version]
       .filter(Boolean)
       .join("/");
 
@@ -111,10 +121,10 @@ export class TinyCli {
 ${title}
 
 Usage:
-  $ ${this.config?.program ?? DEFAULT_PROGRAM} <command>
+  $ ${this.config.program} <command>
 `;
 
-    if (this.config?.description) {
+    if (this.config.description) {
       result += `
 ${this.config.description}
 `;
@@ -129,12 +139,3 @@ ${formatTable(commandsHelp)}
     return result;
   }
 }
-
-type Command = {
-  config: {
-    name: string;
-    description?: string;
-    args: ArgSchemaRecordBase;
-  };
-  action: TypedArgsAction<any>;
-};
