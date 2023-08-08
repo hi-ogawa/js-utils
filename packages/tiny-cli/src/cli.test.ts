@@ -9,7 +9,7 @@ describe(TinyCli, () => {
     const cli = new TinyCli({
       program: "example.js",
       version: "1.2.3-pre.4",
-      description: "Example CLI",
+      description: "Some description for CLI",
       logOverride,
     });
 
@@ -41,6 +41,21 @@ describe(TinyCli, () => {
         }
     );
 
+    // invalid usage
+    expect(() =>
+      cli.defineCommand(
+        {
+          name: "bad",
+          args: {
+            a: { parse: () => "", positional: true, flag: true },
+          },
+        },
+        () => {}
+      )
+    ).toThrowErrorMatchingInlineSnapshot(
+      "\"argument must be either one of 'positional', 'flag', or 'key-value'\""
+    );
+
     // version
     expect(cli.parse(["--version"])).toMatchInlineSnapshot("undefined");
     expect(logOverride.mock.lastCall).toMatchInlineSnapshot(`
@@ -53,7 +68,15 @@ describe(TinyCli, () => {
     expect(cli.parse(["--help"])).toMatchInlineSnapshot("undefined");
     expect(logOverride.mock.lastCall).toMatchInlineSnapshot(`
       [
-        "todo",
+        "Usage:
+        $ example.js <command>
+
+      Some description for CLI
+
+      Available commands:
+        dev
+        build
+      ",
       ]
     `);
 

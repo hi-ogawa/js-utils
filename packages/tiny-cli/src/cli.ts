@@ -5,7 +5,7 @@ import {
   parseTypedArgs,
   validateArgsSchema,
 } from "./typed";
-import { ParseError } from "./utils";
+import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
 
 export class TinyCli {
   private commandMap = new Map<string, Command>();
@@ -64,7 +64,7 @@ export class TinyCli {
     }
     this.matchedCommandName = commandName;
 
-    // intercept --help for command
+    // intercept --help
     if (!this.config?.noDefaultOptions && subRawArgs[0] === "--help") {
       const log = this.config?.logOverride ?? console.log;
       log(helpArgsSchema(command.config.args));
@@ -77,9 +77,32 @@ export class TinyCli {
   }
 
   help() {
-    this.config;
+    // TODO: show sub command help for last `parse` call?
     this.matchedCommandName;
-    return "todo";
+
+    const commandsHelp = Array.from(this.commandMap.entries(), ([k, v]) => [
+      k,
+      v.config.description ?? "",
+    ]);
+
+    let result = `\
+Usage:
+  $ ${this.config?.program ?? DEFAULT_PROGRAM} <command>
+`;
+
+    if (this.config?.description) {
+      result += `
+${this.config.description}
+`;
+    }
+
+    if (commandsHelp.length > 0) {
+      result += `
+Available commands:
+${formatTable(commandsHelp)}
+`;
+    }
+    return result;
   }
 }
 
