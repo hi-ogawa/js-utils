@@ -2,6 +2,7 @@ import { range } from "@hiogawa/utils";
 
 export const DEFAULT_PROGRAM = "(cli)";
 
+// TODO: rename to TinyCliParseError
 export class ParseError extends Error {
   static wrapFn<T>(message: string, f: () => T): T {
     try {
