@@ -50,10 +50,10 @@ describe("presets", () => {
         positionalNumberOptional
 
       options:
+        --testBoolean                 hello boolean
         --testString=...              hello string
         --testStringOpt=...           hello optional string
         --testStringOptDefault=...    hello default string
-        --testBoolean                 hello boolean
       "
     `);
 

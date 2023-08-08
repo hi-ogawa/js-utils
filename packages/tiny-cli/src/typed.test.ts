@@ -276,8 +276,8 @@ describe(zArg, () => {
         files    input files
 
       options:
-        --mode=...    some setting
         --fix         fix files in-place
+        --mode=...    some setting
       "
     `);
     expect(example.parse(["hey"])).toMatchInlineSnapshot(`
