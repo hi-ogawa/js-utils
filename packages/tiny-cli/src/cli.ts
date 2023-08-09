@@ -6,7 +6,12 @@ import {
   parseTypedArgs,
   validateArgsSchema,
 } from "./typed";
-import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
+import {
+  DEFAULT_PROGRAM,
+  DEFAULT_VERSION,
+  ParseError,
+  formatTable,
+} from "./utils";
 
 function initConfig(config?: {
   program?: string;
@@ -18,6 +23,7 @@ function initConfig(config?: {
   return {
     ...config,
     program: config?.program ?? DEFAULT_PROGRAM,
+    version: config?.version ?? DEFAULT_VERSION,
     log: config?.log ?? console.log,
   };
 }
@@ -32,9 +38,9 @@ type Command = {
 };
 
 export class TinyCli {
-  private config: ReturnType<typeof initConfig>;
-  private commandMap = new Map<string, Command>();
-  private lastMatchedCommand?: Command; // track last sub command for the use of help after parse error
+  config: ReturnType<typeof initConfig>;
+  commandMap = new Map<string, Command>();
+  lastMatchedCommand?: Command; // track last sub command for the use of help after parse error
 
   constructor(_config?: Parameters<typeof initConfig>[0]) {
     this.config = initConfig(_config);
@@ -134,6 +140,62 @@ ${formatTable(commandsHelp)}
 `;
     }
     return result;
+  }
+}
+
+export class TinyCliCommand<R extends ArgSchemaRecordBase> {
+  constructor(
+    private config: {
+      program: string;
+      parentProgram?: string; // for sub command help
+      version?: string;
+      description?: string;
+      noDefaultOptions?: boolean;
+      log?: (v: string) => void;
+      args: R;
+    },
+    private action: TypedArgsAction<R>
+  ) {
+    validateArgsSchema(config.args);
+  }
+
+  parse(rawArgs: string[]) {
+    // intercept --help and --version
+    if (!this.config.noDefaultOptions) {
+      const log = this.config.log ?? console.log;
+      if (rawArgs[0] === "--help") {
+        log(this.help());
+        return;
+      }
+      if (this.config.version && rawArgs[0] === "--version") {
+        log(this.config.version);
+        return;
+      }
+    }
+
+    // execute command
+    const typedArgs = parseTypedArgs(this.config.args, rawArgs);
+    return this.action({ args: typedArgs });
+  }
+
+  help(): string {
+    const program =
+      this.config.parentProgram ?? this.config.program ?? DEFAULT_PROGRAM;
+
+    const programUsage = [
+      this.config.parentProgram,
+      this.config.program ?? DEFAULT_PROGRAM,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    const title = [program, this.config.version].filter(Boolean).join("/");
+    const help = helpArgsSchema({
+      program: programUsage,
+      description: this.config.description,
+      args: this.config.args,
+    });
+    return [title, help].join("\n\n");
   }
 }
 

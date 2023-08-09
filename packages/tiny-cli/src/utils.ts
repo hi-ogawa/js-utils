@@ -1,6 +1,7 @@
 import { range } from "@hiogawa/utils";
 
-export const DEFAULT_PROGRAM = "(cli)";
+export const DEFAULT_PROGRAM = "example-cli";
+export const DEFAULT_VERSION = "0.0.0";
 
 // TODO: rename to TinyCliParseError
 export class ParseError extends Error {

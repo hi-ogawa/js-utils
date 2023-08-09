@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { TinyCli, TinyCliSingle } from "./cli";
+import { TinyCli, TinyCliCommand, TinyCliSingle } from "./cli";
 import { arg } from "./presets";
 
 describe(TinyCli, () => {
@@ -256,6 +256,67 @@ describe(TinyCliSingle, () => {
       Options:
         --host=...    dev server host
         --port=...    dev server port
+      ",
+      ]
+    `);
+
+    // command
+    expect(cli.parse(["--port", "3000"])).toMatchInlineSnapshot(`
+      {
+        "host": "localhost",
+        "port": 3000,
+      }
+    `);
+    expect(() =>
+      cli.parse(["--port", "one-two-three"])
+    ).toThrowErrorMatchingInlineSnapshot('"failed to parse --port"');
+  });
+});
+
+describe(TinyCliCommand, () => {
+  it("basic", () => {
+    const mockLog = vi.fn();
+
+    const cli = new TinyCliCommand(
+      {
+        program: "example.js",
+        version: "1.2.3-pre.4",
+        description: "Some description for CLI",
+        log: mockLog,
+        args: {
+          host: arg.string("http server host", { default: "localhost" }),
+          port: arg.number("http server port", { default: 5172 }),
+        },
+      },
+      ({ args }) =>
+        args satisfies {
+          host: string;
+          port: number;
+        }
+    );
+
+    // version
+    expect(cli.parse(["--version"])).toMatchInlineSnapshot("undefined");
+    expect(mockLog.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "1.2.3-pre.4",
+      ]
+    `);
+
+    // help
+    expect(cli.parse(["--help"])).toMatchInlineSnapshot("undefined");
+    expect(mockLog.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "example.js/1.2.3-pre.4
+
+      Usage:
+        $ example.js [options]
+
+      Some description for CLI
+
+      Options:
+        --host=...    http server host
+        --port=...    http server port
       ",
       ]
     `);
