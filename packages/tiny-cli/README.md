@@ -16,3 +16,7 @@ simple type-safe command line parsing library
 - command option alias
 - automatic program version flag
 - special arguments e.g. `--`
+
+## examples
+
+- https://github.com/hi-ogawa/isort-ts/blob/dc95b781cde4b5c7998fc69219fb11eaf055a339/src/cli.ts
