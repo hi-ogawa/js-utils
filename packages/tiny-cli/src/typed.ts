@@ -22,18 +22,18 @@ export type ArgSchema<T> = {
   description?: string | undefined;
 };
 
-export type ArgSchemaRecordBase = Record<string, ArgSchema<unknown>>;
+export type ArgSchemaRecord = Record<string, ArgSchema<unknown>>;
 
-export type TypedArgs<R extends ArgSchemaRecordBase> = {
+export type TypedArgs<R extends ArgSchemaRecord> = {
   [K in keyof R]: R[K] extends ArgSchema<infer T> ? T : never;
 };
 
-export type TypedArgsAction<R extends ArgSchemaRecordBase> = (v: {
+export type TypedArgsAction<R extends ArgSchemaRecord> = (v: {
   args: TypedArgs<R>;
 }) => unknown;
 
 // check unsupported usage (which is not caught by typing)
-export function validateArgsSchema(argsSchema: ArgSchemaRecordBase) {
+export function validateArgsSchema(argsSchema: ArgSchemaRecord) {
   const { entries, variadics, positionals } = normalizeArgsSchema(argsSchema);
 
   // either positional, flag, or key-value
@@ -54,7 +54,7 @@ export function validateArgsSchema(argsSchema: ArgSchemaRecordBase) {
   }
 }
 
-export function normalizeArgsSchema(argsSchema: ArgSchemaRecordBase) {
+export function normalizeArgsSchema(argsSchema: ArgSchemaRecord) {
   const entries = Object.entries(argsSchema);
   return {
     entries,
@@ -66,7 +66,7 @@ export function normalizeArgsSchema(argsSchema: ArgSchemaRecordBase) {
   };
 }
 
-export function parseTypedArgs<R extends ArgSchemaRecordBase>(
+export function parseTypedArgs<R extends ArgSchemaRecord>(
   argsSchema: R,
   rawArgs: string[]
 ): TypedArgs<R> {
@@ -162,7 +162,7 @@ export function parseTypedArgs<R extends ArgSchemaRecordBase>(
 export function helpArgsSchema(config: {
   program?: string;
   description?: string;
-  args: ArgSchemaRecordBase;
+  args: ArgSchemaRecord;
 }): string {
   const normalized = normalizeArgsSchema(config.args);
 

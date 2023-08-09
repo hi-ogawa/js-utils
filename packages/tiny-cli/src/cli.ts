@@ -1,5 +1,5 @@
 import {
-  type ArgSchemaRecordBase,
+  type ArgSchemaRecord,
   type TypedArgsAction,
   helpArgsSchema,
   parseTypedArgs,
@@ -33,7 +33,7 @@ export class TinyCli {
     return this.config?.log ?? console.log;
   }
 
-  defineCommand<R extends ArgSchemaRecordBase>(
+  defineCommand<R extends ArgSchemaRecord>(
     config: {
       name: string;
       description?: string;
@@ -122,7 +122,7 @@ ${formatTable(commandsHelp)}
   }
 }
 
-export class TinyCliCommand<R extends ArgSchemaRecordBase> {
+export class TinyCliCommand<R extends ArgSchemaRecord> {
   constructor(
     public config: {
       program?: string;
