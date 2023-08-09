@@ -14,7 +14,7 @@ simple type-safe command line parsing library
 ## not supported
 
 - command option alias
-- automatic program version flag
+- transform option key from kebab-case to camelCase
 - special arguments e.g. `--`
 
 ## examples
