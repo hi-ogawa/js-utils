@@ -75,7 +75,7 @@ async function main() {
   } catch (e) {
     console.log(formatError(e, { noColor: !process.stdout.isTTY }));
     if (e instanceof TinyCliParseError) {
-      console.log("See '--help' for more information.\n\n" + cli.help());
+      console.log("See '--help' for more info.\n\n" + cli.help());
     }
     process.exit(1);
   }
