@@ -5,35 +5,28 @@ import {
   parseTypedArgs,
   validateArgsSchema,
 } from "./typed";
-import {
-  DEFAULT_PROGRAM,
-  DEFAULT_VERSION,
-  ParseError,
-  formatTable,
-} from "./utils";
-
-function initConfig(config?: {
-  program?: string;
-  version?: string;
-  description?: string;
-  noDefaultOptions?: boolean;
-  log?: (v: string) => void;
-}) {
-  return {
-    ...config,
-    program: config?.program ?? DEFAULT_PROGRAM,
-    version: config?.version ?? DEFAULT_VERSION,
-    log: config?.log ?? console.log,
-  };
-}
+import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
 
 export class TinyCli {
-  config: ReturnType<typeof initConfig>;
   commandMap = new Map<string, TinyCliCommand<any>>();
   lastMatchedCommand?: TinyCliCommand<any>; // track last sub command for easier help after parse error
 
-  constructor(_config?: Parameters<typeof initConfig>[0]) {
-    this.config = initConfig(_config);
+  constructor(
+    private config: {
+      program?: string;
+      version?: string;
+      description?: string;
+      noDefaultOptions?: boolean;
+      log?: (v: string) => void;
+    } = {}
+  ) {}
+
+  get program() {
+    return this.config?.program ?? DEFAULT_PROGRAM;
+  }
+
+  get log() {
+    return this.config?.log ?? console.log;
   }
 
   defineCommand<R extends ArgSchemaRecordBase>(
@@ -47,7 +40,7 @@ export class TinyCli {
     const command = new TinyCliCommand(
       {
         // copy parent config
-        parentProgram: this.config.program,
+        parentProgram: this.program,
         version: this.config.version,
         noDefaultOptions: this.config.noDefaultOptions,
         log: this.config.log,
@@ -65,11 +58,11 @@ export class TinyCli {
     // intercept --help and --version
     if (!this.config.noDefaultOptions) {
       if (rawArgs[0] === "--help") {
-        this.config.log(this.help());
+        this.log(this.help());
         return;
       }
       if (this.config.version && rawArgs[0] === "--version") {
-        this.config.log(this.config.version);
+        this.log(this.config.version);
         return;
       }
     }
@@ -95,9 +88,7 @@ export class TinyCli {
       return this.lastMatchedCommand.help();
     }
 
-    const title = [this.config.program, this.config.version]
-      .filter(Boolean)
-      .join("/");
+    const title = [this.program, this.config.version].filter(Boolean).join("/");
 
     const commandsHelp = Array.from(this.commandMap.entries(), ([k, v]) => [
       k,
@@ -108,7 +99,7 @@ export class TinyCli {
 ${title}
 
 Usage:
-  $ ${this.config.program} <command>
+  $ ${this.program} <command>
 `;
 
     if (this.config.description) {
