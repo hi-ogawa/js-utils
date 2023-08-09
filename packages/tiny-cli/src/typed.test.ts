@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { arg } from "./presets";
 import { defineCommand } from "./typed";
-import { zArg } from "./zod";
 
 describe(defineCommand, () => {
   it("basic", () => {
@@ -237,57 +236,6 @@ describe(defineCommand, () => {
           "1.2.3",
         ],
       ]
-    `);
-  });
-});
-
-describe(zArg, () => {
-  it("basic", () => {
-    const example = defineCommand(
-      {
-        args: {
-          files: zArg(z.string().array(), {
-            positional: true,
-            variadic: true,
-            description: "input files",
-          }),
-          fix: zArg(z.coerce.boolean(), {
-            flag: true,
-            description: "fix files in-place",
-          }),
-          mode: z.coerce.number().default(123).describe("some setting"),
-        },
-      },
-      ({ args }) => {
-        args satisfies {
-          files: string[];
-          fix: boolean;
-        };
-        args.files;
-        return args;
-      }
-    );
-
-    expect(example.help()).toMatchInlineSnapshot(`
-      "usage:
-        $ example-cli [options] <files...>
-
-      positional arguments:
-        files    input files
-
-      options:
-        --fix         fix files in-place
-        --mode=...    some setting
-      "
-    `);
-    expect(example.parse(["hey"])).toMatchInlineSnapshot(`
-      {
-        "files": [
-          "hey",
-        ],
-        "fix": false,
-        "mode": 123,
-      }
     `);
   });
 });

@@ -121,7 +121,7 @@ ${formatTable(commandsHelp)}
 export class TinyCliCommand<R extends ArgSchemaRecordBase> {
   constructor(
     public config: {
-      program: string;
+      program?: string;
       parentProgram?: string; // for sub command help
       version?: string;
       description?: string;
