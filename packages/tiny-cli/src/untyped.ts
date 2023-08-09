@@ -10,7 +10,7 @@ export interface UntypedArgs {
   flags: string[];
 }
 
-export function parseRawArgsToUntyped(
+export function parseToUntypedArgs(
   rawArgs: string[],
   config?: { flags: string[] }
 ): UntypedArgs {
@@ -64,7 +64,7 @@ export function parseRawArgsToUntyped(
 // it supports key/value option only by "--key=value" form
 // which is somewhat similar to esbuild's cli
 // https://github.com/evanw/esbuild/blob/0b48edaac1b92da4d14d300252304c44821dd2f2/pkg/cli/cli_impl.go
-export function parseRawArgsToUntypedSimple(args: string[]): UntypedArgs {
+export function parseToUntypedArgsSimple(args: string[]): UntypedArgs {
   const result: UntypedArgs = {
     positionals: [],
     keyValues: [],

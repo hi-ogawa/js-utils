@@ -1,10 +1,13 @@
 import { tinyassert } from "@hiogawa/utils";
 import type { ArgSchema } from "./typed";
-import { ParseError } from "./utils";
+import { TinyCliParseError } from "./utils";
 
 //
 // define basic presets so that zod is not required for common cases
 //
+
+// TODO: let users import by star to help tree shake? e.g.
+// import * as arg from "tiny-cli/presets"
 
 export const arg = {
   boolean: (description?: string): ArgSchema<boolean> => ({
@@ -30,7 +33,7 @@ export const arg = {
         if (config?.optional) {
           return undefined as any; // why any?
         }
-        throw new ParseError("required 'string'");
+        throw new TinyCliParseError("required 'string'");
       }
       return parser.string(v);
     },
@@ -53,7 +56,7 @@ export const arg = {
         if (config?.optional) {
           return undefined as any;
         }
-        throw new ParseError("required 'number'");
+        throw new TinyCliParseError("required 'number'");
       }
       return parser.coerceNumber(v);
     },
