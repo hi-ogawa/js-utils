@@ -1,4 +1,3 @@
-import { tinyassert } from "@hiogawa/utils";
 import {
   type ArgSchemaRecordBase,
   type TypedArgsAction,
@@ -174,71 +173,6 @@ export class TinyCliCommand<R extends ArgSchemaRecordBase> {
       program: programs.join(" "),
       description: this.config.description,
       args: this.config.args,
-    });
-    return [title, help].join("\n\n");
-  }
-}
-
-//
-// single command version
-//
-
-type CommandSingle = {
-  config: {
-    args: ArgSchemaRecordBase;
-  };
-  action: TypedArgsAction<any>;
-};
-
-export class TinyCliSingle {
-  private config: ReturnType<typeof initConfig>;
-  private _command?: CommandSingle;
-
-  constructor(_config?: Parameters<typeof initConfig>[0]) {
-    this.config = initConfig(_config);
-  }
-
-  private get command() {
-    tinyassert(this._command, "forgot to define command?");
-    return this._command;
-  }
-
-  defineCommand<R extends ArgSchemaRecordBase>(
-    config: {
-      args: R;
-    },
-    action: TypedArgsAction<R>
-  ) {
-    validateArgsSchema(config.args);
-    this._command = { config: { ...config }, action };
-  }
-
-  parse(rawArgs: string[]) {
-    // intercept --help and --version
-    if (!this.config.noDefaultOptions) {
-      if (rawArgs[0] === "--help") {
-        this.config.log(this.help());
-        return;
-      }
-      if (this.config.version && rawArgs[0] === "--version") {
-        this.config.log(this.config.version);
-        return;
-      }
-    }
-
-    // execute command
-    const typedArgs = parseTypedArgs(this.command.config.args, rawArgs);
-    return this.command.action({ args: typedArgs });
-  }
-
-  help(): string {
-    const title = [this.config.program, this.config.version]
-      .filter(Boolean)
-      .join("/");
-    const help = helpArgsSchema({
-      program: this.config.program,
-      description: this.config.description,
-      args: this.command.config.args,
     });
     return [title, help].join("\n\n");
   }

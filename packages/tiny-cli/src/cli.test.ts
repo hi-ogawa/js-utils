@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { TinyCli, TinyCliCommand, TinyCliSingle } from "./cli";
+import { TinyCli, TinyCliCommand } from "./cli";
 import { arg } from "./presets";
 
 describe(TinyCli, () => {
@@ -194,88 +194,6 @@ describe(TinyCli, () => {
         "outDir": "./dist",
       }
     `);
-  });
-});
-
-describe(TinyCliSingle, () => {
-  it("basic", () => {
-    const mockLog = vi.fn();
-
-    const cli = new TinyCliSingle({
-      program: "example.js",
-      version: "1.2.3-pre.4",
-      description: "Some description for CLI",
-      log: mockLog,
-    });
-
-    expect(() => cli.parse([])).toThrowErrorMatchingInlineSnapshot(
-      '"forgot to define command?"'
-    );
-
-    cli.defineCommand(
-      {
-        args: {
-          host: arg.string("dev server host", { default: "localhost" }),
-          port: arg.number("dev server port", { default: 5172 }),
-        },
-      },
-      ({ args }) =>
-        args satisfies {
-          host: string;
-          port: number;
-        }
-    );
-
-    // invalid usage
-    expect(() =>
-      cli.defineCommand(
-        {
-          args: {
-            a: { parse: () => "", positional: true, flag: true },
-          },
-        },
-        () => {}
-      )
-    ).toThrowErrorMatchingInlineSnapshot(
-      "\"argument must be either one of 'positional', 'flag', or 'key-value'\""
-    );
-
-    // version
-    expect(cli.parse(["--version"])).toMatchInlineSnapshot("undefined");
-    expect(mockLog.mock.lastCall).toMatchInlineSnapshot(`
-      [
-        "1.2.3-pre.4",
-      ]
-    `);
-
-    // help
-    expect(cli.parse(["--help"])).toMatchInlineSnapshot("undefined");
-    expect(mockLog.mock.lastCall).toMatchInlineSnapshot(`
-      [
-        "example.js/1.2.3-pre.4
-
-      Usage:
-        $ example.js [options]
-
-      Some description for CLI
-
-      Options:
-        --host=...    dev server host
-        --port=...    dev server port
-      ",
-      ]
-    `);
-
-    // command
-    expect(cli.parse(["--port", "3000"])).toMatchInlineSnapshot(`
-      {
-        "host": "localhost",
-        "port": 3000,
-      }
-    `);
-    expect(() =>
-      cli.parse(["--port", "one-two-three"])
-    ).toThrowErrorMatchingInlineSnapshot('"failed to parse --port"');
   });
 });
 
