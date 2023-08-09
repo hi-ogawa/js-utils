@@ -2,7 +2,7 @@ import {
   type ArgSchemaRecord,
   type TypedArgsAction,
   helpArgsSchema,
-  parseTypedArgs,
+  parseToTypedArgs,
   validateArgsSchema,
 } from "./typed";
 import { DEFAULT_PROGRAM, TinyCliParseError, formatTable } from "./utils";
@@ -153,7 +153,7 @@ export class TinyCliCommand<R extends ArgSchemaRecord> {
     }
 
     // execute command
-    const typedArgs = parseTypedArgs(this.config.args, rawArgs);
+    const typedArgs = parseToTypedArgs(this.config.args, rawArgs);
     return this.action({ args: typedArgs });
   }
 

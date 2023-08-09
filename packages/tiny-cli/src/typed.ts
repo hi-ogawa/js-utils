@@ -5,7 +5,7 @@ import {
   tinyassert,
   zipMax,
 } from "@hiogawa/utils";
-import { parseUntyped } from "./untyped";
+import { parseToUntypedArgs } from "./untyped";
 import { DEFAULT_PROGRAM, TinyCliParseError, formatTable } from "./utils";
 
 //
@@ -66,7 +66,7 @@ export function normalizeArgsSchema(argsSchema: ArgSchemaRecord) {
   };
 }
 
-export function parseTypedArgs<R extends ArgSchemaRecord>(
+export function parseToTypedArgs<R extends ArgSchemaRecord>(
   argsSchema: R,
   rawArgs: string[]
 ): TypedArgs<R> {
@@ -74,7 +74,7 @@ export function parseTypedArgs<R extends ArgSchemaRecord>(
   const normalized = normalizeArgsSchema(argsSchema);
 
   // parse untyped
-  const untypedArgs = parseUntyped(rawArgs, {
+  const untypedArgs = parseToUntypedArgs(rawArgs, {
     flags: normalized.flags.map((e) => e[0]),
   });
 
