@@ -4,6 +4,7 @@ import { DEFAULT_PROGRAM, TinyCliParseError, formatTable } from "./utils";
 // TODO: refactor similar logic from `definedCommand`
 // TODO: class based api?
 
+/** @deprecated use TinyCli */
 export function defineSubCommands(
   config: {
     commands: Record<string, Command>;

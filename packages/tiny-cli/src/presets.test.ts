@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { TinyCliCommand } from "./cli";
 import { arg } from "./presets";
-import { defineCommand } from "./typed";
 
 describe("presets", () => {
   it("basic", () => {
-    const example = defineCommand(
+    const cli = new TinyCliCommand(
       {
         args: {
           positionalString: arg.string("", { positional: true }),
@@ -40,16 +40,18 @@ describe("presets", () => {
       }
     );
 
-    expect(example.help()).toMatchInlineSnapshot(`
-      "usage:
+    expect(cli.help()).toMatchInlineSnapshot(`
+      "example-cli
+
+      Usage:
         $ example-cli [options] <positionalString> <positionalNumberDefault> <positionalNumberOptional>
 
-      positional arguments:
+      Positional arguments:
         positionalString
         positionalNumberDefault
         positionalNumberOptional
 
-      options:
+      Options:
         --testBoolean                 hello boolean
         --testString=...              hello string
         --testStringOpt=...           hello optional string
@@ -57,23 +59,23 @@ describe("presets", () => {
       "
     `);
 
-    expect(() => example.parse([])).toThrowErrorMatchingInlineSnapshot(
+    expect(() => cli.parse([])).toThrowErrorMatchingInlineSnapshot(
       '"failed to parse <positionalString>"'
     );
 
     expect(() =>
-      example.parse(["hello", "not-a-number"])
+      cli.parse(["hello", "not-a-number"])
     ).toThrowErrorMatchingInlineSnapshot(
       '"failed to parse <positionalNumberDefault>"'
     );
 
     expect(() =>
-      example.parse(["hello", "123", "not-a-number"])
+      cli.parse(["hello", "123", "not-a-number"])
     ).toThrowErrorMatchingInlineSnapshot(
       '"failed to parse <positionalNumberOptional>"'
     );
 
-    expect(example.parse(["hello", "123", "456", "--testString", "hey"]))
+    expect(cli.parse(["hello", "123", "456", "--testString", "hey"]))
       .toMatchInlineSnapshot(`
       {
         "positionalNumberDefault": 123,
@@ -86,7 +88,7 @@ describe("presets", () => {
       }
     `);
 
-    expect(example.parse(["--testString", "hey", "--testBoolean", "hello"]))
+    expect(cli.parse(["--testString", "hey", "--testBoolean", "hello"]))
       .toMatchInlineSnapshot(`
         {
           "positionalNumberDefault": 123,
@@ -101,7 +103,7 @@ describe("presets", () => {
   });
 
   it("stringArray", () => {
-    const example = defineCommand(
+    const cli = new TinyCliCommand(
       {
         args: {
           testArray: arg.stringArray("hello array"),
@@ -115,22 +117,24 @@ describe("presets", () => {
       }
     );
 
-    expect(example.help()).toMatchInlineSnapshot(`
-      "usage:
+    expect(cli.help()).toMatchInlineSnapshot(`
+      "example-cli
+
+      Usage:
         $ example-cli <testArray...>
 
-      positional arguments:
+      Positional arguments:
         testArray    hello array
       "
     `);
 
-    expect(example.parse([])).toMatchInlineSnapshot(`
+    expect(cli.parse([])).toMatchInlineSnapshot(`
         {
           "testArray": [],
         }
       `);
 
-    expect(example.parse(["a", "b", "1", "2"])).toMatchInlineSnapshot(`
+    expect(cli.parse(["a", "b", "1", "2"])).toMatchInlineSnapshot(`
       {
         "testArray": [
           "a",
@@ -143,7 +147,7 @@ describe("presets", () => {
   });
 
   it("numberArray", () => {
-    const example = defineCommand(
+    const cli = new TinyCliCommand(
       {
         args: {
           testArray: arg.numberArray("hello array"),
@@ -157,26 +161,28 @@ describe("presets", () => {
       }
     );
 
-    expect(example.help()).toMatchInlineSnapshot(`
-      "usage:
+    expect(cli.help()).toMatchInlineSnapshot(`
+      "example-cli
+
+      Usage:
         $ example-cli <testArray...>
 
-      positional arguments:
+      Positional arguments:
         testArray    hello array
       "
     `);
 
-    expect(example.parse([])).toMatchInlineSnapshot(`
+    expect(cli.parse([])).toMatchInlineSnapshot(`
       {
         "testArray": [],
       }
     `);
 
     expect(() =>
-      example.parse(["a", "b", "1", "2"])
+      cli.parse(["a", "b", "1", "2"])
     ).toThrowErrorMatchingInlineSnapshot('"failed to parse <testArray...>"');
 
-    expect(example.parse(["1", "2"])).toMatchInlineSnapshot(`
+    expect(cli.parse(["1", "2"])).toMatchInlineSnapshot(`
       {
         "testArray": [
           1,

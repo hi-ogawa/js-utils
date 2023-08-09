@@ -225,6 +225,7 @@ export type HelpConfig = {
   autoHelpLog?: (v: string) => void; // for testing
 };
 
+/** @deprecated use TinyCliCommand */
 export function defineCommand<R extends ArgSchemaRecordBase>(
   config: {
     args: R;
