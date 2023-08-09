@@ -76,7 +76,7 @@ async function main() {
     console.log(formatError(e, { noColor: !process.stdout.isTTY }));
     if (e instanceof ParseError) {
       console.log(
-        "Please check '--help' for more information.\n\n" + cli.help()
+        "See '--help' for more information.\n\n" + cli.help()
       );
     }
     process.exit(1);
