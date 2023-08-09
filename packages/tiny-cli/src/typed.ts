@@ -9,7 +9,7 @@ import { parseUntyped } from "./untyped";
 import { DEFAULT_PROGRAM, TinyCliParseError, formatTable } from "./utils";
 
 //
-// parse UntypedArgs to TypedArgs based on ArgSchema
+// parse UntypedArgs to TypedArgs based on Record<string, ArgSchema>
 //
 
 // `parse` and `description` is same as ZodType<T> so zod schema can be reused directly
@@ -27,6 +27,10 @@ export type ArgSchemaRecordBase = Record<string, ArgSchema<unknown>>;
 export type TypedArgs<R extends ArgSchemaRecordBase> = {
   [K in keyof R]: R[K] extends ArgSchema<infer T> ? T : never;
 };
+
+export type TypedArgsAction<R extends ArgSchemaRecordBase> = (v: {
+  args: TypedArgs<R>;
+}) => unknown;
 
 // check unsupported usage (which is not caught by typing)
 export function validateArgsSchema(argsSchema: ArgSchemaRecordBase) {
@@ -205,111 +209,4 @@ ${formatTable(optionsHelp)}
 `;
   }
   return result;
-}
-
-//
-// defineCommand
-//
-
-export type TypedArgsAction<R extends ArgSchemaRecordBase> = (v: {
-  args: TypedArgs<R>;
-}) => unknown;
-
-export type Command = ReturnType<typeof defineCommand>;
-
-export type HelpConfig = {
-  program?: string;
-  version?: string;
-  description?: string;
-  autoHelp?: boolean;
-  autoHelpLog?: (v: string) => void; // for testing
-};
-
-/** @deprecated use TinyCliCommand */
-export function defineCommand<R extends ArgSchemaRecordBase>(
-  config: {
-    args: R;
-  } & HelpConfig,
-  action: TypedArgsAction<R>
-) {
-  validateArgsSchema(config.args);
-
-  //
-  // parse and run action
-  //
-
-  function parse(rawArgs: string[]): unknown {
-    // TODO: refactor this "interception" system? (e.g. throw it and handle in try/catch of user code?)
-    // TODO: how to add these flags in help itself?
-    // intercept --help and --version
-    if (config.autoHelp && rawArgs[0] === "--help") {
-      (config.autoHelpLog ?? console.log)(help());
-      return;
-    }
-    if (config.version && rawArgs[0] === "--version") {
-      (config.autoHelpLog ?? console.log)(config.version);
-      return;
-    }
-    const typedArgs = parseTypedArgs(config.args, rawArgs);
-    return action({ args: typedArgs });
-  }
-
-  //
-  // help
-  //
-
-  // program/version overriden by `defineSubCommands`
-  function help(): string {
-    const normalized = normalizeArgsSchema(config.args);
-
-    const positionalsHelp = normalized.positionals.map((e) => [
-      e[0],
-      e[1].description ?? "",
-    ]);
-
-    const optionsHelp = normalized.keyValueFlags.map((e) => [
-      `--${e[0]}${e[1].flag ? "" : "=..."}`,
-      e[1].description ?? "",
-    ]);
-
-    const usage = [
-      config.program ?? DEFAULT_PROGRAM,
-      optionsHelp.length > 0 && "[options]",
-      ...normalized.positionals.map(
-        (e) => `<${e[0]}${e[1].variadic ? "..." : ""}>`
-      ),
-    ].filter(Boolean);
-
-    let result = `\
-usage:
-  $ ${usage.join(" ")}
-`;
-
-    if (config.description) {
-      result += `
-${config.description}
-`;
-    }
-
-    if (positionalsHelp.length > 0) {
-      result += `
-positional arguments:
-${formatTable(positionalsHelp)}
-`;
-    }
-
-    if (optionsHelp.length > 0) {
-      result += `
-options:
-${formatTable(optionsHelp)}
-`;
-    }
-    return result;
-  }
-
-  return {
-    config, // expose so that `defineSubCommands` can use `config.describe` etc...
-    help,
-    parse,
-  };
 }
