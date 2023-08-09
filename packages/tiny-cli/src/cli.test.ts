@@ -92,7 +92,9 @@ describe(TinyCli, () => {
     expect(cli.parse(["dev", "--help"])).toMatchInlineSnapshot("undefined");
     expect(mockLog.mock.lastCall).toMatchInlineSnapshot(`
       [
-        "Usage:
+        "example.js/1.2.3-pre.4
+
+      Usage:
         $ example.js dev [options]
 
       Start dev server
@@ -107,7 +109,9 @@ describe(TinyCli, () => {
     expect(cli.parse(["build", "--help"])).toMatchInlineSnapshot("undefined");
     expect(mockLog.mock.lastCall).toMatchInlineSnapshot(`
       [
-        "Usage:
+        "example.js/1.2.3-pre.4
+
+      Usage:
         $ example.js build [options] <file>
 
       Build for production
@@ -123,7 +127,9 @@ describe(TinyCli, () => {
 
     // help can show last matched sub command
     expect(cli.help()).toMatchInlineSnapshot(`
-      "Usage:
+      "example.js/1.2.3-pre.4
+
+      Usage:
         $ example.js build [options] <file>
 
       Build for production

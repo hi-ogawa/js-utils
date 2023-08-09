@@ -142,7 +142,7 @@ describe(defineCommand, () => {
 
       expect(example.help()).toMatchInlineSnapshot(`
         "usage:
-          $ (cli) [options] <files...>
+          $ example-cli [options] <files...>
 
         positional arguments:
           files    input files
@@ -270,7 +270,7 @@ describe(zArg, () => {
 
     expect(example.help()).toMatchInlineSnapshot(`
       "usage:
-        $ (cli) [options] <files...>
+        $ example-cli [options] <files...>
 
       positional arguments:
         files    input files

@@ -42,7 +42,7 @@ describe("presets", () => {
 
     expect(example.help()).toMatchInlineSnapshot(`
       "usage:
-        $ (cli) [options] <positionalString> <positionalNumberDefault> <positionalNumberOptional>
+        $ example-cli [options] <positionalString> <positionalNumberDefault> <positionalNumberOptional>
 
       positional arguments:
         positionalString
@@ -117,7 +117,7 @@ describe("presets", () => {
 
     expect(example.help()).toMatchInlineSnapshot(`
       "usage:
-        $ (cli) <testArray...>
+        $ example-cli <testArray...>
 
       positional arguments:
         testArray    hello array
@@ -159,7 +159,7 @@ describe("presets", () => {
 
     expect(example.help()).toMatchInlineSnapshot(`
       "usage:
-        $ (cli) <testArray...>
+        $ example-cli <testArray...>
 
       positional arguments:
         testArray    hello array
