@@ -1,6 +1,6 @@
 import "./polyfill-node";
 import process from "node:process";
-import { ParseError, TinyCli, arg } from "@hiogawa/tiny-cli";
+import { TinyCli, TinyCliParseError, arg } from "@hiogawa/tiny-cli";
 import { formatError } from "@hiogawa/utils";
 import { version } from "../package.json";
 
@@ -58,7 +58,7 @@ cli.defineCommand(
   async ({ args }) => {
     const keygenFn = keygenFns[args.algorithm];
     if (!keygenFn) {
-      throw new ParseError("unsupported algorithm: " + args.algorithm);
+      throw new TinyCliParseError("unsupported algorithm: " + args.algorithm);
     }
     const result = await keygenFn();
     console.log(JSON.stringify(result, null, 2));
@@ -74,10 +74,8 @@ async function main() {
     await cli.parse(process.argv.slice(2));
   } catch (e) {
     console.log(formatError(e, { noColor: !process.stdout.isTTY }));
-    if (e instanceof ParseError) {
-      console.log(
-        "See '--help' for more information.\n\n" + cli.help()
-      );
+    if (e instanceof TinyCliParseError) {
+      console.log("See '--help' for more information.\n\n" + cli.help());
     }
     process.exit(1);
   }

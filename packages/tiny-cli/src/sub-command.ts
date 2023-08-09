@@ -1,5 +1,5 @@
 import { type Command, type HelpConfig } from "./typed";
-import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
+import { DEFAULT_PROGRAM, TinyCliParseError, formatTable } from "./utils";
 
 // TODO: refactor similar logic from `definedCommand`
 // TODO: class based api?
@@ -26,11 +26,11 @@ export function defineSubCommands(
   function parseOnly(rawArgs: string[]) {
     const [name, ...args] = rawArgs;
     if (!name) {
-      throw new ParseError("missing command");
+      throw new TinyCliParseError("missing command");
     }
     const command = config.commands[name];
     if (!command) {
-      throw new ParseError(`invalid command: '${name}'`);
+      throw new TinyCliParseError(`invalid command: '${name}'`);
     }
     return { name, args, command };
   }

@@ -6,7 +6,7 @@ import {
   zipMax,
 } from "@hiogawa/utils";
 import { parseUntyped } from "./untyped";
-import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
+import { DEFAULT_PROGRAM, TinyCliParseError, formatTable } from "./utils";
 
 //
 // parse UntypedArgs to TypedArgs based on ArgSchema
@@ -92,7 +92,7 @@ export function parseTypedArgs<R extends ArgSchemaRecordBase>(
     ).keys(),
   ];
   if (dupKeys.length > 0) {
-    throw new ParseError(
+    throw new TinyCliParseError(
       "duplicate options: " + dupKeys.map((k) => "--" + k).join(", ")
     );
   }
@@ -103,7 +103,7 @@ export function parseTypedArgs<R extends ArgSchemaRecordBase>(
     normalized.keyValueFlags.map((e) => e[0])
   );
   if (unusedKeys.length > 0) {
-    throw new ParseError(
+    throw new TinyCliParseError(
       "unknown options: " + unusedKeys.map((k) => "--" + k).join(", ")
     );
   }
@@ -113,7 +113,7 @@ export function parseTypedArgs<R extends ArgSchemaRecordBase>(
     normalized.variadics.length === 0 &&
     untypedArgs.positionals.length > normalized.positionals.length
   ) {
-    throw new ParseError(
+    throw new TinyCliParseError(
       "too many arguments: " + untypedArgs.positionals.join(", ")
     );
   }
@@ -127,8 +127,9 @@ export function parseTypedArgs<R extends ArgSchemaRecordBase>(
   if (normalized.variadics.length > 0) {
     const [key, schema] = normalized.variadics[0];
     const value = untypedArgs.positionals;
-    typedArgs[key] = ParseError.wrapFn(`failed to parse <${key}...>`, () =>
-      schema.parse(value)
+    typedArgs[key] = TinyCliParseError.wrapFn(
+      `failed to parse <${key}...>`,
+      () => schema.parse(value)
     );
   } else {
     for (const [e, value] of zipMax(
@@ -137,15 +138,16 @@ export function parseTypedArgs<R extends ArgSchemaRecordBase>(
     )) {
       tinyassert(e, "unreachable");
       const [key, schema] = e;
-      typedArgs[key] = ParseError.wrapFn(`failed to parse <${key}>`, () =>
-        schema.parse(value)
+      typedArgs[key] = TinyCliParseError.wrapFn(
+        `failed to parse <${key}>`,
+        () => schema.parse(value)
       );
     }
   }
 
   const untypedKeyValuesMap = new Map(untypedKeyValueFlags);
   for (const [key, schema] of new Map(normalized.keyValueFlags)) {
-    typedArgs[key] = ParseError.wrapFn(`failed to parse --${key}`, () =>
+    typedArgs[key] = TinyCliParseError.wrapFn(`failed to parse --${key}`, () =>
       schema.parse(untypedKeyValuesMap.get(key))
     );
   }

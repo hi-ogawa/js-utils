@@ -2,13 +2,12 @@ import { range } from "@hiogawa/utils";
 
 export const DEFAULT_PROGRAM = "example-cli";
 
-// TODO: rename to TinyCliParseError
-export class ParseError extends Error {
+export class TinyCliParseError extends Error {
   static wrapFn<T>(message: string, f: () => T): T {
     try {
       return f();
     } catch (e) {
-      throw new ParseError(message, { cause: e });
+      throw new TinyCliParseError(message, { cause: e });
     }
   }
 }

@@ -5,7 +5,7 @@ import {
   parseTypedArgs,
   validateArgsSchema,
 } from "./typed";
-import { DEFAULT_PROGRAM, ParseError, formatTable } from "./utils";
+import { DEFAULT_PROGRAM, TinyCliParseError, formatTable } from "./utils";
 
 export class TinyCli {
   commandMap = new Map<string, TinyCliCommand<any>>();
@@ -70,11 +70,11 @@ export class TinyCli {
     // match command
     const [commandName, ...subRawArgs] = rawArgs;
     if (!commandName) {
-      throw new ParseError("missing command");
+      throw new TinyCliParseError("missing command");
     }
     const command = this.commandMap.get(commandName);
     if (!command) {
-      throw new ParseError(`invalid command: '${commandName}'`);
+      throw new TinyCliParseError(`invalid command: '${commandName}'`);
     }
 
     // execute command
