@@ -7,6 +7,10 @@ import {
 } from "./typed";
 import { DEFAULT_PROGRAM, TinyCliParseError, formatTable } from "./utils";
 
+//
+// implement user facing api on top of utilities from "typed.ts"
+//
+
 export class TinyCli {
   commandMap = new Map<string, TinyCliCommand<any>>();
   lastMatchedCommand?: TinyCliCommand<any>; // track last sub command for easier help after parse error
