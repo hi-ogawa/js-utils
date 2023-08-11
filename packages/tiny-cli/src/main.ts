@@ -15,7 +15,7 @@ export async function tinyCliMain(
 ): Promise<Result<unknown, unknown>> {
   // @ts-ignore silence type error on tsup
   const process = opts?.process ?? globalThis.process;
-  const log = opts?.log ?? globalThis.console.log;
+  const log = opts?.log ?? globalThis.console.error;
   try {
     const v = await cli.parse(process.argv.slice(2));
     return Ok(v);
