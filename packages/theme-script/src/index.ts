@@ -5,19 +5,22 @@
 // compile time DEFINE (see tsup.config.ts)
 declare let __DEFINE_MAIN_CODE: string;
 
-export type ThemeScriptOption = {
+export type ThemeScriptOptions = {
   storageKey?: string;
   defaultTheme?: string;
+  noScriptTag?: boolean;
 };
 
 // wrapper to set storage key and default
-export function generateThemeScript(options?: ThemeScriptOption): string {
+export function generateThemeScript(opts?: ThemeScriptOptions): string {
   return [
-    options?.storageKey &&
-      `window.THEME_SCRIPT_STORAGE_KEY = "${options.storageKey}"`,
-    options?.defaultTheme &&
-      `window.THEME_SCRIPT_DEFAULT = "${options.defaultTheme}"`,
+    !opts?.noScriptTag && "<script>",
+    opts?.storageKey &&
+      `window.THEME_SCRIPT_STORAGE_KEY = "${opts.storageKey}";`,
+    opts?.defaultTheme &&
+      `window.THEME_SCRIPT_DEFAULT = "${opts.defaultTheme}";`,
     __DEFINE_MAIN_CODE,
+    !opts?.noScriptTag && "</script>",
   ]
     .filter(Boolean)
     .join("\n");

@@ -1,15 +1,15 @@
 import { type Plugin } from "vite";
-import { type ThemeScriptOption, generateThemeScript } from ".";
+import { type ThemeScriptOptions, generateThemeScript } from ".";
 
 // inject raw script into html head to initialize style as early as possible
-export function themeScriptPlugin(options?: ThemeScriptOption): Plugin {
+export function themeScriptPlugin(options?: ThemeScriptOptions): Plugin {
   return {
     name: "@hiogawa/theme-script:vite-plugin",
     transformIndexHtml() {
       return [
         {
           tag: "script",
-          children: generateThemeScript(options),
+          children: generateThemeScript({ ...options, noScriptTag: true }),
         },
       ];
     },
