@@ -5,10 +5,15 @@ import { TinyCliParseError } from "./utils";
 export async function tinyCliMain(
   cli: TinyCli | TinyCliCommand<any>,
   opts?: {
-    process?: Pick<(typeof globalThis)["process"], "argv" | "exitCode">;
+    // assumes NodeJS.Process but avoid direct type dep
+    process?: {
+      argv: string[];
+      exitCode?: number | undefined;
+    };
     log?: (v: string) => void;
   }
 ): Promise<Result<unknown, unknown>> {
+  // @ts-ignore silence type error on tsup
   const process = opts?.process ?? globalThis.process;
   const log = opts?.log ?? globalThis.console.log;
   try {
