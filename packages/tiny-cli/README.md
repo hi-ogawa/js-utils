@@ -13,6 +13,7 @@ simple type-safe command line parsing library
 
 ## not supported
 
+- short form option e.g. `-h`
 - command option alias
 - transform option key from kebab-case to camelCase
 - special arguments e.g. `--`
