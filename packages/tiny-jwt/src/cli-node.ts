@@ -1,7 +1,10 @@
 import "./polyfill-node";
-import process from "node:process";
-import { TinyCli, TinyCliParseError, arg } from "@hiogawa/tiny-cli";
-import { formatError } from "@hiogawa/utils";
+import {
+  TinyCli,
+  TinyCliParseError,
+  arg,
+  tinyCliMain,
+} from "@hiogawa/tiny-cli";
 import { version } from "../package.json";
 
 const cli = new TinyCli({
@@ -69,16 +72,4 @@ cli.defineCommand(
 // main
 //
 
-async function main() {
-  try {
-    await cli.parse(process.argv.slice(2));
-  } catch (e) {
-    console.log(formatError(e, { noColor: !process.stdout.isTTY }));
-    if (e instanceof TinyCliParseError) {
-      console.log("See '--help' for more info.\n\n" + cli.help());
-    }
-    process.exit(1);
-  }
-}
-
-main();
+tinyCliMain(cli);
