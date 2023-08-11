@@ -18,7 +18,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist/index.*",
+    "dist/vite.*"
   ],
   "license": "MIT",
   "repository": {
