@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
+import {
+  DefaultMap,
+  HashKeyDefaultMap,
+  UncheckedMap,
+  memoize,
+} from "./default-map";
 import { groupBy, range } from "./lodash";
 import { wrapError } from "./result";
 import { tinyassert } from "./tinyassert";
@@ -208,6 +213,35 @@ describe(UncheckedMap, () => {
         "ok": false,
         "value": [Error: UncheckedMap],
       }
+    `);
+  });
+});
+
+describe(memoize, () => {
+  it("basic", () => {
+    const object = { a: 1, b: 2 };
+    const other = { c: 3, d: 4 };
+
+    const f = memoize(Object.values);
+    expect(f(object)).toMatchInlineSnapshot(`
+      [
+        1,
+        2,
+      ]
+    `);
+    expect(f(other)).toMatchInlineSnapshot(`
+      [
+        3,
+        4,
+      ]
+    `);
+
+    object.a = 2;
+    expect(f(object)).toMatchInlineSnapshot(`
+      [
+        1,
+        2,
+      ]
     `);
   });
 });

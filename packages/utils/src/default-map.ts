@@ -74,7 +74,7 @@ export function memoize<F extends (...args: any[]) => any>(
   resolver: (...args: Parameters<F>) => unknown = (...args) => args[0]
 ): F {
   const defaultMap = new HashKeyDefaultMap<Parameters<F>, ReturnType<F>>(
-    f,
+    (args) => f(...args),
     (args) => resolver(...args)
   );
   return saferFunctionCast<F>((...args) => defaultMap.get(args));
