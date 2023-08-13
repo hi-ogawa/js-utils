@@ -3,6 +3,8 @@ import { memoize } from "./default-map";
 
 describe(memoize, () => {
   it("basic", () => {
+    // from https://lodash.com/docs/4.17.15#memoize
+
     const object = { a: 1, b: 2 };
     const other = { c: 3, d: 4 };
 
