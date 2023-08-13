@@ -71,29 +71,18 @@ export class HashKeyDefaultMap<K, V> extends HashKeyMap<K, V> {
 /** by default, use 1st argument as cache key which is same as lodash */
 export function memoize<F extends (...args: any[]) => any>(
   f: F,
-  resolver: (...args: Parameters<F>) => unknown = (...args) => args[0]
-): F {
-  const defaultMap = new MemoizeCacheMap<Parameters<F>, ReturnType<F>>(
-    (args) => f(...args),
-    (args) => resolver(...args)
-  );
-  return saferFunctionCast<F>((...args) => defaultMap.get(args));
-}
-
-// simplified version of `HashKeyDefaultMap` exposing only `get`
-class MemoizeCacheMap<K, V> {
-  private map = new Map<unknown, V>();
-
-  constructor(
-    private defaultFn: (input: K) => V,
-    private keyFn: (input: K) => unknown
-  ) {}
-
-  get(input: K): V {
-    const key = this.keyFn(input);
-    if (!this.map.has(key)) {
-      this.map.set(key, this.defaultFn(input));
-    }
-    return this.map.get(key)!;
+  options?: {
+    keyFn?: (...args: Parameters<F>) => unknown;
+    cache?: Map<unknown, ReturnType<F>>;
   }
+): F {
+  const keyFn = options?.keyFn ?? ((...args) => args[0]);
+  const cache = options?.cache ?? new Map();
+  return saferFunctionCast<F>((...args) => {
+    const key = keyFn(...args);
+    if (!cache.has(key)) {
+      cache.set(key, f(...args));
+    }
+    return cache.get(key)!;
+  });
 }
