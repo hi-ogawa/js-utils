@@ -75,3 +75,11 @@ function defaultKeyFn(v: any): string {
   // shallow sort by key as a cheap normalization
   return JSON.stringify(sortBy(Object.entries(v), ([k]) => k));
 }
+
+export function memoize<F extends (...args: any[]) => any>(f: F): F {
+  const map = new HashKeyDefaultMap<Parameters<F>, ReturnType<F>>(
+    f,
+    JSON.stringify
+  );
+  return ((...args: Parameters<F>) => map.get(args)) as F;
+}
