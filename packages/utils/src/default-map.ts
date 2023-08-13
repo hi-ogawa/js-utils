@@ -1,4 +1,4 @@
-import { sortBy } from "./lodash";
+import { saferFunctionCast } from "./misc";
 
 export class DefaultMap<K, V> extends Map<K, V> {
   constructor(
@@ -25,9 +25,9 @@ export class UncheckedMap<K, V> extends DefaultMap<K, V> {
 }
 
 export class HashKeyMap<K, V> {
-  private map = new Map<string, [k: K, v: V]>();
+  private map = new Map<unknown, [k: K, v: V]>();
 
-  constructor(private keyFn: (key: K) => string = defaultKeyFn) {}
+  constructor(private keyFn: (key: K) => unknown = JSON.stringify) {}
 
   get(key: K): V | undefined {
     return this.map.get(this.keyFn(key))?.[1];
@@ -55,11 +55,8 @@ export class HashKeyMap<K, V> {
   }
 }
 
-export class HashKeyDefaultMap<K extends object, V> extends HashKeyMap<K, V> {
-  constructor(
-    private defaultFn: (key: K) => V,
-    keyFn: (key: K) => string = defaultKeyFn
-  ) {
+export class HashKeyDefaultMap<K, V> extends HashKeyMap<K, V> {
+  constructor(private defaultFn: (key: K) => V, keyFn?: (key: K) => unknown) {
     super(keyFn);
   }
 
@@ -71,15 +68,14 @@ export class HashKeyDefaultMap<K extends object, V> extends HashKeyMap<K, V> {
   }
 }
 
-function defaultKeyFn(v: any): string {
-  // shallow sort by key as a cheap normalization
-  return JSON.stringify(sortBy(Object.entries(v), ([k]) => k));
-}
-
-export function memoize<F extends (...args: any[]) => any>(f: F): F {
-  const map = new HashKeyDefaultMap<Parameters<F>, ReturnType<F>>(
+/** by default, use 1st argument as cache key which is same as lodash */
+export function memoize<F extends (...args: any[]) => any>(
+  f: F,
+  resolver: (...args: Parameters<F>) => unknown = (...args) => args[0]
+): F {
+  const defaultMap = new HashKeyDefaultMap<Parameters<F>, ReturnType<F>>(
     f,
-    JSON.stringify
+    (args) => resolver(...args)
   );
-  return ((...args: Parameters<F>) => map.get(args)) as F;
+  return saferFunctionCast<F>((...args) => defaultMap.get(args));
 }
