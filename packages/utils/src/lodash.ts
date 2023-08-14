@@ -165,7 +165,7 @@ export function memoize<F extends (...args: any[]) => any>(
   const cache = options?.cache ?? new Map<unknown, ReturnType<F>>();
   return safeFunctionCast<F>((...args) => {
     const key = keyFn(...args);
-    // avoid `has/get` since they might not be atomic (e.g. ttl cache)
+    // avoid `has/get` since they might not be atomic for some cache (e.g. ttl cache).
     // however, this logic means `undefined` value will not be cached.
     const value = cache.get(key);
     if (typeof value !== "undefined") {
