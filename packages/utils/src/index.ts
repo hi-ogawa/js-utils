@@ -9,3 +9,4 @@ export * from "./misc";
 export * from "./hash";
 export * from "./regexp";
 export * from "./error";
+export * from "./cache";
