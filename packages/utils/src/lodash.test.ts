@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { LruCache } from "./cache";
 import {
   capitalize,
   debounce,
@@ -495,6 +496,54 @@ describe(memoize, () => {
       [
         1,
         2,
+      ]
+    `);
+  });
+
+  it("with LruCache", () => {
+    const f = vi.fn().mockImplementation((x: number) => x * 2);
+    const g = memoize(f, { cache: new LruCache(3) });
+    expect(range(3).map((e) => g(e))).toMatchInlineSnapshot(`
+      [
+        0,
+        2,
+        4,
+      ]
+    `);
+    expect(f.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          0,
+        ],
+        [
+          1,
+        ],
+        [
+          2,
+        ],
+      ]
+    `);
+    expect(range(1, 4).map((e) => g(e))).toMatchInlineSnapshot(`
+      [
+        2,
+        4,
+        6,
+      ]
+    `);
+    expect(f.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          0,
+        ],
+        [
+          1,
+        ],
+        [
+          2,
+        ],
+        [
+          3,
+        ],
       ]
     `);
   });

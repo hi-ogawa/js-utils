@@ -157,7 +157,10 @@ export function memoize<F extends (...args: any[]) => any>(
   f: F,
   options?: {
     keyFn?: (...args: Parameters<F>) => unknown;
-    cache?: Pick<Map<unknown, ReturnType<F>>, "get" | "set">;
+    cache?: {
+      get(k: Parameters<F>): ReturnType<F> | undefined;
+      set(k: Parameters<F>, v: ReturnType<F>): void;
+    };
   }
 ): F {
   // by default, use 1st argument as a cache key which is same as lodash
