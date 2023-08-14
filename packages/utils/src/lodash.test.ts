@@ -387,12 +387,62 @@ describe(memoize, () => {
     const g = memoize(f);
     expect(g(1)).toMatchInlineSnapshot("11");
     expect(g(1)).toMatchInlineSnapshot("11");
+    expect(g(2)).toMatchInlineSnapshot("12");
+    expect(g(2)).toMatchInlineSnapshot("12");
     expect(f.mock.calls).toMatchInlineSnapshot(`
       [
         [
           1,
         ],
+        [
+          2,
+        ],
       ]
+    `);
+  });
+
+  it("default cache key is 1st argument", () => {
+    const f = vi.fn().mockImplementation((x: number, y: number) => x + y);
+    const g = memoize(f);
+    expect(g(1, 2)).toMatchInlineSnapshot("3");
+    expect(g(1, 3)).toMatchInlineSnapshot("3");
+    expect(g(1, 2)).toMatchInlineSnapshot("3");
+    expect(g(1, 3)).toMatchInlineSnapshot("3");
+    expect(f.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          1,
+          2,
+        ],
+      ]
+    `);
+  });
+
+  it("options", () => {
+    const f = vi.fn().mockImplementation((x: number, y: number) => x + y);
+    const cache = new Map();
+    const g = memoize(f, { cache, keyFn: (...args) => JSON.stringify(args) });
+    expect(g(1, 2)).toMatchInlineSnapshot("3");
+    expect(g(1, 3)).toMatchInlineSnapshot("4");
+    expect(g(1, 2)).toMatchInlineSnapshot("3");
+    expect(g(1, 3)).toMatchInlineSnapshot("4");
+    expect(f.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          1,
+          2,
+        ],
+        [
+          1,
+          3,
+        ],
+      ]
+    `);
+    expect(cache).toMatchInlineSnapshot(`
+      Map {
+        "[1,2]" => 3,
+        "[1,3]" => 4,
+      }
     `);
   });
 
