@@ -2,4 +2,4 @@
 "@hiogawa/utils": minor
 ---
 
-feat: add `TtlCache`
+feat: add `TtlCache` and `LruCache`
