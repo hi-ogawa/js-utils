@@ -1,3 +1,5 @@
+import { safeFunctionCast } from "./misc";
+
 //
 // lodash-like utilities
 //
@@ -149,6 +151,30 @@ export function once<F extends (...args: any[]) => any>(f: F): F {
     return result;
   }
   return wrapper as F;
+}
+
+export function memoize<F extends (...args: any[]) => any>(
+  f: F,
+  options?: {
+    keyFn?: (...args: Parameters<F>) => unknown;
+    cache?: Pick<Map<unknown, ReturnType<F>>, "get" | "set">;
+  }
+): F {
+  // by default, use 1st argument as a cache key which is same as lodash
+  const keyFn = options?.keyFn ?? ((...args) => args[0]);
+  const cache = options?.cache ?? new Map<unknown, ReturnType<F>>();
+  return safeFunctionCast<F>((...args) => {
+    const key = keyFn(...args);
+    // avoid `has/get` since they might not be atomic for some cache (e.g. ttl cache).
+    // however, this logic means `undefined` value will not be cached.
+    const value = cache.get(key);
+    if (typeof value !== "undefined") {
+      return value;
+    }
+    const newValue = f(...args);
+    cache.set(key, newValue);
+    return newValue;
+  });
 }
 
 // utils is not supposed to depend on lib.dom or @types/node. so for now we manual add required typings.

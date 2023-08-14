@@ -25,8 +25,8 @@ export function includesGuard<T>(ls: readonly T[], v: unknown): v is T {
   return ls.includes(v as T);
 }
 
-/** silence "error TSTS2322" but it should be "practically" safer than `any` */
-export function saferFunctionCast<F extends (...args: any[]) => any>(
+/** silence "error TSTS2322" but practically this is safer and more convenient than resorting to `any` */
+export function safeFunctionCast<F extends (...args: any[]) => any>(
   f: (...args: Parameters<F>) => ReturnType<F>
 ): F {
   // silence type error:
