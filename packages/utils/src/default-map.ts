@@ -1,5 +1,3 @@
-import { saferFunctionCast } from "./misc";
-
 export class DefaultMap<K, V> extends Map<K, V> {
   constructor(
     private defaultFn: (key: K) => V,
@@ -66,23 +64,4 @@ export class HashKeyDefaultMap<K, V> extends HashKeyMap<K, V> {
     }
     return super.get(key)!;
   }
-}
-
-/** by default, use 1st argument as cache key which is same as lodash */
-export function memoize<F extends (...args: any[]) => any>(
-  f: F,
-  options?: {
-    keyFn?: (...args: Parameters<F>) => unknown;
-    cache?: Map<unknown, ReturnType<F>>;
-  }
-): F {
-  const keyFn = options?.keyFn ?? ((...args) => args[0]);
-  const cache = options?.cache ?? new Map();
-  return saferFunctionCast<F>((...args) => {
-    const key = keyFn(...args);
-    if (!cache.has(key)) {
-      cache.set(key, f(...args));
-    }
-    return cache.get(key)!;
-  });
 }
