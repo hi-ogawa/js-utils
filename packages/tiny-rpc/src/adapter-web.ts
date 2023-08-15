@@ -24,9 +24,9 @@ export function hattipServerAdapter(opts: {
         const result = await wrapErrorAsync(async () => {
           tinyassert(
             request.method === "POST",
-            new TinyRpcHttpError("invalid method", {
+            new RpcError("invalid method", {
               cause: request.method,
-            }).setHttpStatus(405)
+            }).setStatus(405)
           );
           const path = url.pathname.slice(opts.endpoint.length + 1);
           const args = await request.json();
@@ -35,8 +35,8 @@ export function hattipServerAdapter(opts: {
         let status = 200;
         if (!result.ok) {
           opts.onError?.(result.value);
-          const e = TinyRpcHttpError.fromUnknown(result.value);
-          status = e.httpStatus;
+          const e = RpcError.fromUnknown(result.value);
+          status = e.status;
           result.value = e.serialize();
         }
         return new Response(JSON.stringify(result), {
@@ -72,38 +72,4 @@ export function fetchClientAdapter(opts: {
       return result.value;
     },
   };
-}
-
-// TODO: fine to move to RpcError?
-export class TinyRpcHttpError extends RpcError {
-  public httpStatus = 500;
-
-  // convenience for assertion
-  setHttpStatus(status: number): this {
-    this.httpStatus = status;
-    return this;
-  }
-
-  static override fromUnknown(e: unknown): TinyRpcHttpError {
-    if (e instanceof TinyRpcHttpError) {
-      return e;
-    }
-    const err = Object.assign(
-      new TinyRpcHttpError(),
-      super.fromUnknown(e).serialize()
-    );
-    // ad-hoc handling for zod error
-    if (objectHas(err.cause, "name") && err.cause.name === "ZodError") {
-      err.httpStatus = 400;
-    }
-    return err;
-  }
-}
-
-// TODO: to utils
-function objectHas<Prop extends keyof any>(
-  v: unknown,
-  prop: Prop
-): v is { [prop in Prop]: unknown } {
-  return Boolean(v && typeof v === "object" && prop in v);
 }

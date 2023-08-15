@@ -68,12 +68,26 @@ export function proxyRpc<R extends RpcRoutes>({
   ) as any;
 }
 
+//
+// error
+//
+
 export class RpcError extends Error {
+  // employ http status convention
+  public status = 500;
+
+  // convenient api for assertion
+  setStatus(status: number): this {
+    this.status = status;
+    return this;
+  }
+
   serialize() {
     return {
       message: this.message,
       stack: this.stack,
       cause: this.cause,
+      status: this.status,
     };
   }
 
@@ -91,6 +105,9 @@ export class RpcError extends Error {
       }
       if ("cause" in e) {
         err.cause = e.cause;
+      }
+      if ("status" in e && typeof e.status === "number") {
+        err.status = e.status;
       }
     }
     return err;

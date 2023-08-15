@@ -281,6 +281,13 @@ export function objectKeys<T extends object>(o: T): (keyof T)[] {
   return Object.keys(o) as any;
 }
 
+export function objectHas<Prop extends keyof any>(
+  v: unknown,
+  prop: Prop
+): v is { [prop in Prop]: unknown } {
+  return Boolean(v && typeof v === "object" && prop in v);
+}
+
 //
 // internal
 //

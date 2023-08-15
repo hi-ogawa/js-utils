@@ -123,7 +123,7 @@ describe("e2e", () => {
           });
           logStatus(res.status);
           return res;
-        }
+        },
       }),
     });
     expect(await client.checkId("good")).toMatchInlineSnapshot("true");
@@ -145,7 +145,7 @@ describe("e2e", () => {
     expect(await client.checkAuth()).toMatchInlineSnapshot("true");
     headers["x-auth"] = "bad";
     expect(await client.checkAuth()).toMatchInlineSnapshot("false");
-    expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot('200');
+    expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("200");
 
     //
     // error
@@ -155,7 +155,7 @@ describe("e2e", () => {
     await expect(
       client.incrementCounter({ delta: "2" as any as number })
     ).rejects.toSatisfy((e) => {
-      expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot('400');
+      expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("400");
       tinyassert(e instanceof RpcError);
       expect(e).toMatchInlineSnapshot(`
         [Error: [
@@ -176,7 +176,7 @@ describe("e2e", () => {
     // invalid path
     await expect((client as any).incrementCounterXXX()).rejects.toSatisfy(
       (e) => {
-        expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot('500');
+        expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("500");
         tinyassert(e instanceof RpcError);
         expect(e).toMatchInlineSnapshot("[Error: invalid path]");
         return true;
@@ -185,7 +185,7 @@ describe("e2e", () => {
 
     // runtime erorr
     await expect(client.checkIdThrow("bad")).rejects.toSatisfy((e) => {
-      expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot('500');
+      expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("500");
       tinyassert(e instanceof RpcError);
       expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
       return true;

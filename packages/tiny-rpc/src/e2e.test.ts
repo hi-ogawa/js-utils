@@ -140,18 +140,7 @@ describe("e2e", () => {
       expect(e.status).toMatchInlineSnapshot("500");
       expect(e.cause).toMatchInlineSnapshot(`
         {
-          "issues": [
-            {
-              "code": "invalid_type",
-              "expected": "number",
-              "message": "Expected number, received string",
-              "path": [
-                "delta",
-              ],
-              "received": "string",
-            },
-          ],
-          "name": "ZodError",
+          "status": 400,
         }
       `);
       expect(e).toMatchInlineSnapshot(`
