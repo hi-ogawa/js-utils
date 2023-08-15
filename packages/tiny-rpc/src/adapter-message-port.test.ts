@@ -56,7 +56,7 @@ describe("adapter-message-port", () => {
       routes,
       adapter: messagePortServerAdapter({ port: channel.port1 }),
     });
-    expect(dispose).toMatchInlineSnapshot('[Function]');
+    expect(dispose).toMatchInlineSnapshot("[Function]");
 
     //
     // client

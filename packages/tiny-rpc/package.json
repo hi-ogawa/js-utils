@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/tiny-rpc",
-  "version": "0.2.2",
+  "version": "0.2.3-pre.0",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -10,6 +10,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
+    },
+    "./dist/index-v2": {
+      "import": "./dist/index-v2.js",
+      "require": "./dist/index-v2.cjs",
+      "types": "./dist/index-v2.d.ts"
     },
     "./dist/zod": {
       "import": "./dist/zod.js",
