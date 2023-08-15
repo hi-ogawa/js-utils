@@ -1,4 +1,4 @@
-import { tinyassert, wrapErrorAsync } from "@hiogawa/utils";
+import { type Result, tinyassert, wrapErrorAsync } from "@hiogawa/utils";
 import type { RpcClientAdapter, RpcServerAdapter } from "./core";
 
 // TODO:
@@ -25,13 +25,10 @@ export function hattipServerAdapter(opts: {
         tinyassert(request.method === "POST");
         const path = url.pathname.slice(opts.endpoint.length + 1);
         const args = await request.json();
-
-        // TODO
-        wrapErrorAsync;
-
-        // respond {} when result === undefined
-        const result = await invokeRoute({ path, args });
-        return new Response(JSON.stringify({ result }), {
+        const result = await wrapErrorAsync(async () =>
+          invokeRoute({ path, args })
+        );
+        return new Response(JSON.stringify(result), {
           headers: {
             "content-type": "application/json; charset=utf-8",
           },
@@ -57,9 +54,12 @@ export function fetchClientAdapter(opts: {
         },
       });
       tinyassert(res.ok);
-      const resJson = await res.json();
-      tinyassert(resJson && typeof resJson === "object");
-      return resJson.result;
+
+      const result: Result<unknown, unknown> = await res.json();
+      if (!result.ok) {
+        throw result.value;
+      }
+      return result.value;
     },
   };
 }

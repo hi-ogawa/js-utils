@@ -148,60 +148,38 @@ describe("e2e", () => {
 
     // input validation
     await expect(
-      client.incrementCounter({ delta: "2" as any })
+      client.incrementCounter({ delta: "2" as any as number })
     ).rejects.toSatisfy((e) => {
-      expect(e).toMatchInlineSnapshot("[Error]");
-      // tinyassert(e instanceof TinyRpcError);
-      // expect(e.status).toMatchInlineSnapshot("500");
-      // expect(e.cause).toMatchInlineSnapshot(`
-      //   {
-      //     "issues": [
-      //       {
-      //         "code": "invalid_type",
-      //         "expected": "number",
-      //         "message": "Expected number, received string",
-      //         "path": [
-      //           "delta",
-      //         ],
-      //         "received": "string",
-      //       },
-      //     ],
-      //     "name": "ZodError",
-      //   }
-      // `);
-      // expect(e).toMatchInlineSnapshot(`
-      //   [Error: [
-      //     {
-      //       "code": "invalid_type",
-      //       "expected": "number",
-      //       "received": "string",
-      //       "path": [
-      //         "delta"
-      //       ],
-      //       "message": "Expected number, received string"
-      //     }
-      //   ]]
-      // `);
+      expect(e).toMatchInlineSnapshot(`
+        {
+          "issues": [
+            {
+              "code": "invalid_type",
+              "expected": "number",
+              "message": "Expected number, received string",
+              "path": [
+                "delta",
+              ],
+              "received": "string",
+            },
+          ],
+          "name": "ZodError",
+        }
+      `);
       return true;
     });
 
     // invalid path
     await expect((client as any).incrementCounterXXX()).rejects.toSatisfy(
       (e) => {
-        expect(e).toMatchInlineSnapshot("[Error]");
-        // tinyassert(e instanceof TinyRpcError);
-        // expect(e.status).toMatchInlineSnapshot("404");
-        // expect(e).toMatchInlineSnapshot("[Error: NOT_FOUND]");
+        expect(e).toMatchInlineSnapshot("{}");
         return true;
       }
     );
 
     // runtime erorr
     await expect(client.checkIdThrow("bad")).rejects.toSatisfy((e) => {
-      expect(e).toMatchInlineSnapshot("[Error]");
-      // tinyassert(e instanceof TinyRpcError);
-      // expect(e.status).toMatchInlineSnapshot("500");
-      // expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
+      expect(e).toMatchInlineSnapshot("{}");
       return true;
     });
 

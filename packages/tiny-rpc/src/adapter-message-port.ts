@@ -23,9 +23,9 @@ export function messagePortServerAdapter({
       // TODO: async handler caveat
       port.addEventListener("message", async (ev) => {
         ev.data;
-        const req = ev.data as EventRequestPayload; // TODO: validate
+        const req = ev.data as RequestPayload; // TODO: validate
         const result = await wrapErrorAsync(async () => invokeRoute(req.data));
-        const res: EventResponsePayload = {
+        const res: ResponsePayload = {
           id: req.id,
           result,
         };
@@ -54,15 +54,15 @@ export function messagePortClientAdapter({
 
   return {
     post: async (data) => {
-      const req: EventRequestPayload = {
+      const req: RequestPayload = {
         id: mathRandomId(),
         data,
       };
 
-      const promiseResolvers = newPromiseWithResolvers<EventResponsePayload>();
+      const promiseResolvers = newPromiseWithResolvers<ResponsePayload>();
 
       async function handler(ev: MessageEvent) {
-        const res = ev.data as EventResponsePayload;
+        const res = ev.data as ResponsePayload;
         if (res.id === req.id) {
           promiseResolvers.resolve(res);
           port.removeEventListener("message", handler);
@@ -73,19 +73,19 @@ export function messagePortClientAdapter({
       port.postMessage(req);
       const res = await promiseResolvers.promise;
       if (!res.result.ok) {
-        throw new Error("rpc error", { cause: res.result.value });
+        throw res.result.value;
       }
       return res.result.value;
     },
   };
 }
 
-interface EventRequestPayload {
+interface RequestPayload {
   id: string;
   data: RpcPayload;
 }
 
-interface EventResponsePayload {
+interface ResponsePayload {
   id: string;
   result: Result<unknown, unknown>;
 }
