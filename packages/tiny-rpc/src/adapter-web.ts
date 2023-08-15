@@ -3,7 +3,6 @@ import { type RpcClientAdapter, RpcError, type RpcServerAdapter } from "./core";
 
 // TODO:
 // - custom (de)serializer
-// - support GET version of adapter (or as options)
 
 // compatible with hattip's RequestHandler
 type RequestHandler = (ctx: {
@@ -12,6 +11,7 @@ type RequestHandler = (ctx: {
 
 export function hattipServerAdapter(opts: {
   endpoint: string;
+  method?: "GET" | "POST";
   onError?: (e: unknown) => void;
 }): RpcServerAdapter<RequestHandler> {
   return {
@@ -23,13 +23,20 @@ export function hattipServerAdapter(opts: {
         }
         const result = await wrapErrorAsync(async () => {
           tinyassert(
-            request.method === "POST",
+            request.method === (opts.method ?? "POST"),
             new RpcError("invalid method", {
               cause: request.method,
             }).setStatus(405)
           );
           const path = url.pathname.slice(opts.endpoint.length + 1);
-          const args = await request.json();
+          let args: unknown[];
+          if (opts.method === "GET") {
+            const payload = url.searchParams.get(GET_PAYLOAD_PARAM);
+            tinyassert(typeof payload === "string");
+            args = JSON.parse(payload);
+          } else {
+            args = await request.json();
+          }
           return invokeRoute({ path, args });
         });
         let status = 200;
@@ -52,19 +59,29 @@ export function hattipServerAdapter(opts: {
 
 export function fetchClientAdapter(opts: {
   url: string;
+  method?: "GET" | "POST";
   fetch?: (typeof globalThis)["fetch"];
 }): RpcClientAdapter {
   const fetch = opts.fetch ?? globalThis.fetch;
   return {
     post: async (data) => {
       const url = [opts.url, data.path].join("/");
-      const res = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(data.args),
-        headers: {
-          "content-type": "application/json; charset=utf-8",
-        },
-      });
+      const payload = JSON.stringify(data.args);
+      let req: Request;
+      if (opts.method === "GET") {
+        req = new Request(
+          url + "?" + new URLSearchParams({ [GET_PAYLOAD_PARAM]: payload })
+        );
+      } else {
+        req = new Request(url, {
+          method: "POST",
+          body: payload,
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+          },
+        });
+      }
+      const res = await fetch(req);
       const result: Result<unknown, unknown> = await res.json();
       if (!result.ok) {
         throw result.value;
@@ -73,3 +90,5 @@ export function fetchClientAdapter(opts: {
     },
   };
 }
+
+const GET_PAYLOAD_PARAM = "payload";
