@@ -16,7 +16,7 @@ import {
 
 //
 // slim down MessagePort interface
-// so that it's easy to generalize to "node:worker_threads"
+// so that it's easy to generalize to "node:worker_threads" etc...
 //
 
 export interface TinyRpcMessagePort {
