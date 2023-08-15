@@ -6,15 +6,15 @@ import {
 import type { RpcClientAdapter, RpcPayload, RpcServerAdapter } from "./core";
 
 // TODO:
-// - propagate Error
-// - how to support "transferable"?
+// - propagate custom Error (custom serialize/deserialize?)
+// - support "transferable"?
 
 export function messagePortServerAdapter({
   port,
+  onError,
 }: {
   port: MessagePort;
-  // TODO
-  // onError?
+  onError?: (e: unknown) => void;
 }): RpcServerAdapter<void> {
   return {
     on: (invokeRoute) => {
@@ -22,9 +22,11 @@ export function messagePortServerAdapter({
 
       // TODO: async handler caveat
       port.addEventListener("message", async (ev) => {
-        ev.data;
         const req = ev.data as RequestPayload; // TODO: validate
         const result = await wrapErrorAsync(async () => invokeRoute(req.data));
+        if (!result.ok) {
+          onError?.(result.value);
+        }
         const res: ResponsePayload = {
           id: req.id,
           result,
@@ -32,9 +34,8 @@ export function messagePortServerAdapter({
         port.postMessage(res);
       });
 
-      // TODO
       port.addEventListener("messageerror", (ev) => {
-        ev;
+        onError?.(new Error("messageerror", { cause: ev }));
       });
     },
   };
@@ -42,14 +43,14 @@ export function messagePortServerAdapter({
 
 export function messagePortClientAdapter({
   port,
+  onError,
 }: {
   port: MessagePort;
-  // TODO
-  // onError?
+  onError?: (e: unknown) => void;
 }): RpcClientAdapter {
-  // TODO:
+  // TODO port.removeEventListener
   port.addEventListener("messageerror", (ev) => {
-    ev;
+    onError?.(new Error("messageerror", { cause: ev }));
   });
 
   return {

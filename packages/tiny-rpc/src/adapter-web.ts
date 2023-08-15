@@ -12,8 +12,7 @@ type RequestHandler = (ctx: {
 
 export function hattipServerAdapter(opts: {
   endpoint: string;
-  // TODO
-  // onError?
+  onError?: (e: unknown) => void;
 }): RpcServerAdapter<RequestHandler> {
   return {
     on: (invokeRoute): RequestHandler => {
@@ -28,6 +27,9 @@ export function hattipServerAdapter(opts: {
         const result = await wrapErrorAsync(async () =>
           invokeRoute({ path, args })
         );
+        if (!result.ok) {
+          opts.onError?.(result.value);
+        }
         return new Response(JSON.stringify(result), {
           headers: {
             "content-type": "application/json; charset=utf-8",
