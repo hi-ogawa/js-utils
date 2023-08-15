@@ -32,7 +32,7 @@ export function exposeRpc<T = void>({
   return adapter.on(({ path, args }) => {
     const fn = routes[path];
     tinyassert(fn, `invalid path '${path}'`);
-    fn(...args);
+    return fn(...args);
   });
 }
 

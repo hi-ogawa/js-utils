@@ -3,7 +3,7 @@ import type { RpcClientAdapter, RpcServerAdapter } from "./core";
 
 // TODO:
 // - error code
-// - GET version of client/server
+// - support GET version of adapter (or as options)
 
 // compatible with hattip's RequestHandler
 type RequestHandler = (ctx: {
@@ -23,8 +23,10 @@ export function hattipServerAdapter(opts: {
         tinyassert(request.method === "POST");
         const path = url.pathname.slice(opts.endpoint.length + 1);
         const args = await request.json();
+
+        // respond {} when result === undefined
         const result = await invokeRoute({ path, args });
-        return new Response(JSON.stringify(result), {
+        return new Response(JSON.stringify({ result }), {
           headers: {
             "content-type": "application/json; charset=utf-8",
           },
@@ -34,7 +36,7 @@ export function hattipServerAdapter(opts: {
   };
 }
 
-export function httpClientAdapter(opts: {
+export function fetchClientAdapter(opts: {
   url: string;
   fetch?: typeof fetch;
 }): RpcClientAdapter {
@@ -50,7 +52,9 @@ export function httpClientAdapter(opts: {
         },
       });
       tinyassert(res.ok);
-      return res.json();
+      const resJson = await res.json();
+      tinyassert(resJson && typeof resJson === "object");
+      return resJson.result;
     },
   };
 }
