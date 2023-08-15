@@ -42,7 +42,7 @@ export function hattipServerAdapter(opts: {
 
 export function fetchClientAdapter(opts: {
   url: string;
-  fetch?: typeof fetch;
+  fetch?: (typeof globalThis)["fetch"];
 }): RpcClientAdapter {
   const fetch = opts.fetch ?? globalThis.fetch;
   return {
