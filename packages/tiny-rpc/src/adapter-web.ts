@@ -1,6 +1,10 @@
 import { tinyassert } from "@hiogawa/utils";
 import type { RpcClientAdapter, RpcServerAdapter } from "./core";
 
+// TODO:
+// - error code
+// - GET version of client/server
+
 // compatible with hattip's RequestHandler
 type RequestHandler = (ctx: {
   request: Request;
