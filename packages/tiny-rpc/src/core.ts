@@ -4,30 +4,30 @@ import { tinyassert } from "@hiogawa/utils";
 // uni-directional version of https://github.com/antfu/birpc
 //
 
-export type TinyRpcRoutes2 = Record<string, (...args: any[]) => any>;
+export type RpcRoutes = Record<string, (...args: any[]) => any>;
 
-export type TinyRpcRoutesAsync2<R extends TinyRpcRoutes2> = {
+export type RpcRoutesAsync<R extends RpcRoutes> = {
   [K in keyof R]: (
     ...args: Parameters<R[K]>
   ) => Promise<Awaited<ReturnType<R[K]>>>;
 };
 
-export type TinyRpcPayload = { path: string; args: unknown[] };
+export type RpcPayload = { path: string; args: unknown[] };
 
-export type TinyRpcServerAdapter<T> = {
-  on: (invokeRoute: (data: TinyRpcPayload) => unknown) => T;
+export type RpcServerAdapter<T> = {
+  on: (invokeRoute: (data: RpcPayload) => unknown) => T;
 };
 
-export type TinyRpcClientAdapter = {
-  post: (data: TinyRpcPayload) => unknown;
+export type RpcClientAdapter = {
+  post: (data: RpcPayload) => unknown;
 };
 
-export function exposeTinyRpc<T = void>({
+export function exposeRpc<T = void>({
   routes,
   adapter,
 }: {
-  routes: TinyRpcRoutes2;
-  adapter: TinyRpcServerAdapter<T>;
+  routes: RpcRoutes;
+  adapter: RpcServerAdapter<T>;
 }): T {
   return adapter.on(({ path, args }) => {
     const fn = routes[path];
@@ -36,11 +36,11 @@ export function exposeTinyRpc<T = void>({
   });
 }
 
-export function proxyTinyRpc<R extends TinyRpcRoutes2>({
+export function proxyRpc<R extends RpcRoutes>({
   adapter,
 }: {
-  adapter: TinyRpcClientAdapter;
-}): TinyRpcRoutesAsync2<R> {
+  adapter: RpcClientAdapter;
+}): RpcRoutesAsync<R> {
   return new Proxy(
     {},
     {

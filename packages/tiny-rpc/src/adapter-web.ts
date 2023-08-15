@@ -1,5 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
-import type { TinyRpcClientAdapter, TinyRpcServerAdapter } from "./core";
+import type { RpcClientAdapter, RpcServerAdapter } from "./core";
 
 // compatible with hattip's RequestHandler
 type RequestHandler = (ctx: {
@@ -8,7 +8,7 @@ type RequestHandler = (ctx: {
 
 export function hattipServerAdapter(opts: {
   endpoint: string;
-}): TinyRpcServerAdapter<RequestHandler> {
+}): RpcServerAdapter<RequestHandler> {
   return {
     on: (invokeRoute): RequestHandler => {
       return async ({ request }) => {
@@ -33,7 +33,7 @@ export function hattipServerAdapter(opts: {
 export function httpClientAdapter(opts: {
   url: string;
   fetch?: typeof fetch;
-}): TinyRpcClientAdapter {
+}): RpcClientAdapter {
   const fetch = opts.fetch ?? globalThis.fetch;
   return {
     post: async (data) => {
