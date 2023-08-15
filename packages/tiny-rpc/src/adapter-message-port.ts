@@ -9,6 +9,7 @@ import type { RpcClientAdapter, RpcPayload, RpcServerAdapter } from "./core";
 // - propagate custom Error (custom serialize/deserialize?)
 // - support "transferable"?
 // - dispose listener?
+// - initial hand-shake helper?
 
 export function messagePortServerAdapter({
   port,
