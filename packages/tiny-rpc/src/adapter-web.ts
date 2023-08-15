@@ -1,4 +1,4 @@
-import { tinyassert } from "@hiogawa/utils";
+import { tinyassert, wrapErrorAsync } from "@hiogawa/utils";
 import type { RpcClientAdapter, RpcServerAdapter } from "./core";
 
 // TODO:
@@ -25,6 +25,9 @@ export function hattipServerAdapter(opts: {
         tinyassert(request.method === "POST");
         const path = url.pathname.slice(opts.endpoint.length + 1);
         const args = await request.json();
+
+        // TODO
+        wrapErrorAsync;
 
         // respond {} when result === undefined
         const result = await invokeRoute({ path, args });

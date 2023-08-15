@@ -1,10 +1,13 @@
-import { newPromiseWithResolvers } from "@hiogawa/utils";
+import {
+  type Result,
+  newPromiseWithResolvers,
+  wrapErrorAsync,
+} from "@hiogawa/utils";
 import type { RpcClientAdapter, RpcPayload, RpcServerAdapter } from "./core";
 
 // TODO:
 // - propagate Error
-// - how support "transferable"?
-// - test
+// - how to support "transferable"?
 
 export function messagePortServerAdapter({
   port,
@@ -19,8 +22,9 @@ export function messagePortServerAdapter({
 
       // TODO: async handler caveat
       port.addEventListener("message", async (ev) => {
+        ev.data;
         const req = ev.data as EventRequestPayload; // TODO: validate
-        const result = await invokeRoute(req.data);
+        const result = await wrapErrorAsync(async () => invokeRoute(req.data));
         const res: EventResponsePayload = {
           id: req.id,
           result,
@@ -51,7 +55,7 @@ export function messagePortClientAdapter({
   return {
     post: async (data) => {
       const req: EventRequestPayload = {
-        id: mathRandomUUID(),
+        id: mathRandomId(),
         data,
       };
 
@@ -68,7 +72,10 @@ export function messagePortClientAdapter({
       port.addEventListener("message", handler);
       port.postMessage(req);
       const res = await promiseResolvers.promise;
-      return res.result;
+      if (!res.result.ok) {
+        throw new Error("rpc error", { cause: res.result.value });
+      }
+      return res.result.value;
     },
   };
 }
@@ -80,17 +87,13 @@ interface EventRequestPayload {
 
 interface EventResponsePayload {
   id: string;
-  result: unknown;
+  result: Result<unknown, unknown>;
 }
 
 // WebCrypto.randomUUID?
 // collision check on server?
-export function mathRandomUUID() {
-  return [32, 16, 16, 16, 48]
-    .map((bits) =>
-      Math.floor(Math.random() * 2 ** bits)
-        .toString(16)
-        .padStart(bits / 4, "0")
-    )
-    .join("-");
+export function mathRandomId() {
+  return Math.floor(Math.random() * 2 ** 48)
+    .toString(16)
+    .padStart(12, "0");
 }
