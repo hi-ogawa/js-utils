@@ -10,18 +10,42 @@ import type { RpcClientAdapter, RpcPayload, RpcServerAdapter } from "./core";
 // - support "transferable"?
 // - dispose listener?
 // - initial hand-shake helper?
+// - direct support of `WebWorker` and `node:worker_threads`
+
+//
+// require only a subset of MessagePort
+//
+
+export interface TinyRpcAdapterMessagePort {
+  postMessage(data: unknown): void;
+  addEventListener(type: "message", handler: MessageHandler): void;
+  removeEventListener(type: "message", handler: MessageHandler): void;
+}
+
+type MessageHandler = (ev: { data: unknown }) => void;
+
+function listen(port: TinyRpcAdapterMessagePort, listener: MessageHandler) {
+  port.addEventListener("message", listener);
+  return () => {
+    port.removeEventListener("message", listener);
+  };
+}
+
+//
+// adapter
+//
 
 export function messagePortServerAdapter({
   port,
   onError,
 }: {
-  port: MessagePort;
+  port: TinyRpcAdapterMessagePort;
   onError?: (e: unknown) => void;
 }): RpcServerAdapter<() => void> {
   return {
     on: (invokeRoute) => {
       // TODO: async handler caveat
-      return listen(port, "message", async (ev) => {
+      return listen(port, async (ev) => {
         const req = ev.data as RequestPayload; // TODO: validate
         const result = await wrapErrorAsync(async () => invokeRoute(req.data));
         if (!result.ok && onError) {
@@ -40,7 +64,7 @@ export function messagePortServerAdapter({
 export function messagePortClientAdapter({
   port,
 }: {
-  port: MessagePort;
+  port: TinyRpcAdapterMessagePort;
 }): RpcClientAdapter {
   return {
     post: async (data) => {
@@ -49,7 +73,7 @@ export function messagePortClientAdapter({
         data,
       };
       const promiseResolvers = newPromiseWithResolvers<ResponsePayload>();
-      const unlisten = listen(port, "message", (ev) => {
+      const unlisten = listen(port, (ev) => {
         const res = ev.data as ResponsePayload;
         if (res.id === req.id) {
           promiseResolvers.resolve(res);
@@ -82,15 +106,4 @@ function mathRandomId() {
   return Math.floor(Math.random() * 2 ** 48)
     .toString(16)
     .padStart(12, "0");
-}
-
-function listen<K extends keyof MessagePortEventMap>(
-  port: MessagePort,
-  type: K,
-  listener: (ev: MessagePortEventMap[K]) => unknown
-) {
-  port.addEventListener(type, listener);
-  return () => {
-    port.removeEventListener(type, listener);
-  };
 }
