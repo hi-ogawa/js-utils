@@ -22,7 +22,7 @@ export type RpcClientAdapter = {
   post: (data: RpcPayload) => unknown;
 };
 
-export function exposeRpc<T = void>({
+export function exposeRpc<T>({
   routes,
   adapter,
 }: {

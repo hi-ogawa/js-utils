@@ -2,7 +2,7 @@ import { tinyassert } from "@hiogawa/utils";
 import type { RpcClientAdapter, RpcServerAdapter } from "./core";
 
 // TODO:
-// - error code
+// - propagate Error
 // - support GET version of adapter (or as options)
 
 // compatible with hattip's RequestHandler
@@ -12,6 +12,8 @@ type RequestHandler = (ctx: {
 
 export function hattipServerAdapter(opts: {
   endpoint: string;
+  // TODO
+  // onError?
 }): RpcServerAdapter<RequestHandler> {
   return {
     on: (invokeRoute): RequestHandler => {
