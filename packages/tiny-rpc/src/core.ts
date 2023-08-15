@@ -1,14 +1,12 @@
 import { tinyassert } from "@hiogawa/utils";
 
-// TODO: rename all with prefix "TinyRpc" after removing old ones
-
 //
 // TinyRpc routes schema
 //
 
-export type RpcRoutes = Record<string, (...args: any[]) => any>;
+export type TinyRpcRoutes = Record<string, (...args: any[]) => any>;
 
-export type RpcRoutesAsync<R extends RpcRoutes> = {
+export type TinyRpcRoutesAsync<R extends TinyRpcRoutes> = {
   [K in keyof R]: (
     ...args: Parameters<R[K]>
   ) => Promise<Awaited<ReturnType<R[K]>>>;
@@ -18,49 +16,49 @@ export type RpcRoutesAsync<R extends RpcRoutes> = {
 // Adapter interface
 //
 
-export type RpcPayload = { path: string; args: unknown[] };
+export type TinyRpcPayload = { path: string; args: unknown[] };
 
-export type RpcServerAdapter<T> = {
-  on: (invokeRoute: (data: RpcPayload) => unknown) => T;
+export type TinyRpcServerAdapter<T> = {
+  register: (invokeRoute: (data: TinyRpcPayload) => unknown) => T;
 };
 
-export type RpcClientAdapter = {
-  post: (data: RpcPayload) => unknown;
+export type TinyRpcClientAdapter = {
+  send: (data: TinyRpcPayload) => unknown;
 };
 
-export function exposeRpc<T>({
+export function exposeTinyRpc<T>({
   routes,
   adapter,
 }: {
-  routes: RpcRoutes;
-  adapter: RpcServerAdapter<T>;
+  routes: TinyRpcRoutes;
+  adapter: TinyRpcServerAdapter<T>;
 }): T {
-  return adapter.on(async ({ path, args }) => {
+  return adapter.register(async ({ path, args }) => {
     const fn = routes[path];
-    tinyassert(fn, new RpcError("invalid path", { cause: path }));
+    tinyassert(fn, new TinyRpcError("invalid path", { cause: path }));
     return await fn(...args);
   });
 }
 
-export function proxyRpc<R extends RpcRoutes>({
+export function proxyTinyRpc<R extends TinyRpcRoutes>({
   adapter,
 }: {
-  adapter: RpcClientAdapter;
-}): RpcRoutesAsync<R> {
+  adapter: TinyRpcClientAdapter;
+}): TinyRpcRoutesAsync<R> {
   return new Proxy(
     {},
     {
       get(_target, path, _receiver) {
         tinyassert(
           typeof path === "string",
-          new RpcError("invalid path", { cause: path })
+          new TinyRpcError("invalid path", { cause: path })
         );
         return async (...args: unknown[]) => {
           // automatically wrap all client error as RpcError
           try {
-            return await adapter.post({ path, args });
+            return await adapter.send({ path, args });
           } catch (e) {
-            throw RpcError.fromUnknown(e);
+            throw TinyRpcError.fromUnknown(e);
           }
         };
       },
@@ -72,7 +70,7 @@ export function proxyRpc<R extends RpcRoutes>({
 // error
 //
 
-export class RpcError extends Error {
+export class TinyRpcError extends Error {
   // employ http status convention
   public status = 500;
 
@@ -91,11 +89,11 @@ export class RpcError extends Error {
     };
   }
 
-  static fromUnknown(e: unknown): RpcError {
-    if (e instanceof RpcError) {
+  static fromUnknown(e: unknown): TinyRpcError {
+    if (e instanceof TinyRpcError) {
       return e;
     }
-    const err = new RpcError("unknown", { cause: e });
+    const err = new TinyRpcError("unknown", { cause: e });
     if (e && typeof e === "object") {
       if ("message" in e && typeof e.message === "string") {
         err.message = e.message;

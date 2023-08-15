@@ -4,8 +4,13 @@ import { type RequestHandler, compose } from "@hattip/compose";
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { fetchClientAdapter, hattipServerAdapter } from "./adapter-web";
-import { RpcError, type RpcRoutes, exposeRpc, proxyRpc } from "./core";
+import { httpClientAdapter, httpServerAdapter } from "./adapter-web";
+import {
+  TinyRpcError,
+  type TinyRpcRoutes,
+  exposeTinyRpc,
+  proxyTinyRpc,
+} from "./core";
 import { zodFn } from "./zod";
 
 //
@@ -70,7 +75,7 @@ function defineExampleRpc() {
       const { request } = useContext();
       return request.headers.get("x-auth") === "good";
     },
-  } satisfies RpcRoutes;
+  } satisfies TinyRpcRoutes;
 
   return { routes, contextProviderHandler };
 }
@@ -96,9 +101,9 @@ describe("e2e", () => {
           };
         },
         contextProviderHandler(),
-        exposeRpc({
+        exposeTinyRpc({
           routes,
-          adapter: hattipServerAdapter({ endpoint }),
+          adapter: httpServerAdapter({ endpoint }),
         }),
         () => new Response("tiny-rpc-skipped")
       )
@@ -110,8 +115,8 @@ describe("e2e", () => {
     //
     const headers: Record<string, string> = {}; // inject headers to demonstrate context
     const logStatus = vi.fn();
-    const client = proxyRpc<typeof routes>({
-      adapter: fetchClientAdapter({
+    const client = proxyTinyRpc<typeof routes>({
+      adapter: httpClientAdapter({
         url: url + endpoint,
         fetch: async (url, input) => {
           const res = await fetch(url, {
@@ -156,7 +161,7 @@ describe("e2e", () => {
       client.incrementCounter({ delta: "2" as any as number })
     ).rejects.toSatisfy((e) => {
       expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("400");
-      tinyassert(e instanceof RpcError);
+      tinyassert(e instanceof TinyRpcError);
       expect(e).toMatchInlineSnapshot(`
         [Error: [
           {
@@ -177,7 +182,7 @@ describe("e2e", () => {
     await expect((client as any).incrementCounterXXX()).rejects.toSatisfy(
       (e) => {
         expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("500");
-        tinyassert(e instanceof RpcError);
+        tinyassert(e instanceof TinyRpcError);
         expect(e).toMatchInlineSnapshot("[Error: invalid path]");
         return true;
       }
@@ -186,7 +191,7 @@ describe("e2e", () => {
     // runtime erorr
     await expect(client.checkIdThrow("bad")).rejects.toSatisfy((e) => {
       expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("500");
-      tinyassert(e instanceof RpcError);
+      tinyassert(e instanceof TinyRpcError);
       expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
       return true;
     });
@@ -221,9 +226,9 @@ describe("e2e", () => {
           };
         },
         contextProviderHandler(),
-        exposeRpc({
+        exposeTinyRpc({
           routes,
-          adapter: hattipServerAdapter({ endpoint, method: "GET" }),
+          adapter: httpServerAdapter({ endpoint, method: "GET" }),
         }),
         () => new Response("tiny-rpc-skipped")
       )
@@ -235,8 +240,8 @@ describe("e2e", () => {
     //
     const headers: Record<string, string> = {}; // inject headers to demonstrate context
     const logStatus = vi.fn();
-    const client = proxyRpc<typeof routes>({
-      adapter: fetchClientAdapter({
+    const client = proxyTinyRpc<typeof routes>({
+      adapter: httpClientAdapter({
         url: url + endpoint,
         method: "GET",
         fetch: async (url, input) => {
@@ -282,7 +287,7 @@ describe("e2e", () => {
       client.incrementCounter({ delta: "2" as any as number })
     ).rejects.toSatisfy((e) => {
       expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("400");
-      tinyassert(e instanceof RpcError);
+      tinyassert(e instanceof TinyRpcError);
       expect(e).toMatchInlineSnapshot(`
         [Error: [
           {
@@ -303,7 +308,7 @@ describe("e2e", () => {
     await expect((client as any).incrementCounterXXX()).rejects.toSatisfy(
       (e) => {
         expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("500");
-        tinyassert(e instanceof RpcError);
+        tinyassert(e instanceof TinyRpcError);
         expect(e).toMatchInlineSnapshot("[Error: invalid path]");
         return true;
       }
@@ -312,7 +317,7 @@ describe("e2e", () => {
     // runtime erorr
     await expect(client.checkIdThrow("bad")).rejects.toSatisfy((e) => {
       expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("500");
-      tinyassert(e instanceof RpcError);
+      tinyassert(e instanceof TinyRpcError);
       expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
       return true;
     });

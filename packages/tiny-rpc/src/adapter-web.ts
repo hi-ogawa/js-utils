@@ -1,21 +1,22 @@
 import { type Result, tinyassert, wrapErrorAsync } from "@hiogawa/utils";
-import { type RpcClientAdapter, RpcError, type RpcServerAdapter } from "./core";
-
-// TODO:
-// - custom (de)serializer
+import {
+  type TinyRpcClientAdapter,
+  TinyRpcError,
+  type TinyRpcServerAdapter,
+} from "./core";
 
 // compatible with hattip's RequestHandler
 type RequestHandler = (ctx: {
   request: Request;
 }) => Promise<Response | undefined>;
 
-export function hattipServerAdapter(opts: {
+export function httpServerAdapter(opts: {
   endpoint: string;
   method?: "GET" | "POST";
   onError?: (e: unknown) => void;
-}): RpcServerAdapter<RequestHandler> {
+}): TinyRpcServerAdapter<RequestHandler> {
   return {
-    on: (invokeRoute): RequestHandler => {
+    register: (invokeRoute): RequestHandler => {
       return async ({ request }) => {
         const url = new URL(request.url);
         if (!url.pathname.startsWith(opts.endpoint)) {
@@ -24,7 +25,7 @@ export function hattipServerAdapter(opts: {
         const result = await wrapErrorAsync(async () => {
           tinyassert(
             request.method === (opts.method ?? "POST"),
-            new RpcError("invalid method", {
+            new TinyRpcError("invalid method", {
               cause: request.method,
             }).setStatus(405)
           );
@@ -42,7 +43,7 @@ export function hattipServerAdapter(opts: {
         let status = 200;
         if (!result.ok) {
           opts.onError?.(result.value);
-          const e = RpcError.fromUnknown(result.value);
+          const e = TinyRpcError.fromUnknown(result.value);
           status = e.status;
           result.value = e.serialize();
         }
@@ -57,14 +58,14 @@ export function hattipServerAdapter(opts: {
   };
 }
 
-export function fetchClientAdapter(opts: {
+export function httpClientAdapter(opts: {
   url: string;
   method?: "GET" | "POST";
   fetch?: (typeof globalThis)["fetch"];
-}): RpcClientAdapter {
+}): TinyRpcClientAdapter {
   const fetch = opts.fetch ?? globalThis.fetch;
   return {
-    post: async (data) => {
+    send: async (data) => {
       const url = [opts.url, data.path].join("/");
       const payload = JSON.stringify(data.args);
       let req: Request;

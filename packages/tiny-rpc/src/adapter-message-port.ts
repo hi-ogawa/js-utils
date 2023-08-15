@@ -4,10 +4,10 @@ import {
   wrapErrorAsync,
 } from "@hiogawa/utils";
 import {
-  type RpcClientAdapter,
-  RpcError,
-  type RpcPayload,
-  type RpcServerAdapter,
+  type TinyRpcClientAdapter,
+  TinyRpcError,
+  type TinyRpcPayload,
+  type TinyRpcServerAdapter,
 } from "./core";
 
 // TODO:
@@ -37,16 +37,16 @@ export function messagePortServerAdapter({
 }: {
   port: TinyRpcMessagePort;
   onError?: (e: unknown) => void;
-}): RpcServerAdapter<() => void> {
+}): TinyRpcServerAdapter<() => void> {
   return {
-    on: (invokeRoute) => {
+    register: (invokeRoute) => {
       // TODO: async handler caveat
       return listen(port, async (ev) => {
         const req = ev.data as RequestPayload; // TODO: validate
         const result = await wrapErrorAsync(async () => invokeRoute(req.data));
         if (!result.ok) {
           onError?.(result.value);
-          result.value = RpcError.fromUnknown(result.value).serialize();
+          result.value = TinyRpcError.fromUnknown(result.value).serialize();
         }
         const res: ResponsePayload = {
           id: req.id,
@@ -62,9 +62,9 @@ export function messagePortClientAdapter({
   port,
 }: {
   port: TinyRpcMessagePort;
-}): RpcClientAdapter {
+}): TinyRpcClientAdapter {
   return {
-    post: async (data) => {
+    send: async (data) => {
       const req: RequestPayload = {
         id: mathRandomId(),
         data,
@@ -80,7 +80,7 @@ export function messagePortClientAdapter({
       port.postMessage(req);
       const res = await promiseResolvers.promise;
       if (!res.result.ok) {
-        throw RpcError.fromUnknown(res.result.value);
+        throw TinyRpcError.fromUnknown(res.result.value);
       }
       return res.result.value;
     },
@@ -89,7 +89,7 @@ export function messagePortClientAdapter({
 
 interface RequestPayload {
   id: string;
-  data: RpcPayload;
+  data: TinyRpcPayload;
 }
 
 interface ResponsePayload {

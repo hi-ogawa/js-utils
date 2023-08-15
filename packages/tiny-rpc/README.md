@@ -12,6 +12,10 @@ As `comlink` alternative:
 
 - no callback
 
+## todo
+
+- custom (de)serializer
+
 ## inspired by
 
 - https://github.com/trpc/trpc
