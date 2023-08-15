@@ -2,7 +2,7 @@ import { type Result, tinyassert, wrapErrorAsync } from "@hiogawa/utils";
 import { type RpcClientAdapter, RpcError, type RpcServerAdapter } from "./core";
 
 // TODO:
-// - map error to http error code
+// - custom (de)serializer
 // - support GET version of adapter (or as options)
 
 // compatible with hattip's RequestHandler
@@ -21,17 +21,26 @@ export function hattipServerAdapter(opts: {
         if (!url.pathname.startsWith(opts.endpoint)) {
           return;
         }
-        tinyassert(request.method === "POST"); // TODO: error
-        const path = url.pathname.slice(opts.endpoint.length + 1);
-        const args = await request.json();
-        const result = await wrapErrorAsync(async () =>
-          invokeRoute({ path, args })
-        );
+        const result = await wrapErrorAsync(async () => {
+          tinyassert(
+            request.method === "POST",
+            new TinyRpcHttpError("invalid method", {
+              cause: request.method,
+            }).setHttpStatus(405)
+          );
+          const path = url.pathname.slice(opts.endpoint.length + 1);
+          const args = await request.json();
+          return invokeRoute({ path, args });
+        });
+        let status = 200;
         if (!result.ok) {
           opts.onError?.(result.value);
-          result.value = RpcError.fromUnknown(result.value).serialize();
+          const e = TinyRpcHttpError.fromUnknown(result.value);
+          status = e.httpStatus;
+          result.value = e.serialize();
         }
         return new Response(JSON.stringify(result), {
+          status,
           headers: {
             "content-type": "application/json; charset=utf-8",
           },
@@ -56,13 +65,45 @@ export function fetchClientAdapter(opts: {
           "content-type": "application/json; charset=utf-8",
         },
       });
-      tinyassert(res.ok); // TODO: error
-
       const result: Result<unknown, unknown> = await res.json();
       if (!result.ok) {
-        throw RpcError.fromUnknown(result.value);
+        throw result.value;
       }
       return result.value;
     },
   };
+}
+
+// TODO: fine to move to RpcError?
+export class TinyRpcHttpError extends RpcError {
+  public httpStatus = 500;
+
+  // convenience for assertion
+  setHttpStatus(status: number): this {
+    this.httpStatus = status;
+    return this;
+  }
+
+  static override fromUnknown(e: unknown): TinyRpcHttpError {
+    if (e instanceof TinyRpcHttpError) {
+      return e;
+    }
+    const err = Object.assign(
+      new TinyRpcHttpError(),
+      super.fromUnknown(e).serialize()
+    );
+    // ad-hoc handling for zod error
+    if (objectHas(err.cause, "name") && err.cause.name === "ZodError") {
+      err.httpStatus = 400;
+    }
+    return err;
+  }
+}
+
+// TODO: to utils
+function objectHas<Prop extends keyof any>(
+  v: unknown,
+  prop: Prop
+): v is { [prop in Prop]: unknown } {
+  return Boolean(v && typeof v === "object" && prop in v);
 }

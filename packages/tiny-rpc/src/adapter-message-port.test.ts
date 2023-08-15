@@ -109,7 +109,7 @@ describe("adapter-message-port", () => {
     await expect((client as any).incrementCounterXXX()).rejects.toSatisfy(
       (e) => {
         tinyassert(e instanceof RpcError);
-        expect(e).toMatchInlineSnapshot("[Error: path not found]");
+        expect(e).toMatchInlineSnapshot("[Error: invalid path]");
         expect(e.cause).toMatchInlineSnapshot('"incrementCounterXXX"');
         return true;
       }

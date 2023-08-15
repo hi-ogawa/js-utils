@@ -2,9 +2,15 @@
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/dac9b82160ab002f77a400383d2663c264041080/types/node/assert.d.ts#L12
 // https://github.com/chaijs/assertion-error/blob/08a1f16ece0c5d4b916c9ce1479a776df0e203e0/mod.ts#L10
 
-export function tinyassert(value: unknown, message?: string): asserts value {
+export function tinyassert(
+  value: unknown,
+  message?: string | Error
+): asserts value {
   if (value) {
     return;
+  }
+  if (message instanceof Error) {
+    throw message;
   }
   throw new TinyAssertionError(message, tinyassert);
 }

@@ -1,3 +1,5 @@
+import { tinyassert } from "@hiogawa/utils";
+
 // TODO: rename all with prefix "TinyRpc" after removing old ones
 
 //
@@ -33,12 +35,10 @@ export function exposeRpc<T>({
   routes: RpcRoutes;
   adapter: RpcServerAdapter<T>;
 }): T {
-  return adapter.on(({ path, args }) => {
+  return adapter.on(async ({ path, args }) => {
     const fn = routes[path];
-    if (!fn) {
-      throw new RpcError(`path not found`, { cause: path });
-    }
-    return fn(...args);
+    tinyassert(fn, new RpcError("invalid path", { cause: path }));
+    return await fn(...args);
   });
 }
 
@@ -51,10 +51,18 @@ export function proxyRpc<R extends RpcRoutes>({
     {},
     {
       get(_target, path, _receiver) {
-        if (typeof path !== "string") {
-          throw new RpcError(`invalid path`, { cause: path });
-        }
-        return (...args: unknown[]) => adapter.post({ path, args });
+        tinyassert(
+          typeof path === "string",
+          new RpcError("invalid path", { cause: path })
+        );
+        return async (...args: unknown[]) => {
+          // automatically wrap all client error as RpcError
+          try {
+            return await adapter.post({ path, args });
+          } catch (e) {
+            throw RpcError.fromUnknown(e);
+          }
+        };
       },
     }
   ) as any;

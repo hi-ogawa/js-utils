@@ -2,7 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { createServer } from "@hattip/adapter-node";
 import { type RequestHandler, compose } from "@hattip/compose";
 import { tinyassert } from "@hiogawa/utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { fetchClientAdapter, hattipServerAdapter } from "./adapter-web";
 import { RpcError, type RpcRoutes, exposeRpc, proxyRpc } from "./core";
@@ -109,17 +109,21 @@ describe("e2e", () => {
     // client
     //
     const headers: Record<string, string> = {}; // inject headers to demonstrate context
+    const logStatus = vi.fn();
     const client = proxyRpc<typeof routes>({
       adapter: fetchClientAdapter({
         url: url + endpoint,
-        fetch: (url, input) =>
-          fetch(url, {
+        fetch: async (url, input) => {
+          const res = await fetch(url, {
             ...input,
             headers: {
               ...input?.headers,
               ...headers,
             },
-          }),
+          });
+          logStatus(res.status);
+          return res;
+        }
       }),
     });
     expect(await client.checkId("good")).toMatchInlineSnapshot("true");
@@ -141,6 +145,7 @@ describe("e2e", () => {
     expect(await client.checkAuth()).toMatchInlineSnapshot("true");
     headers["x-auth"] = "bad";
     expect(await client.checkAuth()).toMatchInlineSnapshot("false");
+    expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot('200');
 
     //
     // error
@@ -150,6 +155,7 @@ describe("e2e", () => {
     await expect(
       client.incrementCounter({ delta: "2" as any as number })
     ).rejects.toSatisfy((e) => {
+      expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot('400');
       tinyassert(e instanceof RpcError);
       expect(e).toMatchInlineSnapshot(`
         [Error: [
@@ -170,14 +176,16 @@ describe("e2e", () => {
     // invalid path
     await expect((client as any).incrementCounterXXX()).rejects.toSatisfy(
       (e) => {
+        expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot('500');
         tinyassert(e instanceof RpcError);
-        expect(e).toMatchInlineSnapshot("[Error: path not found]");
+        expect(e).toMatchInlineSnapshot("[Error: invalid path]");
         return true;
       }
     );
 
     // runtime erorr
     await expect(client.checkIdThrow("bad")).rejects.toSatisfy((e) => {
+      expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot('500');
       tinyassert(e instanceof RpcError);
       expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
       return true;
