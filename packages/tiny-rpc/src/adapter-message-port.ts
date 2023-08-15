@@ -15,13 +15,11 @@ export function messagePortServerAdapter({
 }: {
   port: MessagePort;
   onError?: (e: unknown) => void;
-}): RpcServerAdapter<void> {
+}): RpcServerAdapter<{ dispose: () => void }> {
   return {
     on: (invokeRoute) => {
-      // TODO port.removeEventListener
-
       // TODO: async handler caveat
-      port.addEventListener("message", async (ev) => {
+      const unlisten1 = listen(port, "message", async (ev) => {
         const req = ev.data as RequestPayload; // TODO: validate
         const result = await wrapErrorAsync(async () => invokeRoute(req.data));
         if (!result.ok) {
@@ -34,9 +32,16 @@ export function messagePortServerAdapter({
         port.postMessage(res);
       });
 
-      port.addEventListener("messageerror", (ev) => {
+      const unlisten2 = listen(port, "messageerror", (ev) => {
         onError?.(new Error("messageerror", { cause: ev }));
       });
+
+      return {
+        dispose: () => {
+          unlisten1();
+          unlisten2();
+        },
+      };
     },
   };
 }
@@ -48,8 +53,8 @@ export function messagePortClientAdapter({
   port: MessagePort;
   onError?: (e: unknown) => void;
 }): RpcClientAdapter {
-  // TODO port.removeEventListener
-  port.addEventListener("messageerror", (ev) => {
+  // TODO: unlisten
+  listen(port, "messageerror", (ev) => {
     onError?.(new Error("messageerror", { cause: ev }));
   });
 
@@ -59,18 +64,14 @@ export function messagePortClientAdapter({
         id: mathRandomId(),
         data,
       };
-
       const promiseResolvers = newPromiseWithResolvers<ResponsePayload>();
-
-      async function handler(ev: MessageEvent) {
+      const unlisten = listen(port, "message", (ev) => {
         const res = ev.data as ResponsePayload;
         if (res.id === req.id) {
           promiseResolvers.resolve(res);
-          port.removeEventListener("message", handler);
+          unlisten();
         }
-      }
-
-      port.addEventListener("message", handler);
+      });
       port.postMessage(req);
       const res = await promiseResolvers.promise;
       if (!res.result.ok) {
@@ -93,8 +94,19 @@ interface ResponsePayload {
 
 // WebCrypto.randomUUID?
 // collision check on server?
-export function mathRandomId() {
+function mathRandomId() {
   return Math.floor(Math.random() * 2 ** 48)
     .toString(16)
     .padStart(12, "0");
+}
+
+function listen<K extends keyof MessagePortEventMap>(
+  port: MessagePort,
+  type: K,
+  listener: (ev: MessagePortEventMap[K]) => unknown
+) {
+  port.addEventListener(type, listener);
+  return () => {
+    port.removeEventListener(type, listener);
+  };
 }
