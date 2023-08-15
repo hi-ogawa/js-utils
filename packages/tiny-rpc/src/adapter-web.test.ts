@@ -11,7 +11,7 @@ import {
   exposeTinyRpc,
   proxyTinyRpc,
 } from "./core";
-import { zodFn } from "./zod";
+import { validateFn } from "./validation";
 
 //
 // example rpc
@@ -62,7 +62,7 @@ function defineExampleRpc() {
     getCounter: () => counter,
 
     // define with zod validation + input type inference
-    incrementCounter: zodFn(z.object({ delta: z.number().default(1) }))(
+    incrementCounter: validateFn(z.object({ delta: z.number().default(1) }))(
       (input) => {
         input satisfies { delta: number };
         counter += input.delta;

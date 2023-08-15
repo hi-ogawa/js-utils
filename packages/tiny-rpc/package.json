@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/tiny-rpc",
-  "version": "0.2.3-pre.1",
+  "version": "0.2.3-pre.2",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -10,16 +10,6 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
-    },
-    "./dist/index-v2": {
-      "import": "./dist/index-v2.js",
-      "require": "./dist/index-v2.cjs",
-      "types": "./dist/index-v2.d.ts"
-    },
-    "./dist/zod": {
-      "import": "./dist/zod.js",
-      "require": "./dist/zod.cjs",
-      "types": "./dist/zod.d.ts"
     }
   },
   "files": [
@@ -46,13 +36,5 @@
     "@hattip/compose": "^0.0.34",
     "@hiogawa/utils": "workspace:*",
     "zod": "^3.21.4"
-  },
-  "peerDependencies": {
-    "zod": "*"
-  },
-  "peerDependenciesMeta": {
-    "zod": {
-      "optional": true
-    }
   }
 }
