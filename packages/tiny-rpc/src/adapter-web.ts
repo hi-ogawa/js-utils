@@ -1,8 +1,8 @@
 import { type Result, tinyassert, wrapErrorAsync } from "@hiogawa/utils";
-import type { RpcClientAdapter, RpcServerAdapter } from "./core";
+import { type RpcClientAdapter, RpcError, type RpcServerAdapter } from "./core";
 
 // TODO:
-// - propagate Error
+// - map error to http error code
 // - support GET version of adapter (or as options)
 
 // compatible with hattip's RequestHandler
@@ -21,14 +21,15 @@ export function hattipServerAdapter(opts: {
         if (!url.pathname.startsWith(opts.endpoint)) {
           return;
         }
-        tinyassert(request.method === "POST");
+        tinyassert(request.method === "POST"); // TODO: error
         const path = url.pathname.slice(opts.endpoint.length + 1);
         const args = await request.json();
         const result = await wrapErrorAsync(async () =>
           invokeRoute({ path, args })
         );
-        if (!result.ok && opts.onError) {
-          opts.onError(result.value);
+        if (!result.ok) {
+          opts.onError?.(result.value);
+          result.value = RpcError.fromUnknown(result.value).serialize();
         }
         return new Response(JSON.stringify(result), {
           headers: {
@@ -55,11 +56,11 @@ export function fetchClientAdapter(opts: {
           "content-type": "application/json; charset=utf-8",
         },
       });
-      tinyassert(res.ok);
+      tinyassert(res.ok); // TODO: error
 
       const result: Result<unknown, unknown> = await res.json();
       if (!result.ok) {
-        throw result.value;
+        throw RpcError.fromUnknown(result.value);
       }
       return result.value;
     },

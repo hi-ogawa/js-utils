@@ -3,10 +3,14 @@ import {
   newPromiseWithResolvers,
   wrapErrorAsync,
 } from "@hiogawa/utils";
-import type { RpcClientAdapter, RpcPayload, RpcServerAdapter } from "./core";
+import {
+  type RpcClientAdapter,
+  RpcError,
+  type RpcPayload,
+  type RpcServerAdapter,
+} from "./core";
 
 // TODO:
-// - propagate custom Error (custom serialize/deserialize?)
 // - support "transferable"?
 // - dispose?
 
@@ -40,8 +44,9 @@ export function messagePortServerAdapter({
       return listen(port, async (ev) => {
         const req = ev.data as RequestPayload; // TODO: validate
         const result = await wrapErrorAsync(async () => invokeRoute(req.data));
-        if (!result.ok && onError) {
-          onError(result.value);
+        if (!result.ok) {
+          onError?.(result.value);
+          result.value = RpcError.fromUnknown(result.value).serialize();
         }
         const res: ResponsePayload = {
           id: req.id,
@@ -75,7 +80,7 @@ export function messagePortClientAdapter({
       port.postMessage(req);
       const res = await promiseResolvers.promise;
       if (!res.result.ok) {
-        throw res.result.value;
+        throw RpcError.fromUnknown(res.result.value);
       }
       return res.result.value;
     },

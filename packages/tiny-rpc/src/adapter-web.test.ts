@@ -5,7 +5,7 @@ import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { fetchClientAdapter, hattipServerAdapter } from "./adapter-web";
-import { type RpcRoutes, exposeRpc, proxyRpc } from "./core";
+import { RpcError, type RpcRoutes, exposeRpc, proxyRpc } from "./core";
 import { zodFn } from "./zod";
 
 //
@@ -150,21 +150,19 @@ describe("e2e", () => {
     await expect(
       client.incrementCounter({ delta: "2" as any as number })
     ).rejects.toSatisfy((e) => {
+      tinyassert(e instanceof RpcError);
       expect(e).toMatchInlineSnapshot(`
-        {
-          "issues": [
-            {
-              "code": "invalid_type",
-              "expected": "number",
-              "message": "Expected number, received string",
-              "path": [
-                "delta",
-              ],
-              "received": "string",
-            },
-          ],
-          "name": "ZodError",
-        }
+        [Error: [
+          {
+            "code": "invalid_type",
+            "expected": "number",
+            "received": "string",
+            "path": [
+              "delta"
+            ],
+            "message": "Expected number, received string"
+          }
+        ]]
       `);
       return true;
     });
@@ -172,14 +170,16 @@ describe("e2e", () => {
     // invalid path
     await expect((client as any).incrementCounterXXX()).rejects.toSatisfy(
       (e) => {
-        expect(e).toMatchInlineSnapshot("{}");
+        tinyassert(e instanceof RpcError);
+        expect(e).toMatchInlineSnapshot("[Error: path not found]");
         return true;
       }
     );
 
     // runtime erorr
     await expect(client.checkIdThrow("bad")).rejects.toSatisfy((e) => {
-      expect(e).toMatchInlineSnapshot("{}");
+      tinyassert(e instanceof RpcError);
+      expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
       return true;
     });
 

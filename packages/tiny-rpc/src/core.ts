@@ -1,7 +1,7 @@
-import { tinyassert } from "@hiogawa/utils";
+// TODO: rename all with prefix "TinyRpc" after removing old ones
 
 //
-// uni-directional version of https://github.com/antfu/birpc
+// TinyRpc routes schema
 //
 
 export type RpcRoutes = Record<string, (...args: any[]) => any>;
@@ -11,6 +11,10 @@ export type RpcRoutesAsync<R extends RpcRoutes> = {
     ...args: Parameters<R[K]>
   ) => Promise<Awaited<ReturnType<R[K]>>>;
 };
+
+//
+// Adapter interface
+//
 
 export type RpcPayload = { path: string; args: unknown[] };
 
@@ -31,7 +35,9 @@ export function exposeRpc<T>({
 }): T {
   return adapter.on(({ path, args }) => {
     const fn = routes[path];
-    tinyassert(fn, `invalid path '${path}'`);
+    if (!fn) {
+      throw new RpcError(`path not found`, { cause: path });
+    }
     return fn(...args);
   });
 }
@@ -45,9 +51,40 @@ export function proxyRpc<R extends RpcRoutes>({
     {},
     {
       get(_target, path, _receiver) {
-        tinyassert(typeof path === "string");
+        if (typeof path !== "string") {
+          throw new RpcError(`invalid path`, { cause: path });
+        }
         return (...args: unknown[]) => adapter.post({ path, args });
       },
     }
   ) as any;
+}
+
+export class RpcError extends Error {
+  serialize() {
+    return {
+      message: this.message,
+      stack: this.stack,
+      cause: this.cause,
+    };
+  }
+
+  static fromUnknown(e: unknown): RpcError {
+    if (e instanceof RpcError) {
+      return e;
+    }
+    const err = new RpcError("unknown", { cause: e });
+    if (e && typeof e === "object") {
+      if ("message" in e && typeof e.message === "string") {
+        err.message = e.message;
+      }
+      if ("stack" in e && typeof e.stack === "string") {
+        err.stack = e.stack;
+      }
+      if ("cause" in e) {
+        err.cause = e.cause;
+      }
+    }
+    return err;
+  }
 }

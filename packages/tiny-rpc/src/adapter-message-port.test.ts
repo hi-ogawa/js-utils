@@ -7,7 +7,7 @@ import {
   messagePortServerAdapter,
 } from "./adapter-message-port";
 import type { TinyRpcMessagePortNode } from "./adapter-message-port-node";
-import { type RpcRoutes, exposeRpc, proxyRpc } from "./core";
+import { RpcError, type RpcRoutes, exposeRpc, proxyRpc } from "./core";
 import { zodFn } from "./zod";
 
 //
@@ -88,22 +88,19 @@ describe("adapter-message-port", () => {
     await expect(
       client.incrementCounter({ delta: "2" as any as number })
     ).rejects.toSatisfy((e) => {
-      // ZodError is not propagated through MessageChannel
-      // but `Error.stack` is kept as is
-      tinyassert(e instanceof Error);
-      expect(e).toMatchInlineSnapshot("[Error]");
-      expect(e.stack?.match(/.*^]/ms)?.[0]).toMatchInlineSnapshot(`
-        "ZodError: [
+      tinyassert(e instanceof RpcError);
+      expect(e).toMatchInlineSnapshot(`
+        [Error: [
           {
-            \\"code\\": \\"invalid_type\\",
-            \\"expected\\": \\"number\\",
-            \\"received\\": \\"string\\",
-            \\"path\\": [
-              \\"delta\\"
+            "code": "invalid_type",
+            "expected": "number",
+            "received": "string",
+            "path": [
+              "delta"
             ],
-            \\"message\\": \\"Expected number, received string\\"
+            "message": "Expected number, received string"
           }
-        ]"
+        ]]
       `);
       return true;
     });
@@ -111,15 +108,16 @@ describe("adapter-message-port", () => {
     // invalid path
     await expect((client as any).incrementCounterXXX()).rejects.toSatisfy(
       (e) => {
-        expect(e).toMatchInlineSnapshot(
-          "[Error: invalid path 'incrementCounterXXX']"
-        );
+        tinyassert(e instanceof RpcError);
+        expect(e).toMatchInlineSnapshot("[Error: path not found]");
+        expect(e.cause).toMatchInlineSnapshot('"incrementCounterXXX"');
         return true;
       }
     );
 
     // runtime erorr
     await expect(client.checkIdThrow("bad")).rejects.toSatisfy((e) => {
+      tinyassert(e instanceof RpcError);
       expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
       return true;
     });
