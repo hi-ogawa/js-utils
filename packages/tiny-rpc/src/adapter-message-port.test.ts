@@ -52,7 +52,7 @@ describe("adapter-message-port", () => {
     //
 
     const channel = new MessageChannel();
-    const { dispose } = exposeRpc({
+    const dispose = exposeRpc({
       routes,
       adapter: messagePortServerAdapter({ port: channel.port1 }),
     });

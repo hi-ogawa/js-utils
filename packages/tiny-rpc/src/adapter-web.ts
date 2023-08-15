@@ -27,8 +27,8 @@ export function hattipServerAdapter(opts: {
         const result = await wrapErrorAsync(async () =>
           invokeRoute({ path, args })
         );
-        if (!result.ok) {
-          opts.onError?.(result.value);
+        if (!result.ok && opts.onError) {
+          opts.onError(result.value);
         }
         return new Response(JSON.stringify(result), {
           headers: {

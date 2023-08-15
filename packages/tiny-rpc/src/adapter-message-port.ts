@@ -8,6 +8,7 @@ import type { RpcClientAdapter, RpcPayload, RpcServerAdapter } from "./core";
 // TODO:
 // - propagate custom Error (custom serialize/deserialize?)
 // - support "transferable"?
+// - dispose listener?
 
 export function messagePortServerAdapter({
   port,
@@ -15,15 +16,15 @@ export function messagePortServerAdapter({
 }: {
   port: MessagePort;
   onError?: (e: unknown) => void;
-}): RpcServerAdapter<{ dispose: () => void }> {
+}): RpcServerAdapter<() => void> {
   return {
     on: (invokeRoute) => {
       // TODO: async handler caveat
-      const unlisten1 = listen(port, "message", async (ev) => {
+      return listen(port, "message", async (ev) => {
         const req = ev.data as RequestPayload; // TODO: validate
         const result = await wrapErrorAsync(async () => invokeRoute(req.data));
-        if (!result.ok) {
-          onError?.(result.value);
+        if (!result.ok && onError) {
+          onError(result.value);
         }
         const res: ResponsePayload = {
           id: req.id,
@@ -31,33 +32,15 @@ export function messagePortServerAdapter({
         };
         port.postMessage(res);
       });
-
-      const unlisten2 = listen(port, "messageerror", (ev) => {
-        onError?.(new Error("messageerror", { cause: ev }));
-      });
-
-      return {
-        dispose: () => {
-          unlisten1();
-          unlisten2();
-        },
-      };
     },
   };
 }
 
 export function messagePortClientAdapter({
   port,
-  onError,
 }: {
   port: MessagePort;
-  onError?: (e: unknown) => void;
 }): RpcClientAdapter {
-  // TODO: unlisten
-  listen(port, "messageerror", (ev) => {
-    onError?.(new Error("messageerror", { cause: ev }));
-  });
-
   return {
     post: async (data) => {
       const req: RequestPayload = {
