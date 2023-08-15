@@ -88,7 +88,23 @@ describe("adapter-message-port", () => {
     await expect(
       client.incrementCounter({ delta: "2" as any as number })
     ).rejects.toSatisfy((e) => {
+      // ZodError is not propagated through MessageChannel
+      // but `Error.stack` is kept as is
+      tinyassert(e instanceof Error);
       expect(e).toMatchInlineSnapshot("[Error]");
+      expect(e.stack?.match(/.*^]/ms)?.[0]).toMatchInlineSnapshot(`
+        "ZodError: [
+          {
+            \\"code\\": \\"invalid_type\\",
+            \\"expected\\": \\"number\\",
+            \\"received\\": \\"string\\",
+            \\"path\\": [
+              \\"delta\\"
+            ],
+            \\"message\\": \\"Expected number, received string\\"
+          }
+        ]"
+      `);
       return true;
     });
 
