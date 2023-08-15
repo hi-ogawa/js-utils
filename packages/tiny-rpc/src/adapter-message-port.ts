@@ -8,28 +8,20 @@ import type { RpcClientAdapter, RpcPayload, RpcServerAdapter } from "./core";
 // TODO:
 // - propagate custom Error (custom serialize/deserialize?)
 // - support "transferable"?
-// - dispose listener?
-// - initial hand-shake helper?
-// - direct support of `WebWorker` and `node:worker_threads`
+// - dispose?
 
 //
-// require only a subset of MessagePort
+// slim down MessagePort interface
+// so that it's easy to generalize to "node:worker_threads"
 //
 
-export interface TinyRpcAdapterMessagePort {
+export interface TinyRpcMessagePort {
   postMessage(data: unknown): void;
   addEventListener(type: "message", handler: MessageHandler): void;
   removeEventListener(type: "message", handler: MessageHandler): void;
 }
 
 type MessageHandler = (ev: { data: unknown }) => void;
-
-function listen(port: TinyRpcAdapterMessagePort, listener: MessageHandler) {
-  port.addEventListener("message", listener);
-  return () => {
-    port.removeEventListener("message", listener);
-  };
-}
 
 //
 // adapter
@@ -39,7 +31,7 @@ export function messagePortServerAdapter({
   port,
   onError,
 }: {
-  port: TinyRpcAdapterMessagePort;
+  port: TinyRpcMessagePort;
   onError?: (e: unknown) => void;
 }): RpcServerAdapter<() => void> {
   return {
@@ -64,7 +56,7 @@ export function messagePortServerAdapter({
 export function messagePortClientAdapter({
   port,
 }: {
-  port: TinyRpcAdapterMessagePort;
+  port: TinyRpcMessagePort;
 }): RpcClientAdapter {
   return {
     post: async (data) => {
@@ -106,4 +98,11 @@ function mathRandomId() {
   return Math.floor(Math.random() * 2 ** 48)
     .toString(16)
     .padStart(12, "0");
+}
+
+function listen(port: TinyRpcMessagePort, listener: MessageHandler) {
+  port.addEventListener("message", listener);
+  return () => {
+    port.removeEventListener("message", listener);
+  };
 }

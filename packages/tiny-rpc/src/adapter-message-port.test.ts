@@ -2,9 +2,11 @@ import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import {
+  type TinyRpcMessagePort,
   messagePortClientAdapter,
   messagePortServerAdapter,
 } from "./adapter-message-port";
+import type { TinyRpcMessagePortNode } from "./adapter-message-port-node";
 import { type RpcRoutes, exposeRpc, proxyRpc } from "./core";
 import { zodFn } from "./zod";
 
@@ -105,5 +107,22 @@ describe("adapter-message-port", () => {
       expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
       return true;
     });
+  });
+
+  it("web worker", () => {
+    // check typing
+    () => {
+      new Worker("") satisfies TinyRpcMessagePort;
+      self satisfies TinyRpcMessagePort;
+    };
+  });
+
+  it("node worker", () => {
+    // check typing
+    async () => {
+      const { Worker, MessagePort } = await import("node:worker_threads");
+      new Worker("") satisfies TinyRpcMessagePortNode;
+      new MessagePort() satisfies TinyRpcMessagePortNode;
+    };
   });
 });
