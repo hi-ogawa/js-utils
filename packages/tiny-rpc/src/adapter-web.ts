@@ -12,10 +12,11 @@ type RequestHandler = (ctx: {
 
 export function httpServerAdapter(opts: {
   endpoint: string;
-  method?: "GET" | "POST";
+  method: "GET" | "POST"; // GET is useful to cache reponse of public endpoint
+  JSON?: JsonTransformer;
   onError?: (e: unknown) => void;
 }): TinyRpcServerAdapter<RequestHandler> {
-  const method = opts.method ?? "POST";
+  const JSON = opts.JSON ?? globalThis.JSON;
 
   return {
     register: (invokeRoute): RequestHandler => {
@@ -26,19 +27,19 @@ export function httpServerAdapter(opts: {
         }
         const result = await wrapErrorAsync(async () => {
           tinyassert(
-            request.method === method,
+            request.method === opts.method,
             new TinyRpcError("invalid method", {
               cause: request.method,
             }).setStatus(405)
           );
           const path = url.pathname.slice(opts.endpoint.length + 1);
           let args: unknown[];
-          if (method === "GET") {
+          if (opts.method === "GET") {
             const payload = url.searchParams.get(GET_PAYLOAD_PARAM);
             tinyassert(typeof payload === "string");
             args = JSON.parse(payload);
           } else {
-            args = await request.json();
+            args = JSON.parse(await request.text());
           }
           return invokeRoute({ path, args });
         });
@@ -62,18 +63,19 @@ export function httpServerAdapter(opts: {
 
 export function httpClientAdapter(opts: {
   url: string;
-  method?: "GET" | "POST";
-  fetch?: (typeof globalThis)["fetch"];
+  method: "GET" | "POST";
+  JSON?: JsonTransformer;
+  fetch?: (typeof globalThis)["fetch"]; // override fetch e.g. to customize Authorization headers
 }): TinyRpcClientAdapter {
   const fetch = opts.fetch ?? globalThis.fetch;
-  const method = opts.method ?? "POST";
+  const JSON = opts.JSON ?? globalThis.JSON;
 
   return {
     send: async (data) => {
       const url = [opts.url, data.path].join("/");
       const payload = JSON.stringify(data.args);
       let req: Request;
-      if (method === "GET") {
+      if (opts.method === "GET") {
         req = new Request(
           url + "?" + new URLSearchParams({ [GET_PAYLOAD_PARAM]: payload })
         );
@@ -87,7 +89,7 @@ export function httpClientAdapter(opts: {
         });
       }
       const res = await fetch(req);
-      const result: Result<unknown, unknown> = await res.json();
+      const result: Result<unknown, unknown> = JSON.parse(await res.text());
       if (!result.ok) {
         throw result.value;
       }
@@ -97,3 +99,9 @@ export function httpClientAdapter(opts: {
 }
 
 const GET_PAYLOAD_PARAM = "payload";
+
+// do direct convertion `any <-> string` to support https://github.com/brillout/json-serializer
+interface JsonTransformer {
+  parse: (v: string) => any;
+  stringify: (v: any) => string;
+}

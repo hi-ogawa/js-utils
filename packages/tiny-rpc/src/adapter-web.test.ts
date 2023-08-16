@@ -103,7 +103,7 @@ describe("e2e", () => {
         contextProviderHandler(),
         exposeTinyRpc({
           routes,
-          adapter: httpServerAdapter({ endpoint }),
+          adapter: httpServerAdapter({ endpoint, method: "POST" }),
         }),
         () => new Response("tiny-rpc-skipped")
       )
@@ -118,6 +118,7 @@ describe("e2e", () => {
     const client = proxyTinyRpc<typeof routes>({
       adapter: httpClientAdapter({
         url: url + endpoint,
+        method: "POST",
         fetch: async (url, input) => {
           const res = await fetch(url, {
             ...input,
