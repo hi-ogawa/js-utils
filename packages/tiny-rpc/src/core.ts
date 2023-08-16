@@ -6,7 +6,7 @@ import { tinyassert } from "@hiogawa/utils";
 
 export type TinyRpcRoutes = Record<string, (...args: any[]) => any>;
 
-export type TinyRpcRoutesAsync<R extends TinyRpcRoutes> = {
+export type TinyRpcProxy<R extends TinyRpcRoutes> = {
   [K in keyof R]: (
     ...args: Parameters<R[K]>
   ) => Promise<Awaited<ReturnType<R[K]>>>;
@@ -44,7 +44,7 @@ export function proxyTinyRpc<R extends TinyRpcRoutes>({
   adapter,
 }: {
   adapter: TinyRpcClientAdapter;
-}): TinyRpcRoutesAsync<R> {
+}): TinyRpcProxy<R> {
   return new Proxy(
     {},
     {
