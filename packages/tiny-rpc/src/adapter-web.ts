@@ -14,7 +14,6 @@ type RequestHandler = (ctx: {
 
 export function httpServerAdapter(opts: {
   endpoint: string;
-  method?: "GET" | "POST"; // GET is useful to cache reponse of public endpoint
   pathsForGET?: string[]; // GET is useful to cache reponse of public endpoint
   JSON?: JsonTransformer;
   onError?: (e: unknown) => void;
@@ -67,7 +66,6 @@ export function httpServerAdapter(opts: {
 
 export function httpClientAdapter(opts: {
   url: string;
-  method?: "GET" | "POST";
   pathsForGET?: string[];
   JSON?: JsonTransformer;
   fetch?: (typeof globalThis)["fetch"]; // override fetch e.g. to customize Authorization headers
