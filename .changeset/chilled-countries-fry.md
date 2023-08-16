@@ -2,4 +2,4 @@
 "@hiogawa/tiny-rpc": minor
 ---
 
-feat: generalize concepts to support MessagePort
+feat: make protocol agnostic + support `MessagePort`
