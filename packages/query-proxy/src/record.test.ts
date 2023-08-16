@@ -268,4 +268,16 @@ describe(createFnRecordQueryProxy.name, () => {
       await queryClient.fetchQuery(fnRecordQuery.getCounter.queryOptions())
     ).toMatchInlineSnapshot("1");
   });
+
+  it("reject multi arguments", () => {
+    () =>
+      ({
+        good1: () => 1 + 1,
+
+        good2: ({ x, y }: { x: number; y: number }) => x + y,
+
+        // @ts-expect-error
+        bad: (x: number, y: number) => x + y,
+      } satisfies FnRecord);
+  });
 });
