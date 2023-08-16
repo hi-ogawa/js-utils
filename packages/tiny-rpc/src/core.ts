@@ -80,6 +80,7 @@ export class TinyRpcError extends Error {
     return this;
   }
 
+  // TODO: allow obfuscating server error detail?
   serialize() {
     return {
       message: this.message,
