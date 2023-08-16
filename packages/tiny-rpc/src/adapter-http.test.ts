@@ -3,7 +3,7 @@ import { compose } from "@hattip/compose";
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { httpClientAdapter, httpServerAdapter } from "./adapter-web";
+import { httpClientAdapter, httpServerAdapter } from "./adapter-http";
 import {
   TinyRpcError,
   type TinyRpcRoutes,

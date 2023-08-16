@@ -5,8 +5,6 @@ import {
   type TinyRpcServerAdapter,
 } from "./core";
 
-// TODO: rename to adapter-http
-
 // compatible with hattip's RequestHandler
 type RequestHandler = (ctx: {
   request: Request;
