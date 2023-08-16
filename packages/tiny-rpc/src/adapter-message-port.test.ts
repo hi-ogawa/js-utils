@@ -1,58 +1,17 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
-import { z } from "zod";
 import {
   type TinyRpcMessagePort,
   messagePortClientAdapter,
   messagePortServerAdapter,
 } from "./adapter-message-port";
 import type { TinyRpcMessagePortNode } from "./adapter-message-port-node";
-import {
-  TinyRpcError,
-  type TinyRpcRoutes,
-  exposeTinyRpc,
-  proxyTinyRpc,
-} from "./core";
-import { validateFn } from "./validation";
-
-//
-// example rpc
-//
-
-function defineExampleRpc() {
-  let counter = 0;
-
-  const routes = {
-    // define as a bare function
-    checkId: (id: string) => id === "good",
-
-    checkIdThrow: (id: string) => {
-      tinyassert(id === "good", "Invalid ID");
-      return null;
-    },
-
-    getCounter: () => counter,
-
-    // define with zod validation + input type inference
-    incrementCounter: validateFn(z.object({ delta: z.number().default(1) }))(
-      (input) => {
-        input satisfies { delta: number };
-        counter += input.delta;
-        return counter;
-      }
-    ),
-  } satisfies TinyRpcRoutes;
-
-  return { routes };
-}
-
-//
-// test
-//
+import { TinyRpcError, exposeTinyRpc, proxyTinyRpc } from "./core";
+import { defineTestRpcRoutes } from "./tests/helper";
 
 describe("adapter-message-port", () => {
   it("basic", async () => {
-    const { routes } = defineExampleRpc();
+    const { routes } = defineTestRpcRoutes();
 
     //
     // server
