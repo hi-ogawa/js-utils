@@ -5,6 +5,8 @@ import {
   type TinyRpcServerAdapter,
 } from "./core";
 
+// TODO: rename to adapter-http
+
 // compatible with hattip's RequestHandler
 type RequestHandler = (ctx: {
   request: Request;
@@ -12,7 +14,8 @@ type RequestHandler = (ctx: {
 
 export function httpServerAdapter(opts: {
   endpoint: string;
-  method: "GET" | "POST"; // GET is useful to cache reponse of public endpoint
+  method?: "GET" | "POST"; // GET is useful to cache reponse of public endpoint
+  pathsForGET?: string[]; // GET is useful to cache reponse of public endpoint
   JSON?: JsonTransformer;
   onError?: (e: unknown) => void;
 }): TinyRpcServerAdapter<RequestHandler> {
@@ -26,15 +29,16 @@ export function httpServerAdapter(opts: {
           return;
         }
         const result = await wrapErrorAsync(async () => {
+          const path = url.pathname.slice(opts.endpoint.length + 1);
+          const method = opts.pathsForGET?.includes(path) ? "GET" : "POST";
           tinyassert(
-            request.method === opts.method,
+            request.method === method,
             new TinyRpcError("invalid method", {
               cause: request.method,
             }).setStatus(405)
           );
-          const path = url.pathname.slice(opts.endpoint.length + 1);
           let args: unknown[];
-          if (opts.method === "GET") {
+          if (method === "GET") {
             const payload = url.searchParams.get(GET_PAYLOAD_PARAM);
             tinyassert(typeof payload === "string");
             args = JSON.parse(payload);
@@ -63,7 +67,8 @@ export function httpServerAdapter(opts: {
 
 export function httpClientAdapter(opts: {
   url: string;
-  method: "GET" | "POST";
+  method?: "GET" | "POST";
+  pathsForGET?: string[];
   JSON?: JsonTransformer;
   fetch?: (typeof globalThis)["fetch"]; // override fetch e.g. to customize Authorization headers
 }): TinyRpcClientAdapter {
@@ -74,8 +79,9 @@ export function httpClientAdapter(opts: {
     send: async (data) => {
       const url = [opts.url, data.path].join("/");
       const payload = JSON.stringify(data.args);
+      const method = opts.pathsForGET?.includes(data.path) ? "GET" : "POST";
       let req: Request;
-      if (opts.method === "GET") {
+      if (method === "GET") {
         req = new Request(
           url + "?" + new URLSearchParams({ [GET_PAYLOAD_PARAM]: payload })
         );

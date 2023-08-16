@@ -13,14 +13,15 @@ import {
 import { defineTestRpcRoutes } from "./tests/helper";
 import { validateFn } from "./validation";
 
-describe("e2e", () => {
+describe("adapter-http", () => {
   it("basic", async () => {
-    const endpoint = "/rpc";
     const { routes, contextProviderHandler } = defineTestRpcRoutes();
 
     //
     // server
     //
+    const endpoint = "/rpc";
+    const pathsForGET: (keyof typeof routes)[] = ["getCounter"];
     const server = createServer(
       compose(
         (ctx) => {
@@ -31,7 +32,7 @@ describe("e2e", () => {
         contextProviderHandler(),
         exposeTinyRpc({
           routes,
-          adapter: httpServerAdapter({ endpoint, method: "POST" }),
+          adapter: httpServerAdapter({ endpoint, pathsForGET }),
         }),
         () => new Response("tiny-rpc-skipped")
       )
@@ -46,7 +47,7 @@ describe("e2e", () => {
     const client = proxyTinyRpc<typeof routes>({
       adapter: httpClientAdapter({
         url: url + endpoint,
-        method: "POST",
+        pathsForGET,
         fetch: async (url, input) => {
           const res = await fetch(url, {
             ...input,
@@ -132,14 +133,22 @@ describe("e2e", () => {
 
     // invalid method
     expect(
-      await fetch(url + endpoint).then((res) => res.status)
+      await fetch(url + endpoint + "/getCounter", {
+        method: "POST",
+      }).then((res) => res.status)
+    ).toMatchInlineSnapshot("405");
+
+    expect(
+      await fetch(url + endpoint + "/incrementCounter", {
+        method: "GET",
+      }).then((res) => res.status)
     ).toMatchInlineSnapshot("405");
 
     server.close();
   });
 
   // test is copy-pasted for GET
-  it("GET", async () => {
+  it.skip("GET", async () => {
     const endpoint = "/rpc";
     const { routes, contextProviderHandler } = defineTestRpcRoutes();
 
