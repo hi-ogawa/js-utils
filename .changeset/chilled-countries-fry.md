@@ -1,5 +1,5 @@
 ---
-"@hiogawa/tiny-rpc": minor
+"@hiogawa/tiny-rpc": major
 ---
 
-feat: make protocol agnostic + support `MessagePort`
+feat!: make protocol agnostic + support `MessagePort`
