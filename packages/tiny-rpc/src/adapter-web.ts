@@ -15,6 +15,8 @@ export function httpServerAdapter(opts: {
   method?: "GET" | "POST";
   onError?: (e: unknown) => void;
 }): TinyRpcServerAdapter<RequestHandler> {
+  const method = opts.method ?? "POST";
+
   return {
     register: (invokeRoute): RequestHandler => {
       return async ({ request }) => {
@@ -24,14 +26,14 @@ export function httpServerAdapter(opts: {
         }
         const result = await wrapErrorAsync(async () => {
           tinyassert(
-            request.method === (opts.method ?? "POST"),
+            request.method === method,
             new TinyRpcError("invalid method", {
               cause: request.method,
             }).setStatus(405)
           );
           const path = url.pathname.slice(opts.endpoint.length + 1);
           let args: unknown[];
-          if (opts.method === "GET") {
+          if (method === "GET") {
             const payload = url.searchParams.get(GET_PAYLOAD_PARAM);
             tinyassert(typeof payload === "string");
             args = JSON.parse(payload);
@@ -64,12 +66,14 @@ export function httpClientAdapter(opts: {
   fetch?: (typeof globalThis)["fetch"];
 }): TinyRpcClientAdapter {
   const fetch = opts.fetch ?? globalThis.fetch;
+  const method = opts.method ?? "POST";
+
   return {
     send: async (data) => {
       const url = [opts.url, data.path].join("/");
       const payload = JSON.stringify(data.args);
       let req: Request;
-      if (opts.method === "GET") {
+      if (method === "GET") {
         req = new Request(
           url + "?" + new URLSearchParams({ [GET_PAYLOAD_PARAM]: payload })
         );
