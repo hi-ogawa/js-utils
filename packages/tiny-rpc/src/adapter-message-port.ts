@@ -42,7 +42,8 @@ export function messagePortServerAdapter({
     register: (invokeRoute) => {
       // TODO: async handler caveat
       return listen(port, async (ev) => {
-        const req = ev.data as RequestPayload; // TODO: validate
+        // TODO: collision check req.id on server?
+        const req = ev.data as RequestPayload;
         const result = await wrapErrorAsync(async () => invokeRoute(req.data));
         if (!result.ok) {
           onError?.(result.value);
@@ -60,13 +61,15 @@ export function messagePortServerAdapter({
 
 export function messagePortClientAdapter({
   port,
+  generateId = globalThis?.crypto?.randomUUID ?? mathRandomId,
 }: {
   port: TinyRpcMessagePort;
+  generateId?: () => string;
 }): TinyRpcClientAdapter {
   return {
     send: async (data) => {
       const req: RequestPayload = {
-        id: mathRandomId(),
+        id: generateId(),
         data,
       };
       const promiseResolvers = newPromiseWithResolvers<ResponsePayload>();
@@ -97,12 +100,15 @@ interface ResponsePayload {
   result: Result<unknown, unknown>;
 }
 
-// WebCrypto.randomUUID?
-// collision check on server?
+// cheap fallback id
 function mathRandomId() {
-  return Math.floor(Math.random() * 2 ** 48)
-    .toString(16)
-    .padStart(12, "0");
+  return [32, 16, 16, 16, 48]
+    .map((bits) =>
+      Math.floor(Math.random() * 2 ** bits)
+        .toString(16)
+        .padStart(bits / 4, "0")
+    )
+    .join("-");
 }
 
 function listen(port: TinyRpcMessagePort, listener: MessageHandler) {
