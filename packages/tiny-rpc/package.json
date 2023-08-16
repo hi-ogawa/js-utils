@@ -32,6 +32,7 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
+    "@brillout/json-serializer": "^0.5.4",
     "@hattip/adapter-node": "^0.0.34",
     "@hattip/compose": "^0.0.34",
     "@hiogawa/utils": "workspace:*",

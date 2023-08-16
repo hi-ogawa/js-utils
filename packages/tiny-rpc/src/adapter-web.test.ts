@@ -2,13 +2,16 @@ import { createServer } from "@hattip/adapter-node";
 import { compose } from "@hattip/compose";
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 import { httpClientAdapter, httpServerAdapter } from "./adapter-web";
-import { TinyRpcError, exposeTinyRpc, proxyTinyRpc } from "./core";
+import {
+  TinyRpcError,
+  type TinyRpcRoutes,
+  exposeTinyRpc,
+  proxyTinyRpc,
+} from "./core";
 import { defineTestRpcRoutes } from "./tests/helper";
-
-//
-// test
-//
+import { validateFn } from "./validation";
 
 describe("e2e", () => {
   it("basic", async () => {
@@ -258,6 +261,70 @@ describe("e2e", () => {
     ).toMatchInlineSnapshot("405");
 
     server.close();
+  });
+
+  it("custom serializer", async () => {
+    // https://github.com/brillout/json-serializer
+    const { parse } = await import("@brillout/json-serializer/parse");
+    const { stringify } = await import("@brillout/json-serializer/stringify");
+    const brilloutJSON = { parse, stringify };
+
+    const routes = {
+      identity: (v: any) => v,
+
+      validate: validateFn(z.date())(
+        (date) => new Date(date.getTime() + 1000 * 60 * 60)
+      ),
+    } satisfies TinyRpcRoutes;
+
+    //
+    // server
+    //
+    const endpoint = "/rpc";
+    const server = createServer(
+      compose(
+        (ctx) => {
+          ctx.handleError = () => {
+            return new Response(null, { status: 500 });
+          };
+        },
+        exposeTinyRpc({
+          routes,
+          adapter: httpServerAdapter({
+            endpoint,
+            method: "POST",
+            JSON: brilloutJSON,
+          }),
+        }),
+        () => new Response("tiny-rpc-skipped")
+      )
+    );
+    const { url } = await startTestServer(server);
+
+    //
+    // client
+    //
+    const client = proxyTinyRpc<typeof routes>({
+      adapter: httpClientAdapter({
+        url: url + endpoint,
+        method: "POST",
+        JSON: brilloutJSON,
+      }),
+    });
+
+    const obj = {
+      date: new Date("2023-08-17"),
+      undefined: undefined,
+      collision: "!undefined",
+      NaN: NaN,
+      Infinity: Infinity,
+      regexp: /^\d+$/g,
+    };
+    expect(await client.identity(obj)).toEqual(obj);
+    expect(await client.validate(new Date("2023-08-17"))).toMatchInlineSnapshot(
+      "2023-08-17T01:00:00.000Z"
+    );
+    expect(await client.validate(new Date("2023-08-17"))).instanceOf(Date);
   });
 });
 
