@@ -174,9 +174,7 @@ describe("adapter-http", () => {
     const routes = {
       identity: (v: any) => v,
 
-      validate: validateFn(z.date())(
-        (date) => new Date(date.getTime() + 1000 * 60 * 60)
-      ),
+      zodError: validateFn(z.number().int())((x) => 2 * x),
     } satisfies TinyRpcRoutes;
 
     //
@@ -221,10 +219,13 @@ describe("adapter-http", () => {
       regexp: /^\d+$/g,
     };
     expect(await client.identity(obj)).toEqual(obj);
-    expect(await client.validate(new Date("2023-08-17"))).toMatchInlineSnapshot(
-      "2023-08-17T01:00:00.000Z"
-    );
-    expect(await client.validate(new Date("2023-08-17"))).instanceOf(Date);
+    expect(await client.zodError(123)).toMatchInlineSnapshot("246");
+
+    // error
+    await expect(client.zodError(123.456)).rejects.toSatisfy((e) => {
+      expect(e).toMatchInlineSnapshot("[Error: Unexpected end of JSON input]");
+      return true;
+    });
   });
 });
 
