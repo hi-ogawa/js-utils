@@ -12,6 +12,7 @@ import {
   mapKeys,
   mapValues,
   memoize,
+  objectHas,
   objectKeys,
   objectOmit,
   objectOmitBy,
@@ -26,6 +27,7 @@ import {
   zip,
   zipMax,
 } from "./lodash";
+import { tinyassert } from "./tinyassert";
 
 describe("range", () => {
   it("basic", () => {
@@ -321,6 +323,27 @@ describe("objectKeys", () => {
         "y",
       ]
     `);
+  });
+});
+
+describe(objectHas, () => {
+  it("basic", () => {
+    const headers: unknown = { alg: "HS256" };
+
+    // @ts-expect-error
+    headers.alg;
+
+    if (objectHas(headers, "alg")) {
+      // ok
+      headers.alg;
+    }
+
+    // @ts-expect-error
+    headers.alg;
+
+    // ok
+    tinyassert(objectHas(headers, "alg"));
+    headers.alg;
   });
 });
 
