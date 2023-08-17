@@ -105,6 +105,24 @@ describe("adapter-http", () => {
           }
         ]]
       `);
+      expect(e.cause).not.toBeInstanceOf(Error);
+      expect(e.cause).toBeInstanceOf(Object);
+      expect(e.cause).toMatchInlineSnapshot(`
+        {
+          "issues": [
+            {
+              "code": "invalid_type",
+              "expected": "number",
+              "message": "Expected number, received string",
+              "path": [
+                "delta",
+              ],
+              "received": "string",
+            },
+          ],
+          "name": "ZodError",
+        }
+      `);
       return true;
     });
 

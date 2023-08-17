@@ -66,6 +66,9 @@ describe("adapter-message-port", () => {
           }
         ]]
       `);
+      expect(e.cause).toBeInstanceOf(Error);
+      expect(e.cause).not.toBeInstanceOf(TinyRpcError);
+      expect(e.cause).toMatchInlineSnapshot("[Error]");
       return true;
     });
 
