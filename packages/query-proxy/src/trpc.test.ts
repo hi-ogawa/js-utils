@@ -26,7 +26,7 @@ function defineExampleServer() {
   return server;
 }
 
-describe(createTrpcClientQueryProxy.name, () => {
+describe(createTrpcClientQueryProxy, () => {
   it("client", async () => {
     // trpc server/client
     const server = defineExampleServer();
@@ -48,7 +48,7 @@ describe(createTrpcClientQueryProxy.name, () => {
   });
 });
 
-describe(createFnRecordQueryProxy.name, () => {
+describe(createFnRecordQueryProxy, () => {
   it("caller", () => {
     // trpc server/caller
     const server = defineExampleServer();
