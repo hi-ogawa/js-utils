@@ -66,3 +66,10 @@ export function createTrpcClientQueryProxy<Router extends AnyRouter>(
     })
   ) as any;
 }
+
+// strip deprecated query/mutation/subscription api which is incompatible with `FnRecord`
+export function trpcCallerFnRecordCompat<Caller>(
+  caller: Caller
+): Omit<Caller, "query" | "mutation" | "subscription"> {
+  return caller as any;
+}

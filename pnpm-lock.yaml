@@ -125,6 +125,9 @@ importers:
 
   packages/tiny-rpc:
     devDependencies:
+      '@brillout/json-serializer':
+        specifier: ^0.5.4
+        version: 0.5.4
       '@hattip/adapter-node':
         specifier: ^0.0.34
         version: 0.0.34
@@ -455,6 +458,10 @@ packages:
       '@babel/helper-string-parser': 7.22.5
       '@babel/helper-validator-identifier': 7.22.5
       to-fast-properties: 2.0.0
+    dev: true
+
+  /@brillout/json-serializer@0.5.4:
+    resolution: {integrity: sha512-Lz/gQXKSoykR4g0PmBHpa+ILNJU7K0mZpWfBpDg5NnmPyHiDVnipwoH90Zv613FAwgUaV5HMCgYns6Lh78M+Yw==}
     dev: true
 
   /@changesets/apply-release-plan@6.1.4:

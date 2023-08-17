@@ -1,13 +1,20 @@
 # tiny-rpc
 
-extremely simple alternative for `tRPC`.
+Simpler but generalized alternative of `tRPC` and `comlink`.
 
-- no "context"
-  - user code can bring own logic by e.g. [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html)
-- no "query/mutation" distinction
-- use general `@hiogawa/query-proxy` for "react-query" integration
+As `tRPC` alternative:
 
-## todo
+- no distinction of `query` and `mutation`
+- no builtin `context` in favor of letting users impelemnt own logic by [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html)
+- no builtin "react-query" integration in favor of making use of general `@hiogawa/query-proxy`
 
-- support `GET` endpoint?
-  - everything is `POST`, which makes it not possible to utilize `GET` based http caching.
+As `comlink` alternative:
+
+- no callback
+
+## inspired by
+
+- https://github.com/trpc/trpc
+- https://github.com/antfu/birpc
+- https://github.com/GoogleChromeLabs/comlink/
+- https://github.com/brillout/telefunc
