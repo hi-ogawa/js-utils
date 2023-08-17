@@ -2,7 +2,7 @@ import { createServer } from "@hattip/adapter-node";
 import { compose } from "@hattip/compose";
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
-import { z } from "zod";
+import { ZodError, z } from "zod";
 import { httpClientAdapter, httpServerAdapter } from "./adapter-http";
 import {
   TinyRpcError,
@@ -122,6 +122,41 @@ describe("adapter-http", () => {
           ],
           "name": "ZodError",
         }
+      `);
+      return true;
+    });
+
+    // how error is wrapped on server side as a comparison
+    expect(
+      (async () => routes.incrementCounter({ delta: "2" as any as number }))()
+    ).rejects.toSatisfy((e) => {
+      tinyassert(e instanceof TinyRpcError);
+      expect(e).toMatchInlineSnapshot(`
+        [Error: [
+          {
+            "code": "invalid_type",
+            "expected": "number",
+            "received": "string",
+            "path": [
+              "delta"
+            ],
+            "message": "Expected number, received string"
+          }
+        ]]
+      `);
+      tinyassert(e.cause instanceof ZodError);
+      expect(e.cause).toMatchInlineSnapshot(`
+        [ZodError: [
+          {
+            "code": "invalid_type",
+            "expected": "number",
+            "received": "string",
+            "path": [
+              "delta"
+            ],
+            "message": "Expected number, received string"
+          }
+        ]]
       `);
       return true;
     });
