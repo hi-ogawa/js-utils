@@ -61,7 +61,7 @@ export function messagePortServerAdapter({
 
 export function messagePortClientAdapter({
   port,
-  generateId = globalThis?.crypto?.randomUUID ?? mathRandomId,
+  generateId = defaultGenerateId,
 }: {
   port: TinyRpcMessagePort;
   generateId?: () => string;
@@ -98,6 +98,13 @@ interface RequestPayload {
 interface ResponsePayload {
   id: string;
   result: Result<unknown, unknown>;
+}
+
+function defaultGenerateId() {
+  if (typeof globalThis?.crypto?.randomUUID !== "undefined") {
+    return globalThis.crypto.randomUUID();
+  }
+  return mathRandomId();
 }
 
 // cheap fallback id
