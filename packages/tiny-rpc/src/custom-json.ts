@@ -68,7 +68,7 @@ export function createCustomJsonReviver(options?: {
       return v.slice(1);
     }
 
-    if (Array.isArray(v) && v.length === 2) {
+    if (Array.isArray(v) && v.length === 2 && typeof v[0] === "string") {
       for (const [tag, tx] of Object.entries(transformers)) {
         if (v[0].startsWith(`!${tag}`)) {
           return tx.reviver(v[1]);
@@ -115,7 +115,7 @@ const builtins = {
   }),
 
   //
-  // common types
+  // extra types
   //
   Date: defineExtension<Date>({
     is: (v) => v instanceof Date,
@@ -137,16 +137,33 @@ const builtins = {
     is: (v) => v instanceof RegExp,
     replacer: (v) => [v.source, v.flags],
     reviver: (v) => {
-      tinyassert(Array.isArray(v));
-      tinyassert(v.length === 2);
+      tinyassert(
+        Array.isArray(v) &&
+          v.length === 2 &&
+          v.every((s) => typeof s === "string")
+      );
       const [source, flags] = v;
-      tinyassert(typeof source === "string");
-      tinyassert(typeof flags === "string");
       return new RegExp(source, flags);
     },
   }),
 
   //
-  // TODO: common containers
+  // extra containers
   //
+  Map: defineExtension<Map<unknown, unknown>>({
+    is: (v) => v instanceof Map,
+    replacer: (v) => Array.from(v),
+    reviver: (v) => {
+      tinyassert(Array.isArray(v));
+      return new Map(v);
+    },
+  }),
+  Set: defineExtension<Set<unknown>>({
+    is: (v) => v instanceof Set,
+    replacer: (v) => Array.from(v),
+    reviver: (v) => {
+      tinyassert(Array.isArray(v));
+      return new Set(v);
+    },
+  }),
 };

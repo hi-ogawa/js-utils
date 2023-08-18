@@ -21,6 +21,11 @@ describe(createCustomJson, () => {
       new Date("2023-08-17"),
       1234n,
       /^\d+/gms,
+      new Map<any, any>([
+        [0, new Date(0)],
+        [1n, new Set([/a/g])],
+      ]),
+      new Set<any>([0, new Date(0), new Map([[1n, /a/g]])]),
     ];
 
     const stringified = customJson.stringify(original, null, 2);
@@ -66,6 +71,64 @@ describe(createCustomJson, () => {
             \\"^\\\\\\\\d+\\",
             \\"gms\\"
           ]
+        ],
+        [
+          \\"!Map\\",
+          [
+            [
+              0,
+              [
+                \\"!Date\\",
+                \\"1970-01-01T00:00:00.000Z\\"
+              ]
+            ],
+            [
+              [
+                \\"!BigInt\\",
+                \\"1\\"
+              ],
+              [
+                \\"!Set\\",
+                [
+                  [
+                    \\"!RegExp\\",
+                    [
+                      \\"a\\",
+                      \\"g\\"
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          \\"!Set\\",
+          [
+            0,
+            [
+              \\"!Date\\",
+              \\"1970-01-01T00:00:00.000Z\\"
+            ],
+            [
+              \\"!Map\\",
+              [
+                [
+                  [
+                    \\"!BigInt\\",
+                    \\"1\\"
+                  ],
+                  [
+                    \\"!RegExp\\",
+                    [
+                      \\"a\\",
+                      \\"g\\"
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
         ]
       ]"
     `);
@@ -90,6 +153,19 @@ describe(createCustomJson, () => {
         2023-08-17T00:00:00.000Z,
         1234n,
         /\\^\\\\d\\+/gms,
+        Map {
+          0 => 1970-01-01T00:00:00.000Z,
+          1n => Set {
+            /a/g,
+          },
+        },
+        Set {
+          0,
+          1970-01-01T00:00:00.000Z,
+          Map {
+            1n => /a/g,
+          },
+        },
       ]
     `);
     expect(revivied).toEqual(original);
