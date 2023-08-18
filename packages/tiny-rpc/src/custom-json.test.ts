@@ -76,10 +76,9 @@ describe("json", () => {
     const original = {
       date: new Date("2023-08-17"),
       undefined: undefined,
-      collision1: ["!Date", 0],
-      collision2: ["!undefined", undefined],
-      collision3: ["!undefined", ["!Date", 0]],
-      collision4: ["!undefined", ["!Date", new Date("2023-08-17")]],
+      collision2: ["!", undefined],
+      collision3: ["!", ["!", 0]],
+      collision4: ["!", ["!", new Date("2023-08-17"), "!"]],
       collision5: [[], ["!"], ["!", 0], ["!", 0, 0], ["!", 0, 0, 0]],
     };
 
@@ -94,14 +93,9 @@ describe("json", () => {
           \\"!undefined\\",
           0
         ],
-        \\"collision1\\": [
-          \\"!\\",
-          \\"!Date\\",
-          0
-        ],
         \\"collision2\\": [
           \\"!\\",
-          \\"!undefined\\",
+          \\"!\\",
           [
             \\"!undefined\\",
             0
@@ -109,23 +103,24 @@ describe("json", () => {
         ],
         \\"collision3\\": [
           \\"!\\",
-          \\"!undefined\\",
+          \\"!\\",
           [
             \\"!\\",
-            \\"!Date\\",
+            \\"!\\",
             0
           ]
         ],
         \\"collision4\\": [
           \\"!\\",
-          \\"!undefined\\",
+          \\"!\\",
           [
             \\"!\\",
-            \\"!Date\\",
+            \\"!\\",
             [
               \\"!Date\\",
               \\"2023-08-17T00:00:00.000Z\\"
-            ]
+            ],
+            \\"!\\"
           ]
         ],
         \\"collision5\\": [
@@ -158,26 +153,23 @@ describe("json", () => {
     const revived = JSON.parse(stringified, createCustomJsonReviver());
     expect(revived).toMatchInlineSnapshot(`
       {
-        "collision1": [
-          "!Date",
-          0,
-        ],
         "collision2": [
-          "!undefined",
+          "!",
           ,
         ],
         "collision3": [
-          "!undefined",
+          "!",
           [
-            "!Date",
+            "!",
             0,
           ],
         ],
         "collision4": [
-          "!undefined",
+          "!",
           [
-            "!Date",
+            "!",
             2023-08-17T00:00:00.000Z,
+            "!",
           ],
         ],
         "collision5": [
