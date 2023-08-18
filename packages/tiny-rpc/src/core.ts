@@ -72,7 +72,7 @@ export function proxyTinyRpc<R extends TinyRpcRoutes>({
 
 // cf. https://github.com/trpc/trpc/blob/fa7f6d6b804df71d8dd15970168f7be18aeecaf2/packages/server/src/error/TRPCError.ts#L53
 export class TinyRpcError extends Error {
-  // employ http status convention
+  // employ http status convention at the core level
   public status = 500;
 
   // convenient api for assertion
