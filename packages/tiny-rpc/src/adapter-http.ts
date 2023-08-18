@@ -46,6 +46,7 @@ export function httpServerAdapter(opts: {
         });
         let status = 200;
         if (!result.ok) {
+          // user can obfuscate server error via `onError` (e.g. purging e.stack = "")
           opts.onError?.(result.value);
           const e = TinyRpcError.fromUnknown(result.value);
           status = e.status;
@@ -93,7 +94,7 @@ export function httpClientAdapter(opts: {
       const res = await fetch(req);
       const result: Result<unknown, unknown> = JSON.parse(await res.text());
       if (!result.ok) {
-        throw TinyRpcError.fromUnknown(result.value);
+        throw TinyRpcError.deserialize(result.value);
       }
       return result.value;
     },
