@@ -1,14 +1,100 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
 import { ZodError, z } from "zod";
-import {
-  createCustomJson,
-  createCustomJsonReplacer,
-  createCustomJsonReviver,
-  defineExtension,
-} from "./custom-json";
+import { createCustomJson, defineExtension } from "./custom-json";
 
-describe("json", () => {
+describe(createCustomJson, () => {
+  it("basic", () => {
+    const customJson = createCustomJson();
+
+    const original = [
+      null,
+      true,
+      1234,
+      "string",
+      ["array"],
+      { k: "v" },
+      undefined,
+      Infinity,
+      -Infinity,
+      NaN,
+      new Date("2023-08-17"),
+      1234n,
+      /^\d+/gms,
+    ];
+
+    const stringified = customJson.stringify(original, null, 2);
+    expect(stringified).toMatchInlineSnapshot(`
+      "[
+        null,
+        true,
+        1234,
+        \\"string\\",
+        [
+          \\"array\\"
+        ],
+        {
+          \\"k\\": \\"v\\"
+        },
+        [
+          \\"!undefined\\",
+          0
+        ],
+        [
+          \\"!Infinity\\",
+          0
+        ],
+        [
+          \\"!-Infinity\\",
+          0
+        ],
+        [
+          \\"!NaN\\",
+          0
+        ],
+        [
+          \\"!Date\\",
+          \\"2023-08-17T00:00:00.000Z\\"
+        ],
+        [
+          \\"!BigInt\\",
+          \\"1234\\"
+        ],
+        [
+          \\"!RegExp\\",
+          [
+            \\"^\\\\\\\\d+\\",
+            \\"gms\\"
+          ]
+        ]
+      ]"
+    `);
+
+    const revivied = customJson.parse(stringified);
+    expect(revivied).toMatchInlineSnapshot(`
+      [
+        null,
+        true,
+        1234,
+        "string",
+        [
+          "array",
+        ],
+        {
+          "k": "v",
+        },
+        ,
+        Infinity,
+        -Infinity,
+        NaN,
+        2023-08-17T00:00:00.000Z,
+        1234n,
+        /\\^\\\\d\\+/gms,
+      ]
+    `);
+    expect(revivied).toEqual(original);
+  });
+
   it("custom type", () => {
     const customJson = createCustomJson({
       extensions: {
@@ -74,31 +160,21 @@ describe("json", () => {
     const customJson = createCustomJson();
 
     const original = {
-      date: new Date("2023-08-17"),
-      undefined: undefined,
-      collision2: ["!", undefined],
+      collision2: ["!", 1n],
       collision3: ["!", ["!", 0]],
-      collision4: ["!", ["!", new Date("2023-08-17"), "!"]],
+      collision4: ["!", ["!", 1n, "!"]],
       collision5: [[], ["!"], ["!", 0], ["!", 0, 0], ["!", 0, 0, 0]],
     };
 
     const stringified = customJson.stringify(original, null, 2);
     expect(stringified).toMatchInlineSnapshot(`
       "{
-        \\"date\\": [
-          \\"!Date\\",
-          \\"2023-08-17T00:00:00.000Z\\"
-        ],
-        \\"undefined\\": [
-          \\"!undefined\\",
-          0
-        ],
         \\"collision2\\": [
           \\"!\\",
           \\"!\\",
           [
-            \\"!undefined\\",
-            0
+            \\"!BigInt\\",
+            \\"1\\"
           ]
         ],
         \\"collision3\\": [
@@ -117,8 +193,8 @@ describe("json", () => {
             \\"!\\",
             \\"!\\",
             [
-              \\"!Date\\",
-              \\"2023-08-17T00:00:00.000Z\\"
+              \\"!BigInt\\",
+              \\"1\\"
             ],
             \\"!\\"
           ]
@@ -150,12 +226,12 @@ describe("json", () => {
       }"
     `);
 
-    const revived = JSON.parse(stringified, createCustomJsonReviver());
+    const revived = customJson.parse(stringified);
     expect(revived).toMatchInlineSnapshot(`
       {
         "collision2": [
           "!",
-          ,
+          1n,
         ],
         "collision3": [
           "!",
@@ -168,7 +244,7 @@ describe("json", () => {
           "!",
           [
             "!",
-            2023-08-17T00:00:00.000Z,
+            1n,
             "!",
           ],
         ],
@@ -193,13 +269,12 @@ describe("json", () => {
             0,
           ],
         ],
-        "date": 2023-08-17T00:00:00.000Z,
       }
     `);
     expect(revived).toEqual(original);
   });
 
-  it("misc", () => {
+  it("edge cases", () => {
     class X {
       name = "hello";
     }
@@ -210,76 +285,75 @@ describe("json", () => {
       }
     }
 
-    const v = {
-      date: new Date("2023-08-17"),
-      x: new X(),
-      y: new Y(),
-      z: {
+    const original = [
+      Symbol("unique"),
+      Symbol.for("named"),
+      new X(),
+      new Y(),
+      {
         toJSON: () => "zzz",
       },
-      w: {
+      {
         toJSON: "www",
       },
-      u: {
+      {
         toJSON: () => () => "uuu",
       },
-      f: () => {},
-      undefined: undefined,
-      s0: "xyz",
-      s1: "!xyz",
-      s2: "!!xyz",
-      NaN: NaN,
-      Infinity: Infinity,
-      regexp: /^\d+$/g,
-    };
+      () => {},
+    ];
 
-    const s = JSON.stringify(v, createCustomJsonReplacer(), 2);
-    expect(s).toMatchInlineSnapshot(`
-      "{
-        \\"date\\": [
-          \\"!Date\\",
-          \\"2023-08-17T00:00:00.000Z\\"
-        ],
-        \\"x\\": {
-          \\"name\\": \\"hello\\"
-        },
-        \\"y\\": \\"foo\\",
-        \\"z\\": \\"zzz\\",
-        \\"w\\": {
-          \\"toJSON\\": \\"www\\"
-        },
-        \\"undefined\\": [
-          \\"!undefined\\",
-          0
-        ],
-        \\"s0\\": \\"xyz\\",
-        \\"s1\\": \\"!xyz\\",
-        \\"s2\\": \\"!!xyz\\",
-        \\"NaN\\": null,
-        \\"Infinity\\": null,
-        \\"regexp\\": {}
-      }"
-    `);
-
-    const v2 = JSON.parse(s, createCustomJsonReviver());
-    expect(v2).toMatchInlineSnapshot(`
-      {
-        "Infinity": null,
-        "NaN": null,
-        "date": 2023-08-17T00:00:00.000Z,
-        "regexp": {},
-        "s0": "xyz",
-        "s1": "!xyz",
-        "s2": "!!xyz",
-        "w": {
-          "toJSON": "www",
-        },
-        "x": {
+    const customJson = createCustomJson();
+    expect(original).toMatchInlineSnapshot(`
+      [
+        Symbol(unique),
+        Symbol(named),
+        X {
           "name": "hello",
         },
-        "y": "foo",
-        "z": "zzz",
-      }
+        "foo",
+        "zzz",
+        {
+          "toJSON": "www",
+        },
+        [Function],
+        [Function],
+      ]
+    `);
+
+    const stringified = customJson.stringify(original, null, 2);
+    expect(stringified).toMatchInlineSnapshot(`
+      "[
+        null,
+        null,
+        {
+          \\"name\\": \\"hello\\"
+        },
+        \\"foo\\",
+        \\"zzz\\",
+        {
+          \\"toJSON\\": \\"www\\"
+        },
+        null,
+        null
+      ]"
+    `);
+
+    const revived = customJson.parse(stringified);
+    expect(revived).toMatchInlineSnapshot(`
+      [
+        null,
+        null,
+        {
+          "name": "hello",
+        },
+        "foo",
+        "zzz",
+        {
+          "toJSON": "www",
+        },
+        null,
+        null,
+      ]
     `);
   });
 });

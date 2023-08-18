@@ -4,14 +4,13 @@
 // notable differences are
 // - human-readability of json with indentation
 // - support custom type
-// - drop `undefined` property
 //
-
-import { tinyassert } from "@hiogawa/utils";
-
 // cf.
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
+//
+
+import { tinyassert } from "@hiogawa/utils";
 
 export function createCustomJson(options?: {
   extensions?: Record<string, Extension<any>>;
@@ -91,11 +90,33 @@ export function defineExtension<T>(v: Extension<T>): Extension<T> {
 }
 
 const builtins = {
+  //
+  // constants
+  //
   undefined: defineExtension<undefined>({
-    is: (v) => v === void 0,
+    is: (v) => typeof v === "undefined",
     replacer: () => 0,
-    reviver: () => void 0,
+    reviver: () => undefined,
   }),
+  Infinity: defineExtension<number>({
+    is: (v) => v === Infinity,
+    replacer: () => 0,
+    reviver: () => Infinity,
+  }),
+  "-Infinity": defineExtension<number>({
+    is: (v) => v === -Infinity,
+    replacer: () => 0,
+    reviver: () => -Infinity,
+  }),
+  NaN: defineExtension<number>({
+    is: (v) => typeof v === "number" && isNaN(v),
+    replacer: () => 0,
+    reviver: () => NaN,
+  }),
+
+  //
+  // common types
+  //
   Date: defineExtension<Date>({
     is: (v) => v instanceof Date,
     replacer: (v) => v.toISOString(),
@@ -104,4 +125,28 @@ const builtins = {
       return new Date(v);
     },
   }),
+  BigInt: defineExtension<bigint>({
+    is: (v) => typeof v === "bigint",
+    replacer: (v) => v.toString(),
+    reviver: (v) => {
+      tinyassert(typeof v === "string");
+      return BigInt(v);
+    },
+  }),
+  RegExp: defineExtension<RegExp>({
+    is: (v) => v instanceof RegExp,
+    replacer: (v) => [v.source, v.flags],
+    reviver: (v) => {
+      tinyassert(Array.isArray(v));
+      tinyassert(v.length === 2);
+      const [source, flags] = v;
+      tinyassert(typeof source === "string");
+      tinyassert(typeof flags === "string");
+      return new RegExp(source, flags);
+    },
+  }),
+
+  //
+  // TODO: common containers
+  //
 };
