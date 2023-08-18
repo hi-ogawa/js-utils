@@ -37,11 +37,11 @@ export function createCustomJsonReplacer(options?: {
     // escape collision
     if (
       Array.isArray(v) &&
-      v.length === 2 &&
+      v.length >= 2 &&
       typeof v[0] === "string" &&
       v[0].startsWith("!")
     ) {
-      return ["!!", ...v];
+      return ["!", ...v];
     }
 
     for (const [tag, tx] of Object.entries(transformers)) {
@@ -62,9 +62,9 @@ export function createCustomJsonReviver(options?: {
     // unescape collision
     if (
       Array.isArray(v) &&
-      v.length === 3 &&
+      v.length >= 3 &&
       typeof v[0] === "string" &&
-      v[0] === "!!"
+      v[0] === "!"
     ) {
       return v.slice(1);
     }

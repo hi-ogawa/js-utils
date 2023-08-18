@@ -73,16 +73,18 @@ describe("json", () => {
   it("escape-collision", () => {
     const customJson = createCustomJson();
 
-    const v = {
+    const original = {
       date: new Date("2023-08-17"),
       undefined: undefined,
-      col1: ["!Date", 0],
-      col2: ["!undefined", 0],
-      col3: ["!undefined", ["!Date", 0]],
+      collision1: ["!Date", 0],
+      collision2: ["!undefined", undefined],
+      collision3: ["!undefined", ["!Date", 0]],
+      collision4: ["!undefined", ["!Date", new Date("2023-08-17")]],
+      collision5: [[], ["!"], ["!", 0], ["!", 0, 0], ["!", 0, 0, 0]],
     };
 
-    const s = customJson.stringify(v, null, 2);
-    expect(s).toMatchInlineSnapshot(`
+    const stringified = customJson.stringify(original, null, 2);
+    expect(stringified).toMatchInlineSnapshot(`
       "{
         \\"date\\": [
           \\"!Date\\",
@@ -92,49 +94,117 @@ describe("json", () => {
           \\"!undefined\\",
           0
         ],
-        \\"col1\\": [
-          \\"!!\\",
+        \\"collision1\\": [
+          \\"!\\",
           \\"!Date\\",
           0
         ],
-        \\"col2\\": [
-          \\"!!\\",
-          \\"!undefined\\",
-          0
-        ],
-        \\"col3\\": [
-          \\"!!\\",
+        \\"collision2\\": [
+          \\"!\\",
           \\"!undefined\\",
           [
-            \\"!!\\",
+            \\"!undefined\\",
+            0
+          ]
+        ],
+        \\"collision3\\": [
+          \\"!\\",
+          \\"!undefined\\",
+          [
+            \\"!\\",
             \\"!Date\\",
+            0
+          ]
+        ],
+        \\"collision4\\": [
+          \\"!\\",
+          \\"!undefined\\",
+          [
+            \\"!\\",
+            \\"!Date\\",
+            [
+              \\"!Date\\",
+              \\"2023-08-17T00:00:00.000Z\\"
+            ]
+          ]
+        ],
+        \\"collision5\\": [
+          [],
+          [
+            \\"!\\"
+          ],
+          [
+            \\"!\\",
+            \\"!\\",
+            0
+          ],
+          [
+            \\"!\\",
+            \\"!\\",
+            0,
+            0
+          ],
+          [
+            \\"!\\",
+            \\"!\\",
+            0,
+            0,
             0
           ]
         ]
       }"
     `);
 
-    const v2 = JSON.parse(s, createCustomJsonReviver());
-    expect(v2).toMatchInlineSnapshot(`
+    const revived = JSON.parse(stringified, createCustomJsonReviver());
+    expect(revived).toMatchInlineSnapshot(`
       {
-        "col1": [
+        "collision1": [
           "!Date",
           0,
         ],
-        "col2": [
+        "collision2": [
           "!undefined",
-          0,
+          ,
         ],
-        "col3": [
+        "collision3": [
           "!undefined",
           [
             "!Date",
             0,
           ],
         ],
+        "collision4": [
+          "!undefined",
+          [
+            "!Date",
+            2023-08-17T00:00:00.000Z,
+          ],
+        ],
+        "collision5": [
+          [],
+          [
+            "!",
+          ],
+          [
+            "!",
+            0,
+          ],
+          [
+            "!",
+            0,
+            0,
+          ],
+          [
+            "!",
+            0,
+            0,
+            0,
+          ],
+        ],
         "date": 2023-08-17T00:00:00.000Z,
       }
     `);
+    expect(revived).toEqual(original);
   });
 
   it("misc", () => {
