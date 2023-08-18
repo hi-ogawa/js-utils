@@ -14,8 +14,8 @@ describe("json", () => {
       extensions: {
         ZodError: defineExtension<ZodError>({
           match: (v): v is ZodError => v instanceof ZodError,
-          serialize: (v) => v.issues,
-          deserialize: (s) => new ZodError(s as any),
+          replacer: (v) => v.issues,
+          reviver: (s) => new ZodError(s as any),
         }),
       },
     });

@@ -2,7 +2,7 @@
 // inspired by https://github.com/brillout/json-serializer
 //
 // notable differences are
-// - not "stringify" but "serialize" for human-readability of json with indentation
+// - human-readability of json with indentation
 // - support custom type
 // - drop `undefined` property
 //
@@ -46,7 +46,7 @@ export function createCustomJsonReplacer(options?: {
 
     for (const [tag, tx] of Object.entries(transformers)) {
       if (tx.match(v)) {
-        return [`!${tag}`, tx.serialize(v as never)];
+        return [`!${tag}`, tx.replacer(v as never)];
       }
     }
     return vToJson;
@@ -72,7 +72,7 @@ export function createCustomJsonReviver(options?: {
     if (Array.isArray(v) && v.length === 2) {
       for (const [tag, tx] of Object.entries(transformers)) {
         if (v[0].startsWith(`!${tag}`)) {
-          return tx.deserialize(v[1]);
+          return tx.reviver(v[1]);
         }
       }
     }
@@ -82,8 +82,8 @@ export function createCustomJsonReviver(options?: {
 
 type Extension<T> = {
   match: (v: unknown) => boolean;
-  serialize: (v: T) => unknown; // `serialize` doesn't have to `stringify`
-  deserialize: (v: unknown) => T;
+  replacer: (v: T) => unknown; // `serialize` doesn't have to `stringify`
+  reviver: (v: unknown) => T;
 };
 
 export function defineExtension<T>(v: Extension<T>): Extension<T> {
@@ -93,13 +93,13 @@ export function defineExtension<T>(v: Extension<T>): Extension<T> {
 const builtins = {
   undefined: defineExtension<undefined>({
     match: (v) => v === void 0,
-    serialize: () => 0,
-    deserialize: () => void 0,
+    replacer: () => 0,
+    reviver: () => void 0,
   }),
   Date: defineExtension<Date>({
     match: (v) => v instanceof Date,
-    serialize: (v) => v.toISOString(),
-    deserialize: (v) => {
+    replacer: (v) => v.toISOString(),
+    reviver: (v) => {
       tinyassert(typeof v === "string");
       return new Date(v);
     },
