@@ -13,7 +13,7 @@ type RequestHandler = (ctx: {
 export function httpServerAdapter(opts: {
   endpoint: string;
   pathsForGET?: string[]; // GET is useful to cache reponse of public endpoint
-  JSON?: JsonTransformer;
+  JSON?: JsonTransformer; // it doesn't necessary have to be json string but we put "content-type: application/json" anyways for now
   onError?: (e: unknown) => void;
 }): TinyRpcServerAdapter<RequestHandler> {
   const JSON = opts.JSON ?? globalThis.JSON;
