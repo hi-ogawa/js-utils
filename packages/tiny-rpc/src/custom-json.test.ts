@@ -14,8 +14,8 @@ describe("json", () => {
       extensions: {
         ZodError: defineExtension<ZodError>({
           match: (v): v is ZodError => v instanceof ZodError,
-          stringify: (v) => JSON.stringify(v.issues),
-          parse: (s) => new ZodError(JSON.parse(s)),
+          serialize: (v) => v.issues,
+          deserialize: (s) => new ZodError(s as any),
         }),
       },
     });
@@ -33,7 +33,20 @@ describe("json", () => {
       `
       "{
         \\"ok\\": false,
-        \\"value\\": \\"!ZodError:[{\\\\\\"code\\\\\\":\\\\\\"invalid_type\\\\\\",\\\\\\"expected\\\\\\":\\\\\\"integer\\\\\\",\\\\\\"received\\\\\\":\\\\\\"float\\\\\\",\\\\\\"message\\\\\\":\\\\\\"Expected integer, received float\\\\\\",\\\\\\"path\\\\\\":[\\\\\\"int\\\\\\"]}]\\"
+        \\"value\\": [
+          \\"!ZodError\\",
+          [
+            {
+              \\"code\\": \\"invalid_type\\",
+              \\"expected\\": \\"integer\\",
+              \\"received\\": \\"float\\",
+              \\"message\\": \\"Expected integer, received float\\",
+              \\"path\\": [
+                \\"int\\"
+              ]
+            }
+          ]
+        ]
       }"
     `
     );
@@ -55,6 +68,73 @@ describe("json", () => {
       }
     `);
     expect(revived).toEqual(original);
+  });
+
+  it("escape-collision", () => {
+    const customJson = createCustomJson();
+
+    const v = {
+      date: new Date("2023-08-17"),
+      undefined: undefined,
+      col1: ["!Date", 0],
+      col2: ["!undefined", 0],
+      col3: ["!undefined", ["!Date", 0]],
+    };
+
+    const s = customJson.stringify(v, null, 2);
+    expect(s).toMatchInlineSnapshot(`
+      "{
+        \\"date\\": [
+          \\"!Date\\",
+          \\"2023-08-17T00:00:00.000Z\\"
+        ],
+        \\"undefined\\": [
+          \\"!undefined\\",
+          0
+        ],
+        \\"col1\\": [
+          \\"!!\\",
+          \\"!Date\\",
+          0
+        ],
+        \\"col2\\": [
+          \\"!!\\",
+          \\"!undefined\\",
+          0
+        ],
+        \\"col3\\": [
+          \\"!!\\",
+          \\"!undefined\\",
+          [
+            \\"!!\\",
+            \\"!Date\\",
+            0
+          ]
+        ]
+      }"
+    `);
+
+    const v2 = JSON.parse(s, createCustomJsonReviver());
+    expect(v2).toMatchInlineSnapshot(`
+      {
+        "col1": [
+          "!Date",
+          0,
+        ],
+        "col2": [
+          "!undefined",
+          0,
+        ],
+        "col3": [
+          "!undefined",
+          [
+            "!Date",
+            0,
+          ],
+        ],
+        "date": 2023-08-17T00:00:00.000Z,
+      }
+    `);
   });
 
   it("misc", () => {
@@ -94,7 +174,10 @@ describe("json", () => {
     const s = JSON.stringify(v, createCustomJsonReplacer(), 2);
     expect(s).toMatchInlineSnapshot(`
       "{
-        \\"date\\": \\"!Date:2023-08-17T00:00:00.000Z\\",
+        \\"date\\": [
+          \\"!Date\\",
+          \\"2023-08-17T00:00:00.000Z\\"
+        ],
         \\"x\\": {
           \\"name\\": \\"hello\\"
         },
@@ -103,10 +186,13 @@ describe("json", () => {
         \\"w\\": {
           \\"toJSON\\": \\"www\\"
         },
-        \\"undefined\\": \\"!undefined:\\",
+        \\"undefined\\": [
+          \\"!undefined\\",
+          0
+        ],
         \\"s0\\": \\"xyz\\",
-        \\"s1\\": \\"!:!xyz\\",
-        \\"s2\\": \\"!:!!xyz\\",
+        \\"s1\\": \\"!xyz\\",
+        \\"s2\\": \\"!!xyz\\",
         \\"NaN\\": null,
         \\"Infinity\\": null,
         \\"regexp\\": {}

@@ -1,11 +1,13 @@
 //
-// simplified version of https://github.com/brillout/json-serializer
+// inspired by https://github.com/brillout/json-serializer
 //
 // notable differences are
+// - not "stringify" but "serialize" for human-readability of json with indentation
 // - support custom type
-// - builtins support only for `undefined` and `Date`
 // - drop `undefined` property
 //
+
+import { tinyassert } from "@hiogawa/utils";
 
 // cf.
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
@@ -17,7 +19,7 @@ export function createCustomJson(options?: {
   const replacer = createCustomJsonReplacer(options);
   const reviver = createCustomJsonReviver(options);
   return {
-    stringify: (v: any, _ignoredReplacer?: null, space?: number) =>
+    stringify: (v: any, _nullReplacer?: null, space?: number) =>
       JSON.stringify(v, replacer, space),
     parse: (s: string) => JSON.parse(s, reviver),
   };
@@ -31,9 +33,20 @@ export function createCustomJsonReplacer(options?: {
   return function (this: unknown, k: string, vToJson: unknown) {
     // vToJson === v.toJSON() when `toJSON` is defined (e.g. Date)
     const v = (this as any)[k];
+
+    // escape collision
+    if (
+      Array.isArray(v) &&
+      v.length === 2 &&
+      typeof v[0] === "string" &&
+      v[0].startsWith("!")
+    ) {
+      return ["!!", ...v];
+    }
+
     for (const [tag, tx] of Object.entries(transformers)) {
       if (tx.match(v)) {
-        return `!${tag}:${tx.stringify(v as never)}`;
+        return [`!${tag}`, tx.serialize(v as never)];
       }
     }
     return vToJson;
@@ -46,10 +59,20 @@ export function createCustomJsonReviver(options?: {
   const transformers = { ...options?.extensions, ...builtins };
 
   return (_k: string, v: unknown) => {
-    if (typeof v === "string") {
+    // unescape collision
+    if (
+      Array.isArray(v) &&
+      v.length === 3 &&
+      typeof v[0] === "string" &&
+      v[0] === "!!"
+    ) {
+      return v.slice(1);
+    }
+
+    if (Array.isArray(v) && v.length === 2) {
       for (const [tag, tx] of Object.entries(transformers)) {
-        if (v.startsWith(`!${tag}:`)) {
-          return tx.parse(v.slice(tag.length + 2));
+        if (v[0].startsWith(`!${tag}`)) {
+          return tx.deserialize(v[1]);
         }
       }
     }
@@ -58,9 +81,9 @@ export function createCustomJsonReviver(options?: {
 }
 
 type Extension<T> = {
-  match: (v: unknown) => v is T;
-  stringify: (v: T) => string;
-  parse: (s: string) => T;
+  match: (v: unknown) => boolean;
+  serialize: (v: T) => unknown; // `serialize` doesn't have to `stringify`
+  deserialize: (v: unknown) => T;
 };
 
 export function defineExtension<T>(v: Extension<T>): Extension<T> {
@@ -69,18 +92,16 @@ export function defineExtension<T>(v: Extension<T>): Extension<T> {
 
 const builtins = {
   undefined: defineExtension<undefined>({
-    match: (v): v is undefined => v === void 0,
-    stringify: () => "",
-    parse: () => void 0,
+    match: (v) => v === void 0,
+    serialize: () => 0,
+    deserialize: () => void 0,
   }),
   Date: defineExtension<Date>({
-    match: (v): v is Date => v instanceof Date,
-    stringify: (v) => v.toISOString(),
-    parse: (s) => new Date(s),
-  }),
-  "": defineExtension<`!${string}`>({
-    match: (v): v is `!${string}` => typeof v === "string" && v.startsWith("!"),
-    stringify: (v) => v,
-    parse: (v) => v as any,
+    match: (v) => v instanceof Date,
+    serialize: (v) => v.toISOString(),
+    deserialize: (v) => {
+      tinyassert(typeof v === "string");
+      return new Date(v);
+    },
   }),
 };
