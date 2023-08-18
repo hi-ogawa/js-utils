@@ -361,6 +361,11 @@ describe(createCustomJson, () => {
   });
 
   it("edge cases", () => {
+    // edge cases which don't roundtrip
+    // - function
+    // - custom class
+    // - custom toJSON
+
     class X {
       name = "hello";
     }
