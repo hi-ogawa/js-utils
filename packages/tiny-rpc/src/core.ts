@@ -83,6 +83,7 @@ export class TinyRpcError extends Error {
   // TODO: allow obfuscating server error detail?
   serialize() {
     return {
+      name: "TinyRpcError",
       message: this.message,
       stack: this.stack,
       cause: this.cause,
@@ -94,19 +95,23 @@ export class TinyRpcError extends Error {
     if (e instanceof TinyRpcError) {
       return e;
     }
+    // cf. https://github.com/trpc/trpc/blob/fa7f6d6b804df71d8dd15970168f7be18aeecaf2/packages/server/src/error/TRPCError.ts#L53
     const err = new TinyRpcError("unknown", { cause: e });
     if (e && typeof e === "object") {
       if ("message" in e && typeof e.message === "string") {
         err.message = e.message;
       }
-      if ("stack" in e && typeof e.stack === "string") {
-        err.stack = e.stack;
-      }
-      if ("cause" in e) {
-        err.cause = e.cause;
-      }
-      if ("status" in e && typeof e.status === "number") {
-        err.status = e.status;
+      // copy others only when reviving serialized TinyRpcError
+      if ("name" in e && e.name === "TinyRpcError") {
+        if ("stack" in e && typeof e.stack === "string") {
+          err.stack = e.stack;
+        }
+        if ("cause" in e) {
+          err.cause = e.cause;
+        }
+        if ("status" in e && typeof e.status === "number") {
+          err.status = e.status;
+        }
       }
     }
     return err;

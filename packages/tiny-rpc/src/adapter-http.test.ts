@@ -314,7 +314,7 @@ describe("adapter-http", () => {
     expect(await client.identity(obj)).toEqual(obj);
     expect(await client.validate(123)).toMatchInlineSnapshot("246");
 
-    // error
+    // ZodError without custom serializer
     await expect(client.validate(123.456)).rejects.toSatisfy((e) => {
       tinyassert(e instanceof TinyRpcError);
       expect(e).toMatchInlineSnapshot(`
@@ -329,6 +329,7 @@ describe("adapter-http", () => {
         ]]
       `);
       tinyassert(e.cause instanceof Error);
+      tinyassert(!(e.cause instanceof ZodError));
       expect(e.cause).toMatchInlineSnapshot(`
         [ZodError: [
           {
@@ -340,7 +341,55 @@ describe("adapter-http", () => {
           }
         ]]
       `);
-      expect(e.cause.cause).toMatchInlineSnapshot("undefined");
+      return true;
+    });
+
+    // ZodError with custom serializer
+    superjson.registerCustom<ZodError, { issues: any }>(
+      {
+        isApplicable: (v): v is ZodError => v instanceof ZodError,
+        serialize: (v) => ({ issues: v.issues }),
+        deserialize: (v) => new ZodError(v.issues),
+      },
+      ZodError.name
+    );
+
+    await expect(client.validate(123.456)).rejects.toSatisfy((e) => {
+      tinyassert(e instanceof TinyRpcError);
+      expect(e).toMatchInlineSnapshot(`
+        [Error: [
+          {
+            "code": "invalid_type",
+            "expected": "integer",
+            "received": "float",
+            "message": "Expected integer, received float",
+            "path": []
+          }
+        ]]
+      `);
+      tinyassert(e.cause instanceof ZodError);
+      expect(e.cause).toMatchInlineSnapshot(`
+        [ZodError: [
+          {
+            "code": "invalid_type",
+            "expected": "integer",
+            "received": "float",
+            "message": "Expected integer, received float",
+            "path": []
+          }
+        ]]
+      `);
+      expect(e.cause.issues).toMatchInlineSnapshot(`
+        [
+          {
+            "code": "invalid_type",
+            "expected": "integer",
+            "message": "Expected integer, received float",
+            "path": [],
+            "received": "float",
+          },
+        ]
+      `);
       return true;
     });
   });

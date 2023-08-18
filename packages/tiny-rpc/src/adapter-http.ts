@@ -93,7 +93,7 @@ export function httpClientAdapter(opts: {
       const res = await fetch(req);
       const result: Result<unknown, unknown> = JSON.parse(await res.text());
       if (!result.ok) {
-        throw result.value;
+        throw TinyRpcError.fromUnknown(result.value);
       }
       return result.value;
     },
