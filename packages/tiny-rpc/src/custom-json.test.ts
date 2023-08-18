@@ -1,4 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { ZodError, z } from "zod";
 import { createCustomJson, defineExtension } from "./custom-json";
@@ -10,13 +11,15 @@ describe(createCustomJson, () => {
     const original = [
       null,
       true,
-      1234,
+      0,
       "string",
       ["array"],
       { k: "v" },
       undefined,
       Infinity,
       -Infinity,
+      0,
+      -0,
       NaN,
       new Date("2023-08-17"),
       1234n,
@@ -33,7 +36,7 @@ describe(createCustomJson, () => {
       "[
         null,
         true,
-        1234,
+        0,
         \\"string\\",
         [
           \\"array\\"
@@ -51,6 +54,11 @@ describe(createCustomJson, () => {
         ],
         [
           \\"!-Infinity\\",
+          0
+        ],
+        0,
+        [
+          \\"!-0\\",
           0
         ],
         [
@@ -138,7 +146,7 @@ describe(createCustomJson, () => {
       [
         null,
         true,
-        1234,
+        0,
         "string",
         [
           "array",
@@ -149,6 +157,8 @@ describe(createCustomJson, () => {
         ,
         Infinity,
         -Infinity,
+        0,
+        -0,
         NaN,
         2023-08-17T00:00:00.000Z,
         1234n,
@@ -450,5 +460,19 @@ describe(createCustomJson, () => {
           --> starting at object with constructor 'Array'
           --- index 0 closes the circle"
     `);
+  });
+
+  describe("fuzzing", () => {
+    const customJson = createCustomJson();
+    it("jsonValue", () => {
+      fc.assert(
+        fc.property(fc.jsonValue(), (data) => {
+          const stringified = customJson.stringify(data);
+          const revivied = customJson.parse(stringified);
+          expect(revivied).toEqual(data);
+        }),
+        { verbose: true, numRuns: 10 ** 3 }
+      );
+    });
   });
 });
