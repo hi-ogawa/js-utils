@@ -432,4 +432,23 @@ describe(createCustomJson, () => {
       ]
     `);
   });
+
+  it("cyclic", () => {
+    const original: any[] = [];
+    original[0] = original;
+
+    const customJson = createCustomJson();
+    expect(original).toMatchInlineSnapshot(`
+      [
+        [Circular],
+      ]
+    `);
+
+    expect(() => customJson.stringify(original, null, 2))
+      .toThrowErrorMatchingInlineSnapshot(`
+      "Converting circular structure to JSON
+          --> starting at object with constructor 'Array'
+          --- index 0 closes the circle"
+    `);
+  });
 });
