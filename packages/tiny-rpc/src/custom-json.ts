@@ -89,35 +89,23 @@ export function defineExtension<T>(v: Extension<T>): Extension<T> {
   return v;
 }
 
+function defineConstant<T>(c: T): Extension<T> {
+  return {
+    is: (v) => Object.is(v, c),
+    replacer: () => 0,
+    reviver: () => c,
+  };
+}
+
 const builtins = {
   //
   // constants
   //
-  undefined: defineExtension<undefined>({
-    is: (v) => Object.is(v, undefined),
-    replacer: () => 0,
-    reviver: () => undefined,
-  }),
-  Infinity: defineExtension<number>({
-    is: (v) => Object.is(v, Infinity),
-    replacer: () => 0,
-    reviver: () => Infinity,
-  }),
-  "-Infinity": defineExtension<number>({
-    is: (v) => Object.is(v, -Infinity),
-    replacer: () => 0,
-    reviver: () => -Infinity,
-  }),
-  NaN: defineExtension<number>({
-    is: (v) => Object.is(v, NaN),
-    replacer: () => 0,
-    reviver: () => NaN,
-  }),
-  "-0": defineExtension<number>({
-    is: (v) => Object.is(v, -0),
-    replacer: () => 0,
-    reviver: () => -0,
-  }),
+  undefined: defineConstant(undefined),
+  Infinity: defineConstant(Infinity),
+  "-Infinity": defineConstant(-Infinity),
+  NaN: defineConstant(NaN),
+  "-0": defineConstant(-0),
 
   //
   // extra types
