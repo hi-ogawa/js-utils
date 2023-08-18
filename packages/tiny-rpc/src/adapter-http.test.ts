@@ -200,7 +200,7 @@ describe("adapter-http", () => {
     server.close();
   });
 
-  it("custom serializer", async () => {
+  it("brillout-json", async () => {
     // https://github.com/brillout/json-serializer
     const { parse } = await import("@brillout/json-serializer/parse");
     const { stringify } = await import("@brillout/json-serializer/stringify");
@@ -208,8 +208,7 @@ describe("adapter-http", () => {
 
     const routes = {
       identity: (v: any) => v,
-
-      zodError: validateFn(z.number().int())((x) => 2 * x),
+      validate: validateFn(z.number().int())((x) => 2 * x),
     } satisfies TinyRpcRoutes;
 
     //
@@ -254,11 +253,94 @@ describe("adapter-http", () => {
       regexp: /^\d+$/g,
     };
     expect(await client.identity(obj)).toEqual(obj);
-    expect(await client.zodError(123)).toMatchInlineSnapshot("246");
+    expect(await client.validate(123)).toMatchInlineSnapshot("246");
 
     // error
-    await expect(client.zodError(123.456)).rejects.toSatisfy((e) => {
+    await expect(client.validate(123.456)).rejects.toSatisfy((e) => {
       expect(e).toMatchInlineSnapshot("[Error: Unexpected end of JSON input]");
+      return true;
+    });
+  });
+
+  it("superjson", async () => {
+    const superjson = await import("superjson");
+
+    const routes = {
+      identity: (v: any) => v,
+      validate: validateFn(z.number().int())((x) => 2 * x),
+    } satisfies TinyRpcRoutes;
+
+    //
+    // server
+    //
+    const endpoint = "/rpc";
+    const server = createServer(
+      compose(
+        (ctx) => {
+          ctx.handleError = () => {
+            return new Response(null, { status: 500 });
+          };
+        },
+        exposeTinyRpc({
+          routes,
+          adapter: httpServerAdapter({
+            endpoint,
+            JSON: superjson,
+          }),
+        }),
+        () => new Response("tiny-rpc-skipped")
+      )
+    );
+    const { url } = await startTestServer(server);
+
+    //
+    // client
+    //
+    const client = proxyTinyRpc<typeof routes>({
+      adapter: httpClientAdapter({
+        url: url + endpoint,
+        JSON: superjson,
+      }),
+    });
+
+    const obj = {
+      date: new Date("2023-08-17"),
+      undefined: undefined,
+      collision: "!undefined",
+      NaN: NaN,
+      Infinity: Infinity,
+      regexp: /^\d+$/g,
+    };
+    expect(await client.identity(obj)).toEqual(obj);
+    expect(await client.validate(123)).toMatchInlineSnapshot("246");
+
+    // error
+    await expect(client.validate(123.456)).rejects.toSatisfy((e) => {
+      tinyassert(e instanceof TinyRpcError);
+      expect(e).toMatchInlineSnapshot(`
+        [Error: [
+          {
+            "code": "invalid_type",
+            "expected": "integer",
+            "received": "float",
+            "message": "Expected integer, received float",
+            "path": []
+          }
+        ]]
+      `);
+      tinyassert(e.cause instanceof Error);
+      expect(e.cause).toMatchInlineSnapshot(`
+        [ZodError: [
+          {
+            "code": "invalid_type",
+            "expected": "integer",
+            "received": "float",
+            "message": "Expected integer, received float",
+            "path": []
+          }
+        ]]
+      `);
+      expect(e.cause.cause).toMatchInlineSnapshot("undefined");
       return true;
     });
   });
