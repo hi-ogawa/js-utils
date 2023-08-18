@@ -464,6 +464,7 @@ describe(createCustomJson, () => {
 
   describe("fuzzing", () => {
     const customJson = createCustomJson();
+
     it("jsonValue", () => {
       fc.assert(
         fc.property(fc.jsonValue(), (data) => {
@@ -471,6 +472,25 @@ describe(createCustomJson, () => {
           const revivied = customJson.parse(stringified);
           expect(revivied).toEqual(data);
         }),
+        { verbose: true, numRuns: 10 ** 3 }
+      );
+    });
+
+    it("anything", () => {
+      fc.assert(
+        fc.property(
+          fc.anything({
+            withBigInt: true,
+            withDate: true,
+            withMap: true,
+            withSet: true,
+          }),
+          (data) => {
+            const stringified = customJson.stringify(data);
+            const revivied = customJson.parse(stringified);
+            expect(revivied).toEqual(data);
+          }
+        ),
         { verbose: true, numRuns: 10 ** 3 }
       );
     });
