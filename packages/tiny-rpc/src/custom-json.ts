@@ -45,7 +45,7 @@ export function createCustomJsonReplacer(options?: {
     }
 
     for (const [tag, tx] of Object.entries(transformers)) {
-      if (tx.match(v)) {
+      if (tx.is(v)) {
         return [`!${tag}`, tx.replacer(v as never)];
       }
     }
@@ -81,8 +81,8 @@ export function createCustomJsonReviver(options?: {
 }
 
 type Extension<T> = {
-  match: (v: unknown) => boolean;
-  replacer: (v: T) => unknown; // `serialize` doesn't have to `stringify`
+  is: (v: unknown) => boolean;
+  replacer: (v: T) => unknown;
   reviver: (v: unknown) => T;
 };
 
@@ -92,12 +92,12 @@ export function defineExtension<T>(v: Extension<T>): Extension<T> {
 
 const builtins = {
   undefined: defineExtension<undefined>({
-    match: (v) => v === void 0,
+    is: (v) => v === void 0,
     replacer: () => 0,
     reviver: () => void 0,
   }),
   Date: defineExtension<Date>({
-    match: (v) => v instanceof Date,
+    is: (v) => v instanceof Date,
     replacer: (v) => v.toISOString(),
     reviver: (v) => {
       tinyassert(typeof v === "string");

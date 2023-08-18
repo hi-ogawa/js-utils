@@ -13,7 +13,7 @@ describe("json", () => {
     const customJson = createCustomJson({
       extensions: {
         ZodError: defineExtension<ZodError>({
-          match: (v): v is ZodError => v instanceof ZodError,
+          is: (v): v is ZodError => v instanceof ZodError,
           replacer: (v) => v.issues,
           reviver: (s) => new ZodError(s as any),
         }),
