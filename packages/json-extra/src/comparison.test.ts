@@ -203,8 +203,8 @@ describe("superjson", () => {
 
 describe("brillout-json-serializer", () => {
   it("basic", async () => {
-    const { parse } = await import("@brillout/json-serializer/parse");
     const { stringify } = await import("@brillout/json-serializer/stringify");
+    const { parse } = await import("@brillout/json-serializer/parse");
 
     const original = [
       // standard json value
