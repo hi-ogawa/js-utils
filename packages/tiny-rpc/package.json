@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/tiny-rpc",
-  "version": "0.2.3-pre.8",
+  "version": "0.2.3-pre.9",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
