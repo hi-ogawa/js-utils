@@ -11,4 +11,4 @@ and also provides human-readibility for custom containers.
 
 ## examples
 
-See `./src/index.test.ts`
+See `./src/*.test.ts`
