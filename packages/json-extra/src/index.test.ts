@@ -2,11 +2,7 @@ import { tinyassert } from "@hiogawa/utils";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { ZodError, z } from "zod";
-import {
-  createJsonExtra,
-  defineJsonExtraExtension,
-  jsonParseReviveUndefined,
-} from ".";
+import { createJsonExtra, defineJsonExtraExtension } from ".";
 
 describe(createJsonExtra, () => {
   it("basic", () => {
@@ -156,8 +152,8 @@ describe(createJsonExtra, () => {
       ]"
     `);
 
-    const revivied = jsonExtra.parse(stringified);
-    expect(revivied).toMatchInlineSnapshot(`
+    const revived = jsonExtra.parse(stringified);
+    expect(revived).toMatchInlineSnapshot(`
       [
         null,
         true,
@@ -197,7 +193,50 @@ describe(createJsonExtra, () => {
         ],
       ]
     `);
-    expect(revivied).toEqual(original);
+    expect(revived).toEqual(original);
+
+    const revivedUndefined = jsonExtra.parseReviveUndefined(stringified);
+    expect(revivedUndefined).toMatchInlineSnapshot(`
+      [
+        null,
+        true,
+        123,
+        "string",
+        [
+          "array",
+        ],
+        {
+          "k": "v",
+        },
+        undefined,
+        Infinity,
+        -Infinity,
+        NaN,
+        0,
+        -0,
+        2023-08-17T00:00:00.000Z,
+        1234n,
+        /\\^\\\\d\\+/gms,
+        Map {
+          0 => 1970-01-01T00:00:00.000Z,
+          1n => Set {
+            /a/g,
+          },
+        },
+        Set {
+          0,
+          1970-01-01T00:00:00.000Z,
+          Map {
+            1n => /a/g,
+          },
+        },
+        [
+          "!NaN",
+          "collision",
+        ],
+      ]
+    `);
+    expect(revivedUndefined).toEqual(original);
   });
 
   it("custom type", () => {
@@ -264,24 +303,34 @@ describe(createJsonExtra, () => {
 
   it("selected builtins", () => {
     const jsonExtra = createJsonExtra({ builtins: ["undefined", "Date"] });
-    jsonExtra.parse;
-
-    const original = [undefined, new Date("2023-08-17"), NaN, new Set([0, 1])];
-    expect(original).toMatchInlineSnapshot(`
-      [
-        undefined,
-        2023-08-17T00:00:00.000Z,
-        NaN,
-        Set {
-          0,
-          1,
-        },
-      ]
-    `);
-
-    const stringified = jsonExtra.stringify(original, null, 2);
-    expect(stringified).toMatchInlineSnapshot(`
-      "[
+    const result = testStringifyAndParse(
+      [undefined, new Date("2023-08-17"), NaN, new Set([0, 1])],
+      jsonExtra
+    );
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "original": [
+          undefined,
+          2023-08-17T00:00:00.000Z,
+          NaN,
+          Set {
+            0,
+            1,
+          },
+        ],
+        "revived": [
+          ,
+          2023-08-17T00:00:00.000Z,
+          null,
+          {},
+        ],
+        "revivedUndefined": [
+          undefined,
+          2023-08-17T00:00:00.000Z,
+          null,
+          {},
+        ],
+        "stringified": "[
         [
           \\"!undefined\\",
           0
@@ -292,17 +341,8 @@ describe(createJsonExtra, () => {
         ],
         null,
         {}
-      ]"
-    `);
-
-    const revived = jsonExtra.parse(stringified);
-    expect(revived).toMatchInlineSnapshot(`
-      [
-        ,
-        2023-08-17T00:00:00.000Z,
-        null,
-        {},
-      ]
+      ]",
+      }
     `);
   });
 
@@ -606,9 +646,9 @@ describe(createJsonExtra, () => {
     it("jsonValue", () => {
       fc.assert(
         fc.property(fc.jsonValue(), (data) => {
-          const stringified = jsonExtra.stringify(data);
-          const revivied = jsonExtra.parse(stringified);
-          expect(revivied).toEqual(data);
+          const result = testStringifyAndParse(data, jsonExtra);
+          expect(result.revived).toEqual(result.original);
+          expect(result.revivedUndefined).toEqual(result.original);
         }),
         // TODO: more runs on CI?
         { verbose: true, numRuns: 10 ** 3 }
@@ -625,9 +665,9 @@ describe(createJsonExtra, () => {
             withSet: true,
           }),
           (data) => {
-            const stringified = jsonExtra.stringify(data);
-            const revivied = jsonExtra.parse(stringified);
-            expect(revivied).toEqual(data);
+            const result = testStringifyAndParse(data, jsonExtra);
+            expect(result.revived).toEqual(result.original);
+            expect(result.revivedUndefined).toEqual(result.original);
           }
         ),
         { verbose: true, numRuns: 10 ** 3 }
@@ -642,9 +682,6 @@ function testStringifyAndParse(
 ) {
   const stringified = jsonExtra.stringify(original, null, 2);
   const revived = jsonExtra.parse(stringified);
-  const revivedUndefined = jsonParseReviveUndefined(
-    stringified,
-    jsonExtra.reviver
-  );
+  const revivedUndefined = jsonExtra.parseReviveUndefined(stringified);
   return { original, stringified, revived, revivedUndefined };
 }

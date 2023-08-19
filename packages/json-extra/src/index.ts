@@ -18,12 +18,15 @@ export function createJsonExtra(options: Options) {
   function parse(s: string) {
     return JSON.parse(s, reviver);
   }
-  return { stringify, parse, replacer, reviver };
+  function parseReviveUndefined(s: string) {
+    return jsonParseReviveUndefined(s, reviver);
+  }
+  return { stringify, parse, parseReviveUndefined, replacer, reviver };
 }
 
 // by default we don't bother dropping `undefined` properties, but we still provide non-dropping version.
 // cf. https://github.com/brillout/json-serializer/blob/133fc9b1f73c4e29a8374b8eb5efa461a72949cc/src/parse.ts#L6
-export function jsonParseReviveUndefined(
+function jsonParseReviveUndefined(
   s: string,
   reviver: ReturnType<typeof createReviver>
 ) {
