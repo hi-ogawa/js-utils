@@ -194,6 +194,8 @@ importers:
 
   packages/utils: {}
 
+  packages/utils-hattip: {}
+
   packages/utils-react:
     devDependencies:
       '@hiogawa/utils':
