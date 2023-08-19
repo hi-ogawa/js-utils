@@ -5,6 +5,9 @@
       "path": "packages/query-proxy"
     },
     {
+      "path": "packages/json-extra"
+    },
+    {
       "path": "packages/tiny-cli"
     },
     {
@@ -27,6 +30,9 @@
     },
     {
       "path": "packages/utils-experimental"
+    },
+    {
+      "path": "packages/utils-hattip"
     },
     {
       "path": "packages/utils-react"
