@@ -34,7 +34,7 @@ describe(createCustomJson, () => {
       ]),
       new Set<any>([0, new Date(0), new Map([[1n, /a/g]])]),
       // escape
-      ["!NaN", "collision"]
+      ["!NaN", "collision"],
     ];
 
     const stringified = customJson.stringify(original, null, 2);
