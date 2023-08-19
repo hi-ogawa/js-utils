@@ -6,7 +6,7 @@ import { createJsonExtra, defineJsonExtraExtension } from ".";
 
 describe(createJsonExtra, () => {
   it("basic", () => {
-    const customJson = createJsonExtra();
+    const customJson = createJsonExtra({ builtins: true });
 
     const original = [
       // standard json value
@@ -205,6 +205,7 @@ describe(createJsonExtra, () => {
           reviver: (s) => new ZodError(s as any),
         }),
       },
+      builtins: [],
     });
 
     const error = z.object({ int: z.number().int() }).safeParse({ int: 1.23 });
@@ -258,7 +259,7 @@ describe(createJsonExtra, () => {
   });
 
   it("escape-collision", () => {
-    const customJson = createJsonExtra();
+    const customJson = createJsonExtra({ builtins: true });
 
     const original = {
       collision2: ["!", 1n],
@@ -408,7 +409,7 @@ describe(createJsonExtra, () => {
       () => {},
     ];
 
-    const customJson = createJsonExtra();
+    const customJson = createJsonExtra({ builtins: true });
     expect(original).toMatchInlineSnapshot(`
       [
         Symbol(unique),
@@ -467,7 +468,7 @@ describe(createJsonExtra, () => {
     const original: any[] = [];
     original[0] = original;
 
-    const customJson = createJsonExtra();
+    const customJson = createJsonExtra({ builtins: true });
     expect(original).toMatchInlineSnapshot(`
       [
         [Circular],
@@ -483,7 +484,7 @@ describe(createJsonExtra, () => {
   });
 
   describe("fuzzing", () => {
-    const customJson = createJsonExtra();
+    const customJson = createJsonExtra({ builtins: true });
 
     it("jsonValue", () => {
       fc.assert(

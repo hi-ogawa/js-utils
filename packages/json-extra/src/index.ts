@@ -1,14 +1,17 @@
-import { tinyassert } from "@hiogawa/utils";
+import { objectPick, tinyassert } from "@hiogawa/utils";
 
 // references
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
 
-export function createJsonExtra(options?: {
+interface Options {
+  builtins: true | BuiltinExtension[];
   extensions?: Record<string, Extension<any>>;
-}) {
-  const replacer = createJsonExtraReplacer(options);
-  const reviver = createJsonExtraReviver(options);
+}
+
+export function createJsonExtra(options: Options) {
+  const replacer = createReplacer(options);
+  const reviver = createReviver(options);
   return {
     stringify: (v: any, _nullReplacer?: null, space?: number) =>
       JSON.stringify(v, replacer, space),
@@ -16,10 +19,8 @@ export function createJsonExtra(options?: {
   };
 }
 
-export function createJsonExtraReplacer(options?: {
-  extensions?: Record<string, Extension<any>>;
-}) {
-  const transformers = { ...options?.extensions, ...builtins };
+function createReplacer(options: Options) {
+  const extensions = getExtensions(options);
 
   return function (this: unknown, k: string, vToJson: unknown) {
     // vToJson === v.toJSON() when `toJSON` is defined (e.g. Date)
@@ -35,7 +36,7 @@ export function createJsonExtraReplacer(options?: {
       return ["!", ...v];
     }
 
-    for (const [tag, tx] of Object.entries(transformers)) {
+    for (const [tag, tx] of Object.entries(extensions)) {
       if (tx.is(v)) {
         return [`!${tag}`, tx.replacer(v as never)];
       }
@@ -44,10 +45,8 @@ export function createJsonExtraReplacer(options?: {
   };
 }
 
-export function createJsonExtraReviver(options?: {
-  extensions?: Record<string, Extension<any>>;
-}) {
-  const transformers = { ...options?.extensions, ...builtins };
+function createReviver(options: Options) {
+  const extensions = getExtensions(options);
 
   return (_k: string, v: unknown) => {
     // unescape collision
@@ -61,7 +60,7 @@ export function createJsonExtraReviver(options?: {
     }
 
     if (Array.isArray(v) && v.length === 2 && typeof v[0] === "string") {
-      for (const [tag, tx] of Object.entries(transformers)) {
+      for (const [tag, tx] of Object.entries(extensions)) {
         if (v[0].startsWith(`!${tag}`)) {
           return tx.reviver(v[1]);
         }
@@ -71,12 +70,27 @@ export function createJsonExtraReviver(options?: {
   };
 }
 
+function getExtensions(options: Options): Record<string, Extension<any>> {
+  let selected: Record<string, Extension<any>> = {};
+  if (options.builtins === true) {
+    selected = builtins;
+  } else {
+    selected = objectPick(builtins, options.builtins);
+  }
+  return { ...selected, ...options.extensions };
+}
+
+//
+// extension definition
+//
+
 type Extension<T> = {
   is: (v: unknown) => boolean;
   replacer: (v: T) => unknown;
   reviver: (v: unknown) => T;
 };
 
+// type check helper
 export function defineJsonExtraExtension<T>(v: Extension<T>): Extension<T> {
   return v;
 }
@@ -88,6 +102,12 @@ function defineConstant<T>(c: T): Extension<T> {
     reviver: () => c,
   };
 }
+
+//
+// builtin extension
+//
+
+type BuiltinExtension = keyof typeof builtins;
 
 const builtins = {
   //
