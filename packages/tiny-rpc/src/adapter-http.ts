@@ -13,10 +13,14 @@ type RequestHandler = (ctx: {
 export function httpServerAdapter(opts: {
   endpoint: string;
   pathsForGET?: string[]; // GET is useful to cache reponse of public endpoint
-  JSON?: JsonTransformer; // it doesn't necessary have to be json string but we put "content-type: application/json" anyways for now
+  JSON?: Partial<JsonTransformer>;
   onError?: (e: unknown) => void;
 }): TinyRpcServerAdapter<RequestHandler> {
-  const JSON = opts.JSON ?? globalThis.JSON;
+  const JSON: JsonTransformer = {
+    parse: globalThis.JSON.parse,
+    stringify: globalThis.JSON.stringify,
+    ...opts.JSON,
+  };
 
   return {
     register: (invokeRoute): RequestHandler => {
@@ -66,11 +70,15 @@ export function httpServerAdapter(opts: {
 export function httpClientAdapter(opts: {
   url: string;
   pathsForGET?: string[];
-  JSON?: JsonTransformer;
+  JSON?: Partial<JsonTransformer>;
   fetch?: (typeof globalThis)["fetch"]; // override fetch e.g. to customize Authorization headers
 }): TinyRpcClientAdapter {
   const fetch = opts.fetch ?? globalThis.fetch;
-  const JSON = opts.JSON ?? globalThis.JSON;
+  const JSON: JsonTransformer = {
+    parse: globalThis.JSON.parse,
+    stringify: globalThis.JSON.stringify,
+    ...opts.JSON,
+  };
 
   return {
     send: async (data) => {
@@ -104,6 +112,7 @@ export function httpClientAdapter(opts: {
 const GET_PAYLOAD_PARAM = "payload";
 
 // do direct convertion `any <-> string` to support https://github.com/brillout/json-serializer
+// it doesn't necessary have to be json string but we put "content-type: application/json" anyways for now
 interface JsonTransformer {
   parse: (v: string) => any; // TODO: eliminate proto pollution at least on server by default cf. https://github.com/fastify/secure-json-parse
   stringify: (v: any) => string;
