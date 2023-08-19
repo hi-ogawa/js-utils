@@ -134,6 +134,9 @@ importers:
       '@hattip/compose':
         specifier: ^0.0.34
         version: 0.0.34
+      '@hiogawa/json-extra':
+        specifier: ^0.0.1
+        version: 0.0.1
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1302,6 +1305,10 @@ packages:
     dependencies:
       prettier: 2.8.8
       typescript: 5.1.6
+    dev: true
+
+  /@hiogawa/json-extra@0.0.1:
+    resolution: {integrity: sha512-LFh/FLhj0s0LqxCeHPD6xk8j+01oSkqKOwTH2+lQtxbMW6b7Br6TynMlTQ9RUT9d3Ih4+IcqNeopudwRUMnuvQ==}
     dev: true
 
   /@hiogawa/unocss-preset-antd@2.2.1-pre.3(@unocss/preset-uno@0.54.0)(unocss@0.53.6):
