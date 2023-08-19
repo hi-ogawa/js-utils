@@ -105,6 +105,6 @@ const GET_PAYLOAD_PARAM = "payload";
 
 // do direct convertion `any <-> string` to support https://github.com/brillout/json-serializer
 interface JsonTransformer {
-  parse: (v: string) => any;
+  parse: (v: string) => any; // TODO: eliminate proto pollution at least on server by default cf. https://github.com/fastify/secure-json-parse
   stringify: (v: any) => string;
 }
