@@ -3,7 +3,7 @@ import { initTRPC } from "@trpc/server";
 import { describe, it } from "vitest";
 import { z } from "zod";
 import { createFnRecordQueryProxy } from "./record";
-import { createTrpcClientQueryProxy } from "./trpc";
+import { createTrpcClientQueryProxy, trpcCallerFnRecordCompat } from "./trpc";
 
 // example trpc server
 function defineExampleServer() {
@@ -54,8 +54,10 @@ describe(createFnRecordQueryProxy.name, () => {
     const server = defineExampleServer();
     const caller = server.createCaller({});
 
-    // caller is just FnRecord
-    const callerQuery = createFnRecordQueryProxy(caller);
+    // caller is just FnRecord but requires a small type hacking
+    const callerQuery = createFnRecordQueryProxy(
+      trpcCallerFnRecordCompat(caller)
+    );
 
     // type-check
     callerQuery.checkId.queryOptions satisfies (id: string) => {

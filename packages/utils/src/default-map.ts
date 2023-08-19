@@ -1,5 +1,3 @@
-import { sortBy } from "./lodash";
-
 export class DefaultMap<K, V> extends Map<K, V> {
   constructor(
     private defaultFn: (key: K) => V,
@@ -25,9 +23,9 @@ export class UncheckedMap<K, V> extends DefaultMap<K, V> {
 }
 
 export class HashKeyMap<K, V> {
-  private map = new Map<string, [k: K, v: V]>();
+  private map = new Map<unknown, [k: K, v: V]>();
 
-  constructor(private keyFn: (key: K) => string = defaultKeyFn) {}
+  constructor(private keyFn: (key: K) => unknown = JSON.stringify) {}
 
   get(key: K): V | undefined {
     return this.map.get(this.keyFn(key))?.[1];
@@ -55,11 +53,8 @@ export class HashKeyMap<K, V> {
   }
 }
 
-export class HashKeyDefaultMap<K extends object, V> extends HashKeyMap<K, V> {
-  constructor(
-    private defaultFn: (key: K) => V,
-    keyFn: (key: K) => string = defaultKeyFn
-  ) {
+export class HashKeyDefaultMap<K, V> extends HashKeyMap<K, V> {
+  constructor(private defaultFn: (key: K) => V, keyFn?: (key: K) => unknown) {
     super(keyFn);
   }
 
@@ -69,9 +64,4 @@ export class HashKeyDefaultMap<K extends object, V> extends HashKeyMap<K, V> {
     }
     return super.get(key)!;
   }
-}
-
-function defaultKeyFn(v: any): string {
-  // shallow sort by key as a cheap normalization
-  return JSON.stringify(sortBy(Object.entries(v), ([k]) => k));
 }

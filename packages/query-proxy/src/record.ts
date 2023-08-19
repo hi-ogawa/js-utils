@@ -1,6 +1,6 @@
 import { createGetterProxy } from "./utils";
 
-type FnAny = (...args: any[]) => any;
+type FnAny = (() => any) | ((input: any) => any);
 type FnAnyToAsync<F extends FnAny> = (
   ...args: Parameters<F>
 ) => Promise<Awaited<ReturnType<F>>>;

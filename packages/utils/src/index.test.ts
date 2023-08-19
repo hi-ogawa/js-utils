@@ -265,7 +265,7 @@ describe(HashKeyDefaultMap.name, () => {
         "defaultFn": [Function],
         "keyFn": [Function],
         "map": Map {
-          "[[\\"mod2\\",0],[\\"mod3\\",0]]" => [
+          "{\\"mod2\\":0,\\"mod3\\":0}" => [
             {
               "mod2": 0,
               "mod3": 0,
@@ -275,7 +275,7 @@ describe(HashKeyDefaultMap.name, () => {
               6,
             ],
           ],
-          "[[\\"mod2\\",1],[\\"mod3\\",1]]" => [
+          "{\\"mod2\\":1,\\"mod3\\":1}" => [
             {
               "mod2": 1,
               "mod3": 1,
@@ -285,7 +285,7 @@ describe(HashKeyDefaultMap.name, () => {
               7,
             ],
           ],
-          "[[\\"mod2\\",0],[\\"mod3\\",2]]" => [
+          "{\\"mod2\\":0,\\"mod3\\":2}" => [
             {
               "mod2": 0,
               "mod3": 2,
@@ -295,7 +295,7 @@ describe(HashKeyDefaultMap.name, () => {
               8,
             ],
           ],
-          "[[\\"mod2\\",1],[\\"mod3\\",0]]" => [
+          "{\\"mod2\\":1,\\"mod3\\":0}" => [
             {
               "mod2": 1,
               "mod3": 0,
@@ -305,7 +305,7 @@ describe(HashKeyDefaultMap.name, () => {
               9,
             ],
           ],
-          "[[\\"mod2\\",0],[\\"mod3\\",1]]" => [
+          "{\\"mod2\\":0,\\"mod3\\":1}" => [
             {
               "mod2": 0,
               "mod3": 1,
@@ -314,7 +314,7 @@ describe(HashKeyDefaultMap.name, () => {
               4,
             ],
           ],
-          "[[\\"mod2\\",1],[\\"mod3\\",2]]" => [
+          "{\\"mod2\\":1,\\"mod3\\":2}" => [
             {
               "mod2": 1,
               "mod3": 2,
