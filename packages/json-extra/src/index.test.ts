@@ -258,6 +258,50 @@ describe(createJsonExtra, () => {
     expect(revived).toEqual(original);
   });
 
+  it("selected builtins", () => {
+    const customJson = createJsonExtra({ builtins: ["undefined", "Date"] });
+    customJson.parse;
+
+    const original = [undefined, new Date("2023-08-17"), NaN, new Set([0, 1])];
+    expect(original).toMatchInlineSnapshot(`
+      [
+        undefined,
+        2023-08-17T00:00:00.000Z,
+        NaN,
+        Set {
+          0,
+          1,
+        },
+      ]
+    `);
+
+    const stringified = customJson.stringify(original, null, 2);
+    expect(stringified).toMatchInlineSnapshot(`
+      "[
+        [
+          \\"!undefined\\",
+          0
+        ],
+        [
+          \\"!Date\\",
+          \\"2023-08-17T00:00:00.000Z\\"
+        ],
+        null,
+        {}
+      ]"
+    `);
+
+    const revived = customJson.parse(stringified);
+    expect(revived).toMatchInlineSnapshot(`
+      [
+        ,
+        2023-08-17T00:00:00.000Z,
+        null,
+        {},
+      ]
+    `);
+  });
+
   it("escape-collision", () => {
     const customJson = createJsonExtra({ builtins: true });
 
