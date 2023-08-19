@@ -10,7 +10,7 @@ import {
 
 describe(createJsonExtra, () => {
   it("basic", () => {
-    const customJson = createJsonExtra({ builtins: true });
+    const jsonExtra = createJsonExtra({ builtins: true });
 
     const original = [
       // standard json value
@@ -41,7 +41,7 @@ describe(createJsonExtra, () => {
       ["!NaN", "collision"],
     ];
 
-    const stringified = customJson.stringify(original, null, 2);
+    const stringified = jsonExtra.stringify(original, null, 2);
     expect(stringified).toMatchInlineSnapshot(`
       "[
         null,
@@ -156,7 +156,7 @@ describe(createJsonExtra, () => {
       ]"
     `);
 
-    const revivied = customJson.parse(stringified);
+    const revivied = jsonExtra.parse(stringified);
     expect(revivied).toMatchInlineSnapshot(`
       [
         null,
@@ -201,7 +201,7 @@ describe(createJsonExtra, () => {
   });
 
   it("custom type", () => {
-    const customJson = createJsonExtra({
+    const jsonExtra = createJsonExtra({
       extensions: {
         ZodError: defineJsonExtraExtension<ZodError>({
           is: (v): v is ZodError => v instanceof ZodError,
@@ -220,7 +220,7 @@ describe(createJsonExtra, () => {
       value: error.error,
     };
 
-    const stringified = customJson.stringify(original, null, 2);
+    const stringified = jsonExtra.stringify(original, null, 2);
     expect(stringified).toMatchInlineSnapshot(
       `
       "{
@@ -242,7 +242,7 @@ describe(createJsonExtra, () => {
       }"
     `
     );
-    const revived = customJson.parse(stringified);
+    const revived = jsonExtra.parse(stringified);
     expect(revived).toMatchInlineSnapshot(`
       {
         "ok": false,
@@ -263,8 +263,8 @@ describe(createJsonExtra, () => {
   });
 
   it("selected builtins", () => {
-    const customJson = createJsonExtra({ builtins: ["undefined", "Date"] });
-    customJson.parse;
+    const jsonExtra = createJsonExtra({ builtins: ["undefined", "Date"] });
+    jsonExtra.parse;
 
     const original = [undefined, new Date("2023-08-17"), NaN, new Set([0, 1])];
     expect(original).toMatchInlineSnapshot(`
@@ -279,7 +279,7 @@ describe(createJsonExtra, () => {
       ]
     `);
 
-    const stringified = customJson.stringify(original, null, 2);
+    const stringified = jsonExtra.stringify(original, null, 2);
     expect(stringified).toMatchInlineSnapshot(`
       "[
         [
@@ -295,7 +295,7 @@ describe(createJsonExtra, () => {
       ]"
     `);
 
-    const revived = customJson.parse(stringified);
+    const revived = jsonExtra.parse(stringified);
     expect(revived).toMatchInlineSnapshot(`
       [
         ,
@@ -307,7 +307,7 @@ describe(createJsonExtra, () => {
   });
 
   it("escape-collision", () => {
-    const customJson = createJsonExtra({ builtins: true });
+    const jsonExtra = createJsonExtra({ builtins: true });
 
     const original = {
       collision2: ["!", 1n],
@@ -316,7 +316,7 @@ describe(createJsonExtra, () => {
       collision5: [[], ["!"], ["!", 0], ["!", 0, 0], ["!", 0, 0, 0]],
     };
 
-    const stringified = customJson.stringify(original, null, 2);
+    const stringified = jsonExtra.stringify(original, null, 2);
     expect(stringified).toMatchInlineSnapshot(`
       "{
         \\"collision2\\": [
@@ -376,7 +376,7 @@ describe(createJsonExtra, () => {
       }"
     `);
 
-    const revived = customJson.parse(stringified);
+    const revived = jsonExtra.parse(stringified);
     expect(revived).toMatchInlineSnapshot(`
       {
         "collision2": [
@@ -457,7 +457,7 @@ describe(createJsonExtra, () => {
       () => {},
     ];
 
-    const customJson = createJsonExtra({ builtins: true });
+    const jsonExtra = createJsonExtra({ builtins: true });
     expect(original).toMatchInlineSnapshot(`
       [
         Symbol(unique),
@@ -475,7 +475,7 @@ describe(createJsonExtra, () => {
       ]
     `);
 
-    const stringified = customJson.stringify(original, null, 2);
+    const stringified = jsonExtra.stringify(original, null, 2);
     expect(stringified).toMatchInlineSnapshot(`
       "[
         null,
@@ -493,7 +493,7 @@ describe(createJsonExtra, () => {
       ]"
     `);
 
-    const revived = customJson.parse(stringified);
+    const revived = jsonExtra.parse(stringified);
     expect(revived).toMatchInlineSnapshot(`
       [
         null,
@@ -516,14 +516,14 @@ describe(createJsonExtra, () => {
     const original: any[] = [];
     original[0] = original;
 
-    const customJson = createJsonExtra({ builtins: true });
+    const jsonExtra = createJsonExtra({ builtins: true });
     expect(original).toMatchInlineSnapshot(`
       [
         [Circular],
       ]
     `);
 
-    expect(() => customJson.stringify(original, null, 2))
+    expect(() => jsonExtra.stringify(original, null, 2))
       .toThrowErrorMatchingInlineSnapshot(`
       "Converting circular structure to JSON
           --> starting at object with constructor 'Array'
@@ -533,33 +533,34 @@ describe(createJsonExtra, () => {
 
   describe("undefined", () => {
     it("top-value", () => {
-      const customJson = createJsonExtra({ builtins: true });
-      const result = testStringifyAndParse(undefined, customJson);
+      const jsonExtra = createJsonExtra({ builtins: true });
+      const result = testStringifyAndParse(undefined, jsonExtra);
       expect(result).toMatchInlineSnapshot(`
         {
           "original": undefined,
-          "revivied": undefined,
+          "revived": undefined,
+          "revivedUndefined": undefined,
           "stringified": "[
           \\"!undefined\\",
           0
         ]",
         }
       `);
-      expect(
-        jsonParseReviveUndefined(result.stringified, customJson.reviver)
-      ).toMatchInlineSnapshot("undefined");
-      expect(result.revivied).toEqual(result.original);
+      expect(result.revived).toEqual(result.original);
     });
 
     it("property", () => {
-      const customJson = createJsonExtra({ builtins: true });
-      const result = testStringifyAndParse({ prop: undefined }, customJson);
+      const jsonExtra = createJsonExtra({ builtins: true });
+      const result = testStringifyAndParse({ prop: undefined }, jsonExtra);
       expect(result).toMatchInlineSnapshot(`
         {
           "original": {
             "prop": undefined,
           },
-          "revivied": {},
+          "revived": {},
+          "revivedUndefined": {
+            "prop": undefined,
+          },
           "stringified": "{
           \\"prop\\": [
             \\"!undefined\\",
@@ -568,26 +569,23 @@ describe(createJsonExtra, () => {
         }",
         }
       `);
-      expect(
-        jsonParseReviveUndefined(result.stringified, customJson.reviver)
-      ).toMatchInlineSnapshot(`
-        {
-          "prop": undefined,
-        }
-      `);
-      expect(result.revivied).toEqual(result.original);
+      expect(result.revived).toEqual(result.original);
+      expect(result.revivedUndefined).toEqual(result.original);
     });
 
     it("array", () => {
-      const customJson = createJsonExtra({ builtins: true });
-      const result = testStringifyAndParse([undefined], customJson);
+      const jsonExtra = createJsonExtra({ builtins: true });
+      const result = testStringifyAndParse([undefined], jsonExtra);
       expect(result).toMatchInlineSnapshot(`
         {
           "original": [
             undefined,
           ],
-          "revivied": [
+          "revived": [
             ,
+          ],
+          "revivedUndefined": [
+            undefined,
           ],
           "stringified": "[
           [
@@ -597,25 +595,19 @@ describe(createJsonExtra, () => {
         ]",
         }
       `);
-      expect(
-        jsonParseReviveUndefined(result.stringified, customJson.reviver)
-      ).toMatchInlineSnapshot(`
-        [
-          undefined,
-        ]
-      `);
-      expect(result.revivied).toEqual(result.original);
+      expect(result.revived).toEqual(result.original);
+      expect(result.revivedUndefined).toEqual(result.original);
     });
   });
 
   describe("fuzzing", () => {
-    const customJson = createJsonExtra({ builtins: true });
+    const jsonExtra = createJsonExtra({ builtins: true });
 
     it("jsonValue", () => {
       fc.assert(
         fc.property(fc.jsonValue(), (data) => {
-          const stringified = customJson.stringify(data);
-          const revivied = customJson.parse(stringified);
+          const stringified = jsonExtra.stringify(data);
+          const revivied = jsonExtra.parse(stringified);
           expect(revivied).toEqual(data);
         }),
         // TODO: more runs on CI?
@@ -633,8 +625,8 @@ describe(createJsonExtra, () => {
             withSet: true,
           }),
           (data) => {
-            const stringified = customJson.stringify(data);
-            const revivied = customJson.parse(stringified);
+            const stringified = jsonExtra.stringify(data);
+            const revivied = jsonExtra.parse(stringified);
             expect(revivied).toEqual(data);
           }
         ),
@@ -646,9 +638,13 @@ describe(createJsonExtra, () => {
 
 function testStringifyAndParse(
   original: unknown,
-  customJson: Pick<JSON, "parse" | "stringify">
+  jsonExtra: ReturnType<typeof createJsonExtra>
 ) {
-  const stringified = customJson.stringify(original, null, 2);
-  const revivied = customJson.parse(stringified);
-  return { original, stringified, revivied };
+  const stringified = jsonExtra.stringify(original, null, 2);
+  const revived = jsonExtra.parse(stringified);
+  const revivedUndefined = jsonParseReviveUndefined(
+    stringified,
+    jsonExtra.reviver
+  );
+  return { original, stringified, revived, revivedUndefined };
 }
