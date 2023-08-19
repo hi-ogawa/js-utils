@@ -2,11 +2,11 @@ import { tinyassert } from "@hiogawa/utils";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { ZodError, z } from "zod";
-import { createCustomJson, defineExtension } from ".";
+import { createJsonExtra, defineJsonExtraExtension } from ".";
 
-describe(createCustomJson, () => {
+describe(createJsonExtra, () => {
   it("basic", () => {
-    const customJson = createCustomJson();
+    const customJson = createJsonExtra();
 
     const original = [
       // standard json value
@@ -197,9 +197,9 @@ describe(createCustomJson, () => {
   });
 
   it("custom type", () => {
-    const customJson = createCustomJson({
+    const customJson = createJsonExtra({
       extensions: {
-        ZodError: defineExtension<ZodError>({
+        ZodError: defineJsonExtraExtension<ZodError>({
           is: (v): v is ZodError => v instanceof ZodError,
           replacer: (v) => v.issues,
           reviver: (s) => new ZodError(s as any),
@@ -258,7 +258,7 @@ describe(createCustomJson, () => {
   });
 
   it("escape-collision", () => {
-    const customJson = createCustomJson();
+    const customJson = createJsonExtra();
 
     const original = {
       collision2: ["!", 1n],
@@ -408,7 +408,7 @@ describe(createCustomJson, () => {
       () => {},
     ];
 
-    const customJson = createCustomJson();
+    const customJson = createJsonExtra();
     expect(original).toMatchInlineSnapshot(`
       [
         Symbol(unique),
@@ -467,7 +467,7 @@ describe(createCustomJson, () => {
     const original: any[] = [];
     original[0] = original;
 
-    const customJson = createCustomJson();
+    const customJson = createJsonExtra();
     expect(original).toMatchInlineSnapshot(`
       [
         [Circular],
@@ -483,7 +483,7 @@ describe(createCustomJson, () => {
   });
 
   describe("fuzzing", () => {
-    const customJson = createCustomJson();
+    const customJson = createJsonExtra();
 
     it("jsonValue", () => {
       fc.assert(

@@ -4,11 +4,11 @@ import { tinyassert } from "@hiogawa/utils";
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
 
-export function createCustomJson(options?: {
+export function createJsonExtra(options?: {
   extensions?: Record<string, Extension<any>>;
 }) {
-  const replacer = createCustomJsonReplacer(options);
-  const reviver = createCustomJsonReviver(options);
+  const replacer = createJsonExtraReplacer(options);
+  const reviver = createJsonExtraReviver(options);
   return {
     stringify: (v: any, _nullReplacer?: null, space?: number) =>
       JSON.stringify(v, replacer, space),
@@ -16,7 +16,7 @@ export function createCustomJson(options?: {
   };
 }
 
-export function createCustomJsonReplacer(options?: {
+export function createJsonExtraReplacer(options?: {
   extensions?: Record<string, Extension<any>>;
 }) {
   const transformers = { ...options?.extensions, ...builtins };
@@ -44,7 +44,7 @@ export function createCustomJsonReplacer(options?: {
   };
 }
 
-export function createCustomJsonReviver(options?: {
+export function createJsonExtraReviver(options?: {
   extensions?: Record<string, Extension<any>>;
 }) {
   const transformers = { ...options?.extensions, ...builtins };
@@ -77,7 +77,7 @@ type Extension<T> = {
   reviver: (v: unknown) => T;
 };
 
-export function defineExtension<T>(v: Extension<T>): Extension<T> {
+export function defineJsonExtraExtension<T>(v: Extension<T>): Extension<T> {
   return v;
 }
 
@@ -102,7 +102,7 @@ const builtins = {
   //
   // extra types
   //
-  Date: defineExtension<Date>({
+  Date: defineJsonExtraExtension<Date>({
     is: (v) => v instanceof Date,
     replacer: (v) => v.toISOString(),
     reviver: (v) => {
@@ -110,7 +110,7 @@ const builtins = {
       return new Date(v);
     },
   }),
-  BigInt: defineExtension<bigint>({
+  BigInt: defineJsonExtraExtension<bigint>({
     is: (v) => typeof v === "bigint",
     replacer: (v) => v.toString(),
     reviver: (v) => {
@@ -118,7 +118,7 @@ const builtins = {
       return BigInt(v);
     },
   }),
-  RegExp: defineExtension<RegExp>({
+  RegExp: defineJsonExtraExtension<RegExp>({
     is: (v) => v instanceof RegExp,
     replacer: (v) => [v.source, v.flags],
     reviver: (v) => {
@@ -135,7 +135,7 @@ const builtins = {
   //
   // extra containers
   //
-  Map: defineExtension<Map<unknown, unknown>>({
+  Map: defineJsonExtraExtension<Map<unknown, unknown>>({
     is: (v) => v instanceof Map,
     replacer: (v) => Array.from(v),
     reviver: (v) => {
@@ -143,7 +143,7 @@ const builtins = {
       return new Map(v);
     },
   }),
-  Set: defineExtension<Set<unknown>>({
+  Set: defineJsonExtraExtension<Set<unknown>>({
     is: (v) => v instanceof Set,
     replacer: (v) => Array.from(v),
     reviver: (v) => {
