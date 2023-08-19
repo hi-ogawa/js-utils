@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/tiny-rpc",
-  "version": "0.2.3-pre.8",
+  "version": "0.2.3-pre.10",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -35,7 +35,9 @@
     "@brillout/json-serializer": "^0.5.4",
     "@hattip/adapter-node": "^0.0.34",
     "@hattip/compose": "^0.0.34",
+    "@hiogawa/json-extra": "workspace:*",
     "@hiogawa/utils": "workspace:*",
+    "superjson": "^1.13.1",
     "zod": "^3.21.4"
   }
 }

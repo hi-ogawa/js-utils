@@ -83,7 +83,7 @@ export function messagePortClientAdapter({
       port.postMessage(req);
       const res = await promiseResolvers.promise;
       if (!res.result.ok) {
-        throw TinyRpcError.fromUnknown(res.result.value);
+        throw TinyRpcError.deserialize(res.result.value);
       }
       return res.result.value;
     },
