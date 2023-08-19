@@ -7,44 +7,21 @@ type LoggerHandler = (ctx: {
   next: () => Promise<Response>;
 }) => Promise<Response>;
 
-type Entry =
-  | { type: "request"; request: Request }
-  | {
-      type: "response";
-      request: Request;
-      response: Response;
-      duration: number;
-    };
-
 export function createLoggerHandler(options?: {
-  printer?: (e: Entry) => void;
   log?: (v: string) => void;
 }): LoggerHandler {
-  const printer = options?.printer ?? defaultPrinter(options);
-
+  const log = options?.log ?? console.log;
   return async (ctx) => {
-    const request = ctx.request;
-    printer({ type: "request", request });
+    const method = ctx.request.method;
+    const pathname = new URL(ctx.request.url).pathname;
+    log(`  --> ${method} ${pathname}`);
+
     const startTime = Date.now();
     const response = await ctx.next();
-    const duration = Date.now() - startTime;
-    printer({ type: "response", request, response, duration });
-    return response;
-  };
-}
+    const duration = formatDuration(Date.now() - startTime);
+    log(`  <-- ${method} ${pathname} ${response.status} ${duration}`);
 
-function defaultPrinter(options?: { log?: (v: string) => void }) {
-  const log = options?.log ?? console.log;
-  return (e: Entry) => {
-    const method = e.request.method;
-    const pathname = new URL(e.request.url).pathname;
-    if (e.type === "request") {
-      log(`  --> ${method} ${pathname}`);
-    }
-    if (e.type === "response") {
-      const duration = formatDuration(e.duration);
-      log(`  <-- ${method} ${pathname} ${e.response.status} ${duration}`);
-    }
+    return response;
   };
 }
 
