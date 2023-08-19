@@ -194,8 +194,6 @@ importers:
 
   packages/utils: {}
 
-  packages/utils-experimental: {}
-
   packages/utils-react:
     devDependencies:
       '@hiogawa/utils':

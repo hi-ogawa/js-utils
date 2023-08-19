@@ -26,9 +26,6 @@
       "path": "packages/utils"
     },
     {
-      "path": "packages/utils-experimental"
-    },
-    {
       "path": "packages/utils-react"
     }
   ]
