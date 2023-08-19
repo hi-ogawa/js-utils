@@ -194,7 +194,7 @@ importers:
 
   packages/utils: {}
 
-  packages/utils-experimental: {}
+  packages/utils-hattip: {}
 
   packages/utils-react:
     devDependencies:
