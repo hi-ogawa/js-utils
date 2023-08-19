@@ -155,9 +155,6 @@ importers:
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../utils
-      superjson:
-        specifier: ^1.13.1
-        version: 1.13.1
       zod:
         specifier: ^3.21.4
         version: 3.21.4
