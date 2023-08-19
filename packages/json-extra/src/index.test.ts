@@ -2,7 +2,11 @@ import { tinyassert } from "@hiogawa/utils";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { ZodError, z } from "zod";
-import { createJsonExtra, defineJsonExtraExtension } from ".";
+import {
+  createJsonExtra,
+  defineJsonExtraExtension,
+  jsonParseReviveUndefined,
+} from ".";
 
 describe(createJsonExtra, () => {
   it("basic", () => {
@@ -527,6 +531,83 @@ describe(createJsonExtra, () => {
     `);
   });
 
+  describe("undefined", () => {
+    it("top-value", () => {
+      const customJson = createJsonExtra({ builtins: true });
+      const result = testStringifyAndParse(undefined, customJson);
+      expect(result).toMatchInlineSnapshot(`
+        {
+          "original": undefined,
+          "revivied": undefined,
+          "stringified": "[
+          \\"!undefined\\",
+          0
+        ]",
+        }
+      `);
+      expect(
+        jsonParseReviveUndefined(result.stringified, customJson.reviver)
+      ).toMatchInlineSnapshot("undefined");
+      expect(result.revivied).toEqual(result.original);
+    });
+
+    it("property", () => {
+      const customJson = createJsonExtra({ builtins: true });
+      const result = testStringifyAndParse({ prop: undefined }, customJson);
+      expect(result).toMatchInlineSnapshot(`
+        {
+          "original": {
+            "prop": undefined,
+          },
+          "revivied": {},
+          "stringified": "{
+          \\"prop\\": [
+            \\"!undefined\\",
+            0
+          ]
+        }",
+        }
+      `);
+      expect(
+        jsonParseReviveUndefined(result.stringified, customJson.reviver)
+      ).toMatchInlineSnapshot(`
+        {
+          "prop": undefined,
+        }
+      `);
+      expect(result.revivied).toEqual(result.original);
+    });
+
+    it("array", () => {
+      const customJson = createJsonExtra({ builtins: true });
+      const result = testStringifyAndParse([undefined], customJson);
+      expect(result).toMatchInlineSnapshot(`
+        {
+          "original": [
+            undefined,
+          ],
+          "revivied": [
+            ,
+          ],
+          "stringified": "[
+          [
+            \\"!undefined\\",
+            0
+          ]
+        ]",
+        }
+      `);
+      expect(
+        jsonParseReviveUndefined(result.stringified, customJson.reviver)
+      ).toMatchInlineSnapshot(`
+        [
+          undefined,
+        ]
+      `);
+      expect(result.revivied).toEqual(result.original);
+    });
+  });
+
   describe("fuzzing", () => {
     const customJson = createJsonExtra({ builtins: true });
 
@@ -537,6 +618,7 @@ describe(createJsonExtra, () => {
           const revivied = customJson.parse(stringified);
           expect(revivied).toEqual(data);
         }),
+        // TODO: more runs on CI?
         { verbose: true, numRuns: 10 ** 3 }
       );
     });
@@ -561,3 +643,12 @@ describe(createJsonExtra, () => {
     });
   });
 });
+
+function testStringifyAndParse(
+  original: unknown,
+  customJson: Pick<JSON, "parse" | "stringify">
+) {
+  const stringified = customJson.stringify(original, null, 2);
+  const revivied = customJson.parse(stringified);
+  return { original, stringified, revivied };
+}
