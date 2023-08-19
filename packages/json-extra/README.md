@@ -11,6 +11,4 @@ and also provides human-readibility for custom containers.
 
 ## examples
 
-```tsx
-// TODO
-```
+See `./src/index.test.ts`
