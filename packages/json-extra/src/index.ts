@@ -12,11 +12,13 @@ interface Options {
 export function createJsonExtra(options: Options) {
   const replacer = createReplacer(options);
   const reviver = createReviver(options);
-  return {
-    stringify: (v: any, _nullReplacer?: null, space?: number) =>
-      JSON.stringify(v, replacer, space),
-    parse: (s: string) => JSON.parse(s, reviver),
-  };
+  function stringify(v: any, _unused?: unknown, space?: number) {
+    return JSON.stringify(v, replacer, space);
+  }
+  function parse(s: string) {
+    return JSON.parse(s, reviver);
+  }
+  return { stringify, parse, replacer, reviver };
 }
 
 function createReplacer(options: Options) {
