@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HashRng, hashInt32, hashString } from "./hash";
+import { HashRng, hashInt32, hashString, hashString_murmur3_32 } from "./hash";
 import { mapGroupBy, range } from "./lodash";
 
 function formatBin(x: number) {
@@ -127,5 +127,23 @@ describe(hashString.name, () => {
       "fluent:select-all-on-20-regular",
     ];
     expect(hashString(pair[0])).toBe(hashString(pair[1]));
+  });
+});
+
+describe(hashString_murmur3_32, () => {
+  describe("cases", () => {
+    const cases = [
+      [0x00000000, ""],
+      [0x9416ac93, "1"],
+      [0x721c5dc3, "1234"],
+      [0x13a51193, "12345"],
+      [0xc0363e43, "Hello, world!"],
+    ] as const;
+
+    for (const [output, input] of cases) {
+      it(`${input}`, () => {
+        expect(hashString_murmur3_32(input)).toBe(output);
+      });
+    }
   });
 });
