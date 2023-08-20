@@ -9,7 +9,7 @@ import { renderToJson } from "./test/helper";
 import { useDebounce, useDelay } from "./timer";
 import { usePrevious, useRefCallbackEffect, useStableCallback } from "./utils";
 
-describe("Debug", () => {
+describe(Debug, () => {
   it("basic", () => {
     const el = <Debug debug={{ hello: "world" }} />;
     expect(renderToJson(el)).toMatchInlineSnapshot(`
@@ -29,7 +29,7 @@ describe("Debug", () => {
   });
 });
 
-describe("Compose", () => {
+describe(Compose, () => {
   it("basic", () => {
     const el = (
       <Compose
@@ -65,7 +65,7 @@ describe("Compose", () => {
   });
 });
 
-describe("useStableCallback", () => {
+describe(useStableCallback, () => {
   it("basic", async () => {
     function useDocumentEvent<K extends keyof DocumentEventMap>(
       type: K,
@@ -113,7 +113,7 @@ describe("useStableCallback", () => {
   });
 });
 
-describe("useRefCallbackEffect", () => {
+describe(useRefCallbackEffect, () => {
   it("basic", async () => {
     function TestComponent() {
       const [result, setResult] = React.useState<unknown[]>([]);
@@ -177,7 +177,7 @@ describe("useRefCallbackEffect", () => {
   });
 });
 
-describe("usePrevious", () => {
+describe(usePrevious, () => {
   it("basic", () => {
     const { result, rerender } = renderHook(
       ({ value }: { value: number }) => {
@@ -216,7 +216,7 @@ describe("usePrevious", () => {
   });
 });
 
-describe("toArraySetState", () => {
+describe(toArraySetState, () => {
   it("basic", async () => {
     const { result } = renderHook(() => {
       const [state, setState] = React.useState(() => [0]);
@@ -289,7 +289,7 @@ describe("toArraySetState", () => {
   });
 });
 
-describe("toSetSetState", () => {
+describe(toSetSetState, () => {
   it("basic", async () => {
     const { result } = renderHook(() => {
       const [state, setState] = React.useState(() => new Set([0]));
@@ -342,7 +342,7 @@ describe("toSetSetState", () => {
   });
 });
 
-describe(useDelay.name, () => {
+describe(useDelay, () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -379,7 +379,7 @@ describe(useDelay.name, () => {
 });
 
 // TODO: test effect cleanup
-describe(useDebounce.name, () => {
+describe(useDebounce, () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });

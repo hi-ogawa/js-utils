@@ -2,7 +2,7 @@ import process from "node:process";
 import { assert, describe, expect, it } from "vitest";
 import { tinyassert } from "./tinyassert";
 
-describe("tinyassert", () => {
+describe(tinyassert, () => {
   it("error stacktrace snapshot", () => {
     function boom() {
       tinyassert(false);
