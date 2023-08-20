@@ -132,6 +132,7 @@ describe(hashString, () => {
 
 describe(hashString_murmur3_32, () => {
   describe("cases", () => {
+    // from https://github.com/stusmall/murmur3/blob/07e7a1ab421f8807ff49d3ad1388bda4d43d6544/tests/test.rs
     const cases = [
       [0x00000000, ""],
       [0x9416ac93, "1"],
