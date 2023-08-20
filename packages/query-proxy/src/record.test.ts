@@ -7,7 +7,7 @@ import {
 import { describe, expect, it } from "vitest";
 import { type FnRecord, createFnRecordQueryProxy } from "./record";
 
-describe(createFnRecordQueryProxy.name, () => {
+describe(createFnRecordQueryProxy, () => {
   it("example", async () => {
     //
     // define "FnRecord service"

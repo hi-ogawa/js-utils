@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { type MigrationState, Migrator } from "./migrator";
 
-describe(Migrator.name, () => {
+describe(Migrator, () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(0);

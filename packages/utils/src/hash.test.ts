@@ -8,7 +8,7 @@ function formatBin(x: number) {
     .join("");
 }
 
-describe(hashInt32.name, () => {
+describe(hashInt32, () => {
   it("basic", () => {
     expect(range(20).map(hashInt32).map(formatBin)).toMatchInlineSnapshot(
       `
@@ -39,7 +39,7 @@ describe(hashInt32.name, () => {
   });
 });
 
-describe(HashRng.name, () => {
+describe(HashRng, () => {
   it("basic", () => {
     const rng = new HashRng(18181);
     expect(range(10).map(() => formatBin(rng.int32()))).toMatchInlineSnapshot(
@@ -99,7 +99,7 @@ describe(HashRng.name, () => {
   });
 });
 
-describe(hashString.name, () => {
+describe(hashString, () => {
   it("basic", () => {
     expect(hashString("hello").length).toMatchInlineSnapshot("32");
     expect(hashString("hello")).toMatchInlineSnapshot(

@@ -1,3 +1,4 @@
+// TODO: how is it different from this? https://github.com/remix-run/remix/blob/1d3d86eaceb7784c56d34d963310ecbcb8c9637a/packages/remix-dev/channel.ts#L1-L2
 export function newPromiseWithResolvers<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
   let reject!: (value: unknown) => void;

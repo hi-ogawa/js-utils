@@ -21,7 +21,7 @@ import {
 } from "./result";
 import { tinyassert } from "./tinyassert";
 
-describe("typedBoolean", () => {
+describe(typedBoolean, () => {
   it("basic", () => {
     const someBoolean = true as boolean;
     const numberOrNull = null as number | null;
@@ -141,7 +141,7 @@ describe(includesGuard, () => {
   });
 });
 
-describe("defaultDict", () => {
+describe(defaultDict, () => {
   it("basic", () => {
     const record = defaultDict(() => [0]);
 
@@ -173,7 +173,7 @@ describe("defaultDict", () => {
   });
 });
 
-describe("DefaultMap", () => {
+describe(DefaultMap, () => {
   it("basic", () => {
     const map: DefaultMap<string, number[]> = new DefaultMap(() => [0]);
     expect(map).toMatchInlineSnapshot("Map {}");
@@ -251,7 +251,7 @@ describe("DefaultMap", () => {
   });
 });
 
-describe(HashKeyDefaultMap.name, () => {
+describe(HashKeyDefaultMap, () => {
   it("basic", () => {
     const map: HashKeyDefaultMap<{ mod2: number; mod3: number }, number[]> =
       new HashKeyDefaultMap(() => []);
@@ -329,7 +329,7 @@ describe(HashKeyDefaultMap.name, () => {
   });
 });
 
-describe("UncheckedMap", () => {
+describe(UncheckedMap, () => {
   it("basic", () => {
     const map = new UncheckedMap<string, number>();
     expect(map).toMatchInlineSnapshot("Map {}");
@@ -409,7 +409,7 @@ describe("Result", () => {
     }
   });
 
-  describe("wrapError", () => {
+  describe(wrapError, () => {
     function boom(value: boolean) {
       if (value) {
         throw new Error("boom");
@@ -471,7 +471,7 @@ describe("Result", () => {
     });
   });
 
-  describe("okToOption", () => {
+  describe(okToOption, () => {
     it("basic", () => {
       expect(okToOption(Ok(1))).toMatchInlineSnapshot("1");
       expect(okToOption(Err("xxx"))).toMatchInlineSnapshot("undefined");
@@ -479,7 +479,7 @@ describe("Result", () => {
   });
 });
 
-describe("mapOption", () => {
+describe(mapOption, () => {
   it("basic", () => {
     const map = groupBy(range(8), (x) => x % 3);
     const result = mapOption(map.get(0), (v) => v.length) satisfies
@@ -489,7 +489,7 @@ describe("mapOption", () => {
   });
 });
 
-describe("newPromiseWithResolvers", () => {
+describe(newPromiseWithResolvers, () => {
   it("resolve", async () => {
     const { promise, resolve } = newPromiseWithResolvers<number>();
     resolve(123);
@@ -515,7 +515,7 @@ describe("newPromiseWithResolvers", () => {
   });
 });
 
-describe(assertUnreachable.name, () => {
+describe(assertUnreachable, () => {
   it("basic", () => {
     type X = "a" | "b";
 
@@ -547,7 +547,7 @@ describe(assertUnreachable.name, () => {
   });
 });
 
-describe(regExpRaw.name, () => {
+describe(regExpRaw, () => {
   it("basic", () => {
     const re = regExpRaw`/username/${/\w+/}/profile`;
     expect(re).toMatchInlineSnapshot(
@@ -565,7 +565,7 @@ describe(regExpRaw.name, () => {
   });
 });
 
-describe(escapeRegExp.name, () => {
+describe(escapeRegExp, () => {
   it("basic", () => {
     const re = escapeRegExp("/remix/$id/hello.ts");
     expect(re).toMatchInlineSnapshot(
@@ -580,7 +580,7 @@ describe(escapeRegExp.name, () => {
   });
 });
 
-describe(mapRegExp.name, () => {
+describe(mapRegExp, () => {
   it("basic", () => {
     function transform(input: string): string {
       let output = "";

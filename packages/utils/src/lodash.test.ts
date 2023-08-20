@@ -29,7 +29,7 @@ import {
 } from "./lodash";
 import { tinyassert } from "./tinyassert";
 
-describe("range", () => {
+describe(range, () => {
   it("basic", () => {
     expect(range(3)).toMatchInlineSnapshot(`
       [
@@ -49,7 +49,7 @@ describe("range", () => {
   });
 });
 
-describe("groupBy", () => {
+describe(groupBy, () => {
   it("basic", () => {
     expect(groupBy(range(8), (x) => x % 3)).toMatchInlineSnapshot(`
       Map {
@@ -72,7 +72,7 @@ describe("groupBy", () => {
   });
 });
 
-describe("mapKeys", () => {
+describe(mapKeys, () => {
   it("basic", () => {
     const result = mapKeys(
       groupBy(range(8), (x) => x % 3),
@@ -99,7 +99,7 @@ describe("mapKeys", () => {
   });
 });
 
-describe("mapValues", () => {
+describe(mapValues, () => {
   it("basic", () => {
     const result = mapValues(
       groupBy(range(8), (x) => x % 3),
@@ -115,7 +115,7 @@ describe("mapValues", () => {
   });
 });
 
-describe(mapGroupBy.name, () => {
+describe(mapGroupBy, () => {
   it("basic", () => {
     expect(
       mapGroupBy(
@@ -133,7 +133,7 @@ describe(mapGroupBy.name, () => {
   });
 });
 
-describe("pickBy", () => {
+describe(pickBy, () => {
   it("basic", () => {
     const result = pickBy(
       groupBy(range(8), (x) => x % 3),
@@ -155,7 +155,7 @@ describe("pickBy", () => {
   });
 });
 
-describe("partition", () => {
+describe(partition, () => {
   it("basic", () => {
     expect(partition(range(8), (x) => x % 3 === 0)).toMatchInlineSnapshot(`
       [
@@ -176,7 +176,7 @@ describe("partition", () => {
   });
 });
 
-describe("sortBy", () => {
+describe(sortBy, () => {
   it("basic", () => {
     expect(
       sortBy(
@@ -199,7 +199,7 @@ describe("sortBy", () => {
   });
 });
 
-describe("uniqBy", () => {
+describe(uniqBy, () => {
   it("basic", () => {
     expect(uniqBy(range(8), (x) => x % 3)).toMatchInlineSnapshot(`
       [
@@ -211,7 +211,7 @@ describe("uniqBy", () => {
   });
 });
 
-describe("objectPick", () => {
+describe(objectPick, () => {
   it("basic", () => {
     const o = {
       x: 0,
@@ -239,7 +239,7 @@ describe("objectPick", () => {
   });
 });
 
-describe("objectOmit", () => {
+describe(objectOmit, () => {
   it("basic", () => {
     const o = {
       x: 0,
@@ -270,7 +270,7 @@ describe("objectOmit", () => {
   });
 });
 
-describe("objectPickBy", () => {
+describe(objectPickBy, () => {
   it("basic", () => {
     const result = objectPickBy(
       Object.fromEntries(groupBy(range(8), (x) => x % 3)),
@@ -292,7 +292,7 @@ describe("objectPickBy", () => {
   });
 });
 
-describe("objectOmitBy", () => {
+describe(objectOmitBy, () => {
   it("basic", () => {
     const result = objectOmitBy(
       Object.fromEntries(groupBy(range(8), (x) => x % 3)),
@@ -310,7 +310,7 @@ describe("objectOmitBy", () => {
   });
 });
 
-describe("objectKeys", () => {
+describe(objectKeys, () => {
   it("basic", () => {
     const o = {
       x: 0,
@@ -347,7 +347,7 @@ describe(objectHas, () => {
   });
 });
 
-describe("isNil", () => {
+describe(isNil, () => {
   it("typing-1", () => {
     const ls = [0, true, false, null, undefined] as const;
 
@@ -381,7 +381,7 @@ describe("isNil", () => {
   });
 });
 
-describe("once", () => {
+describe(once, () => {
   it("basic", () => {
     let count = 0;
     const f = once(() => ++count);
@@ -572,7 +572,7 @@ describe(memoize, () => {
   });
 });
 
-describe("zip", () => {
+describe(zip, () => {
   it("basic", () => {
     const ls1 = range(2, 5);
     const ls2 = range(10, 20).map(String);
@@ -643,7 +643,7 @@ describe(zipMax, () => {
   });
 });
 
-describe(difference.name, () => {
+describe(difference, () => {
   it("basic", () => {
     expect(difference(range(2, 8), range(5, 10))).toMatchInlineSnapshot(`
       [
@@ -666,7 +666,7 @@ describe(difference.name, () => {
   });
 });
 
-describe(capitalize.name, () => {
+describe(capitalize, () => {
   it("basic", () => {
     expect(capitalize("")).toMatchInlineSnapshot('""');
     expect(capitalize("abc")).toMatchInlineSnapshot('"Abc"');
@@ -675,7 +675,7 @@ describe(capitalize.name, () => {
   });
 });
 
-describe(debounce.name, () => {
+describe(debounce, () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -730,7 +730,7 @@ describe(debounce.name, () => {
   });
 });
 
-describe(delay.name, () => {
+describe(delay, () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
