@@ -1,5 +1,3 @@
-import { range } from "./lodash";
-
 // https://nullprogram.com/blog/2018/07/31/
 export function hashInt32(x: number): number {
   x ^= x >>> 16;
