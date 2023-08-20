@@ -26,31 +26,24 @@ export class HashRng {
   }
 }
 
-/** @deprecated this is only a toy ideaa and shouldn't be used... */
-export function hashString(input: string): string {
-  // iterate on 32 bits x 4
-  const xs = new Uint32Array(range(4).map((i) => hashInt32(i + 1)));
-  for (const i of range(input.length)) {
-    const c = input.codePointAt(i) ?? 0;
-    xs[0] = hashInt32(xs[3] ^ c);
-    xs[1] = hashInt32(xs[0] ^ c);
-    xs[2] = hashInt32(xs[1] ^ c);
-    xs[3] = hashInt32(xs[2] ^ c);
-  }
-
-  // format to hex (4bits) x 32
-  return Array.from(xs, (x) => x.toString(16).padStart(8, "0")).join("");
+export function hashString(
+  input: string,
+  textEncoder = new TextEncoder()
+): string {
+  // from SHA constants
+  const seeds = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a];
+  const key = textEncoder.encode(input);
+  return seeds
+    .map((seed) => murmur3_32(key, seed).toString(16).padStart(8, "0"))
+    .join("");
 }
 
 export function hashString_murmur3_32(
   input: string,
-  seed?: number,
-  textEncoder?: TextEncoder
+  seed = 0,
+  textEncoder = new TextEncoder()
 ): number {
-  seed ??= 0;
-  textEncoder ??= new TextEncoder();
-  const key = textEncoder.encode(input);
-  return murmur3_32(key, seed);
+  return murmur3_32(textEncoder.encode(input), seed);
 }
 
 // https://en.wikipedia.org/wiki/MurmurHash#Algorithm
