@@ -1,4 +1,4 @@
-import { tinyassert } from "@hiogawa/utils";
+import { objectHas, tinyassert } from "@hiogawa/utils";
 
 //
 // TinyRpc routes schema
@@ -70,8 +70,9 @@ export function proxyTinyRpc<R extends TinyRpcRoutes>({
 // error
 //
 
+// cf. https://github.com/trpc/trpc/blob/fa7f6d6b804df71d8dd15970168f7be18aeecaf2/packages/server/src/error/TRPCError.ts#L53
 export class TinyRpcError extends Error {
-  // employ http status convention
+  // employ http status convention at the core level
   public status = 500;
 
   // convenient api for assertion
@@ -80,14 +81,21 @@ export class TinyRpcError extends Error {
     return this;
   }
 
-  // TODO: allow obfuscating server error detail?
   serialize() {
     return {
       message: this.message,
-      stack: this.stack,
-      cause: this.cause,
+      stack: this.stack ?? "",
+      cause: this.cause ?? null,
       status: this.status,
     };
+  }
+
+  static deserialize(e: unknown): TinyRpcError {
+    tinyassert(objectHas(e, "message") && typeof e.message === "string");
+    tinyassert(objectHas(e, "stack") && typeof e.stack === "string");
+    tinyassert(objectHas(e, "cause"));
+    tinyassert(objectHas(e, "status") && typeof e.status === "number");
+    return Object.assign(new TinyRpcError(), e);
   }
 
   static fromUnknown(e: unknown): TinyRpcError {
@@ -95,19 +103,8 @@ export class TinyRpcError extends Error {
       return e;
     }
     const err = new TinyRpcError("unknown", { cause: e });
-    if (e && typeof e === "object") {
-      if ("message" in e && typeof e.message === "string") {
-        err.message = e.message;
-      }
-      if ("stack" in e && typeof e.stack === "string") {
-        err.stack = e.stack;
-      }
-      if ("cause" in e) {
-        err.cause = e.cause;
-      }
-      if ("status" in e && typeof e.status === "number") {
-        err.status = e.status;
-      }
+    if (objectHas(e, "message") && typeof e.message === "string") {
+      err.message = e.message;
     }
     return err;
   }

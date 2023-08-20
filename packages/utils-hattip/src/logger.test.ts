@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { loggerMiddleware } from "./logger-middleware";
+import { createLoggerHandler } from "./logger";
 
-describe(loggerMiddleware, () => {
+describe(createLoggerHandler, () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -11,38 +11,37 @@ describe(loggerMiddleware, () => {
   });
 
   it("basic", async () => {
-    let logs: string[] = [];
-    const logger = loggerMiddleware({ log: (v) => logs.push(v) });
+    const logFn = vi.fn();
+    const logger = createLoggerHandler({ log: logFn });
 
     vi.setSystemTime(new Date("2020-02-02T00:00:00.000Z"));
     await logger({
-      request: { url: "http://dummy.local/test", method: "GET" },
+      request: new Request("http://dummy.local/test"),
       next: async () => {
         vi.setSystemTime(new Date("2020-02-02T00:00:00.123Z"));
         return new Response(null, { status: 200 });
       },
     });
 
-    expect(logs).toMatchInlineSnapshot(`
+    expect(logFn.mock.calls.map((v) => v[0])).toMatchInlineSnapshot(`
       [
         "  --> GET /test",
         "  <-- GET /test 200 123ms",
       ]
     `);
+    logFn.mockReset();
 
     vi.setSystemTime(new Date("2020-02-02T00:00:00.000Z"));
     await logger({
-      request: { url: "http://dummy.local/test2", method: "POST" },
+      request: new Request("http://dummy.local/test2", { method: "POST" }),
       next: async () => {
         vi.setSystemTime(new Date("2020-02-02T00:00:01.230Z"));
         return new Response(null, { status: 302 });
       },
     });
 
-    expect(logs).toMatchInlineSnapshot(`
+    expect(logFn.mock.calls.map((v) => v[0])).toMatchInlineSnapshot(`
       [
-        "  --> GET /test",
-        "  <-- GET /test 200 123ms",
         "  --> POST /test2",
         "  <-- POST /test2 302 1.2s",
       ]

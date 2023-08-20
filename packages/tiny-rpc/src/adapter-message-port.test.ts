@@ -66,6 +66,10 @@ describe("adapter-message-port", () => {
           }
         ]]
       `);
+      // TODO: support custom Error class in cause
+      expect(e.cause).toBeInstanceOf(Error);
+      expect(e.cause).not.toBeInstanceOf(TinyRpcError);
+      expect(e.cause).toMatchInlineSnapshot("[Error]");
       return true;
     });
 

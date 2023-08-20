@@ -1,31 +1,27 @@
 // porting hono's logger to hattip
 // https://github.com/honojs/hono/blob/a8ebb47dddf2297341ced144b7e7e32b79a4f850/src/middleware/logger/index.ts
 
-// compatible with hattip's RequestHandler
-export type LoggerMiddleware = (ctx: {
-  request: Pick<Request, "url" | "method">;
+// don't have to require hard dependency to hattip typing
+type LoggerHandler = (ctx: {
+  request: Request;
   next: () => Promise<Response>;
 }) => Promise<Response>;
 
-export function loggerMiddleware(options?: {
+export function createLoggerHandler(options?: {
   log?: (v: string) => void;
-}): LoggerMiddleware {
+}): LoggerHandler {
   const log = options?.log ?? console.log;
-
   return async (ctx) => {
     const method = ctx.request.method;
-    const url = new URL(ctx.request.url);
-    const pathname = url.pathname;
-
-    const startTime = Date.now();
+    const pathname = new URL(ctx.request.url).pathname;
     log(`  --> ${method} ${pathname}`);
 
-    const res = await ctx.next();
-
+    const startTime = Date.now();
+    const response = await ctx.next();
     const duration = formatDuration(Date.now() - startTime);
-    log(`  <-- ${method} ${pathname} ${res.status} ${duration}`);
+    log(`  <-- ${method} ${pathname} ${response.status} ${duration}`);
 
-    return res;
+    return response;
   };
 }
 
