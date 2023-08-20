@@ -147,4 +147,6 @@ describe(hashString_murmur3_32, () => {
       });
     }
   });
+
+  describe.skip("fuzz", () => {});
 });
