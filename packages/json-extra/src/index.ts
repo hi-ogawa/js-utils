@@ -24,7 +24,7 @@ export function createJsonExtra(options: Options) {
     return jsonParseReviveUndefined(s, reviver);
   }
 
-  // any <-> any (silly but convenience e.g. when framework provide only already parsed json object e.g. loader data in remix)
+  // any <-> any (silly but required since frameworks usually accept/provide only already parsed json object e.g. loader data in remix)
   function serialize(v: any) {
     return JSON.parse(stringify(v));
   }
