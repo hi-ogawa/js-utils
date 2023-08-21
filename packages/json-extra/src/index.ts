@@ -12,6 +12,8 @@ interface Options {
 export function createJsonExtra(options: Options) {
   const replacer = createReplacer(options);
   const reviver = createReviver(options);
+
+  // any <-> string
   function stringify(v: any, _unused?: unknown, space?: number) {
     return JSON.stringify(v, replacer, space);
   }
@@ -21,7 +23,24 @@ export function createJsonExtra(options: Options) {
   function parseReviveUndefined(s: string) {
     return jsonParseReviveUndefined(s, reviver);
   }
-  return { stringify, parse, parseReviveUndefined, replacer, reviver };
+
+  // any <-> any (silly but convenience e.g. when framework provide only already parsed json object e.g. loader data in remix)
+  function serialize(v: any) {
+    return JSON.parse(stringify(v));
+  }
+  function deserialize(v: any) {
+    return parse(JSON.stringify(v));
+  }
+
+  return {
+    stringify,
+    parse,
+    parseReviveUndefined,
+    serialize,
+    deserialize,
+    replacer,
+    reviver,
+  };
 }
 
 // by default we don't bother dropping `undefined` properties, but we still provide non-dropping version.

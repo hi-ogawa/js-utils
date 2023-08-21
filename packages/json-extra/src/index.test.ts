@@ -640,6 +640,156 @@ describe(createJsonExtra, () => {
     });
   });
 
+  it("serialize/deserialize", () => {
+    const jsonExtra = createJsonExtra({ builtins: true });
+    const original = [
+      // standard json value
+      null,
+      true,
+      123,
+      "string",
+      ["array"],
+      { k: "v" },
+      // special constants
+      undefined,
+      Infinity,
+      -Infinity,
+      NaN,
+      0,
+      -0,
+      // extra types
+      new Date("2023-08-17"),
+      1234n,
+      /^\d+/gms,
+      // extra containers
+      new Map<any, any>([
+        [0, new Date(0)],
+        [1n, new Set([/a/g])],
+      ]),
+      new Set<any>([0, new Date(0), new Map([[1n, /a/g]])]),
+      // escape
+      ["!NaN", "collision"],
+    ];
+
+    const serialized = jsonExtra.serialize(original);
+    expect(serialized).toMatchInlineSnapshot(`
+      [
+        null,
+        true,
+        123,
+        "string",
+        [
+          "array",
+        ],
+        {
+          "k": "v",
+        },
+        [
+          "!undefined",
+          0,
+        ],
+        [
+          "!Infinity",
+          0,
+        ],
+        [
+          "!-Infinity",
+          0,
+        ],
+        [
+          "!NaN",
+          0,
+        ],
+        0,
+        [
+          "!-0",
+          0,
+        ],
+        [
+          "!Date",
+          "2023-08-17T00:00:00.000Z",
+        ],
+        [
+          "!BigInt",
+          "1234",
+        ],
+        [
+          "!RegExp",
+          [
+            "^\\\\d+",
+            "gms",
+          ],
+        ],
+        [
+          "!Map",
+          [
+            [
+              0,
+              [
+                "!Date",
+                "1970-01-01T00:00:00.000Z",
+              ],
+            ],
+            [
+              [
+                "!BigInt",
+                "1",
+              ],
+              [
+                "!Set",
+                [
+                  [
+                    "!RegExp",
+                    [
+                      "a",
+                      "g",
+                    ],
+                  ],
+                ],
+              ],
+            ],
+          ],
+        ],
+        [
+          "!Set",
+          [
+            0,
+            [
+              "!Date",
+              "1970-01-01T00:00:00.000Z",
+            ],
+            [
+              "!Map",
+              [
+                [
+                  [
+                    "!BigInt",
+                    "1",
+                  ],
+                  [
+                    "!RegExp",
+                    [
+                      "a",
+                      "g",
+                    ],
+                  ],
+                ],
+              ],
+            ],
+          ],
+        ],
+        [
+          "!",
+          "!NaN",
+          "collision",
+        ],
+      ]
+    `);
+
+    const deserialized = jsonExtra.deserialize(serialized);
+    expect(deserialized).toEqual(original);
+  });
+
   describe("fuzzing", () => {
     const jsonExtra = createJsonExtra({ builtins: true });
 
