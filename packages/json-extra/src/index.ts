@@ -20,16 +20,19 @@ export function createJsonExtra(options: Options) {
   function parse(s: string) {
     return JSON.parse(s, reviver);
   }
+
+  // by applying reviver manually, it avoids dropping `undefined` property.
+  // cf. https://github.com/brillout/json-serializer/blob/133fc9b1f73c4e29a8374b8eb5efa461a72949cc/src/parse.ts#L6
   function parseReviveUndefined(s: string) {
-    return jsonParseReviveUndefined(s, reviver);
+    return applyReviver(JSON.parse(s), reviver);
   }
 
-  // any <-> any (silly but required since frameworks usually accept/provide only already parsed json object e.g. loader data in remix)
+  // any <-> any (frameworks usually accept/provide only already parsed json object e.g. loader data in remix)
   function serialize(v: any) {
-    return JSON.parse(stringify(v));
+    return applyReplacer(v, replacer);
   }
   function deserialize(v: any) {
-    return parse(JSON.stringify(v));
+    return applyReviver(v, reviver);
   }
 
   return {
@@ -43,22 +46,57 @@ export function createJsonExtra(options: Options) {
   };
 }
 
-// by default we don't bother dropping `undefined` properties, but we still provide non-dropping version.
-// cf. https://github.com/brillout/json-serializer/blob/133fc9b1f73c4e29a8374b8eb5efa461a72949cc/src/parse.ts#L6
-function jsonParseReviveUndefined(
-  s: string,
+function applyReplacer(
+  data: unknown,
+  replacer: ReturnType<typeof createReplacer>
+) {
+  function recurse(v: unknown) {
+    const vToJson =
+      v &&
+      typeof v === "object" &&
+      "toJSON" in v &&
+      typeof v.toJSON === "function"
+        ? v.toJSON()
+        : v;
+    v = replacer.apply({ "": v }, ["", vToJson]);
+    if (v && typeof v === "object") {
+      for (const [k, e] of Object.entries(v)) {
+        (v as any)[k] = recurse(e);
+      }
+    }
+    return v;
+  }
+  return recurse(data);
+}
+
+function applyReviver(
+  data: unknown,
   reviver: ReturnType<typeof createReviver>
 ) {
-  function recurseReviver(v: unknown) {
+  function recurse(v: unknown) {
     if (v && typeof v === "object") {
-      for (const [k, vv] of Object.entries(v)) {
-        (v as any)[k] = recurseReviver(vv);
+      for (const [k, e] of Object.entries(v)) {
+        (v as any)[k] = recurse(e);
       }
     }
     return reviver("", v);
   }
-  return recurseReviver(JSON.parse(s));
+  return recurse(data);
 }
+
+function getExtensions(options: Options): Record<string, Extension<any>> {
+  let selected: Record<string, Extension<any>> = {};
+  if (options.builtins === true) {
+    selected = builtins;
+  } else {
+    selected = objectPick(builtins, options.builtins);
+  }
+  return { ...selected, ...options.extensions };
+}
+
+//
+// custom encoding/decoding via replacer/reviver
+//
 
 function createReplacer(options: Options) {
   const extensions = getExtensions(options);
@@ -109,16 +147,6 @@ function createReviver(options: Options) {
     }
     return v;
   };
-}
-
-function getExtensions(options: Options): Record<string, Extension<any>> {
-  let selected: Record<string, Extension<any>> = {};
-  if (options.builtins === true) {
-    selected = builtins;
-  } else {
-    selected = objectPick(builtins, options.builtins);
-  }
-  return { ...selected, ...options.extensions };
 }
 
 //
