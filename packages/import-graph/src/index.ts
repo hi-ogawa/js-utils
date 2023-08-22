@@ -11,9 +11,14 @@ async function main() {
 //   dependents
 // }
 
+interface ImportInfo {
+  source: string;
+  // specifier
+}
+
 function analyzeCode({ code }: { path: string; code: string }) {
   const [esmImports, esmExports] = esModuleLexer.parse(code);
-  esmImports;
+  esmImports[0].a;
 }
 
 main();
