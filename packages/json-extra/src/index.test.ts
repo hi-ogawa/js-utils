@@ -671,129 +671,205 @@ describe(createJsonExtra, () => {
       ["!NaN", "collision"],
     ];
 
-    const serialized = jsonExtra.serialize(original);
-    expect(serialized).toMatchInlineSnapshot(`
-      [
-        null,
-        true,
-        123,
-        "string",
-        [
-          "array",
-        ],
-        {
-          "k": "v",
-        },
-        [
-          "!undefined",
-          0,
-        ],
-        [
-          "!Infinity",
-          0,
-        ],
-        [
-          "!-Infinity",
-          0,
-        ],
-        [
-          "!NaN",
-          0,
-        ],
-        0,
-        [
-          "!-0",
-          0,
-        ],
-        [
-          "!Date",
-          "2023-08-17T00:00:00.000Z",
-        ],
-        [
-          "!BigInt",
-          "1234",
-        ],
-        [
-          "!RegExp",
+    const result = testSerializeAndDeserialize(original, jsonExtra);
+    expect(result.deserialized).toEqual(original);
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "deserialized": [
+          null,
+          true,
+          123,
+          "string",
           [
-            "^\\\\d+",
-            "gms",
+            "array",
+          ],
+          {
+            "k": "v",
+          },
+          undefined,
+          Infinity,
+          -Infinity,
+          NaN,
+          0,
+          -0,
+          2023-08-17T00:00:00.000Z,
+          1234n,
+          /\\^\\\\d\\+/gms,
+          Map {
+            0 => 1970-01-01T00:00:00.000Z,
+            1n => Set {
+              /a/g,
+            },
+          },
+          Set {
+            0,
+            1970-01-01T00:00:00.000Z,
+            Map {
+              1n => /a/g,
+            },
+          },
+          [
+            "!NaN",
+            "collision",
           ],
         ],
-        [
-          "!Map",
+        "original": [
+          null,
+          true,
+          123,
+          "string",
           [
+            "array",
+          ],
+          {
+            "k": "v",
+          },
+          undefined,
+          Infinity,
+          -Infinity,
+          NaN,
+          0,
+          -0,
+          2023-08-17T00:00:00.000Z,
+          1234n,
+          /\\^\\\\d\\+/gms,
+          Map {
+            0 => 1970-01-01T00:00:00.000Z,
+            1n => Set {
+              /a/g,
+            },
+          },
+          Set {
+            0,
+            1970-01-01T00:00:00.000Z,
+            Map {
+              1n => /a/g,
+            },
+          },
+          [
+            "!NaN",
+            "collision",
+          ],
+        ],
+        "serialized": [
+          null,
+          true,
+          123,
+          "string",
+          [
+            "array",
+          ],
+          {
+            "k": "v",
+          },
+          [
+            "!undefined",
+            0,
+          ],
+          [
+            "!Infinity",
+            0,
+          ],
+          [
+            "!-Infinity",
+            0,
+          ],
+          [
+            "!NaN",
+            0,
+          ],
+          0,
+          [
+            "!-0",
+            0,
+          ],
+          [
+            "!Date",
+            "2023-08-17T00:00:00.000Z",
+          ],
+          [
+            "!BigInt",
+            "1234",
+          ],
+          [
+            "!RegExp",
+            [
+              "^\\\\d+",
+              "gms",
+            ],
+          ],
+          [
+            "!Map",
+            [
+              [
+                0,
+                [
+                  "!Date",
+                  "1970-01-01T00:00:00.000Z",
+                ],
+              ],
+              [
+                [
+                  "!BigInt",
+                  "1",
+                ],
+                [
+                  "!Set",
+                  [
+                    [
+                      "!RegExp",
+                      [
+                        "a",
+                        "g",
+                      ],
+                    ],
+                  ],
+                ],
+              ],
+            ],
+          ],
+          [
+            "!Set",
             [
               0,
               [
                 "!Date",
                 "1970-01-01T00:00:00.000Z",
               ],
-            ],
-            [
               [
-                "!BigInt",
-                "1",
-              ],
-              [
-                "!Set",
+                "!Map",
                 [
                   [
-                    "!RegExp",
                     [
-                      "a",
-                      "g",
+                      "!BigInt",
+                      "1",
+                    ],
+                    [
+                      "!RegExp",
+                      [
+                        "a",
+                        "g",
+                      ],
                     ],
                   ],
                 ],
               ],
             ],
           ],
-        ],
-        [
-          "!Set",
           [
-            0,
-            [
-              "!Date",
-              "1970-01-01T00:00:00.000Z",
-            ],
-            [
-              "!Map",
-              [
-                [
-                  [
-                    "!BigInt",
-                    "1",
-                  ],
-                  [
-                    "!RegExp",
-                    [
-                      "a",
-                      "g",
-                    ],
-                  ],
-                ],
-              ],
-            ],
+            "!",
+            "!NaN",
+            "collision",
           ],
         ],
-        [
-          "!",
-          "!NaN",
-          "collision",
-        ],
-      ]
+      }
     `);
-
-    const deserialized = jsonExtra.deserialize(serialized);
-    expect(deserialized).toEqual(original);
   });
 
   describe("fuzzing", () => {
     const jsonExtra = createJsonExtra({ builtins: true });
 
-    it("jsonValue", () => {
+    it("jsonValue-parse-stringify", () => {
       fc.assert(
         fc.property(fc.jsonValue(), (data) => {
           const result = testStringifyAndParse(data, jsonExtra);
@@ -805,7 +881,7 @@ describe(createJsonExtra, () => {
       );
     });
 
-    it("anything", () => {
+    it("anything-parse-stringify", () => {
       fc.assert(
         fc.property(
           fc.anything({
@@ -823,6 +899,35 @@ describe(createJsonExtra, () => {
         { verbose: true, numRuns: 10 ** 3 }
       );
     });
+
+    it("jsonValue-deser", () => {
+      fc.assert(
+        fc.property(fc.jsonValue(), (data) => {
+          const result = testSerializeAndDeserialize(data, jsonExtra);
+          expect(result.deserialized).toEqual(result.original);
+        }),
+        // TODO: more runs on CI?
+        { verbose: true, numRuns: 10 ** 3 }
+      );
+    });
+
+    it("anything-deser", () => {
+      fc.assert(
+        fc.property(
+          fc.anything({
+            withBigInt: true,
+            withDate: true,
+            withMap: true,
+            withSet: true,
+          }),
+          (data) => {
+            const result = testSerializeAndDeserialize(data, jsonExtra);
+            expect(result.deserialized).toEqual(result.original);
+          }
+        ),
+        { verbose: true, numRuns: 10 ** 3 }
+      );
+    });
   });
 });
 
@@ -834,4 +939,13 @@ function testStringifyAndParse(
   const revived = jsonExtra.parse(stringified);
   const revivedUndefined = jsonExtra.parseReviveUndefined(stringified);
   return { original, stringified, revived, revivedUndefined };
+}
+
+function testSerializeAndDeserialize(
+  original: unknown,
+  jsonExtra: ReturnType<typeof createJsonExtra>
+) {
+  const serialized = jsonExtra.serialize(original);
+  const deserialized = jsonExtra.deserialize(serialized);
+  return { original, serialized, deserialized };
 }

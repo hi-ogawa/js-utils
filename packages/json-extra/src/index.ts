@@ -60,7 +60,8 @@ function applyReplacer(
         : v;
     v = replacer.apply({ "": v }, ["", vToJson]);
     if (v && typeof v === "object") {
-      for (const [k, e] of Object.entries(v)) {
+      v = Array.isArray(v) ? [...v] : { ...v };
+      for (const [k, e] of Object.entries(v as any)) {
         (v as any)[k] = recurse(e);
       }
     }
@@ -75,7 +76,8 @@ function applyReviver(
 ) {
   function recurse(v: unknown) {
     if (v && typeof v === "object") {
-      for (const [k, e] of Object.entries(v)) {
+      v = Array.isArray(v) ? [...v] : { ...v };
+      for (const [k, e] of Object.entries(v as any)) {
         (v as any)[k] = recurse(e);
       }
     }
