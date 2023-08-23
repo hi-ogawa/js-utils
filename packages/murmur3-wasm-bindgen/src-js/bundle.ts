@@ -7,4 +7,4 @@ export async function initBundle() {
 }
 
 // re-export
-export { murmur3_32 } from "../pkg/index";
+export { murmur3_32, murmur3_x64_128, murmur3_x86_128 } from "../pkg/index";
