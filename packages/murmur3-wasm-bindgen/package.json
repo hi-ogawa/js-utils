@@ -1,5 +1,6 @@
 {
   "name": "@hiogawa/murmur3-wasm-bindgen",
+  "private": true,
   "version": "0.0.0",
   "type": "module",
   "main": "./dist/bundle.js",
