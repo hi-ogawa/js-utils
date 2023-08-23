@@ -63,8 +63,8 @@ importers:
   packages/murmur3-wasm-bindgen:
     devDependencies:
       wasm-pack:
-        specifier: ^0.11.1
-        version: 0.11.1
+        specifier: ^0.12.1
+        version: 0.12.1
 
   packages/query-proxy:
     devDependencies:
@@ -5596,8 +5596,8 @@ packages:
       xml-name-validator: 4.0.0
     dev: true
 
-  /wasm-pack@0.11.1:
-    resolution: {integrity: sha512-0BKEioKJY/SMqahDEoaUUR8jrRkHO0cdYhRqqHKQMY3Bac6Eep3ZRsTlpFSSwS4LYPxd+Tb5KFFNhUikCkq8Yg==}
+  /wasm-pack@0.12.1:
+    resolution: {integrity: sha512-dIyKWUumPFsGohdndZjDXRFaokUT/kQS+SavbbiXVAvA/eN4riX5QNdB6AhXQx37zNxluxQkuixZUgJ8adKjOg==}
     hasBin: true
     requiresBuild: true
     dependencies:

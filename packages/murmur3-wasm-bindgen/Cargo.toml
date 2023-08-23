@@ -7,5 +7,5 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-wasm-bindgen = { version = "0.2.86" }
+wasm-bindgen = { version = "0.2.87" }
 murmur3 = { version = "0.5.2" }
