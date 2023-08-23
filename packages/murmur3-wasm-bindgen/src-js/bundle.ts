@@ -1,7 +1,7 @@
 import initWasmBindGen from "../pkg/index";
 import wasmSource from "../pkg/index_bg.wasm"; // let tsup/esbuild bundles binary ~ 20KB
 
-export async function initBundle() {
+export async function init() {
   const wasmModule = await WebAssembly.compile(wasmSource as any as Uint8Array);
   await initWasmBindGen(wasmModule);
 }

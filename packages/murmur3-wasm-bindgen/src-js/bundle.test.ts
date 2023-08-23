@@ -1,13 +1,13 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import {
-  initBundle,
+  init,
   murmur3_32,
   murmur3_x64_128,
   murmur3_x86_128,
 } from "../dist/bundle";
 
 beforeAll(async () => {
-  await initBundle();
+  await init();
 });
 
 describe("bundle", () => {
