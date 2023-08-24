@@ -6,6 +6,7 @@ beforeAll(() => esModuleLexer.init);
 
 describe(analyzeCode, () => {
   it("basic", () => {
+    // https://astexplorer.net/
     const code = `
 import someDefaultImport, { someNamedImport, x as someRenamedImport } from "./some-dep1";
 import * as someStarImport from "./some-dep2";
