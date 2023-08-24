@@ -7,11 +7,11 @@ export function parseImportExport({
 }: {
   code: string;
   isTsx: boolean;
-}): Result<ParserResult, ts.Diagnostic[]> {
+}): Result<ParseOutput, ts.Diagnostic[]> {
   // access typescript AST via `ts.transpileModule` with custom transformer
   // cf. https://gist.github.com/hi-ogawa/cb338b4765d25321b120b2a47819abcc
 
-  let result: ParserResult;
+  let result: ParseOutput;
 
   const transpileOutput = ts.transpileModule(code, {
     compilerOptions: {},
@@ -35,7 +35,7 @@ export function parseImportExport({
   return Ok(result);
 }
 
-interface ParserResult {
+export interface ParseOutput {
   importInfos: ImportInfo[];
   exportInfos: ExportInfo[];
 }
@@ -55,8 +55,8 @@ interface ExportInfo {
   position: number;
 }
 
-function analyzeInner(node: ts.SourceFile): ParserResult {
-  const result: ParserResult = {
+function analyzeInner(node: ts.SourceFile): ParseOutput {
+  const result: ParseOutput = {
     importInfos: [],
     exportInfos: [],
   };
