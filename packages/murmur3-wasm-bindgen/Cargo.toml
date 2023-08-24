@@ -1,0 +1,11 @@
+[package]
+name = "argon2_wasm_bindgen"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = { version = "0.2.87" }
+murmur3 = { version = "0.5.2" }

@@ -1,0 +1,88 @@
+import { beforeAll, describe, expect, it } from "vitest";
+import {
+  init,
+  murmur3_32,
+  murmur3_x64_128,
+  murmur3_x86_128,
+} from "../dist/bundle";
+
+beforeAll(async () => {
+  await init();
+});
+
+describe("bundle", () => {
+  describe("examples", () => {
+    // from https://github.com/stusmall/murmur3/blob/07e7a1ab421f8807ff49d3ad1388bda4d43d6544/tests/test.rs
+    const examples = [
+      {
+        string: "",
+        hash_32: 0x00000000,
+        hash_128_x86: [
+          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+          0x00, 0x00, 0x00, 0x00, 0x00,
+        ],
+        hash_128_x64: [
+          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+          0x00, 0x00, 0x00, 0x00, 0x00,
+        ],
+      },
+      {
+        string: "1",
+        hash_32: 0x9416ac93,
+        hash_128_x86: [
+          0xfb, 0xf4, 0xf2, 0xe0, 0xd5, 0xb1, 0x6b, 0xd9, 0xd5, 0xb1, 0x6b,
+          0xd9, 0xd5, 0xb1, 0x6b, 0xd9,
+        ],
+        hash_128_x64: [
+          0x71, 0x7c, 0x7b, 0x8a, 0xfe, 0xbb, 0xfb, 0x71, 0x37, 0xf6, 0xf0,
+          0xf9, 0x9b, 0xeb, 0x2a, 0x94,
+        ],
+      },
+      {
+        string: "1234",
+        hash_32: 0x721c5dc3,
+        hash_128_x86: [
+          0x4d, 0x64, 0xdf, 0x4a, 0xce, 0x32, 0xaa, 0x2e, 0xce, 0x32, 0xaa,
+          0x2e, 0xce, 0x32, 0xaa, 0x2e,
+        ],
+        hash_128_x64: [
+          0xb4, 0xe7, 0x8f, 0x21, 0x4d, 0x36, 0x97, 0x08, 0xa5, 0xfd, 0x37,
+          0x24, 0xd9, 0x8b, 0x1e, 0x34,
+        ],
+      },
+      {
+        string: "12345",
+        hash_32: 0x13a51193,
+        hash_128_x86: [
+          0x7c, 0xf8, 0x48, 0xd0, 0x30, 0xd9, 0x59, 0x0a, 0x94, 0xed, 0x4f,
+          0xd4, 0x94, 0xed, 0x4f, 0xd4,
+        ],
+        hash_128_x64: [
+          0xcb, 0xdf, 0x21, 0x6b, 0x17, 0x3a, 0xf8, 0x20, 0xf4, 0xa9, 0x5c,
+          0x32, 0x41, 0x5c, 0x3c, 0xf1,
+        ],
+      },
+    ];
+
+    for (const e of examples) {
+      it(`${e.string}`, () => {
+        const seed = 0;
+        const input = new TextEncoder().encode(e.string);
+
+        expect(murmur3_32(input, seed)).toBe(e.hash_32);
+
+        const output_128_x64 = new Uint32Array(4);
+        murmur3_x64_128(input, seed, output_128_x64);
+        expect(Array.from(new Uint8Array(output_128_x64.buffer))).toEqual(
+          e.hash_128_x64
+        );
+
+        const output_128_x86 = new Uint32Array(4);
+        murmur3_x86_128(input, seed, output_128_x86);
+        expect(Array.from(new Uint8Array(output_128_x86.buffer))).toEqual(
+          e.hash_128_x86
+        );
+      });
+    }
+  });
+});
