@@ -103,29 +103,25 @@ describe(hashString, () => {
   it("basic", () => {
     expect(hashString("hello").length).toMatchInlineSnapshot("32");
     expect(hashString("hello")).toMatchInlineSnapshot(
-      '"d92b722e0eb15a3645ba72fd43c96bd2"'
+      '"33404c8ffab857730077534ecea96ab0"'
     );
-    expect(range(10).map(String).map(hashString)).toMatchInlineSnapshot(`
+    expect(
+      range(10)
+        .map(String)
+        .map((v) => hashString(v))
+    ).toMatchInlineSnapshot(`
       [
-        "8ef8ffb785943b292e2f971ce26c1e52",
-        "00afd0df2bea949d65dd8b6d3d3218d2",
-        "8d0a631566cd81eaea114a04e7141510",
-        "0cd3f4168410c08ef4290adc2bd5f692",
-        "49f55c78cd61fc64bcc4d71f3ee7a7df",
-        "3e7b6f2806dbe6d82dde8a1b81b912ff",
-        "152c9a3f90af38ada29222a0ad2bd42b",
-        "551fd72cd6162d1e681bb5e246f107ec",
-        "1600836ef14883c00017467a2b1fb3eb",
-        "d9c289ac21e3bc6e2d0b5368990bc733",
+        "c058ceb51a9b50de5960d20780e4ecf8",
+        "dc4abac120fe5e63a71df9d505b34753",
+        "8c5463bf3c01b227582146da5fc69262",
+        "a596b8d4a1d0810be3ee11985d7c70aa",
+        "dd220a216d7a801a825e9c59923ffbc7",
+        "0fd1804ed2230f3e178d8f2597bb9d3f",
+        "7c6d4246e4298f9c4176be6c7dbfae9a",
+        "59e3a7158030f8ee98131bafcaccd20e",
+        "e0b69a46d203e20ffbf2b5976f2fbd15",
+        "7b789ab4823a80b1fab16634a49a890d",
       ]
     `);
-  });
-
-  it("collision", () => {
-    const pair = [
-      "solar:shield-minus-linear",
-      "fluent:select-all-on-20-regular",
-    ];
-    expect(hashString(pair[0])).toBe(hashString(pair[1]));
   });
 });
