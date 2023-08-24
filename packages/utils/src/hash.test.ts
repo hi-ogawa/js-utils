@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HashRng, hashInt32, hashString, hashString_murmur3_32 } from "./hash";
+import { HashRng, hashInt32, hashString } from "./hash";
 import { mapGroupBy, range } from "./lodash";
 
 function formatBin(x: number) {
@@ -103,7 +103,7 @@ describe(hashString, () => {
   it("basic", () => {
     expect(hashString("hello").length).toMatchInlineSnapshot("32");
     expect(hashString("hello")).toMatchInlineSnapshot(
-      '"33404c8f668517fca50765196ae593af"'
+      '"33404c8ffab857730077534ecea96ab0"'
     );
     expect(
       range(10)
@@ -111,38 +111,17 @@ describe(hashString, () => {
         .map((v) => hashString(v))
     ).toMatchInlineSnapshot(`
       [
-        "c058ceb581f0c018f0cee090e4343b2a",
-        "dc4abac164be6a6faf341ca63be0db12",
-        "8c5463bff1eaa506fc767520a8d4e876",
-        "a596b8d4b04903436064705382eb9865",
-        "dd220a2161365fa7edfc166b897a1bbc",
-        "0fd1804ea74fa6cbce9cbd74594d4a1d",
-        "7c6d4246247d9142d268f8c332203cad",
-        "59e3a71516a2217554e9afeef88921f0",
-        "e0b69a461b6fad35030d337614eb2c80",
-        "7b789ab4b08d04d17235c8080ba00752",
+        "c058ceb51a9b50de5960d20780e4ecf8",
+        "dc4abac120fe5e63a71df9d505b34753",
+        "8c5463bf3c01b227582146da5fc69262",
+        "a596b8d4a1d0810be3ee11985d7c70aa",
+        "dd220a216d7a801a825e9c59923ffbc7",
+        "0fd1804ed2230f3e178d8f2597bb9d3f",
+        "7c6d4246e4298f9c4176be6c7dbfae9a",
+        "59e3a7158030f8ee98131bafcaccd20e",
+        "e0b69a46d203e20ffbf2b5976f2fbd15",
+        "7b789ab4823a80b1fab16634a49a890d",
       ]
     `);
   });
-});
-
-describe(hashString_murmur3_32, () => {
-  describe("cases", () => {
-    // from https://github.com/stusmall/murmur3/blob/07e7a1ab421f8807ff49d3ad1388bda4d43d6544/tests/test.rs
-    const cases = [
-      [0x00000000, ""],
-      [0x9416ac93, "1"],
-      [0x721c5dc3, "1234"],
-      [0x13a51193, "12345"],
-      [0xc0363e43, "Hello, world!"],
-    ] as const;
-
-    for (const [output, input] of cases) {
-      it(`${input}`, () => {
-        expect(hashString_murmur3_32(input)).toBe(output);
-      });
-    }
-  });
-
-  describe.skip("fuzz", () => {});
 });

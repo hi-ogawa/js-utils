@@ -24,27 +24,24 @@ export class HashRng {
   }
 }
 
+// run `murmur3_32` for `n` times with different seed then return concatinated hex
 export function hashString(
   input: string,
+  n: number = 4,
   textEncoder = new TextEncoder()
 ): string {
-  // from SHA constants
-  const seeds = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a];
+  let h = "";
+  let seed = new Uint32Array([0x6a09e667]); // python -c 'import math; print(math.sqrt(2).hex())'
   const key = textEncoder.encode(input);
-  return seeds
-    .map((seed) => murmur3_32(key, seed).toString(16).padStart(8, "0"))
-    .join("");
-}
-
-export function hashString_murmur3_32(
-  input: string,
-  seed = 0,
-  textEncoder = new TextEncoder()
-): number {
-  return murmur3_32(textEncoder.encode(input), seed);
+  for (let i = 0; i < n; i++) {
+    h += murmur3_32(key, seed[0]).toString(16).padStart(8, "0");
+    seed[0] = murmur3_32(new Uint8Array(seed.buffer), 0);
+  }
+  return h;
 }
 
 // https://en.wikipedia.org/wiki/MurmurHash#Algorithm
+// fuzz test in packages/murmur3-wasm-bindgen/src-js/fuzz.test.ts
 export function murmur3_32(key: Uint8Array, seed: number): number {
   const len = key.length;
   let h = seed;
