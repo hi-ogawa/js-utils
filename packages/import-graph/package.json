@@ -28,5 +28,8 @@
   },
   "devDependencies": {
     "@hiogawa/utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "typescript": "*"
   }
 }
