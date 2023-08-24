@@ -12,4 +12,5 @@ TODO
   - parser
   - path resolver
   - graph builder
+- check "typescript" peer dep range
 ```
