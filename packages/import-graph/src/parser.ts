@@ -1,10 +1,13 @@
 import { Err, Ok, type Result, tinyassert } from "@hiogawa/utils";
 import ts from "typescript";
 
-export function parseImportExport(
-  code: string,
-  fileName: string
-): Result<ParserResult, ts.Diagnostic[]> {
+export function parseImportExport({
+  code,
+  isTsx,
+}: {
+  code: string;
+  isTsx: boolean;
+}): Result<ParserResult, ts.Diagnostic[]> {
   // access typescript AST via `ts.transpileModule` with custom transformer
   // cf. https://gist.github.com/hi-ogawa/cb338b4765d25321b120b2a47819abcc
 
@@ -12,7 +15,7 @@ export function parseImportExport(
 
   const transpileOutput = ts.transpileModule(code, {
     compilerOptions: {},
-    fileName, // critical to differentiate different syntax for ts and tsx
+    fileName: isTsx ? "__dummy.tsx" : "__dummy.ts",
     reportDiagnostics: true,
     transformers: {
       before: [

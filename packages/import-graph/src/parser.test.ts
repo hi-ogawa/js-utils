@@ -25,7 +25,7 @@ export const f1 = () => {};
 export default function f2() {};
 export function f3() {};
 `;
-    expect(parseImportExport(code, "dummy.ts")).toMatchInlineSnapshot(`
+    expect(parseImportExport({ code, isTsx: false })).toMatchInlineSnapshot(`
       {
         "ok": true,
         "value": {
