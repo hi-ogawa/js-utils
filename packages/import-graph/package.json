@@ -26,6 +26,9 @@
     "test": "vitest",
     "release": "pnpm publish --no-git-checks --access public"
   },
+  "devDependencies": {
+    "@hiogawa/utils": "workspace:*"
+  },
   "dependencies": {
     "es-module-lexer": "^1.3.0"
   }
