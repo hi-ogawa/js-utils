@@ -7,8 +7,8 @@ beforeAll(async () => {
   await bundle.init();
 });
 
-describe("fuzzing", () => {
-  it("string", () => {
+describe("fuzz", () => {
+  it("murmur3_32", () => {
     fc.assert(
       fc.property(
         fc.uint8Array(),
