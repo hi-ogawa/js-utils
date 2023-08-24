@@ -1,5 +1,3 @@
-import { range } from "./lodash";
-
 // https://nullprogram.com/blog/2018/07/31/
 export function hashInt32(x: number): number {
   x ^= x >>> 16;
@@ -26,18 +24,50 @@ export class HashRng {
   }
 }
 
-/** @deprecated this is only a toy ideaa and shouldn't be used... */
-export function hashString(input: string): string {
-  // iterate on 32 bits x 4
-  const xs = new Uint32Array(range(4).map((i) => hashInt32(i + 1)));
-  for (const i of range(input.length)) {
-    const c = input.codePointAt(i) ?? 0;
-    xs[0] = hashInt32(xs[3] ^ c);
-    xs[1] = hashInt32(xs[0] ^ c);
-    xs[2] = hashInt32(xs[1] ^ c);
-    xs[3] = hashInt32(xs[2] ^ c);
+// run `murmur3_32` for `n` times with different seed then return concatinated hex
+export function hashString(
+  input: string,
+  n: number = 4,
+  textEncoder = new TextEncoder()
+): string {
+  let h = "";
+  let seed = new Uint32Array([0x6a09e667]); // python -c 'import math; print(math.sqrt(2).hex())'
+  const key = textEncoder.encode(input);
+  for (let i = 0; i < n; i++) {
+    h += murmur3_32(key, seed[0]).toString(16).padStart(8, "0");
+    seed[0] = murmur3_32(new Uint8Array(seed.buffer), 0);
   }
+  return h;
+}
 
-  // format to hex (4bits) x 32
-  return Array.from(xs, (x) => x.toString(16).padStart(8, "0")).join("");
+// https://en.wikipedia.org/wiki/MurmurHash#Algorithm
+// fuzz test in packages/murmur3-wasm-bindgen/src-js/fuzz.test.ts
+export function murmur3_32(key: Uint8Array, seed: number): number {
+  const len = key.length;
+  let h = seed;
+  let i = 0;
+
+  while (i < len - (len % 4)) {
+    const k = key[i++] | (key[i++] << 8) | (key[i++] << 16) | (key[i++] << 24);
+    h ^= murmur3_32_scramble(k);
+    h = (h << 13) | (h >>> 19);
+    h = (Math.imul(h, 5) >>> 0) + 0xe6546b64;
+    h >>>= 0;
+  }
+  h ^= murmur3_32_scramble(key[i++] | (key[i++] << 8) | (key[i++] << 16));
+
+  h ^= len;
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+  return h >>> 0;
+}
+
+function murmur3_32_scramble(k: number) {
+  k = Math.imul(k, 0xcc9e2d51);
+  k = (k << 15) | (k >>> 17);
+  k = Math.imul(k, 0x1b873593);
+  return k >>> 0;
 }
