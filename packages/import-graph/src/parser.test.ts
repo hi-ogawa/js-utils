@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { analyze } from "./analyzer";
+import { parseImportExport } from "./parser";
 
-describe(analyze, () => {
+describe(parseImportExport, () => {
   it("basic", () => {
     // https://astexplorer.net/
     const code = `
@@ -25,7 +25,7 @@ export const f1 = () => {};
 export default function f2() {};
 export function f3() {};
 `;
-    expect(analyze(code, "dummy.ts")).toMatchInlineSnapshot(`
+    expect(parseImportExport(code, "dummy.ts")).toMatchInlineSnapshot(`
       {
         "ok": true,
         "value": {

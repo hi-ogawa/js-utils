@@ -1,11 +1,11 @@
 import { Err, Ok, tinyassert } from "@hiogawa/utils";
 import ts from "typescript";
 
-export function analyze(code: string, fileName: string) {
+export function parseImportExport(code: string, fileName: string) {
   // access typescript AST via `ts.transpileModule` with custom transformer
   // cf. https://gist.github.com/hi-ogawa/cb338b4765d25321b120b2a47819abcc
 
-  let result: AnalyzeResult;
+  let result: ParserResult;
 
   const transpileOutput = ts.transpileModule(code, {
     compilerOptions: {},
@@ -44,13 +44,13 @@ interface ExportInfo {
   position: number;
 }
 
-interface AnalyzeResult {
+interface ParserResult {
   importInfos: ImportInfo[];
   exportInfos: ExportInfo[];
 }
 
-function analyzeInner(node: ts.SourceFile): AnalyzeResult {
-  const result: AnalyzeResult = {
+function analyzeInner(node: ts.SourceFile): ParserResult {
+  const result: ParserResult = {
     importInfos: [],
     exportInfos: [],
   };
