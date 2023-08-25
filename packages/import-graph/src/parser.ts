@@ -40,11 +40,17 @@ export function parseImportExport({
 }
 
 export interface ParseOutput {
+  bareImports: BareImportInfo[];
   namespaceImports: NamespaceImportInfo[];
   namedImports: NamedImportInfo[];
   namespaceReExports: NamespaceReExportInfo[];
   namedReExports: NamedReExportInfo[];
   namedExports: NamedExportInfo[];
+}
+
+interface BareImportInfo {
+  source: string;
+  position: number;
 }
 
 interface NamespaceImportInfo {
@@ -77,6 +83,7 @@ interface NamedExportInfo {
 
 function analyzeInner(node: ts.SourceFile): ParseOutput {
   const result: ParseOutput = {
+    bareImports: [],
     namespaceImports: [],
     namedImports: [],
     namespaceReExports: [],
@@ -122,6 +129,11 @@ function analyzeInner(node: ts.SourceFile): ParseOutput {
             });
           }
         }
+      } else {
+        result.bareImports.push({
+          source,
+          position: stmt.getStart(),
+        });
       }
       continue;
     }

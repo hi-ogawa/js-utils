@@ -24,11 +24,20 @@ export default () => {};
 export const f1 = () => {};
 export default function f2() {};
 export function f3() {};
+
+// more cases
+import "./dep5";
 `;
     expect(parseImportExport({ code, jsx: false })).toMatchInlineSnapshot(`
       {
         "ok": true,
         "value": {
+          "bareImports": [
+            {
+              "position": 525,
+              "source": "./dep5",
+            },
+          ],
           "namedExports": [
             {
               "name": "f3",
