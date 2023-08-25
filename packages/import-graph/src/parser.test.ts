@@ -29,11 +29,10 @@ export function f3() {};
       {
         "ok": true,
         "value": {
-          "exportInfos": [
+          "namedExports": [
             {
-              "name": "f4",
+              "name": "f3",
               "position": 364,
-              "propertyName": "f3",
             },
             {
               "name": "default",
@@ -52,103 +51,58 @@ export function f3() {};
               "position": 485,
             },
           ],
-          "importInfos": [
+          "namedImports": [
             {
-              "position": 24,
-              "reExport": false,
+              "name": "default",
+              "position": 31,
               "source": "./dep1",
-              "specifierStar": false,
-              "specifiers": [
-                {
-                  "name": "default",
-                },
-              ],
             },
             {
-              "position": 49,
-              "reExport": false,
+              "name": "d2",
+              "position": 58,
               "source": "./dep2",
-              "specifierStar": false,
-              "specifiers": [
-                {
-                  "name": "d2",
-                  "propertyName": undefined,
-                },
-              ],
             },
             {
-              "position": 78,
-              "reExport": false,
+              "name": "d3",
+              "position": 87,
               "source": "./dep3",
-              "specifierStar": false,
-              "specifiers": [
-                {
-                  "name": "d4",
-                  "propertyName": "d3",
-                },
-              ],
             },
             {
-              "position": 113,
-              "reExport": false,
+              "name": "default",
+              "position": 122,
               "source": "./dep3-1",
-              "specifierStar": false,
-              "specifiers": [
-                {
-                  "name": "d3_1",
-                  "propertyName": "default",
-                },
-              ],
             },
+          ],
+          "namedReExports": [
             {
-              "position": 157,
-              "reExport": false,
-              "source": "./dep4",
-              "specifierStar": true,
-              "specifiers": [],
-            },
-            {
-              "position": 211,
-              "reExport": true,
+              "name": "r1",
+              "nameBefore": undefined,
+              "position": 220,
               "source": "./re-dep1",
-              "specifierStar": false,
-              "specifiers": [
-                {
-                  "name": "r1",
-                  "propertyName": undefined,
-                },
-              ],
             },
             {
-              "position": 243,
-              "reExport": true,
+              "name": "r3",
+              "nameBefore": "r2",
+              "position": 252,
               "source": "./re-dep2",
-              "specifierStar": false,
-              "specifiers": [
-                {
-                  "name": "r3",
-                  "propertyName": "r2",
-                },
-              ],
             },
             {
-              "position": 281,
-              "reExport": true,
+              "name": "r2_1",
+              "nameBefore": "default",
+              "position": 290,
               "source": "./re-dep2-1",
-              "specifierStar": false,
-              "specifiers": [
-                {
-                  "name": "r2_1",
-                  "propertyName": "default",
-                },
-              ],
             },
+          ],
+          "namespaceImports": [
+            {
+              "position": 164,
+              "source": "./dep4",
+            },
+          ],
+          "namespaceReExports": [
             {
               "position": 328,
-              "reExport": true,
               "source": "./re-dep3",
-              "specifierStar": true,
-              "specifiers": [],
             },
           ],
         },
