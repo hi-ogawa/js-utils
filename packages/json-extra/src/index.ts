@@ -61,6 +61,8 @@ function applyReplacer(
     v = replacer.apply({ "": v }, ["", vToJson]);
     if (v && typeof v === "object") {
       v = Array.isArray(v) ? [...v] : { ...v };
+      // `Object.entries` to loop only "enumerable" properties to align with `JSON.stringify`.
+      // Note that this also "__proto__" as well since, it guarantees `k === "__proto__"` is an enumerable property of `v`.
       for (const [k, e] of Object.entries(v as any)) {
         (v as any)[k] = recurse(e);
       }

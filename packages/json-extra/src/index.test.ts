@@ -866,6 +866,120 @@ describe(createJsonExtra, () => {
     `);
   });
 
+  describe("proto", () => {
+    it("enumerable", () => {
+      const jsonExtra = createJsonExtra({ builtins: true });
+      const x: any = {};
+      Object.defineProperty(x, "__proto__", {
+        value: { foo: NaN, bar: undefined },
+        enumerable: true,
+      });
+      expect(x.foo).toMatchInlineSnapshot("undefined");
+
+      const y = testStringifyAndParse(x, jsonExtra);
+      expect(y).toMatchInlineSnapshot(`
+          {
+            "original": {
+              "__proto__": {
+                "bar": undefined,
+                "foo": NaN,
+              },
+            },
+            "revived": {
+              "__proto__": {
+                "foo": NaN,
+              },
+            },
+            "revivedUndefined": {
+              "__proto__": {
+                "bar": undefined,
+                "foo": NaN,
+              },
+            },
+            "stringified": "{
+            \\"__proto__\\": {
+              \\"foo\\": [
+                \\"!NaN\\",
+                0
+              ],
+              \\"bar\\": [
+                \\"!undefined\\",
+                0
+              ]
+            }
+          }",
+          }
+        `);
+      expect(y.revived.foo).toMatchInlineSnapshot("undefined");
+      expect(y.revivedUndefined.foo).toMatchInlineSnapshot("undefined");
+      expect(y.revived).toEqual(x);
+      expect(y.revivedUndefined).toEqual(x);
+
+      const z = testSerializeAndDeserialize(x, jsonExtra);
+      expect(z).toMatchInlineSnapshot(`
+          {
+            "deserialized": {
+              "__proto__": {
+                "bar": undefined,
+                "foo": NaN,
+              },
+            },
+            "original": {
+              "__proto__": {
+                "bar": undefined,
+                "foo": NaN,
+              },
+            },
+            "serialized": {
+              "__proto__": {
+                "bar": [
+                  "!undefined",
+                  0,
+                ],
+                "foo": [
+                  "!NaN",
+                  0,
+                ],
+              },
+            },
+          }
+        `);
+      expect(z.deserialized.foo).toMatchInlineSnapshot("undefined");
+      expect(z.deserialized).toEqual(x);
+    });
+
+    it("bad", () => {
+      const jsonExtra = createJsonExtra({ builtins: true });
+      const x: any = { __proto__: { foo: NaN, bar: undefined } };
+      expect(x.foo).toMatchInlineSnapshot("NaN");
+
+      const y = testStringifyAndParse(x, jsonExtra);
+      expect(y).toMatchInlineSnapshot(`
+        {
+          "original": {},
+          "revived": {},
+          "revivedUndefined": {},
+          "stringified": "{}",
+        }
+      `);
+      expect(y.revived.foo).toMatchInlineSnapshot("undefined");
+      expect(y.revivedUndefined.foo).toMatchInlineSnapshot("undefined");
+      expect(y.revived).toEqual(x);
+      expect(y.revivedUndefined).toEqual(x);
+
+      const z = testSerializeAndDeserialize(x, jsonExtra);
+      expect(z).toMatchInlineSnapshot(`
+        {
+          "deserialized": {},
+          "original": {},
+          "serialized": {},
+        }
+      `);
+      expect(z.deserialized.foo).toMatchInlineSnapshot("undefined");
+      expect(z.deserialized).toEqual(x);
+    });
+  });
+
   describe("fuzzing", () => {
     const jsonExtra = createJsonExtra({ builtins: true });
 
