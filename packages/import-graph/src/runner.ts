@@ -6,10 +6,7 @@ type Fs = typeof import("node:fs");
 
 interface ImportRelation {
   file: string;
-  target: {
-    source: string; // resolved file path if not external
-    external: boolean;
-  };
+  moduleSource: ModuleSource;
   usage:
     | {
         // import { x as y } from "a"
@@ -25,6 +22,11 @@ interface ImportRelation {
         type: "sideEffect";
       };
 }
+
+type ModuleSource = {
+  type: "external" | "internal" | "unknown";
+  source: string; // resolved file path if not external
+};
 
 export function run(inputFiles: string[], options?: { fs?: Fs }) {
   const fs = options?.fs ?? nodeFs;
@@ -60,7 +62,7 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
     for (const e of entry.parseOutput.bareImports) {
       relations.push({
         file: entry.file,
-        target: resolveImportModule(entry.file, e.source, fs),
+        moduleSource: resolveImportModule(entry.file, e.source, fs),
         usage: {
           type: "sideEffect",
         },
@@ -69,7 +71,7 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
     for (const e of entry.parseOutput.namedImports) {
       relations.push({
         file: entry.file,
-        target: resolveImportModule(entry.file, e.source, fs),
+        moduleSource: resolveImportModule(entry.file, e.source, fs),
         usage: {
           type: "named",
           name: e.name,
@@ -79,7 +81,7 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
     for (const e of entry.parseOutput.namespaceImports) {
       relations.push({
         file: entry.file,
-        target: resolveImportModule(entry.file, e.source, fs),
+        moduleSource: resolveImportModule(entry.file, e.source, fs),
         usage: {
           type: "namespace",
         },
@@ -88,7 +90,7 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
     for (const e of entry.parseOutput.namedReExports) {
       relations.push({
         file: entry.file,
-        target: resolveImportModule(entry.file, e.source, fs),
+        moduleSource: resolveImportModule(entry.file, e.source, fs),
         usage: {
           type: "named",
           name: e.name,
@@ -98,7 +100,7 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
     for (const e of entry.parseOutput.namespaceReExports) {
       relations.push({
         file: entry.file,
-        target: resolveImportModule(entry.file, e.source, fs),
+        moduleSource: resolveImportModule(entry.file, e.source, fs),
         usage: {
           type: "namespace",
         },
@@ -121,34 +123,43 @@ function resolveImportModule(
   containingFile: string,
   source: string,
   fs: Fs
-): {
-  source: string;
-  external: boolean;
-} {
-  fs;
-  const dir = path.dirname(containingFile);
-
+): ModuleSource {
   // external
   // TODO: extra resolution for tsconfig (e.g. baseUrl, paths)
   if (!source.startsWith(".")) {
     return {
+      type: "external",
       source,
-      external: true,
     };
   }
 
-  // normalize relative path
-  source = path.normalize(path.join(dir, source));
+  //
+  // poor-man's module path resolusion
+  //
 
-  // TODO: quick-and-dirty module path resolusion
+  // normalize relative path
+  const fileDir = path.dirname(containingFile);
+  source = path.normalize(path.join(fileDir, source));
+
   // "." => "./index"
-  if (fs.statSync(source).isDirectory()) {
+  // "./dir" => "./dir/index"
+  if (fs.statSync(source, { throwIfNoEntry: false })?.isDirectory()) {
+    source = path.join(source, "index");
   }
 
-  // - extension
+  // "./file" => "./file.ts"
+  if (!fs.existsSync(source)) {
+    for (const ext of ["ts", "tsx", "js", "jsx"]) {
+      const sourceExt = source + "." + ext;
+      if (fs.existsSync(sourceExt)) {
+        source = sourceExt;
+        break;
+      }
+    }
+  }
 
   return {
+    type: fs.existsSync(source) ? "internal" : "unknown",
     source,
-    external: false,
   };
 }

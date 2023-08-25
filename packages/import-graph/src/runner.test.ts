@@ -8,9 +8,10 @@ describe(run, () => {
     const volumeJson = {
       "f1.ts": `
 import { x2 as y2 } from "./f2";
-import "./dir1/f4";
-import * as f5 from "./dir1/f5";
+import * as f5 from "./dir2/f5";
 import process from "node:process";
+import "./dir1/f3";
+import "./dir1/unknown";
 `,
 
       "f2.tsx": `
@@ -44,9 +45,9 @@ import * as j from "..";
       [
         {
           "file": "f1.ts",
-          "target": {
-            "external": false,
-            "source": "dir1/f4",
+          "moduleSource": {
+            "source": "dir1/f3.ts",
+            "type": "internal",
           },
           "usage": {
             "type": "sideEffect",
@@ -54,9 +55,19 @@ import * as j from "..";
         },
         {
           "file": "f1.ts",
-          "target": {
-            "external": false,
-            "source": "f2",
+          "moduleSource": {
+            "source": "dir1/unknown",
+            "type": "unknown",
+          },
+          "usage": {
+            "type": "sideEffect",
+          },
+        },
+        {
+          "file": "f1.ts",
+          "moduleSource": {
+            "source": "f2.tsx",
+            "type": "internal",
           },
           "usage": {
             "name": "x2",
@@ -65,9 +76,9 @@ import * as j from "..";
         },
         {
           "file": "f1.ts",
-          "target": {
-            "external": true,
+          "moduleSource": {
             "source": "node:process",
+            "type": "external",
           },
           "usage": {
             "name": "default",
@@ -76,9 +87,9 @@ import * as j from "..";
         },
         {
           "file": "f1.ts",
-          "target": {
-            "external": false,
-            "source": "dir1/f5",
+          "moduleSource": {
+            "source": "dir2/f5.ts",
+            "type": "internal",
           },
           "usage": {
             "type": "namespace",
@@ -86,9 +97,9 @@ import * as j from "..";
         },
         {
           "file": "f2.tsx",
-          "target": {
-            "external": false,
-            "source": "dir1/f3",
+          "moduleSource": {
+            "source": "dir1/f3.ts",
+            "type": "internal",
           },
           "usage": {
             "name": "x3",
@@ -97,9 +108,9 @@ import * as j from "..";
         },
         {
           "file": "dir1/f3.ts",
-          "target": {
-            "external": false,
-            "source": "dir1",
+          "moduleSource": {
+            "source": "dir1/index.ts",
+            "type": "internal",
           },
           "usage": {
             "type": "namespace",
@@ -107,9 +118,9 @@ import * as j from "..";
         },
         {
           "file": "dir1/f3.ts",
-          "target": {
-            "external": false,
-            "source": "dir1/",
+          "moduleSource": {
+            "source": "dir1/index.ts",
+            "type": "internal",
           },
           "usage": {
             "type": "namespace",
@@ -117,9 +128,9 @@ import * as j from "..";
         },
         {
           "file": "dir1/f3.ts",
-          "target": {
-            "external": false,
-            "source": "dir1/index",
+          "moduleSource": {
+            "source": "dir1/index.ts",
+            "type": "internal",
           },
           "usage": {
             "type": "namespace",
@@ -127,9 +138,9 @@ import * as j from "..";
         },
         {
           "file": "dir2/dir3/f7.ts",
-          "target": {
-            "external": false,
-            "source": "dir2/f5",
+          "moduleSource": {
+            "source": "dir2/f5.ts",
+            "type": "internal",
           },
           "usage": {
             "type": "namespace",
@@ -137,9 +148,9 @@ import * as j from "..";
         },
         {
           "file": "dir2/dir3/f7.ts",
-          "target": {
-            "external": false,
-            "source": "dir2",
+          "moduleSource": {
+            "source": "dir2/index.tsx",
+            "type": "internal",
           },
           "usage": {
             "type": "namespace",
