@@ -36,8 +36,8 @@ import * as j from "..";
 `,
     };
     const volume = Volume.fromJSON(volumeJson);
-    const result = await run(Object.keys(volumeJson), {
-      fs: volume.promises as any,
+    const result = run(Object.keys(volumeJson), {
+      fs: volume as any,
     });
     expect(result.errors.length).toBe(0);
     expect(result.relations).toMatchInlineSnapshot(`

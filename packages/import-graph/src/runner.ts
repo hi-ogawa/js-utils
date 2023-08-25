@@ -1,7 +1,8 @@
+import nodeFs from "node:fs";
 import path from "node:path";
 import { type ParseOutput, parseImportExport } from "./parser";
 
-type VirtualFS = Pick<typeof import("node:fs/promises"), "readFile" | "stat">;
+type Fs = typeof import("node:fs");
 
 interface ImportRelation {
   file: string;
@@ -25,8 +26,8 @@ interface ImportRelation {
       };
 }
 
-export async function run(inputFiles: string[], options?: { fs?: VirtualFS }) {
-  const fs = options?.fs ?? (await import("node:fs/promises"));
+export function run(inputFiles: string[], options?: { fs?: Fs }) {
+  const fs = options?.fs ?? nodeFs;
 
   const entries: { file: string; parseOutput: ParseOutput }[] = [];
   const errors: { file: string; error: unknown }[] = [];
@@ -35,7 +36,7 @@ export async function run(inputFiles: string[], options?: { fs?: VirtualFS }) {
   for (const file of inputFiles) {
     // TODO(perf): cache
     // TODO(perf): worker
-    const code = await fs.readFile(file, "utf-8");
+    const code = fs.readFileSync(file, "utf-8");
     const jsx = file.endsWith("x");
     const result = parseImportExport({ code, jsx });
     if (!result.ok) {
@@ -119,7 +120,7 @@ export async function run(inputFiles: string[], options?: { fs?: VirtualFS }) {
 function resolveImportModule(
   containingFile: string,
   source: string,
-  fs: VirtualFS
+  fs: Fs
 ): {
   source: string;
   external: boolean;
@@ -138,6 +139,7 @@ function resolveImportModule(
 
   // normalize relative path
   source = path.normalize(path.join(dir, source));
+
   // TODO: quick-and-dirty module path resolusion
   // - index
   // - extension
