@@ -27,7 +27,8 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
-    "@hiogawa/utils": "workspace:*"
+    "@hiogawa/utils": "workspace:*",
+    "memfs": "^4.2.1"
   },
   "peerDependencies": {
     "typescript": "*"

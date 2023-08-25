@@ -7,10 +7,10 @@ import ts from "typescript";
 
 export function parseImportExport({
   code,
-  isTsx,
+  jsx,
 }: {
   code: string;
-  isTsx: boolean;
+  jsx: boolean;
 }): Result<ParseOutput, ts.Diagnostic[]> {
   // access typescript AST via `ts.transpileModule` with custom transformer
   // cf. https://gist.github.com/hi-ogawa/cb338b4765d25321b120b2a47819abcc
@@ -19,7 +19,7 @@ export function parseImportExport({
 
   const transpileOutput = ts.transpileModule(code, {
     compilerOptions: {},
-    fileName: isTsx ? "__dummy.tsx" : "__dummy.ts",
+    fileName: jsx ? "__dummy.tsx" : "__dummy.ts",
     reportDiagnostics: true,
     transformers: {
       before: [
@@ -77,8 +77,6 @@ interface NamedExportInfo {
 
 function analyzeInner(node: ts.SourceFile): ParseOutput {
   const result: ParseOutput = {
-    // importInfos: [],
-    // exportInfos: [],
     namespaceImports: [],
     namedImports: [],
     namespaceReExports: [],
