@@ -4,14 +4,16 @@ interface VirtualFS {
   readFile: (file: string, encoding: "utf-8") => Promise<string>;
 }
 
-export async function run(inputFiles: string[], options: { fs?: VirtualFS }) {
-  const fs = options.fs ?? (await import("node:fs/promises"));
+export async function run(inputFiles: string[], options?: { fs?: VirtualFS }) {
+  const fs = options?.fs ?? (await import("node:fs/promises"));
 
   const entries: { file: string; parseOutput: ParseOutput }[] = [];
   const errors: { file: string; error: unknown }[] = [];
 
   // extract import/export
   for (const file of inputFiles) {
+    // TODO(perf): cache
+    // TODO(perf): worker
     const code = await fs.readFile(file, "utf-8");
     const jsx = file.endsWith("x");
     const result = parseImportExport({ code, jsx });
