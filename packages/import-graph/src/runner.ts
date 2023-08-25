@@ -141,7 +141,10 @@ function resolveImportModule(
   source = path.normalize(path.join(dir, source));
 
   // TODO: quick-and-dirty module path resolusion
-  // - index
+  // "." => "./index"
+  if (fs.statSync(source).isDirectory()) {
+  }
+
   // - extension
 
   return {
