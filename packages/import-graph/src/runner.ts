@@ -1,4 +1,5 @@
 import { type ParseOutput, parseImportExport } from "./parser";
+import path from "node:path";
 
 interface VirtualFS {
   readFile: (file: string, encoding: "utf-8") => Promise<string>;
@@ -29,14 +30,26 @@ export async function run(inputFiles: string[], options?: { fs?: VirtualFS }) {
 
   // TODO: resolve/normalize file path
   // - relative
+  // - file extension (e.g. "./some-util" => "./some-utils.ts")
   // - index
   // - tsconfig paths?
   // - check node_modules?
-  for (const e of entries) {
-    e.parseOutput.namedImports;
-    e.parseOutput.namespaceImports;
-    e.parseOutput.namedReExports;
-    e.parseOutput.namespaceReExports;
+  for (const entry of entries) {
+    for (const e of entry.parseOutput.bareImports) {
+      e.source = resolveImportSource(entry.file, e.source);
+    }
+    for (const e of entry.parseOutput.namedImports) {
+      e.source = resolveImportSource(entry.file, e.source);
+    }
+    for (const e of entry.parseOutput.namespaceImports) {
+      e.source = resolveImportSource(entry.file, e.source);
+    }
+    for (const e of entry.parseOutput.namedReExports) {
+      e.source = resolveImportSource(entry.file, e.source);
+    }
+    for (const e of entry.parseOutput.namespaceReExports) {
+      e.source = resolveImportSource(entry.file, e.source);
+    }
   }
 
   // TODO: build graph
@@ -45,4 +58,20 @@ export async function run(inputFiles: string[], options?: { fs?: VirtualFS }) {
   // - unused exports
 
   return { entries, errors };
+}
+
+// cf. https://nodejs.org/api/esm.html#import-specifiers
+
+function resolveImportSource(file: string, source: string) {
+  const dir = path.dirname(file);
+
+  // relative
+  if (source.startsWith(".")) {
+    return path.normalize(path.join(dir, source));
+  }
+
+  // otherwise external
+  // TODO: tsconfig paths
+
+  return source;
 }

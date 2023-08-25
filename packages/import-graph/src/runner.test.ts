@@ -37,7 +37,7 @@ export const x3 =  0;
                 {
                   "name": "x2",
                   "position": 10,
-                  "source": "./f2",
+                  "source": "f2",
                 },
               ],
               "namedReExports": [],
@@ -59,7 +59,7 @@ export const x3 =  0;
                 {
                   "name": "x3",
                   "position": 10,
-                  "source": "./dir1/f3",
+                  "source": "dir1/f3",
                 },
               ],
               "namedReExports": [],
