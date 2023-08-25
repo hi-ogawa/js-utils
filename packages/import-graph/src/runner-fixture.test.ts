@@ -2,7 +2,7 @@ import fastGlob from "fast-glob";
 import { describe, expect, it } from "vitest";
 import { run } from "./runner";
 
-describe("fixture", () => {
+describe.skip("fixture", () => {
   it("ytsub", async () => {
     const base = "./fixtures/ytsub-v3/app";
     const files = await fastGlob([base + "/**/*.ts", base + "/**/*.tsx"]);

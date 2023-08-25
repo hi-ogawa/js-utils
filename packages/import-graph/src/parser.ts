@@ -64,6 +64,7 @@ interface NamedImportInfo {
   position: number;
 }
 
+// TODO: need extra steps to resolve re-exported identifiers
 interface NamespaceReExportInfo {
   source: string;
   position: number;

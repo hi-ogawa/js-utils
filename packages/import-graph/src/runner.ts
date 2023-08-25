@@ -1,8 +1,28 @@
-import { type ParseOutput, parseImportExport } from "./parser";
 import path from "node:path";
+import { type ParseOutput, parseImportExport } from "./parser";
 
-interface VirtualFS {
-  readFile: (file: string, encoding: "utf-8") => Promise<string>;
+type VirtualFS = Pick<typeof import("node:fs/promises"), "readFile" | "stat">;
+
+interface ImportRelation {
+  file: string;
+  target: {
+    source: string; // resolved file path if not external
+    external: boolean;
+  };
+  usage:
+    | {
+        // import { x as y } from "a"
+        type: "named";
+        name: string; // x
+      }
+    | {
+        // import * from "a"
+        type: "namespace";
+      }
+    | {
+        // import "a"
+        type: "sideEffect";
+      };
 }
 
 export async function run(inputFiles: string[], options?: { fs?: VirtualFS }) {
@@ -28,27 +48,60 @@ export async function run(inputFiles: string[], options?: { fs?: VirtualFS }) {
     });
   }
 
-  // TODO: resolve/normalize file path
+  const relations: ImportRelation[] = [];
+
+  // TODO: resolve module source
   // - relative
-  // - file extension (e.g. "./some-util" => "./some-utils.ts")
-  // - index
+  // - file extension (e.g. "./some" => "./some.ts")
+  // - index (e.g. "." => "./index.ts")
   // - tsconfig paths?
-  // - check node_modules?
   for (const entry of entries) {
     for (const e of entry.parseOutput.bareImports) {
-      e.source = resolveImportSource(entry.file, e.source);
+      relations.push({
+        file: entry.file,
+        target: resolveImportModule(entry.file, e.source, fs),
+        usage: {
+          type: "sideEffect",
+        },
+      });
     }
     for (const e of entry.parseOutput.namedImports) {
-      e.source = resolveImportSource(entry.file, e.source);
+      relations.push({
+        file: entry.file,
+        target: resolveImportModule(entry.file, e.source, fs),
+        usage: {
+          type: "named",
+          name: e.name,
+        },
+      });
     }
     for (const e of entry.parseOutput.namespaceImports) {
-      e.source = resolveImportSource(entry.file, e.source);
+      relations.push({
+        file: entry.file,
+        target: resolveImportModule(entry.file, e.source, fs),
+        usage: {
+          type: "namespace",
+        },
+      });
     }
     for (const e of entry.parseOutput.namedReExports) {
-      e.source = resolveImportSource(entry.file, e.source);
+      relations.push({
+        file: entry.file,
+        target: resolveImportModule(entry.file, e.source, fs),
+        usage: {
+          type: "named",
+          name: e.name,
+        },
+      });
     }
     for (const e of entry.parseOutput.namespaceReExports) {
-      e.source = resolveImportSource(entry.file, e.source);
+      relations.push({
+        file: entry.file,
+        target: resolveImportModule(entry.file, e.source, fs),
+        usage: {
+          type: "namespace",
+        },
+      });
     }
   }
 
@@ -57,21 +110,40 @@ export async function run(inputFiles: string[], options?: { fs?: VirtualFS }) {
   // TODO: analyze
   // - unused exports
 
-  return { entries, errors };
+  return { entries, errors, relations };
 }
 
-// cf. https://nodejs.org/api/esm.html#import-specifiers
+// cf.
+// https://nodejs.org/api/esm.html#import-specifiers
+// https://www.typescriptlang.org/tsconfig#moduleResolution
+function resolveImportModule(
+  containingFile: string,
+  source: string,
+  fs: VirtualFS
+): {
+  source: string;
+  external: boolean;
+} {
+  fs;
+  const dir = path.dirname(containingFile);
 
-function resolveImportSource(file: string, source: string) {
-  const dir = path.dirname(file);
-
-  // relative
-  if (source.startsWith(".")) {
-    return path.normalize(path.join(dir, source));
+  // external
+  // TODO: extra resolution for tsconfig (e.g. baseUrl, paths)
+  if (!source.startsWith(".")) {
+    return {
+      source,
+      external: true,
+    };
   }
 
-  // otherwise external
-  // TODO: tsconfig paths
+  // normalize relative path
+  source = path.normalize(path.join(dir, source));
+  // TODO: quick-and-dirty module path resolusion
+  // - index
+  // - extension
 
-  return source;
+  return {
+    source,
+    external: false,
+  };
 }
