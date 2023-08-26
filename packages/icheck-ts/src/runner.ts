@@ -1,13 +1,17 @@
 import nodeFs from "node:fs";
 import path from "node:path";
-import { DefaultMap } from "@hiogawa/utils";
+import { DefaultMap, LruCache, hashString, memoize } from "@hiogawa/utils";
+import {
+  name as packageName,
+  version as packageVersion,
+} from "../package.json";
 import { type ParseOutput, parseImportExport } from "./parser";
 
 type Fs = typeof import("node:fs");
 
 // TODO: rework structure
 
-// TODO: track code position
+// TODO: track code position for error message
 interface ImportTarget {
   source: ModuleSource;
   usage: ModuleUsage;
@@ -40,7 +44,10 @@ type ModuleExportUsage = {
   used: boolean;
 };
 
-export function run(inputFiles: string[], options?: { fs?: Fs }) {
+export function run(
+  inputFiles: string[],
+  options?: { fs?: Fs; cache?: boolean }
+) {
   const fs = options?.fs ?? nodeFs;
 
   const entries: { file: string; parseOutput: ParseOutput }[] = [];
@@ -48,6 +55,10 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
 
   // normalize relative path (e.g. "./x.ts" => "x.ts")
   inputFiles = inputFiles.map((f) => path.normalize(f));
+
+  const cachedParser = options?.cache ? createCachedParser() : undefined;
+  let parse = cachedParser?.parse ?? parseImportExport;
+  cachedParser?.load();
 
   //
   // extract import/export
@@ -58,7 +69,7 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
     // TODO(perf): worker
     const code = fs.readFileSync(file, "utf-8");
     const jsx = file.endsWith("x");
-    const result = parseImportExport({ code, jsx });
+    const result = parse({ code, jsx });
     if (!result.ok) {
       errors.push({ file, error: result.value });
       continue;
@@ -68,6 +79,7 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
       parseOutput: result.value,
     });
   }
+  cachedParser?.save();
 
   //
   // resolve import module
@@ -230,4 +242,37 @@ export function resolveImportSource(
         type: "unknown",
         name: source,
       };
+}
+
+//
+// cache (TODO: move this logic to cli.ts)
+//
+
+// configurable
+const CACHE_FILE = `node_modules/.cache/${packageName}/v${packageVersion}/parseImportExport`;
+const CACHE_SIZE = 1000_000;
+
+function createCachedParser() {
+  const fs = nodeFs;
+  const cache = new LruCache<string, any>(CACHE_SIZE);
+
+  function load() {
+    if (fs.existsSync(CACHE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(CACHE_FILE, "utf-8"));
+      cache._map = new Map(data);
+    }
+  }
+
+  function save() {
+    const data = JSON.stringify([...cache._map.entries()]);
+    fs.mkdirSync(path.dirname(CACHE_FILE), { recursive: true });
+    fs.writeFileSync(CACHE_FILE, data);
+  }
+
+  const parse = memoize(parseImportExport, {
+    keyFn: (arg) => hashString(JSON.stringify(arg)),
+    cache,
+  });
+
+  return { parse, load, save };
 }

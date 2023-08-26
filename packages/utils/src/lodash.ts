@@ -158,8 +158,8 @@ export function memoize<F extends (...args: any[]) => any>(
   options?: {
     keyFn?: (...args: Parameters<F>) => unknown;
     cache?: {
-      get(k: Parameters<F>): ReturnType<F> | undefined;
-      set(k: Parameters<F>, v: ReturnType<F>): void;
+      get(k: unknown): ReturnType<F> | undefined;
+      set(k: unknown, v: ReturnType<F>): void;
     };
   }
 ): F {

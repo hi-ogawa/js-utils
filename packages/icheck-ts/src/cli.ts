@@ -1,15 +1,16 @@
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
-import { version } from "../package.json";
+import { version as packageVersion } from "../package.json";
 import { run } from "./runner";
 
 const command = new TinyCliCommand(
   {
     program: "icheck-ts",
-    version,
+    version: packageVersion,
     description: "Lint import and export usages",
     args: {
       files: arg.stringArray("Typescript files to lint"),
+      cache: arg.boolean("enable caching"),
       ignore: arg.string("RegExp pattern to ignore export names", {
         optional: true,
       }),
@@ -17,7 +18,7 @@ const command = new TinyCliCommand(
     },
   },
   ({ args }) => {
-    const result = run(args.files);
+    const result = run(args.files, { cache: args.cache });
 
     if (args.debug) {
       console.log(new Map(result.exportUsages));
