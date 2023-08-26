@@ -65,8 +65,6 @@ export function run(
   //
 
   for (const file of inputFiles) {
-    // TODO(perf): cache
-    // TODO(perf): worker
     const code = fs.readFileSync(file, "utf-8");
     const jsx = file.endsWith("x");
     const result = parse({ code, jsx });
@@ -89,7 +87,7 @@ export function run(
   const importRelations = new DefaultMap<string, ImportTarget[]>(() => []);
 
   for (const entry of entries) {
-    // TODO: cache resolveImportSource
+    // TODO: cache resolveImportSource?
     for (const e of entry.parseOutput.bareImports) {
       importRelations.get(entry.file).push({
         source: resolveImportSource(entry.file, e.source, fs),
