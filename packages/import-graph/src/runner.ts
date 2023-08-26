@@ -10,11 +10,13 @@ interface ImportRelation {
   usage:
     | {
         // import { x as y } from "a"
+        // export { x as y } from "a"
         type: "named";
         name: string; // x
       }
     | {
-        // import * from "a"
+        // import * as a from "a"
+        // export * from "a"
         type: "namespace";
       }
     | {
@@ -25,7 +27,7 @@ interface ImportRelation {
 
 type ModuleSource = {
   type: "external" | "internal" | "unknown";
-  source: string; // resolved file path if not external
+  source: string; // resolved file path if "internal"
 };
 
 export function run(inputFiles: string[], options?: { fs?: Fs }) {
