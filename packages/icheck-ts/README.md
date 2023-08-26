@@ -1,4 +1,4 @@
-# ts-import-graph
+# icheck-ts
 
 simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative
 
@@ -6,8 +6,3 @@ simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative
 pnpm build
 pnpm release
 ```
-
-## todo
-
-- [ ] perf: caching?
-- [ ] track re-export chain?

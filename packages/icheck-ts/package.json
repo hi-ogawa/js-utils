@@ -1,5 +1,5 @@
 {
-  "name": "@hiogawa/import-graph",
+  "name": "@hiogawa/icheck-ts",
   "version": "0.0.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -19,7 +19,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/import-graph"
+    "directory": "packages/icheck-ts"
   },
   "scripts": {
     "build": "tsup",
