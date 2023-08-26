@@ -120,13 +120,18 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
 
 // cf.
 // https://nodejs.org/api/esm.html#import-specifiers
+// https://nodejs.org/api/modules.html#all-together
 // https://www.typescriptlang.org/tsconfig#moduleResolution
 function resolveImportModule(
   containingFile: string,
   source: string,
   fs: Fs
 ): ModuleSource {
-  // external
+  //
+  // poor-man's module path resolusion
+  //
+
+  // check ".", "./", "../" otherwise external
   // TODO: extra resolution for tsconfig (e.g. baseUrl, paths)
   if (!source.startsWith(".")) {
     return {
@@ -135,33 +140,35 @@ function resolveImportModule(
     };
   }
 
-  //
-  // poor-man's module path resolusion
-  //
-
   // normalize relative path
-  const fileDir = path.dirname(containingFile);
-  source = path.normalize(path.join(fileDir, source));
+  let tmpSource = path.normalize(
+    path.join(path.dirname(containingFile), source)
+  );
 
   // "." => "./index"
   // "./dir" => "./dir/index"
-  if (fs.statSync(source, { throwIfNoEntry: false })?.isDirectory()) {
-    source = path.join(source, "index");
+  if (fs.statSync(tmpSource, { throwIfNoEntry: false })?.isDirectory()) {
+    tmpSource = path.join(tmpSource, "index");
   }
 
   // "./file" => "./file.ts"
-  if (!fs.existsSync(source)) {
+  if (!fs.existsSync(tmpSource)) {
     for (const ext of ["ts", "tsx", "js", "jsx"]) {
-      const sourceExt = source + "." + ext;
-      if (fs.existsSync(sourceExt)) {
-        source = sourceExt;
+      const internalExt = tmpSource + "." + ext;
+      if (fs.existsSync(internalExt)) {
+        tmpSource = internalExt;
         break;
       }
     }
   }
 
-  return {
-    type: fs.existsSync(source) ? "internal" : "unknown",
-    source,
-  };
+  return fs.existsSync(tmpSource)
+    ? {
+        type: "internal",
+        source: tmpSource,
+      }
+    : {
+        type: "unknown",
+        source,
+      };
 }

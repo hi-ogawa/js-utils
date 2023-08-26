@@ -12,6 +12,7 @@ import * as f5 from "./dir2/f5";
 import process from "node:process";
 import "./dir1/f3";
 import "./dir1/unknown";
+import "./dir2/dir3";
 `,
 
       "f2.tsx": `
@@ -56,7 +57,17 @@ import * as j from "..";
         {
           "file": "f1.ts",
           "moduleSource": {
-            "source": "dir1/unknown",
+            "source": "./dir1/unknown",
+            "type": "unknown",
+          },
+          "usage": {
+            "type": "sideEffect",
+          },
+        },
+        {
+          "file": "f1.ts",
+          "moduleSource": {
+            "source": "./dir2/dir3",
             "type": "unknown",
           },
           "usage": {
