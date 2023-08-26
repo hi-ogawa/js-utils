@@ -1,12 +1,12 @@
 import nodeFs from "node:fs";
 import path from "node:path";
+import { DefaultMap } from "@hiogawa/utils";
 import { type ParseOutput, parseImportExport } from "./parser";
 
 type Fs = typeof import("node:fs");
 
-interface ImportRelation {
-  file: string;
-  moduleSource: ModuleSource;
+interface ImportTarget {
+  source: ModuleSource;
   usage:
     | {
         // import { x as y } from "a"
@@ -27,7 +27,7 @@ interface ImportRelation {
 
 type ModuleSource = {
   type: "external" | "internal" | "unknown";
-  source: string; // resolved file path if "internal"
+  name: string; // resolved file path if "internal"
 };
 
 export function run(inputFiles: string[], options?: { fs?: Fs }) {
@@ -36,7 +36,10 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
   const entries: { file: string; parseOutput: ParseOutput }[] = [];
   const errors: { file: string; error: unknown }[] = [];
 
+  //
   // extract import/export
+  //
+
   for (const file of inputFiles) {
     // TODO(perf): cache
     // TODO(perf): worker
@@ -53,22 +56,25 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
     });
   }
 
+  //
   // resolve import module
-  const relations: ImportRelation[] = [];
+  //
+
+  // as adjacency list
+  const importRelations = new DefaultMap<string, ImportTarget[]>(() => []);
+
   for (const entry of entries) {
     for (const e of entry.parseOutput.bareImports) {
-      relations.push({
-        file: entry.file,
-        moduleSource: resolveImportModule(entry.file, e.source, fs),
+      importRelations.get(entry.file).push({
+        source: resolveImportSource(entry.file, e.source, fs),
         usage: {
           type: "sideEffect",
         },
       });
     }
     for (const e of entry.parseOutput.namedImports) {
-      relations.push({
-        file: entry.file,
-        moduleSource: resolveImportModule(entry.file, e.source, fs),
+      importRelations.get(entry.file).push({
+        source: resolveImportSource(entry.file, e.source, fs),
         usage: {
           type: "named",
           name: e.name,
@@ -76,18 +82,16 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
       });
     }
     for (const e of entry.parseOutput.namespaceImports) {
-      relations.push({
-        file: entry.file,
-        moduleSource: resolveImportModule(entry.file, e.source, fs),
+      importRelations.get(entry.file).push({
+        source: resolveImportSource(entry.file, e.source, fs),
         usage: {
           type: "namespace",
         },
       });
     }
     for (const e of entry.parseOutput.namedReExports) {
-      relations.push({
-        file: entry.file,
-        moduleSource: resolveImportModule(entry.file, e.source, fs),
+      importRelations.get(entry.file).push({
+        source: resolveImportSource(entry.file, e.source, fs),
         usage: {
           type: "named",
           name: e.name,
@@ -95,9 +99,8 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
       });
     }
     for (const e of entry.parseOutput.namespaceReExports) {
-      relations.push({
-        file: entry.file,
-        moduleSource: resolveImportModule(entry.file, e.source, fs),
+      importRelations.get(entry.file).push({
+        source: resolveImportSource(entry.file, e.source, fs),
         usage: {
           type: "namespace",
         },
@@ -110,14 +113,14 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
   // TODO: analyze
   // - unused exports
 
-  return { entries, errors, relations };
+  return { entries, errors, importRelations };
 }
 
 // cf.
 // https://nodejs.org/api/esm.html#import-specifiers
 // https://nodejs.org/api/modules.html#all-together
 // https://www.typescriptlang.org/tsconfig#moduleResolution
-function resolveImportModule(
+function resolveImportSource(
   containingFile: string,
   source: string,
   fs: Fs
@@ -131,7 +134,7 @@ function resolveImportModule(
   if (!source.startsWith(".")) {
     return {
       type: "external",
-      source,
+      name: source,
     };
   }
 
@@ -160,10 +163,10 @@ function resolveImportModule(
   return fs.existsSync(tmpSource)
     ? {
         type: "internal",
-        source: tmpSource,
+        name: tmpSource,
       }
     : {
         type: "unknown",
-        source,
+        name: source,
       };
 }

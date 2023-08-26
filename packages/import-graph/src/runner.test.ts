@@ -2,8 +2,8 @@ import { Volume } from "memfs";
 import { describe, expect, it } from "vitest";
 import { run } from "./runner";
 
-describe(run, () => {
-  it("basic", async () => {
+describe("runner", () => {
+  it("importRelations", async () => {
     // https://github.com/streamich/memfs/blob/master/docs/node/usage.md
     const volumeJson = {
       "f1.ts": `
@@ -43,143 +43,138 @@ import * as j from "..";
       fs: volume as any,
     });
     expect(result.errors.length).toBe(0);
-    expect(result.relations).toMatchInlineSnapshot(`
-      [
-        {
-          "file": "f1.ts",
-          "moduleSource": {
-            "source": "dir1/f3.ts",
-            "type": "internal",
+    expect(result.importRelations).toMatchInlineSnapshot(`
+      Map {
+        "f1.ts" => [
+          {
+            "source": {
+              "name": "dir1/f3.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "type": "sideEffect",
+            },
           },
-          "usage": {
-            "type": "sideEffect",
+          {
+            "source": {
+              "name": "./dir1/unknown",
+              "type": "unknown",
+            },
+            "usage": {
+              "type": "sideEffect",
+            },
           },
-        },
-        {
-          "file": "f1.ts",
-          "moduleSource": {
-            "source": "./dir1/unknown",
-            "type": "unknown",
+          {
+            "source": {
+              "name": "./dir2/dir3",
+              "type": "unknown",
+            },
+            "usage": {
+              "type": "sideEffect",
+            },
           },
-          "usage": {
-            "type": "sideEffect",
+          {
+            "source": {
+              "name": "f2.tsx",
+              "type": "internal",
+            },
+            "usage": {
+              "name": "x2",
+              "type": "named",
+            },
           },
-        },
-        {
-          "file": "f1.ts",
-          "moduleSource": {
-            "source": "./dir2/dir3",
-            "type": "unknown",
+          {
+            "source": {
+              "name": "f2.tsx",
+              "type": "internal",
+            },
+            "usage": {
+              "name": "x4",
+              "type": "named",
+            },
           },
-          "usage": {
-            "type": "sideEffect",
+          {
+            "source": {
+              "name": "node:process",
+              "type": "external",
+            },
+            "usage": {
+              "name": "default",
+              "type": "named",
+            },
           },
-        },
-        {
-          "file": "f1.ts",
-          "moduleSource": {
-            "source": "f2.tsx",
-            "type": "internal",
+          {
+            "source": {
+              "name": "dir2/f5.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "type": "namespace",
+            },
           },
-          "usage": {
-            "name": "x2",
-            "type": "named",
+        ],
+        "f2.tsx" => [
+          {
+            "source": {
+              "name": "dir1/f3.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "name": "x3",
+              "type": "named",
+            },
           },
-        },
-        {
-          "file": "f1.ts",
-          "moduleSource": {
-            "source": "f2.tsx",
-            "type": "internal",
+        ],
+        "dir1/f3.ts" => [
+          {
+            "source": {
+              "name": "dir1/index.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "type": "namespace",
+            },
           },
-          "usage": {
-            "name": "x4",
-            "type": "named",
+          {
+            "source": {
+              "name": "dir1/index.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "type": "namespace",
+            },
           },
-        },
-        {
-          "file": "f1.ts",
-          "moduleSource": {
-            "source": "node:process",
-            "type": "external",
+          {
+            "source": {
+              "name": "dir1/index.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "type": "namespace",
+            },
           },
-          "usage": {
-            "name": "default",
-            "type": "named",
+        ],
+        "dir2/dir3/f7.ts" => [
+          {
+            "source": {
+              "name": "dir2/f5.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "type": "namespace",
+            },
           },
-        },
-        {
-          "file": "f1.ts",
-          "moduleSource": {
-            "source": "dir2/f5.ts",
-            "type": "internal",
+          {
+            "source": {
+              "name": "dir2/index.tsx",
+              "type": "internal",
+            },
+            "usage": {
+              "type": "namespace",
+            },
           },
-          "usage": {
-            "type": "namespace",
-          },
-        },
-        {
-          "file": "f2.tsx",
-          "moduleSource": {
-            "source": "dir1/f3.ts",
-            "type": "internal",
-          },
-          "usage": {
-            "name": "x3",
-            "type": "named",
-          },
-        },
-        {
-          "file": "dir1/f3.ts",
-          "moduleSource": {
-            "source": "dir1/index.ts",
-            "type": "internal",
-          },
-          "usage": {
-            "type": "namespace",
-          },
-        },
-        {
-          "file": "dir1/f3.ts",
-          "moduleSource": {
-            "source": "dir1/index.ts",
-            "type": "internal",
-          },
-          "usage": {
-            "type": "namespace",
-          },
-        },
-        {
-          "file": "dir1/f3.ts",
-          "moduleSource": {
-            "source": "dir1/index.ts",
-            "type": "internal",
-          },
-          "usage": {
-            "type": "namespace",
-          },
-        },
-        {
-          "file": "dir2/dir3/f7.ts",
-          "moduleSource": {
-            "source": "dir2/f5.ts",
-            "type": "internal",
-          },
-          "usage": {
-            "type": "namespace",
-          },
-        },
-        {
-          "file": "dir2/dir3/f7.ts",
-          "moduleSource": {
-            "source": "dir2/index.tsx",
-            "type": "internal",
-          },
-          "usage": {
-            "type": "namespace",
-          },
-        },
-      ]
+        ],
+      }
     `);
   });
 });
