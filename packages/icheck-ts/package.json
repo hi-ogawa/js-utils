@@ -2,17 +2,7 @@
   "name": "@hiogawa/icheck-ts",
   "version": "0.0.0",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "bin": "./bin/cli.js",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
-    }
-  },
   "files": [
     "dist",
     "bin"
@@ -25,8 +15,8 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "tsx ./src/cli.ts",
-    "dev-local": "tsx ./src/cli.ts src/*.ts",
+    "cli": "node ./bin/cli.js",
+    "cli-dev": "tsx ./src/cli.ts",
     "test": "vitest",
     "release": "pnpm publish --no-git-checks --access public"
   },
