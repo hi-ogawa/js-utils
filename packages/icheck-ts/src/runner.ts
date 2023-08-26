@@ -42,6 +42,7 @@ type ModuleUsage =
 type ModuleExportUsage = {
   name: string;
   used: boolean;
+  position: number;
 };
 
 export function run(
@@ -168,12 +169,14 @@ export function run(
       exportUsages.get(entry.file).push({
         name: e.name,
         used: isUsedExport(entry.file, e.name),
+        position: e.position,
       });
     }
     for (const e of entry.parseOutput.namedExports) {
       exportUsages.get(entry.file).push({
         name: e.name,
         used: isUsedExport(entry.file, e.name),
+        position: e.position,
       });
     }
   }

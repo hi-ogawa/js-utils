@@ -1,5 +1,7 @@
+import fs from "node:fs";
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
+import { memoize } from "@hiogawa/utils";
 import { version as packageVersion } from "../package.json";
 import { run } from "./runner";
 
@@ -47,12 +49,23 @@ const command = new TinyCliCommand(
       console.log("* Unused exports");
       for (const [file, entries] of unused) {
         for (const e of entries) {
-          console.log(`${file} - ${e.name}`);
+          const line = resolveFilePosition(file)(e.position)[0];
+          console.log(`${file}:${line} - ${e.name}`);
         }
       }
       process.exitCode = 1;
     }
   }
 );
+
+// TODO: shouldn't read files again. just resolve during `parseImportExport` already?
+const resolveFilePosition = memoize((file: string) => {
+  const code = fs.readFileSync(file, "utf-8");
+  return (position: number) => {
+    const slice = code.slice(0, position);
+    const lines = slice.split("\n");
+    return [lines.length, lines.at(-1)!.length];
+  };
+});
 
 tinyCliMain(command);
