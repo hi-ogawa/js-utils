@@ -101,26 +101,31 @@ import * as j from "..";
         "f1.ts" => [
           {
             "name": "z2",
+            "position": 47,
             "used": false,
           },
         ],
         "f2.tsx" => [
           {
             "name": "x2",
+            "position": 46,
             "used": true,
           },
           {
             "name": "x4",
+            "position": 72,
             "used": true,
           },
           {
             "name": "x4_1",
+            "position": 98,
             "used": false,
           },
         ],
         "dir1/f3.ts" => [
           {
             "name": "x3",
+            "position": 93,
             "used": true,
           },
         ],
