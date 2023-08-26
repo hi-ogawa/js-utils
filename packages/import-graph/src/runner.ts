@@ -53,13 +53,8 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
     });
   }
 
+  // resolve import module
   const relations: ImportRelation[] = [];
-
-  // TODO: resolve module source
-  // - relative
-  // - file extension (e.g. "./some" => "./some.ts")
-  // - index (e.g. "." => "./index.ts")
-  // - tsconfig paths?
   for (const entry of entries) {
     for (const e of entry.parseOutput.bareImports) {
       relations.push({

@@ -7,7 +7,7 @@ describe(run, () => {
     // https://github.com/streamich/memfs/blob/master/docs/node/usage.md
     const volumeJson = {
       "f1.ts": `
-import { x2 as y2 } from "./f2";
+import { x2 as y2, x4 } from "./f2";
 import * as f5 from "./dir2/f5";
 import process from "node:process";
 import "./dir1/f3";
@@ -18,6 +18,7 @@ import "./dir2/dir3";
       "f2.tsx": `
 import { x3 } from "./dir1/f3";
 export const x2 = x3 + 1;
+export const x4 = x3 + 2;
 `,
 
       "dir1/index.ts": "",
@@ -82,6 +83,17 @@ import * as j from "..";
           },
           "usage": {
             "name": "x2",
+            "type": "named",
+          },
+        },
+        {
+          "file": "f1.ts",
+          "moduleSource": {
+            "source": "f2.tsx",
+            "type": "internal",
+          },
+          "usage": {
+            "name": "x4",
             "type": "named",
           },
         },
