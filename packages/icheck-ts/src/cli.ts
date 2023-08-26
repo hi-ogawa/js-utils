@@ -23,6 +23,14 @@ const command = new TinyCliCommand(
       console.log(new Map(result.exportUsages));
     }
 
+    if (result.errors.length > 0) {
+      console.log("* Parse errors");
+      for (const { file, error } of result.errors) {
+        console.log(file, error);
+      }
+      process.exitCode = 1;
+    }
+
     const ignoreRe = args.ignore && new RegExp(args.ignore);
     const unused = [...result.exportUsages]
       .map(
@@ -35,13 +43,13 @@ const command = new TinyCliCommand(
       .filter(([_k, vs]) => vs.length > 0);
 
     if (unused.length > 0) {
-      console.log("* found unused exports");
+      console.log("* Unused exports");
       for (const [file, entries] of unused) {
         for (const e of entries) {
           console.log(`${file} - ${e.name}`);
         }
       }
-      process.exit(1);
+      process.exitCode = 1;
     }
   }
 );

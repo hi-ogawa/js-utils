@@ -11,7 +11,7 @@ export function parseImportExport({
 }: {
   code: string;
   jsx: boolean;
-}): Result<ParseOutput, ts.Diagnostic[]> {
+}): Result<ParseOutput, { diagnostics: string[] }> {
   // access typescript AST via `ts.transpileModule` with custom transformer
   // cf. https://gist.github.com/hi-ogawa/cb338b4765d25321b120b2a47819abcc
 
@@ -32,7 +32,10 @@ export function parseImportExport({
   });
 
   if (transpileOutput.diagnostics && transpileOutput.diagnostics?.length > 0) {
-    return Err(transpileOutput.diagnostics);
+    const diagnostics = transpileOutput.diagnostics.map((d) =>
+      typeof d.messageText === "string" ? d.messageText : "(unknown)"
+    );
+    return Err({ diagnostics });
   }
 
   tinyassert(result!);
