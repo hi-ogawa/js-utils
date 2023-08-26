@@ -5,24 +5,12 @@ import { type ParseOutput, parseImportExport } from "./parser";
 
 type Fs = typeof import("node:fs");
 
+// TODO: rework structure
+
+// TODO: track code position
 interface ImportTarget {
   source: ModuleSource;
-  usage:
-    | {
-        // import { x as y } from "a"
-        // export { x as y } from "a"
-        type: "named";
-        name: string; // x
-      }
-    | {
-        // import * as a from "a"
-        // export * from "a"
-        type: "namespace";
-      }
-    | {
-        // import "a"
-        type: "sideEffect";
-      };
+  usage: ModuleUsage;
 }
 
 type ModuleSource = {
@@ -30,11 +18,36 @@ type ModuleSource = {
   name: string; // resolved file path if "internal"
 };
 
+type ModuleUsage =
+  | {
+      // import { x as y } from "a"
+      // export { x as y } from "a"
+      type: "named";
+      name: string; // x
+    }
+  | {
+      // import * as a from "a"
+      // export * from "a"
+      type: "namespace";
+    }
+  | {
+      // import "a"
+      type: "sideEffect";
+    };
+
+type ModuleExportUsage = {
+  name: string;
+  used: boolean;
+};
+
 export function run(inputFiles: string[], options?: { fs?: Fs }) {
   const fs = options?.fs ?? nodeFs;
 
   const entries: { file: string; parseOutput: ParseOutput }[] = [];
   const errors: { file: string; error: unknown }[] = [];
+
+  // normalize relative path (e.g. "./x.ts" => "x.ts")
+  inputFiles = inputFiles.map((f) => path.normalize(f));
 
   //
   // extract import/export
@@ -64,6 +77,7 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
   const importRelations = new DefaultMap<string, ImportTarget[]>(() => []);
 
   for (const entry of entries) {
+    // TODO: cache resolveImportSource
     for (const e of entry.parseOutput.bareImports) {
       importRelations.get(entry.file).push({
         source: resolveImportSource(entry.file, e.source, fs),
@@ -94,7 +108,7 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
         source: resolveImportSource(entry.file, e.source, fs),
         usage: {
           type: "named",
-          name: e.name,
+          name: e.nameBefore ?? e.name,
         },
       });
     }
@@ -108,19 +122,66 @@ export function run(inputFiles: string[], options?: { fs?: Fs }) {
     }
   }
 
-  // TODO: build graph
+  //
+  // collect internal import usages
+  //
 
-  // TODO: analyze
-  // - unused exports
+  const importUsages = new DefaultMap<string, ModuleUsage[]>(() => []);
+  for (const target of [...importRelations.values()].flat()) {
+    if (target.source.type === "internal") {
+      importUsages.get(target.source.name).push(target.usage);
+    }
+  }
 
-  return { entries, errors, importRelations };
+  function isUsedExport(file: string, name: string) {
+    return (
+      importUsages.has(file) &&
+      importUsages
+        .get(file)
+        .some(
+          (e) =>
+            e.type === "namespace" || (e.type === "named" && e.name === name)
+        )
+    );
+  }
+
+  //
+  // resolve export usages
+  //
+  const exportUsages = new DefaultMap<string, ModuleExportUsage[]>(() => []);
+
+  for (const entry of entries) {
+    // TODO: resolve re-export chain?
+    // entry.parseOutput.namespaceReExports
+
+    for (const e of entry.parseOutput.namedReExports) {
+      exportUsages.get(entry.file).push({
+        name: e.name,
+        used: isUsedExport(entry.file, e.name),
+      });
+    }
+    for (const e of entry.parseOutput.namedExports) {
+      exportUsages.get(entry.file).push({
+        name: e.name,
+        used: isUsedExport(entry.file, e.name),
+      });
+    }
+  }
+
+  return {
+    entries,
+    errors,
+    importRelations,
+    importUsages,
+    exportUsages,
+  };
 }
 
 // cf.
 // https://nodejs.org/api/esm.html#import-specifiers
 // https://nodejs.org/api/modules.html#all-together
 // https://www.typescriptlang.org/tsconfig#moduleResolution
-function resolveImportSource(
+export function resolveImportSource(
   containingFile: string,
   source: string,
   fs: Fs
