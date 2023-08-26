@@ -1,6 +1,8 @@
 import { Err, Ok, type Result, tinyassert } from "@hiogawa/utils";
 import ts from "typescript";
 
+console.log(ts.version)
+
 //
 // parse AST to collect import/export
 //
