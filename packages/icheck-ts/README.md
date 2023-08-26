@@ -5,6 +5,8 @@ simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative.
 ## features
 
 - requires only `typescript` as `peerDependencies`
+- `// icheck-ignore`
+- `--ignore <RegExp>`
 
 ## development
 
