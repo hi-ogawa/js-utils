@@ -39,6 +39,7 @@ export function parseImportExport({
   return Ok(result);
 }
 
+// TODO: rework structure
 export interface ParseOutput {
   bareImports: BareImportInfo[];
   namespaceImports: NamespaceImportInfo[];
@@ -82,6 +83,14 @@ interface NamedExportInfo {
   position: number;
 }
 
+// TODO: configurable?
+const IGNORE_COMMENT = "icheck-ignore";
+
+function checkIgnoreComment(node: ts.Node): boolean {
+  const trivia = node.getFullText().slice(0, node.getLeadingTriviaWidth());
+  return trivia.includes(IGNORE_COMMENT);
+}
+
 function analyzeInner(node: ts.SourceFile): ParseOutput {
   const result: ParseOutput = {
     bareImports: [],
@@ -93,6 +102,10 @@ function analyzeInner(node: ts.SourceFile): ParseOutput {
   };
 
   for (const stmt of node.statements) {
+    if (checkIgnoreComment(stmt)) {
+      continue;
+    }
+
     // import d1 from "./dep1";
     // import { d2 } from "./dep2";
     // import { d3 as d4 } from "./dep3";

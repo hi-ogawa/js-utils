@@ -118,4 +118,42 @@ import "./dep5";
       }
     `);
   });
+
+  it("ignore", () => {
+    // https://astexplorer.net/
+    const code = `
+export const yes1 = 0;
+// icheck-ignore
+export const no1 = 0;
+
+export function yes2() {};
+/* icheck-ignore */
+export function no2() {};
+
+// icheck-ignore
+export default {};
+`;
+    expect(parseImportExport({ code, jsx: false })).toMatchInlineSnapshot(`
+      {
+        "ok": true,
+        "value": {
+          "bareImports": [],
+          "namedExports": [
+            {
+              "name": "yes1",
+              "position": 14,
+            },
+            {
+              "name": "yes2",
+              "position": 64,
+            },
+          ],
+          "namedImports": [],
+          "namedReExports": [],
+          "namespaceImports": [],
+          "namespaceReExports": [],
+        },
+      }
+    `);
+  });
 });
