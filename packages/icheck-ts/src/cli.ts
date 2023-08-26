@@ -9,19 +9,29 @@ const command = new TinyCliCommand(
     version,
     description: "Lint import and export usages",
     args: {
-      files: arg.stringArray("typescript files to lint"),
-      verbose: arg.boolean("versobe output"),
+      files: arg.stringArray("Typescript files to lint"),
+      ignore: arg.string("RegExp pattern to ignore export names", {
+        optional: true,
+      }),
+      debug: arg.boolean("Debug output"),
     },
   },
   ({ args }) => {
     const result = run(args.files);
 
-    if (args.verbose) {
+    if (args.debug) {
       console.log(new Map(result.exportUsages));
     }
 
+    const ignoreRe = args.ignore && new RegExp(args.ignore);
     const unused = [...result.exportUsages]
-      .map(([k, vs]) => [k, vs.filter((v) => !v.used)] as const)
+      .map(
+        ([k, vs]) =>
+          [
+            k,
+            vs.filter((v) => !v.used && !(ignoreRe && v.name.match(ignoreRe))),
+          ] as const
+      )
       .filter(([_k, vs]) => vs.length > 0);
 
     if (unused.length > 0) {
