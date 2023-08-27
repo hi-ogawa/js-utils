@@ -9,7 +9,6 @@ import {
 // https://github.com/google/zx
 // https://github.com/sindresorhus/execa/blob/f4b8b3ab601c94d1503f1010822952758dcc6350/docs/scripts.md
 
-// TODO: support array and unescaped wrapper?
 type ScriptParam = string | number;
 
 const defaultSpawnOptions: SpawnOptions = {
@@ -34,9 +33,9 @@ export function $new(options: SpawnOptions & { $?: HelperOptions } = {}) {
 
   return function $(strings: TemplateStringsArray, ...params: ScriptParam[]) {
     let command = strings[0];
-    for (let i = 0; i < params.length; i++) {
-      command += params[i] + strings[i + 1];
-    }
+    params.forEach((param, i) => {
+      command += param + strings[i + 1];
+    });
     if (helperOptions.verbose) {
       log(`$ ${command}`);
     }
