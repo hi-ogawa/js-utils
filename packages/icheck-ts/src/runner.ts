@@ -249,7 +249,7 @@ export function resolveImportSource(
 // cache (TODO: move this logic to cli.ts)
 //
 
-// configurable
+// configurable?
 const CACHE_FILE = `node_modules/.cache/${packageName}/v${packageVersion}/parseImportExport`;
 const CACHE_SIZE = 1000_000;
 
