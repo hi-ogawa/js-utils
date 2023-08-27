@@ -10,7 +10,11 @@ describe(newScriptHelper, () => {
   it("helperOptions", async () => {
     const logFn = vi.fn();
     const $ = newScriptHelper({
-      helper: { noTrim: true, verbose: true, log: logFn },
+      $: {
+        noTrim: true,
+        verbose: true,
+        consoleLog: logFn,
+      },
     });
     const output = await $`echo hello`;
     expect(output).toMatchInlineSnapshot(`

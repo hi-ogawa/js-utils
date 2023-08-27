@@ -12,36 +12,36 @@ import { zip } from "@hiogawa/utils";
 
 type ScriptParam = string | number;
 
-type HelperOptions = {
-  noTrim?: boolean;
-  verbose?: boolean;
-  log?: (v: string) => void;
-};
-
 const defaultSpawnOptions: SpawnOptions = {
   shell: true,
   stdio: ["ignore", "pipe", "pipe"],
 };
 
+type HelperOptions = {
+  noTrim?: boolean;
+  verbose?: boolean;
+  consoleLog?: (v: string) => void;
+};
+
 export const $ = /* @__PURE__ */ newScriptHelper();
 
-export function newScriptHelper(options?: {
-  spawn?: SpawnOptions;
-  helper?: HelperOptions;
-}) {
-  const spawnOptions = { ...defaultSpawnOptions, ...options?.spawn };
-  const helperOptions = options?.helper ?? {};
-  const log = helperOptions.log ?? console.log;
+export function newScriptHelper(
+  options: SpawnOptions & { $?: HelperOptions } = {}
+) {
+  const { $: helperOptions = {}, ...spawnOptions } = options;
+  const log = helperOptions.consoleLog ?? console.log;
 
-  function $(strings: TemplateStringsArray, ...params: ScriptParam[]) {
+  return function $(strings: TemplateStringsArray, ...params: ScriptParam[]) {
     const command = [zip(strings, params), strings.at(-1)].flat(2).join("");
     if (helperOptions.verbose) {
       log(`$ ${command}`);
     }
-    return new SpawnPromise(command, spawnOptions, helperOptions);
-  }
-
-  return $;
+    return new SpawnPromise(
+      command,
+      { ...defaultSpawnOptions, ...spawnOptions },
+      helperOptions
+    );
+  };
 }
 
 class SpawnPromise implements PromiseLike<string> {
