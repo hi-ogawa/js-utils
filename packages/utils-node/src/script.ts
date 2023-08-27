@@ -78,7 +78,7 @@ class SpawnPromise implements PromiseLike<string> {
           resolve(stdout);
         } else {
           reject(
-            new Error(`ChildProcess error`, {
+            new Error(`ScriptError`, {
               cause: {
                 code,
                 stdout: this.stdout,

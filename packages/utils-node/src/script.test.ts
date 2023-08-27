@@ -37,7 +37,7 @@ describe($new, () => {
       expect(result).toMatchInlineSnapshot(`
         {
           "ok": false,
-          "value": [Error: ChildProcess error],
+          "value": [Error: ScriptError],
         }
       `);
       tinyassert(!result.ok);
