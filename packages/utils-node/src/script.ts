@@ -4,7 +4,6 @@ import {
   type SpawnOptions,
   spawn,
 } from "node:child_process";
-import { zip } from "@hiogawa/utils";
 
 // too simple but maybe useful enough version of
 // https://github.com/google/zx
@@ -32,7 +31,10 @@ export function newScriptHelper(
   const log = helperOptions.consoleLog ?? console.log;
 
   return function $(strings: TemplateStringsArray, ...params: ScriptParam[]) {
-    const command = [zip(strings, params), strings.at(-1)].flat(2).join("");
+    let command = strings[0];
+    for (let i = 0; i < params.length; i++) {
+      command += params[i] + strings[i + 1];
+    }
     if (helperOptions.verbose) {
       log(`$ ${command}`);
     }
