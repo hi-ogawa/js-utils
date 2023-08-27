@@ -9,6 +9,7 @@ import {
 // https://github.com/google/zx
 // https://github.com/sindresorhus/execa/blob/f4b8b3ab601c94d1503f1010822952758dcc6350/docs/scripts.md
 
+// TODO: support array and unescaped wrapper?
 type ScriptParam = string | number;
 
 const defaultSpawnOptions: SpawnOptions = {
@@ -16,6 +17,9 @@ const defaultSpawnOptions: SpawnOptions = {
   stdio: ["ignore", "pipe", "pipe"],
 };
 
+// TODO
+// abstract command escape/parsing and spawn implementation?
+// e.g. for https://github.com/moxystudio/node-cross-spawn
 type HelperOptions = {
   noTrim?: boolean;
   verbose?: boolean;
