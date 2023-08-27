@@ -2,6 +2,7 @@ import { tinyassert } from "@hiogawa/utils";
 import { TinyRpcError } from "./core";
 
 // validator agnostic function guard
+// (it only supports zod for starter)
 
 export function validateFn<Schema>(schema: Schema) {
   return function decorate<Out>(

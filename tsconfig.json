@@ -2,13 +2,28 @@
   "include": [],
   "references": [
     {
-      "path": "packages/query-proxy"
+      "path": "packages/icheck-ts"
     },
     {
       "path": "packages/json-extra"
     },
     {
+      "path": "packages/murmur3-wasm-bindgen"
+    },
+    {
+      "path": "packages/query-proxy"
+    },
+    {
+      "path": "packages/theme-script"
+    },
+    {
+      "path": "packages/theme-script/examples/vite"
+    },
+    {
       "path": "packages/tiny-cli"
+    },
+    {
+      "path": "packages/tiny-jwt"
     },
     {
       "path": "packages/tiny-rpc"
@@ -18,12 +33,6 @@
     },
     {
       "path": "packages/tiny-sql/examples/sqlite"
-    },
-    {
-      "path": "packages/theme-script"
-    },
-    {
-      "path": "packages/theme-script/examples/vite"
     },
     {
       "path": "packages/utils"
