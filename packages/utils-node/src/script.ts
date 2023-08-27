@@ -15,6 +15,7 @@ type ScriptParam = string | number;
 type HelperOptions = {
   noTrim?: boolean;
   verbose?: boolean;
+  log?: (v: string) => void;
 };
 
 const defaultSpawnOptions: SpawnOptions = {
@@ -22,19 +23,20 @@ const defaultSpawnOptions: SpawnOptions = {
   stdio: ["ignore", "pipe", "pipe"],
 };
 
-export const $ = /* @__PURE__ */ newScriptHelper({});
+export const $ = /* @__PURE__ */ newScriptHelper();
 
-export function newScriptHelper(options: {
+export function newScriptHelper(options?: {
   spawn?: SpawnOptions;
   helper?: HelperOptions;
 }) {
-  const spawnOptions = { ...defaultSpawnOptions, ...options.spawn };
-  const helperOptions = options.helper ?? {};
+  const spawnOptions = { ...defaultSpawnOptions, ...options?.spawn };
+  const helperOptions = options?.helper ?? {};
+  const log = helperOptions.log ?? console.log;
 
   function $(strings: TemplateStringsArray, ...params: ScriptParam[]) {
     const command = [zip(strings, params), strings.at(-1)].flat(2).join("");
     if (helperOptions.verbose) {
-      console.log("$ ", command);
+      log(`$ ${command}`);
     }
     return new SpawnPromise(command, spawnOptions, helperOptions);
   }
@@ -73,7 +75,7 @@ class SpawnPromise implements PromiseLike<string> {
           if (!this.helperOptions.noTrim) {
             stdout = stdout.trim();
           }
-          resolve(this.stdout.trim());
+          resolve(stdout);
         } else {
           reject(new Error(`ChildProcess code ${code}`));
         }
