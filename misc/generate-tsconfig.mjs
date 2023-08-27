@@ -4,6 +4,8 @@ import { $ } from "@hiogawa/utils-node";
 // usage:
 //   node misc/generate-tsconfig.mjs > tsconfig.json
 
+$._.verbose = true;
+
 const pnpmList = JSON.parse(
   await $`pnpm ls --filter './packages/**' --depth -1 --json`
 );

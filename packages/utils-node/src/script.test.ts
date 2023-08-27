@@ -13,7 +13,7 @@ describe("script", () => {
     const $ = $new();
     $._.noTrim = true;
     $._.verbose = true;
-    $._.log = (v) => logFn(v.replace(/^\[.*?\]/, "[...]")); // reduct non-deterministic timestamp
+    $._.log = (v) => logFn(v.replace(/^\[\d{2}:\d{2}:\d{2}.\d{3}\]/, "[...]")); // reduct non-deterministic timestamp
     const output = await $`echo ${"hello"} ${"world"}`;
     expect(output).toMatchInlineSnapshot(`
       "hello world

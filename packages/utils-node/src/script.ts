@@ -125,14 +125,11 @@ function processOutput(
 }
 
 function formatNow() {
-  // cf. https://github.com/sindresorhus/execa/blob/f4b8b3ab601c94d1503f1010822952758dcc6350/lib/verbose.js#L10
-  const d = new Date();
-  const h = d.getHours();
-  const m = d.getMinutes();
-  const s = d.getSeconds();
-  const ms = d.getMilliseconds();
-  function pad(n: number, max: number) {
-    return String(n).padStart(max, "0");
-  }
-  return `${pad(h, 2)}:${pad(m, 2)}:${pad(s, 2)}.${pad(ms, 3)}`;
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    fractionalSecondDigits: 3,
+    hour12: false,
+  }).format(new Date());
 }
