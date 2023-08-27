@@ -22,11 +22,9 @@ type HelperOptions = {
   consoleLog?: (v: string) => void;
 };
 
-export const $ = /* @__PURE__ */ newScriptHelper();
+export const $ = /* @__PURE__ */ $new();
 
-export function newScriptHelper(
-  options: SpawnOptions & { $?: HelperOptions } = {}
-) {
+export function $new(options: SpawnOptions & { $?: HelperOptions } = {}) {
   const { $: helperOptions = {}, ...spawnOptions } = options;
   const log = helperOptions.consoleLog ?? console.log;
 

@@ -1,8 +1,8 @@
 import { tinyassert, wrapErrorAsync } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
-import { $, newScriptHelper } from "./script";
+import { $, $new } from "./script";
 
-describe(newScriptHelper, () => {
+describe($new, () => {
   it("basic", async () => {
     const output = await $`echo ${"hello"} ${"world"}`;
     expect(output).toMatchInlineSnapshot('"hello world"');
@@ -10,7 +10,7 @@ describe(newScriptHelper, () => {
 
   it("helperOptions", async () => {
     const logFn = vi.fn();
-    const $ = newScriptHelper({
+    const $ = $new({
       $: {
         noTrim: true,
         verbose: true,
