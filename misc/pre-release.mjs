@@ -6,6 +6,8 @@ import fs from "node:fs";
 // usage:
 //   node misc/pre-release.mjs packages/utils-node
 
+$._.verbose = true;
+
 async function main() {
   const packageDir = process.argv[2];
   tinyassert(packageDir, "missing 'packageDir'");
@@ -14,7 +16,7 @@ async function main() {
   // require no diff to start
   const gitStatus = await $`git status --porcelain`;
   if (gitStatus) {
-    console.error("dirty 'git status'");
+    console.error("[ERROR] require clean 'git status'");
     console.error(gitStatus);
     process.exit(1);
   }
