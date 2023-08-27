@@ -17,6 +17,7 @@ simple type-safe command line parsing library
 - command option alias
 - transform option key from kebab-case to camelCase
 - special arguments e.g. `--`
+- default command when sub commands mode
 
 ## examples
 

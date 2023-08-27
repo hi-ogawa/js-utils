@@ -9,3 +9,7 @@ pnpm build
 pnpm dev
 pnpm test
 ```
+
+```sh
+pnpm ls --filter './packages/**' --depth -1 --json | jq '{ include:[], references: map({ path: .path }) }'
+```
