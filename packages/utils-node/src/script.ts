@@ -23,35 +23,42 @@ export const $ = /* @__PURE__ */ $new();
 export function $new(
   options: SpawnOptions & { _?: Partial<HelperOptions> } = {}
 ) {
-  const spawnOptions: SpawnOptions = {
-    shell: process.env["SHELL"] || true,
-    stdio: ["pipe", "pipe", "pipe"],
-    ...options,
-  };
-  const helperOptions: HelperOptions = {
-    noTrim: false,
-    verbose: false,
-    log: console.error,
-    spawn: childProcessSpawn,
-    ...options._,
-  };
+  function $(strings: TemplateStringsArray, ...params: (string | number)[]) {
+    // process options
+    const spawnOptions: SpawnOptions = {
+      shell: process.env["SHELL"] || true,
+      stdio: ["pipe", "pipe", "pipe"],
+      ...api,
+    };
+    const helperOptions: HelperOptions = {
+      noTrim: false,
+      verbose: false,
+      log: console.error,
+      spawn: childProcessSpawn,
+      ...api._,
+    };
 
-  return function $(
-    strings: TemplateStringsArray,
-    ...params: (string | number)[]
-  ) {
+    // format command
     let command = strings[0];
     params.forEach((param, i) => {
       command += param + strings[i + 1];
     });
+
+    // verbose
     if (helperOptions.verbose) {
       helperOptions.log(`$ ${command}`);
     }
-    return new SpawnPromise(command, spawnOptions, helperOptions);
-  };
+
+    // spawn
+    return new SpawnPromiseLike(command, spawnOptions, helperOptions);
+  }
+
+  // expose options in a self-referential way
+  const api = Object.assign($, { _: {}, ...options });
+  return api;
 }
 
-class SpawnPromise implements PromiseLike<string> {
+class SpawnPromiseLike implements PromiseLike<string> {
   child: ChildProcess;
   promise: Promise<string>;
   stderr: string = "";

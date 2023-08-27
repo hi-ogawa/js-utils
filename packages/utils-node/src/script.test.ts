@@ -10,13 +10,10 @@ describe("script", () => {
 
   it("helperOptions", async () => {
     const logFn = vi.fn();
-    const $ = $new({
-      _: {
-        noTrim: true,
-        verbose: true,
-        log: logFn,
-      },
-    });
+    const $ = $new();
+    $._.noTrim = true;
+    $._.verbose = true;
+    $._.log = logFn;
     const output = await $`echo ${"hello"} ${"world"}`;
     expect(output).toMatchInlineSnapshot(`
       "hello world
