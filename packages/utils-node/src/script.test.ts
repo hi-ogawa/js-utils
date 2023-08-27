@@ -2,7 +2,7 @@ import { tinyassert, wrapErrorAsync } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { $, $new } from "./script";
 
-describe($new, () => {
+describe("script", () => {
   it("basic", async () => {
     const output = await $`echo ${"hello"} ${"world"}`;
     expect(output).toMatchInlineSnapshot('"hello world"');
