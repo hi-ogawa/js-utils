@@ -9,20 +9,28 @@ import fs from "node:fs";
 async function main() {
   const packageDir = process.argv[2];
   tinyassert(packageDir, "missing 'packageDir'");
+  const packageJsonPath = `${packageDir}/package.json`;
 
   // require no diff to start
-  await $`git diff --exit-code --name-only`;
+  const gitStatus = await $`git status --porcelain`;
+  if (gitStatus) {
+    console.error("dirty 'git status'");
+    console.error(gitStatus);
+    process.exit(1);
+  }
 
   // update version
   /** @type {{ version: string }} */
-  const pakcageJson = JSON.parse(
-    fs.readFileSync(`${packageDir}/package.json`, "utf-8")
-  );
+  const pakcageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
   pakcageJson.version = getNextVersion(pakcageJson.version);
   fs.writeFileSync(
-    `${packageDir}/package.json`,
+    packageJsonPath,
     JSON.stringify(pakcageJson, null, 2) + "\n"
   );
+
+  // commit
+  await $`git add ${packageDir}/package.json`;
+  await $`git commit -m 'chore: pre release (${pakcageJson.version})'`;
 }
 
 /**
