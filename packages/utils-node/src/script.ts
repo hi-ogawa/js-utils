@@ -66,7 +66,7 @@ class SpawnPromise implements PromiseLike<string> {
       });
 
       child.stderr?.on("data", (raw: unknown) => {
-        processOutput(raw, (v) => (this.stdout += v), reject);
+        processOutput(raw, (v) => (this.stderr += v), reject);
       });
 
       child.on("close", (code) => {

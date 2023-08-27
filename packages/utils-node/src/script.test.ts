@@ -46,11 +46,25 @@ describe($new, () => {
         {
           "code": 9,
           "command": "node --yelp",
-          "stderr": "",
-          "stdout": "node: bad option: --yelp
+          "stderr": "node: bad option: --yelp
         ",
+          "stdout": "",
         }
       `);
     });
+  });
+
+  it("ChildProcess", async () => {
+    const spawned = $`node -e 'console.log("abc"); console.error("def")'`;
+    expect(await spawned.promise).toMatchInlineSnapshot('"abc"');
+    expect(spawned.stdout).toMatchInlineSnapshot(`
+      "abc
+      "
+    `);
+    expect(spawned.stderr).toMatchInlineSnapshot(`
+      "def
+      "
+    `);
+    expect(spawned.child.exitCode).toMatchInlineSnapshot("0");
   });
 });
