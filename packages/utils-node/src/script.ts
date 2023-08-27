@@ -80,6 +80,7 @@ class SpawnPromise implements PromiseLike<string> {
           reject(
             new Error(`ScriptError`, {
               cause: {
+                command,
                 code,
                 stdout: this.stdout,
                 stderr: this.stderr,

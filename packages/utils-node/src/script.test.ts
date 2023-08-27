@@ -45,6 +45,7 @@ describe($new, () => {
       expect(result.value.cause).toMatchInlineSnapshot(`
         {
           "code": 9,
+          "command": "node --yelp",
           "stderr": "",
           "stdout": "node: bad option: --yelp
         ",
