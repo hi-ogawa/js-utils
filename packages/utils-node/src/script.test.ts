@@ -13,7 +13,7 @@ describe("script", () => {
     const $ = $new();
     $._.noTrim = true;
     $._.verbose = true;
-    $._.log = logFn;
+    $._.log = (v) => logFn(v.replace(/^\[.*?\]/, "[...]")); // reduct non-deterministic timestamp
     const output = await $`echo ${"hello"} ${"world"}`;
     expect(output).toMatchInlineSnapshot(`
       "hello world
@@ -22,7 +22,7 @@ describe("script", () => {
     expect(logFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "$ echo hello world",
+          "[...] echo hello world",
         ],
       ]
     `);
