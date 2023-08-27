@@ -2,7 +2,7 @@ import { Buffer } from "node:buffer";
 import {
   type ChildProcess,
   type SpawnOptions,
-  spawn,
+  spawn as childProcessSpawn,
 } from "node:child_process";
 import process from "node:process";
 
@@ -11,23 +11,29 @@ import process from "node:process";
 // https://github.com/sindresorhus/execa/blob/f4b8b3ab601c94d1503f1010822952758dcc6350/docs/scripts.md
 
 type HelperOptions = {
-  noTrim?: boolean;
-  verbose?: boolean;
-  log?: (v: string) => void;
-  spawn?: typeof import("node:child_process").spawn; // it could be for https://github.com/moxystudio/node-cross-spawn
+  noTrim: boolean;
+  verbose: boolean;
+  log: (v: string) => void;
+  // maybe used to override with https://github.com/moxystudio/node-cross-spawn
+  spawn: typeof childProcessSpawn;
 };
 
 export const $ = /* @__PURE__ */ $new();
 
-export function $new(options: SpawnOptions & { _?: HelperOptions } = {}) {
-  let { _: helperOptions = {}, ...spawnOptions } = options;
-
-  const log = helperOptions.log ?? console.error;
-
-  spawnOptions = {
+export function $new(
+  options: SpawnOptions & { _?: Partial<HelperOptions> } = {}
+) {
+  const spawnOptions: SpawnOptions = {
     shell: process.env["SHELL"] || true,
     stdio: ["pipe", "pipe", "pipe"],
-    ...spawnOptions,
+    ...options,
+  };
+  const helperOptions: HelperOptions = {
+    noTrim: false,
+    verbose: false,
+    log: console.error,
+    spawn: childProcessSpawn,
+    ...options._,
   };
 
   return function $(
@@ -39,7 +45,7 @@ export function $new(options: SpawnOptions & { _?: HelperOptions } = {}) {
       command += param + strings[i + 1];
     });
     if (helperOptions.verbose) {
-      log(`$ ${command}`);
+      helperOptions.log(`$ ${command}`);
     }
     return new SpawnPromise(command, spawnOptions, helperOptions);
   };
@@ -56,8 +62,7 @@ class SpawnPromise implements PromiseLike<string> {
     private options: SpawnOptions,
     private helperOptions: HelperOptions
   ) {
-    const spawnImpl = helperOptions.spawn ?? spawn;
-    const child = spawnImpl(this.command, this.options);
+    const child = helperOptions.spawn(this.command, this.options);
     this.child = child;
     this.promise = new Promise<string>((resolve, reject) => {
       child.stdout?.on("data", (raw: unknown) => {
