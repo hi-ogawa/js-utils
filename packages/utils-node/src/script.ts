@@ -31,13 +31,15 @@ export function newScriptHelper(options: {
   const spawnOptions = { ...defaultSpawnOptions, ...options.spawn };
   const helperOptions = options.helper ?? {};
 
-  return function $(strings: TemplateStringsArray, ...params: ScriptParam[]) {
+  function $(strings: TemplateStringsArray, ...params: ScriptParam[]) {
     const command = [zip(strings, params), strings.at(-1)].flat(2).join("");
     if (helperOptions.verbose) {
       console.log("$ ", command);
     }
     return new SpawnPromise(command, spawnOptions, helperOptions);
-  };
+  }
+
+  return $;
 }
 
 class SpawnPromise implements PromiseLike<string> {
