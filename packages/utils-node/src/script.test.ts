@@ -14,7 +14,7 @@ describe("script", () => {
       $: {
         noTrim: true,
         verbose: true,
-        consoleLog: logFn,
+        log: logFn,
       },
     });
     const output = await $`echo ${"hello"} ${"world"}`;
@@ -54,17 +54,26 @@ describe("script", () => {
     });
   });
 
-  it("ChildProcess", async () => {
-    const spawned = $`node -e 'console.log("abc"); console.error("def")'`;
-    expect(await spawned.promise).toMatchInlineSnapshot('"abc"');
-    expect(spawned.stdout).toMatchInlineSnapshot(`
-      "abc
-      "
-    `);
-    expect(spawned.stderr).toMatchInlineSnapshot(`
-      "def
-      "
-    `);
-    expect(spawned.child.exitCode).toMatchInlineSnapshot("0");
+  describe("ChildProcess", () => {
+    it("basic", async () => {
+      const proc = $`node -e 'console.log("abc"); console.error("def")'`;
+      expect(await proc.promise).toMatchInlineSnapshot('"abc"');
+      expect(proc.stdout).toMatchInlineSnapshot(`
+        "abc
+        "
+      `);
+      expect(proc.stderr).toMatchInlineSnapshot(`
+        "def
+        "
+      `);
+      expect(proc.child.exitCode).toMatchInlineSnapshot("0");
+    });
+
+    it("stdin", async () => {
+      const proc = $`node -`;
+      tinyassert(proc.child.stdin);
+      proc.child.stdin.end("console.log(1 + 1)");
+      expect(await proc.promise).toMatchInlineSnapshot('"2"');
+    });
   });
 });

@@ -14,7 +14,7 @@ type ScriptParam = string | number;
 
 const defaultSpawnOptions: SpawnOptions = {
   shell: true,
-  stdio: ["ignore", "pipe", "pipe"],
+  stdio: ["pipe", "pipe", "pipe"],
 };
 
 // TODO
@@ -23,14 +23,14 @@ const defaultSpawnOptions: SpawnOptions = {
 type HelperOptions = {
   noTrim?: boolean;
   verbose?: boolean;
-  consoleLog?: (v: string) => void;
+  log?: (v: string) => void;
 };
 
 export const $ = /* @__PURE__ */ $new();
 
 export function $new(options: SpawnOptions & { $?: HelperOptions } = {}) {
   const { $: helperOptions = {}, ...spawnOptions } = options;
-  const log = helperOptions.consoleLog ?? console.log;
+  const log = helperOptions.log ?? console.error;
 
   return function $(strings: TemplateStringsArray, ...params: ScriptParam[]) {
     let command = strings[0];
@@ -62,9 +62,6 @@ class SpawnPromise implements PromiseLike<string> {
     const child = spawn(this.command, this.options);
     this.child = child;
     this.promise = new Promise<string>((resolve, reject) => {
-      // TODO: support stdin?
-      child.stdin;
-
       child.stdout?.on("data", (raw: unknown) => {
         processOutput(raw, (v) => (this.stdout += v), reject);
       });
