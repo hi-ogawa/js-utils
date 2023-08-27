@@ -41,6 +41,9 @@
       "path": "packages/utils-hattip"
     },
     {
+      "path": "packages/utils-node"
+    },
+    {
       "path": "packages/utils-react"
     }
   ]

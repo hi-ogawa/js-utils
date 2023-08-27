@@ -14,6 +14,12 @@ importers:
       '@hiogawa/isort-ts':
         specifier: 1.1.1
         version: 1.1.1(prettier@2.8.8)(typescript@5.1.6)
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:packages/utils
+      '@hiogawa/utils-node':
+        specifier: workspace:*
+        version: link:packages/utils-node
       '@tsconfig/strictest':
         specifier: ^2.0.1
         version: 2.0.1
@@ -229,6 +235,15 @@ importers:
   packages/utils: {}
 
   packages/utils-hattip: {}
+
+  packages/utils-node:
+    devDependencies:
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@types/node':
+        specifier: ^20.5.6
+        version: 20.5.6
 
   packages/utils-react:
     devDependencies:
@@ -1665,6 +1680,10 @@ packages:
 
   /@types/node@20.4.1:
     resolution: {integrity: sha512-JIzsAvJeA/5iY6Y/OxZbv1lUcc8dNSE77lb2gnBH+/PJ3lFR1Ccvgwl5JWnHAkNHcRsT0TbpVOsiMKZ1F/yyJg==}
+    dev: true
+
+  /@types/node@20.5.6:
+    resolution: {integrity: sha512-Gi5wRGPbbyOTX+4Y2iULQ27oUPrefaB0PxGQJnfyWN3kvEDGM3mIB5M/gQLmitZf7A9FmLeaqxD3L1CXpm3VKQ==}
     dev: true
 
   /@types/normalize-package-data@2.4.1:
