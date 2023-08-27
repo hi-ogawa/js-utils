@@ -11,7 +11,7 @@ describe("script", () => {
   it("helperOptions", async () => {
     const logFn = vi.fn();
     const $ = $new({
-      $: {
+      _: {
         noTrim: true,
         verbose: true,
         log: logFn,

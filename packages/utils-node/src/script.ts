@@ -4,17 +4,11 @@ import {
   type SpawnOptions,
   spawn,
 } from "node:child_process";
+import process from "node:process";
 
 // too simple but maybe useful enough version of
 // https://github.com/google/zx
 // https://github.com/sindresorhus/execa/blob/f4b8b3ab601c94d1503f1010822952758dcc6350/docs/scripts.md
-
-type ScriptParam = string | number;
-
-const defaultSpawnOptions: SpawnOptions = {
-  shell: true,
-  stdio: ["pipe", "pipe", "pipe"],
-};
 
 type HelperOptions = {
   noTrim?: boolean;
@@ -25,11 +19,21 @@ type HelperOptions = {
 
 export const $ = /* @__PURE__ */ $new();
 
-export function $new(options: SpawnOptions & { $?: HelperOptions } = {}) {
-  const { $: helperOptions = {}, ...spawnOptions } = options;
+export function $new(options: SpawnOptions & { _?: HelperOptions } = {}) {
+  let { _: helperOptions = {}, ...spawnOptions } = options;
+
   const log = helperOptions.log ?? console.error;
 
-  return function $(strings: TemplateStringsArray, ...params: ScriptParam[]) {
+  spawnOptions = {
+    shell: process.env["SHELL"] || true,
+    stdio: ["pipe", "pipe", "pipe"],
+    ...spawnOptions,
+  };
+
+  return function $(
+    strings: TemplateStringsArray,
+    ...params: (string | number)[]
+  ) {
     let command = strings[0];
     params.forEach((param, i) => {
       command += param + strings[i + 1];
@@ -37,11 +41,7 @@ export function $new(options: SpawnOptions & { $?: HelperOptions } = {}) {
     if (helperOptions.verbose) {
       log(`$ ${command}`);
     }
-    return new SpawnPromise(
-      command,
-      { ...defaultSpawnOptions, ...spawnOptions },
-      helperOptions
-    );
+    return new SpawnPromise(command, spawnOptions, helperOptions);
   };
 }
 
