@@ -16,13 +16,11 @@ const defaultSpawnOptions: SpawnOptions = {
   stdio: ["pipe", "pipe", "pipe"],
 };
 
-// TODO
-// abstract command escape/parsing and spawn implementation?
-// e.g. for https://github.com/moxystudio/node-cross-spawn
 type HelperOptions = {
   noTrim?: boolean;
   verbose?: boolean;
   log?: (v: string) => void;
+  spawn?: typeof import("node:child_process").spawn; // it could be for https://github.com/moxystudio/node-cross-spawn
 };
 
 export const $ = /* @__PURE__ */ $new();
@@ -58,7 +56,8 @@ class SpawnPromise implements PromiseLike<string> {
     private options: SpawnOptions,
     private helperOptions: HelperOptions
   ) {
-    const child = spawn(this.command, this.options);
+    const spawnImpl = helperOptions.spawn ?? spawn;
+    const child = spawnImpl(this.command, this.options);
     this.child = child;
     this.promise = new Promise<string>((resolve, reject) => {
       child.stdout?.on("data", (raw: unknown) => {
