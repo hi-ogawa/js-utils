@@ -23,6 +23,8 @@ export const $ = /* @__PURE__ */ $new();
 export function $new(
   options: SpawnOptions & { _?: Partial<HelperOptions> } = {}
 ) {
+  // currently there's no special quoting or escaping so it's equivalent to normal string literal template.
+  // for now, limit to `string | number` since that's the same usage.
   function $(strings: TemplateStringsArray, ...params: (string | number)[]) {
     // process options
     const spawnOptions: SpawnOptions = {
