@@ -8,7 +8,7 @@ export async function promptQuestion(query: string): Promise<string> {
   });
   // delegate SIGINT (cf. https://github.com/SBoudrias/Inquirer.js/pull/569)
   rl.once("SIGINT", () => {
-    rl.write("\n"); // tiny aesthetics improvement on Ctrl-C
+    rl.write("\n"); // tiny aesthetics to get next cursor after new line
     process.kill(process.pid, "SIGINT");
   });
   try {
