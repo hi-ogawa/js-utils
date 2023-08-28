@@ -1,6 +1,6 @@
 import process from "node:process";
 import { tinyassert } from "@hiogawa/utils";
-import { $ } from "@hiogawa/utils-node";
+import { $, promptQuestion } from "@hiogawa/utils-node";
 import fs from "node:fs";
 
 // usage:
@@ -16,9 +16,11 @@ async function main() {
   // require no diff to start
   const gitStatus = await $`git status --porcelain`;
   if (gitStatus) {
-    console.error("[ERROR] require clean 'git status'");
-    console.error(gitStatus);
-    process.exit(1);
+    console.log(gitStatus);
+    const input = await promptQuestion(
+      "* proceed regardless of dirty 'git status'? (y/n) "
+    );
+    if (input !== "y") process.exit(1);
   }
 
   // update version
@@ -30,9 +32,14 @@ async function main() {
     JSON.stringify(pakcageJson, null, 2) + "\n"
   );
 
-  // commit
-  await $`git add ${packageDir}/package.json`;
-  await $`git commit -m 'chore: pre release (${pakcageJson.version})'`;
+  // push
+  console.log(await $`git diff ${packageJsonPath}`);
+  const input = await promptQuestion("* proceed to push changes? (y/n) ");
+  if (input !== "y") process.exit(1);
+
+  await $`git add ${packageJsonPath}`;
+  await $`git commit -m 'chore: pre release (${pakcageJson.name}@${pakcageJson.version})'`;
+  await $`git push origin HEAD`;
 }
 
 /**
