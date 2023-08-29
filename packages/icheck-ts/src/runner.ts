@@ -1,11 +1,45 @@
 import fs from "node:fs";
 import path from "node:path";
+import { type ArgSchemaRecord, type TypedArgs, arg } from "@hiogawa/tiny-cli";
 import { DefaultMap, LruCache, hashString, memoize } from "@hiogawa/utils";
 import {
   name as packageName,
   version as packageVersion,
 } from "../package.json";
 import { type ParseOutput, parseImportExport } from "./parser";
+
+export const runnerArgs = {
+  files: arg.stringArray("Typescript files to lint"),
+  cache: arg.boolean("Enable caching"),
+  cacheLocation: arg.string("Cache directory location", {
+    default: `node_modules/.cache/${packageName}/v${packageVersion}`,
+  }),
+  ignore: arg.string("RegExp pattern to ignore export names", {
+    optional: true,
+  }),
+  debug: arg.boolean("Debug output"),
+} satisfies ArgSchemaRecord;
+
+export async function runCommand(args: TypedArgs<typeof runnerArgs>) {
+  const result = run(args.files, { cache: args.cache });
+
+  const ignoreRegExp = args.ignore && new RegExp(args.ignore);
+  const ignoreComment = "icheck-ignore";
+
+  function isUsedExport(e: ExportUsage): boolean {
+    return Boolean(
+      e.used ||
+        (ignoreRegExp && e.name.match(ignoreRegExp)) ||
+        e.comment.includes(ignoreComment)
+    );
+  }
+
+  const unused = [...result.exportUsages]
+    .map(([k, vs]) => [k, vs.filter((v) => !isUsedExport(v))] as const)
+    .filter(([_k, vs]) => vs.length > 0);
+
+  return { result, unused };
+}
 
 interface ImportTarget {
   source: ImportSource;
