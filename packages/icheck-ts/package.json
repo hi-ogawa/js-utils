@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/icheck-ts",
-  "version": "0.0.1-pre.2",
+  "version": "0.0.1-pre.3",
   "type": "module",
   "bin": "./bin/cli.js",
   "files": [
