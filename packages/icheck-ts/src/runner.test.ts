@@ -47,15 +47,6 @@ import * as j from "..";
     expect(result.errors.length).toBe(0);
     expect(result.importUsages).toMatchInlineSnapshot(`
       Map {
-        "dir1/f3.ts" => [
-          {
-            "type": "sideEffect",
-          },
-          {
-            "name": "x3",
-            "type": "named",
-          },
-        ],
         "f2.tsx" => [
           {
             "name": "x2",
@@ -76,6 +67,15 @@ import * as j from "..";
           },
           {
             "type": "namespace",
+          },
+        ],
+        "dir1/f3.ts" => [
+          {
+            "type": "sideEffect",
+          },
+          {
+            "name": "x3",
+            "type": "named",
           },
         ],
         "dir1/index.ts" => [
@@ -101,31 +101,46 @@ import * as j from "..";
         "f1.ts" => [
           {
             "name": "z2",
-            "position": 47,
+            "position": [
+              3,
+              0,
+            ],
             "used": false,
           },
         ],
         "f2.tsx" => [
           {
             "name": "x2",
-            "position": 46,
+            "position": [
+              3,
+              0,
+            ],
             "used": true,
           },
           {
             "name": "x4",
-            "position": 72,
+            "position": [
+              4,
+              0,
+            ],
             "used": true,
           },
           {
             "name": "x4_1",
-            "position": 98,
+            "position": [
+              5,
+              0,
+            ],
             "used": false,
           },
         ],
         "dir1/f3.ts" => [
           {
             "name": "x3",
-            "position": 93,
+            "position": [
+              5,
+              0,
+            ],
             "used": true,
           },
         ],
@@ -134,6 +149,55 @@ import * as j from "..";
     expect(result.importRelations).toMatchInlineSnapshot(`
       Map {
         "f1.ts" => [
+          {
+            "source": {
+              "name": "f2.tsx",
+              "type": "internal",
+            },
+            "usage": {
+              "name": "x2",
+              "type": "named",
+            },
+          },
+          {
+            "source": {
+              "name": "f2.tsx",
+              "type": "internal",
+            },
+            "usage": {
+              "name": "x4",
+              "type": "named",
+            },
+          },
+          {
+            "source": {
+              "name": "f2.tsx",
+              "type": "internal",
+            },
+            "usage": {
+              "name": "x2",
+              "type": "named",
+            },
+          },
+          {
+            "source": {
+              "name": "dir2/f5.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "type": "namespace",
+            },
+          },
+          {
+            "source": {
+              "name": "node:process",
+              "type": "external",
+            },
+            "usage": {
+              "name": "default",
+              "type": "named",
+            },
+          },
           {
             "source": {
               "name": "dir1/f3.ts",
@@ -159,55 +223,6 @@ import * as j from "..";
             },
             "usage": {
               "type": "sideEffect",
-            },
-          },
-          {
-            "source": {
-              "name": "f2.tsx",
-              "type": "internal",
-            },
-            "usage": {
-              "name": "x2",
-              "type": "named",
-            },
-          },
-          {
-            "source": {
-              "name": "f2.tsx",
-              "type": "internal",
-            },
-            "usage": {
-              "name": "x4",
-              "type": "named",
-            },
-          },
-          {
-            "source": {
-              "name": "node:process",
-              "type": "external",
-            },
-            "usage": {
-              "name": "default",
-              "type": "named",
-            },
-          },
-          {
-            "source": {
-              "name": "dir2/f5.ts",
-              "type": "internal",
-            },
-            "usage": {
-              "type": "namespace",
-            },
-          },
-          {
-            "source": {
-              "name": "f2.tsx",
-              "type": "internal",
-            },
-            "usage": {
-              "name": "x2",
-              "type": "named",
             },
           },
         ],

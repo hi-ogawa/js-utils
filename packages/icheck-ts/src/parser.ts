@@ -2,7 +2,7 @@ import { Err, Ok, type Result, tinyassert } from "@hiogawa/utils";
 import ts from "typescript";
 
 //
-// parse AST to collect import/export
+// parse AST to collect and normalize import/export information
 //
 
 export function parseImportExport({
@@ -11,11 +11,11 @@ export function parseImportExport({
 }: {
   code: string;
   jsx: boolean;
-}): Result<ParseOutput, { diagnostics: string[] }> {
+}): Result<ParseOutput2, { diagnostics: string[] }> {
   // access typescript AST via `ts.transpileModule` with custom transformer
   // cf. https://gist.github.com/hi-ogawa/cb338b4765d25321b120b2a47819abcc
 
-  let result: ParseOutput;
+  let result: ParseOutput2;
 
   const transpileOutput = ts.transpileModule(code, {
     compilerOptions: {},
@@ -85,7 +85,7 @@ interface NamedExportInfo {
   position: number;
 }
 
-interface ParseOutput2 {
+export interface ParseOutput2 {
   imports: ParsedImport[];
   exports: ParsedExport[];
 }
@@ -127,7 +127,7 @@ function checkIgnoreComment(node: ts.Node): boolean {
   return trivia.includes(IGNORE_COMMENT);
 }
 
-function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
+function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput2 {
   const result: ParseOutput = {
     bareImports: [],
     namespaceImports: [],
@@ -142,6 +142,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
   };
 
   for (const stmt of node.statements) {
+    // TODO: move logic outside
     if (checkIgnoreComment(stmt)) {
       continue;
     }
@@ -161,7 +162,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
         sideEffect: false,
         reExport: false,
         position: resolvePosition(inputCode, stmt.getStart()),
-        comment: parseComment(node),
+        comment: parseComment(stmt),
       };
       result2.imports.push(parsed);
 
@@ -226,7 +227,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
           sideEffect: false,
           reExport: true,
           position: resolvePosition(inputCode, stmt.getStart()),
-          comment: parseComment(node),
+          comment: parseComment(stmt),
         };
         result2.imports.push(parsed);
 
@@ -267,7 +268,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
       const parsed: ParsedExport = {
         elements: [],
         position: resolvePosition(inputCode, stmt.getStart()),
-        comment: parseComment(node),
+        comment: parseComment(stmt),
       };
       result2.exports.push(parsed);
 
@@ -293,7 +294,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
       result2.exports.push({
         elements: [{ name: "default" }],
         position: resolvePosition(inputCode, stmt.getStart()),
-        comment: parseComment(node),
+        comment: parseComment(stmt),
       });
       continue;
     }
@@ -311,7 +312,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
           result2.exports.push({
             elements: [{ name: decl.name.text }],
             position: resolvePosition(inputCode, stmt.getStart()),
-            comment: parseComment(node),
+            comment: parseComment(stmt),
           });
         }
       }
@@ -334,14 +335,14 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
         result2.exports.push({
           elements: [{ name }],
           position: resolvePosition(inputCode, stmt.getStart()),
-          comment: parseComment(node),
+          comment: parseComment(stmt),
         });
       }
       continue;
     }
   }
 
-  return result;
+  return result2;
 }
 
 function parseComment(node: ts.Node) {

@@ -32,86 +32,245 @@ import "./dep5";
       {
         "ok": true,
         "value": {
-          "bareImports": [
+          "exports": [
             {
-              "position": 525,
-              "source": "./dep5",
+              "comment": "
+      ",
+              "elements": [
+                {
+                  "name": "f4",
+                  "propertyName": "f3",
+                },
+              ],
+              "position": [
+                14,
+                0,
+              ],
+            },
+            {
+              "comment": "
+
+      // export other cases
+      ",
+              "elements": [
+                {
+                  "name": "default",
+                },
+              ],
+              "position": [
+                17,
+                0,
+              ],
+            },
+            {
+              "comment": "
+      ",
+              "elements": [
+                {
+                  "name": "f1",
+                },
+              ],
+              "position": [
+                18,
+                0,
+              ],
+            },
+            {
+              "comment": "
+      ",
+              "elements": [
+                {
+                  "name": "default",
+                },
+              ],
+              "position": [
+                19,
+                0,
+              ],
+            },
+            {
+              "comment": "
+      ",
+              "elements": [
+                {
+                  "name": "f3",
+                },
+              ],
+              "position": [
+                20,
+                0,
+              ],
             },
           ],
-          "namedExports": [
+          "imports": [
             {
-              "name": "f3",
-              "position": 364,
-            },
-            {
-              "name": "default",
-              "position": 399,
-            },
-            {
-              "name": "f1",
-              "position": 437,
-            },
-            {
-              "name": "default",
-              "position": 452,
-            },
-            {
-              "name": "f3",
-              "position": 485,
-            },
-          ],
-          "namedImports": [
-            {
-              "name": "default",
-              "position": 31,
+              "comment": "
+      // import declarations
+      ",
+              "elements": [
+                {
+                  "name": "default",
+                },
+              ],
+              "namespace": false,
+              "position": [
+                3,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": false,
               "source": "./dep1",
             },
             {
-              "name": "d2",
-              "position": 58,
+              "comment": "
+      ",
+              "elements": [
+                {
+                  "name": "d2",
+                  "propertyName": undefined,
+                },
+              ],
+              "namespace": false,
+              "position": [
+                4,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": false,
               "source": "./dep2",
             },
             {
-              "name": "d3",
-              "position": 87,
+              "comment": "
+      ",
+              "elements": [
+                {
+                  "name": "d4",
+                  "propertyName": "d3",
+                },
+              ],
+              "namespace": false,
+              "position": [
+                5,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": false,
               "source": "./dep3",
             },
             {
-              "name": "default",
-              "position": 122,
+              "comment": "
+      ",
+              "elements": [
+                {
+                  "name": "d3_1",
+                  "propertyName": "default",
+                },
+              ],
+              "namespace": false,
+              "position": [
+                6,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": false,
               "source": "./dep3-1",
             },
-          ],
-          "namedReExports": [
             {
-              "name": "r1",
-              "nameBefore": undefined,
-              "position": 220,
+              "comment": "
+      ",
+              "elements": [],
+              "namespace": true,
+              "position": [
+                7,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": false,
+              "source": "./dep4",
+            },
+            {
+              "comment": "
+
+      // export declarations
+      ",
+              "elements": [
+                {
+                  "name": "r1",
+                  "propertyName": undefined,
+                },
+              ],
+              "namespace": false,
+              "position": [
+                10,
+                0,
+              ],
+              "reExport": true,
+              "sideEffect": false,
               "source": "./re-dep1",
             },
             {
-              "name": "r3",
-              "nameBefore": "r2",
-              "position": 252,
+              "comment": "
+      ",
+              "elements": [
+                {
+                  "name": "r3",
+                  "propertyName": "r2",
+                },
+              ],
+              "namespace": false,
+              "position": [
+                11,
+                0,
+              ],
+              "reExport": true,
+              "sideEffect": false,
               "source": "./re-dep2",
             },
             {
-              "name": "r2_1",
-              "nameBefore": "default",
-              "position": 290,
+              "comment": "
+      ",
+              "elements": [
+                {
+                  "name": "r2_1",
+                  "propertyName": "default",
+                },
+              ],
+              "namespace": false,
+              "position": [
+                12,
+                0,
+              ],
+              "reExport": true,
+              "sideEffect": false,
               "source": "./re-dep2-1",
             },
-          ],
-          "namespaceImports": [
             {
-              "position": 164,
-              "source": "./dep4",
-            },
-          ],
-          "namespaceReExports": [
-            {
-              "position": 328,
+              "comment": "
+      ",
+              "elements": [],
+              "namespace": true,
+              "position": [
+                13,
+                0,
+              ],
+              "reExport": true,
+              "sideEffect": false,
               "source": "./re-dep3",
+            },
+            {
+              "comment": "
+
+      // more cases
+      ",
+              "elements": [],
+              "namespace": false,
+              "position": [
+                23,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": true,
+              "source": "./dep5",
             },
           ],
         },
@@ -137,21 +296,36 @@ export default {};
       {
         "ok": true,
         "value": {
-          "bareImports": [],
-          "namedExports": [
+          "exports": [
             {
-              "name": "yes1",
-              "position": 14,
+              "comment": "
+      ",
+              "elements": [
+                {
+                  "name": "yes1",
+                },
+              ],
+              "position": [
+                2,
+                0,
+              ],
             },
             {
-              "name": "yes2",
-              "position": 64,
+              "comment": "
+
+      ",
+              "elements": [
+                {
+                  "name": "yes2",
+                },
+              ],
+              "position": [
+                6,
+                0,
+              ],
             },
           ],
-          "namedImports": [],
-          "namedReExports": [],
-          "namespaceImports": [],
-          "namespaceReExports": [],
+          "imports": [],
         },
       }
     `);

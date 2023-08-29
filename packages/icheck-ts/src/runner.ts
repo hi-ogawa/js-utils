@@ -5,7 +5,7 @@ import {
   name as packageName,
   version as packageVersion,
 } from "../package.json";
-import { type ParseOutput, parseImportExport } from "./parser";
+import { type ParseOutput2, parseImportExport } from "./parser";
 
 type Fs = typeof import("node:fs");
 
@@ -42,7 +42,8 @@ type ModuleUsage =
 type ModuleExportUsage = {
   name: string;
   used: boolean;
-  position: number;
+  position: [number, number];
+  comment: string;
 };
 
 export function run(
@@ -51,7 +52,7 @@ export function run(
 ) {
   const fs = options?.fs ?? nodeFs;
 
-  const entries: { file: string; parseOutput: ParseOutput }[] = [];
+  const entries: { file: string; parseOutput: ParseOutput2 }[] = [];
   const errors: { file: string; error: unknown }[] = [];
 
   // normalize relative path (e.g. "./x.ts" => "x.ts")
@@ -88,49 +89,64 @@ export function run(
   const importRelations = new DefaultMap<string, ImportTarget[]>(() => []);
 
   for (const entry of entries) {
-    // TODO: cache resolveImportSource?
-    for (const e of entry.parseOutput.bareImports) {
-      importRelations.get(entry.file).push({
-        source: resolveImportSource(entry.file, e.source, fs),
-        usage: {
-          type: "sideEffect",
-        },
-      });
+    for (const e of entry.parseOutput.imports) {
+      const usages: ModuleUsage[] = [];
+      if (e.sideEffect) {
+        usages.push({ type: "sideEffect" });
+      }
+      if (e.namespace) {
+        usages.push({ type: "namespace" });
+      }
+      for (const el of e.elements) {
+        usages.push({ type: "named", name: el.propertyName ?? el.name });
+      }
+      const source = resolveImportSource(entry.file, e.source, fs);
+      importRelations
+        .get(entry.file)
+        .push(...usages.map((usage) => ({ source, usage })));
     }
-    for (const e of entry.parseOutput.namedImports) {
-      importRelations.get(entry.file).push({
-        source: resolveImportSource(entry.file, e.source, fs),
-        usage: {
-          type: "named",
-          name: e.name,
-        },
-      });
-    }
-    for (const e of entry.parseOutput.namespaceImports) {
-      importRelations.get(entry.file).push({
-        source: resolveImportSource(entry.file, e.source, fs),
-        usage: {
-          type: "namespace",
-        },
-      });
-    }
-    for (const e of entry.parseOutput.namedReExports) {
-      importRelations.get(entry.file).push({
-        source: resolveImportSource(entry.file, e.source, fs),
-        usage: {
-          type: "named",
-          name: e.nameBefore ?? e.name,
-        },
-      });
-    }
-    for (const e of entry.parseOutput.namespaceReExports) {
-      importRelations.get(entry.file).push({
-        source: resolveImportSource(entry.file, e.source, fs),
-        usage: {
-          type: "namespace",
-        },
-      });
-    }
+    // for (const e of entry.parseOutput.bareImports) {
+    //   importRelations.get(entry.file).push({
+    //     source: resolveImportSource(entry.file, e.source, fs),
+    //     usage: {
+    //       type: "sideEffect",
+    //     },
+    //   });
+    // }
+    // for (const e of entry.parseOutput.namedImports) {
+    //   importRelations.get(entry.file).push({
+    //     source: resolveImportSource(entry.file, e.source, fs),
+    //     usage: {
+    //       type: "named",
+    //       name: e.name,
+    //     },
+    //   });
+    // }
+    // for (const e of entry.parseOutput.namespaceImports) {
+    //   importRelations.get(entry.file).push({
+    //     source: resolveImportSource(entry.file, e.source, fs),
+    //     usage: {
+    //       type: "namespace",
+    //     },
+    //   });
+    // }
+    // for (const e of entry.parseOutput.namedReExports) {
+    //   importRelations.get(entry.file).push({
+    //     source: resolveImportSource(entry.file, e.source, fs),
+    //     usage: {
+    //       type: "named",
+    //       name: e.nameBefore ?? e.name,
+    //     },
+    //   });
+    // }
+    // for (const e of entry.parseOutput.namespaceReExports) {
+    //   importRelations.get(entry.file).push({
+    //     source: resolveImportSource(entry.file, e.source, fs),
+    //     usage: {
+    //       type: "namespace",
+    //     },
+    //   });
+    // }
   }
 
   //
@@ -165,20 +181,45 @@ export function run(
     // TODO: resolve re-export chain?
     // entry.parseOutput.namespaceReExports
 
-    for (const e of entry.parseOutput.namedReExports) {
-      exportUsages.get(entry.file).push({
-        name: e.name,
-        used: isUsedExport(entry.file, e.name),
-        position: e.position,
-      });
+    for (const e of entry.parseOutput.imports.filter((e) => e.reExport)) {
+      // TODO: need to resolve re-export chain
+      // e.namespace;
+
+      for (const el of e.elements) {
+        exportUsages.get(entry.file).push({
+          name: el.name,
+          used: isUsedExport(entry.file, el.name),
+          position: e.position,
+          comment: e.comment,
+        });
+      }
     }
-    for (const e of entry.parseOutput.namedExports) {
-      exportUsages.get(entry.file).push({
-        name: e.name,
-        used: isUsedExport(entry.file, e.name),
-        position: e.position,
-      });
+
+    for (const e of entry.parseOutput.exports) {
+      for (const el of e.elements) {
+        exportUsages.get(entry.file).push({
+          name: el.name,
+          used: isUsedExport(entry.file, el.name),
+          position: e.position,
+          comment: e.comment,
+        });
+      }
     }
+
+    // for (const e of entry.parseOutput.namedReExports) {
+    //   exportUsages.get(entry.file).push({
+    //     name: e.name,
+    //     used: isUsedExport(entry.file, e.name),
+    //     position: e.position,
+    //   });
+    // }
+    // for (const e of entry.parseOutput.namedExports) {
+    //   exportUsages.get(entry.file).push({
+    //     name: e.name,
+    //     used: isUsedExport(entry.file, e.name),
+    //     position: e.position,
+    //   });
+    // }
   }
 
   return {
@@ -199,6 +240,8 @@ export function resolveImportSource(
   source: string,
   fs: Fs
 ): ModuleSource {
+  // TODO: memoize fs check?
+
   //
   // poor-man's module path resolusion
   //
