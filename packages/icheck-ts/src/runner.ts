@@ -9,9 +9,6 @@ import { type ParseOutput, parseImportExport } from "./parser";
 
 type Fs = typeof import("node:fs");
 
-// TODO: rework structure
-
-// TODO: track code position for error message
 interface ImportTarget {
   source: ImportSource;
   usage: ImportUsage;
@@ -46,6 +43,9 @@ export type ExportUsage = {
   comment: string;
 };
 
+// 1. parse files
+// 2. resolve import source
+// 3. check unused exports
 export function run(
   inputFiles: string[],
   options?: { fs?: Fs; cache?: boolean }
@@ -85,7 +85,7 @@ export function run(
   // resolve import module
   //
 
-  // as adjacency list
+  // import graph as adjacency list
   const importRelations = new DefaultMap<string, ImportTarget[]>(() => []);
 
   for (const entry of entries) {
@@ -136,9 +136,6 @@ export function run(
   const exportUsages = new DefaultMap<string, ExportUsage[]>(() => []);
 
   for (const entry of entries) {
-    // TODO: resolve re-export chain?
-    // entry.parseOutput.namespaceReExports
-
     for (const e of entry.parseOutput.imports.filter((e) => e.reExport)) {
       // TODO: need to resolve re-export chain
       // e.namespace;
