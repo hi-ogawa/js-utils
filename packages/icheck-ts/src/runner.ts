@@ -1,4 +1,4 @@
-import nodeFs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
 import { DefaultMap, LruCache, hashString, memoize } from "@hiogawa/utils";
 import {
@@ -6,8 +6,6 @@ import {
   version as packageVersion,
 } from "../package.json";
 import { type ParseOutput, parseImportExport } from "./parser";
-
-type Fs = typeof import("node:fs");
 
 interface ImportTarget {
   source: ImportSource;
@@ -46,12 +44,7 @@ export type ExportUsage = {
 // 1. parse files
 // 2. resolve import source
 // 3. check unused exports
-export function run(
-  inputFiles: string[],
-  options?: { fs?: Fs; cache?: boolean }
-) {
-  const fs = options?.fs ?? nodeFs;
-
+export function run(inputFiles: string[], options?: { cache?: boolean }) {
   const entries: { file: string; parseOutput: ParseOutput }[] = [];
   const errors: { file: string; error: unknown }[] = [];
 
@@ -100,7 +93,7 @@ export function run(
       for (const el of e.bindings) {
         usages.push({ type: "named", name: el.nameBefore ?? el.name });
       }
-      const source = resolveImportSource(entry.file, e.source, fs);
+      const source = resolveImportSource(entry.file, e.source);
       importRelations
         .get(entry.file)
         .push(...usages.map((usage) => ({ source, usage })));
@@ -177,8 +170,7 @@ export function run(
 // https://www.typescriptlang.org/tsconfig#moduleResolution
 export function resolveImportSource(
   containingFile: string,
-  source: string,
-  fs: Fs
+  source: string
 ): ImportSource {
   // TODO: memoize fs check?
 
@@ -237,7 +229,6 @@ const CACHE_FILE = `node_modules/.cache/${packageName}/v${packageVersion}/parseI
 const CACHE_SIZE = 1000_000;
 
 function createCachedParser() {
-  const fs = nodeFs;
   const cache = new LruCache<string, any>(CACHE_SIZE);
 
   function load() {

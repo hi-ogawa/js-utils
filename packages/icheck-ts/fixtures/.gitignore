@@ -1,1 +1,3 @@
-ytsub-v3
+*
+!.gitignore
+!README.md
