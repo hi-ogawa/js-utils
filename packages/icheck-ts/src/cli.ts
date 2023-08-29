@@ -1,9 +1,13 @@
+import fs from "node:fs";
+import path from "node:path";
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
+import { LruCache, hashString, memoize } from "@hiogawa/utils";
 import {
   name as packageName,
   version as packageVersion,
 } from "../package.json";
+import { parseImportExport } from "./parser";
 import { type ExportUsage, run } from "./runner";
 
 const command = new TinyCliCommand(
@@ -17,13 +21,21 @@ const command = new TinyCliCommand(
       cacheLocation: arg.string("Cache directory location", {
         default: `node_modules/.cache/${packageName}/v${packageVersion}`,
       }),
+      cacheSize: arg.number("LRU cache size", { default: 1000_000 }),
       ignore: arg.string("RegExp pattern to ignore export names", {
         optional: true,
       }),
     },
   },
   async ({ args }) => {
-    const result = run(args.files, { cache: args.cache });
+    const [parse, cache] = memoizeOnFile(parseImportExport, {
+      disabled: !args.cache,
+      maxSize: args.cacheSize,
+      file: args.cacheLocation,
+    });
+    cache.load();
+    const result = run(args.files, { parse });
+    cache.save();
 
     // apply extra unused rules
     const ignoreRegExp = args.ignore && new RegExp(args.ignore);
@@ -62,6 +74,42 @@ const command = new TinyCliCommand(
     }
   }
 );
+
+//
+// cache
+//
+
+// TOOD: to utils?
+export function memoizeOnFile<F extends (...args: any[]) => any>(
+  f: F,
+  options: { disabled?: boolean; file: string; maxSize: number }
+) {
+  if (options.disabled) {
+    return [f, { load: () => {}, save: () => {} }] as const;
+  }
+
+  const cache = new LruCache<string, any>(options.maxSize);
+
+  function load() {
+    if (fs.existsSync(options.file)) {
+      const data = JSON.parse(fs.readFileSync(options.file, "utf-8"));
+      cache._map = new Map(data);
+    }
+  }
+
+  function save() {
+    const data = JSON.stringify([...cache._map.entries()]);
+    fs.mkdirSync(path.dirname(options.file), { recursive: true });
+    fs.writeFileSync(options.file, data);
+  }
+
+  const memoized = memoize(f, {
+    keyFn: (...arg) => hashString(JSON.stringify(arg)),
+    cache,
+  });
+
+  return [memoized, { load, save }] as const;
+}
 
 //
 // main

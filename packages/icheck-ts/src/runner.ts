@@ -1,10 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { DefaultMap, LruCache, hashString, memoize } from "@hiogawa/utils";
-import {
-  name as packageName,
-  version as packageVersion,
-} from "../package.json";
+import { DefaultMap } from "@hiogawa/utils";
 import { type ParseOutput, parseImportExport } from "./parser";
 
 interface ImportTarget {
@@ -44,7 +40,10 @@ export type ExportUsage = {
 // 1. parse files
 // 2. resolve import source
 // 3. check unused exports
-export function run(inputFiles: string[], options?: { cache?: boolean }) {
+export function run(
+  inputFiles: string[],
+  options?: { parse?: typeof parseImportExport }
+) {
   // normalize relative path to match with `resolveImportSource` (e.g. "./x.ts" => "x.ts")
   inputFiles = inputFiles.map((f) => path.normalize(f));
 
@@ -53,11 +52,7 @@ export function run(inputFiles: string[], options?: { cache?: boolean }) {
   //
   const parsedFiles = new Map<string, ParseOutput>();
   const errors = new Map<string, unknown>();
-
-  const cachedParser = options?.cache ? createCachedParser() : undefined;
-  let parse = cachedParser?.parse ?? parseImportExport;
-  cachedParser?.load();
-
+  const parse = options?.parse ?? parseImportExport;
   for (const file of inputFiles) {
     const code = fs.readFileSync(file, "utf-8");
     const jsx = file.endsWith("x");
@@ -68,7 +63,6 @@ export function run(inputFiles: string[], options?: { cache?: boolean }) {
     }
     parsedFiles.set(file, result.value);
   }
-  cachedParser?.save();
 
   //
   // resolve import module
@@ -214,36 +208,4 @@ export function resolveImportSource(
         type: "unknown",
         name: source,
       };
-}
-
-//
-// cache (TODO: move this logic to cli.ts)
-//
-
-// configurable?
-const CACHE_FILE = `node_modules/.cache/${packageName}/v${packageVersion}/parseImportExport`;
-const CACHE_SIZE = 1000_000;
-
-function createCachedParser() {
-  const cache = new LruCache<string, any>(CACHE_SIZE);
-
-  function load() {
-    if (fs.existsSync(CACHE_FILE)) {
-      const data = JSON.parse(fs.readFileSync(CACHE_FILE, "utf-8"));
-      cache._map = new Map(data);
-    }
-  }
-
-  function save() {
-    const data = JSON.stringify([...cache._map.entries()]);
-    fs.mkdirSync(path.dirname(CACHE_FILE), { recursive: true });
-    fs.writeFileSync(CACHE_FILE, data);
-  }
-
-  const parse = memoize(parseImportExport, {
-    keyFn: (arg) => hashString(JSON.stringify(arg)),
-    cache,
-  });
-
-  return { parse, load, save };
 }
