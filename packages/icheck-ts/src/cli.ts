@@ -42,9 +42,9 @@ const command = new TinyCliCommand(
       .filter(([_k, vs]) => vs.length > 0);
 
     // parse error
-    if (result.errors.length > 0) {
+    if (result.errors.size > 0) {
       console.log("** Parse errors **");
-      for (const { file, error } of result.errors) {
+      for (const [file, error] of result.errors) {
         console.log(file, error);
       }
       process.exitCode = 1;

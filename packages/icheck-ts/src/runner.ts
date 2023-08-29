@@ -45,32 +45,28 @@ export type ExportUsage = {
 // 2. resolve import source
 // 3. check unused exports
 export function run(inputFiles: string[], options?: { cache?: boolean }) {
-  const entries: { file: string; parseOutput: ParseOutput }[] = [];
-  const errors: { file: string; error: unknown }[] = [];
-
   // normalize relative path to match with `resolveImportSource` (e.g. "./x.ts" => "x.ts")
   inputFiles = inputFiles.map((f) => path.normalize(f));
-
-  const cachedParser = options?.cache ? createCachedParser() : undefined;
-  let parse = cachedParser?.parse ?? parseImportExport;
-  cachedParser?.load();
 
   //
   // extract import/export
   //
+  const parsedFiles = new Map<string, ParseOutput>();
+  const errors = new Map<string, unknown>();
+
+  const cachedParser = options?.cache ? createCachedParser() : undefined;
+  let parse = cachedParser?.parse ?? parseImportExport;
+  cachedParser?.load();
 
   for (const file of inputFiles) {
     const code = fs.readFileSync(file, "utf-8");
     const jsx = file.endsWith("x");
     const result = parse({ code, jsx });
     if (!result.ok) {
-      errors.push({ file, error: result.value });
+      errors.set(file, result.value);
       continue;
     }
-    entries.push({
-      file,
-      parseOutput: result.value,
-    });
+    parsedFiles.set(file, result.value);
   }
   cachedParser?.save();
 
@@ -81,8 +77,8 @@ export function run(inputFiles: string[], options?: { cache?: boolean }) {
   // import graph as adjacency list
   const importRelations = new DefaultMap<string, ImportTarget[]>(() => []);
 
-  for (const entry of entries) {
-    for (const e of entry.parseOutput.imports) {
+  for (const [file, parseOutput] of parsedFiles) {
+    for (const e of parseOutput.imports) {
       const usages: ImportUsage[] = [];
       if (e.sideEffect) {
         usages.push({ type: "sideEffect" });
@@ -93,9 +89,9 @@ export function run(inputFiles: string[], options?: { cache?: boolean }) {
       for (const el of e.bindings) {
         usages.push({ type: "named", name: el.nameBefore ?? el.name });
       }
-      const source = resolveImportSource(entry.file, e.source);
+      const source = resolveImportSource(file, e.source);
       importRelations
-        .get(entry.file)
+        .get(file)
         .push(...usages.map((usage) => ({ source, usage })));
     }
   }
@@ -128,26 +124,26 @@ export function run(inputFiles: string[], options?: { cache?: boolean }) {
   //
   const exportUsages = new DefaultMap<string, ExportUsage[]>(() => []);
 
-  for (const entry of entries) {
-    for (const e of entry.parseOutput.imports.filter((e) => e.reExport)) {
+  for (const [file, parseOutput] of parsedFiles) {
+    for (const e of parseOutput.imports.filter((e) => e.reExport)) {
       // TODO: need to resolve re-export chain
       // e.namespace;
 
       for (const el of e.bindings) {
-        exportUsages.get(entry.file).push({
+        exportUsages.get(file).push({
           name: el.name,
-          used: isUsedExport(entry.file, el.name),
+          used: isUsedExport(file, el.name),
           position: e.position,
           comment: e.comment,
         });
       }
     }
 
-    for (const e of entry.parseOutput.exports) {
+    for (const e of parseOutput.exports) {
       for (const el of e.bindings) {
-        exportUsages.get(entry.file).push({
+        exportUsages.get(file).push({
           name: el.name,
-          used: isUsedExport(entry.file, el.name),
+          used: isUsedExport(file, el.name),
           position: e.position,
           comment: e.comment,
         });
@@ -156,7 +152,7 @@ export function run(inputFiles: string[], options?: { cache?: boolean }) {
   }
 
   return {
-    entries,
+    parsedFiles,
     errors,
     importRelations,
     importUsages,

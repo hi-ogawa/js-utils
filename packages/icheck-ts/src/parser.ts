@@ -11,7 +11,7 @@ export function parseImportExport({
 }: {
   code: string;
   jsx: boolean;
-}): Result<ParseOutput, { diagnostics: string[] }> {
+}): Result<ParseOutput, ParseErrorInfo> {
   // access typescript AST via `ts.transpileModule` with custom transformer
   // cf. https://gist.github.com/hi-ogawa/cb338b4765d25321b120b2a47819abcc
 
@@ -40,6 +40,10 @@ export function parseImportExport({
 
   tinyassert(result!);
   return Ok(result);
+}
+
+interface ParseErrorInfo {
+  diagnostics: string[];
 }
 
 export interface ParseOutput {
