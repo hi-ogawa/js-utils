@@ -1,7 +1,7 @@
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
 import { version as packageVersion } from "../package.json";
-import { run } from "./runner";
+import { type ExportUsage, run } from "./runner";
 
 const command = new TinyCliCommand(
   {
@@ -32,23 +32,19 @@ const command = new TinyCliCommand(
       process.exitCode = 1;
     }
 
-    const ignoreRe = args.ignore && new RegExp(args.ignore);
+    const ignoreRegExp = args.ignore && new RegExp(args.ignore);
+    const ignoreComment = "icheck-ignore";
+
+    function isUsedExport(e: ExportUsage): boolean {
+      return Boolean(
+        e.used ||
+          (ignoreRegExp && e.name.match(ignoreRegExp)) ||
+          e.comment.includes(ignoreComment)
+      );
+    }
+
     const unused = [...result.exportUsages]
-      .map(
-        ([k, vs]) =>
-          [
-            k,
-            vs.filter(
-              (v) =>
-                !v.used &&
-                !(
-                  ignoreRe &&
-                  v.name.match(ignoreRe) &&
-                  !v.comment.includes(IGNORE_COMMENT)
-                )
-            ),
-          ] as const
-      )
+      .map(([k, vs]) => [k, vs.filter((v) => !isUsedExport(v))] as const)
       .filter(([_k, vs]) => vs.length > 0);
 
     if (unused.length > 0) {
@@ -62,7 +58,5 @@ const command = new TinyCliCommand(
     }
   }
 );
-
-const IGNORE_COMMENT = "icheck-ignore";
 
 tinyCliMain(command);

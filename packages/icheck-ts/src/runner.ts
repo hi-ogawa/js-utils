@@ -39,7 +39,7 @@ type ImportUsage =
       type: "sideEffect";
     };
 
-type ExportUsage = {
+export type ExportUsage = {
   name: string;
   used: boolean;
   position: [number, number];
