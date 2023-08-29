@@ -5,7 +5,7 @@ import {
   name as packageName,
   version as packageVersion,
 } from "../package.json";
-import { type ParseOutput2, parseImportExport } from "./parser";
+import { type ParseOutput, parseImportExport } from "./parser";
 
 type Fs = typeof import("node:fs");
 
@@ -13,16 +13,16 @@ type Fs = typeof import("node:fs");
 
 // TODO: track code position for error message
 interface ImportTarget {
-  source: ModuleSource;
-  usage: ModuleUsage;
+  source: ImportSource;
+  usage: ImportUsage;
 }
 
-type ModuleSource = {
+type ImportSource = {
   type: "external" | "internal" | "unknown";
   name: string; // resolved file path if "internal"
 };
 
-type ModuleUsage =
+type ImportUsage =
   | {
       // import { x as y } from "a"
       // export { x as y } from "a"
@@ -39,7 +39,7 @@ type ModuleUsage =
       type: "sideEffect";
     };
 
-type ModuleExportUsage = {
+type ExportUsage = {
   name: string;
   used: boolean;
   position: [number, number];
@@ -52,7 +52,7 @@ export function run(
 ) {
   const fs = options?.fs ?? nodeFs;
 
-  const entries: { file: string; parseOutput: ParseOutput2 }[] = [];
+  const entries: { file: string; parseOutput: ParseOutput }[] = [];
   const errors: { file: string; error: unknown }[] = [];
 
   // normalize relative path (e.g. "./x.ts" => "x.ts")
@@ -90,7 +90,7 @@ export function run(
 
   for (const entry of entries) {
     for (const e of entry.parseOutput.imports) {
-      const usages: ModuleUsage[] = [];
+      const usages: ImportUsage[] = [];
       if (e.sideEffect) {
         usages.push({ type: "sideEffect" });
       }
@@ -105,55 +105,13 @@ export function run(
         .get(entry.file)
         .push(...usages.map((usage) => ({ source, usage })));
     }
-    // for (const e of entry.parseOutput.bareImports) {
-    //   importRelations.get(entry.file).push({
-    //     source: resolveImportSource(entry.file, e.source, fs),
-    //     usage: {
-    //       type: "sideEffect",
-    //     },
-    //   });
-    // }
-    // for (const e of entry.parseOutput.namedImports) {
-    //   importRelations.get(entry.file).push({
-    //     source: resolveImportSource(entry.file, e.source, fs),
-    //     usage: {
-    //       type: "named",
-    //       name: e.name,
-    //     },
-    //   });
-    // }
-    // for (const e of entry.parseOutput.namespaceImports) {
-    //   importRelations.get(entry.file).push({
-    //     source: resolveImportSource(entry.file, e.source, fs),
-    //     usage: {
-    //       type: "namespace",
-    //     },
-    //   });
-    // }
-    // for (const e of entry.parseOutput.namedReExports) {
-    //   importRelations.get(entry.file).push({
-    //     source: resolveImportSource(entry.file, e.source, fs),
-    //     usage: {
-    //       type: "named",
-    //       name: e.nameBefore ?? e.name,
-    //     },
-    //   });
-    // }
-    // for (const e of entry.parseOutput.namespaceReExports) {
-    //   importRelations.get(entry.file).push({
-    //     source: resolveImportSource(entry.file, e.source, fs),
-    //     usage: {
-    //       type: "namespace",
-    //     },
-    //   });
-    // }
   }
 
   //
   // collect internal import usages
   //
 
-  const importUsages = new DefaultMap<string, ModuleUsage[]>(() => []);
+  const importUsages = new DefaultMap<string, ImportUsage[]>(() => []);
   for (const target of [...importRelations.values()].flat()) {
     if (target.source.type === "internal") {
       importUsages.get(target.source.name).push(target.usage);
@@ -175,7 +133,7 @@ export function run(
   //
   // resolve export usages
   //
-  const exportUsages = new DefaultMap<string, ModuleExportUsage[]>(() => []);
+  const exportUsages = new DefaultMap<string, ExportUsage[]>(() => []);
 
   for (const entry of entries) {
     // TODO: resolve re-export chain?
@@ -205,21 +163,6 @@ export function run(
         });
       }
     }
-
-    // for (const e of entry.parseOutput.namedReExports) {
-    //   exportUsages.get(entry.file).push({
-    //     name: e.name,
-    //     used: isUsedExport(entry.file, e.name),
-    //     position: e.position,
-    //   });
-    // }
-    // for (const e of entry.parseOutput.namedExports) {
-    //   exportUsages.get(entry.file).push({
-    //     name: e.name,
-    //     used: isUsedExport(entry.file, e.name),
-    //     position: e.position,
-    //   });
-    // }
   }
 
   return {
@@ -239,7 +182,7 @@ export function resolveImportSource(
   containingFile: string,
   source: string,
   fs: Fs
-): ModuleSource {
+): ImportSource {
   // TODO: memoize fs check?
 
   //

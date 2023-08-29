@@ -11,11 +11,11 @@ export function parseImportExport({
 }: {
   code: string;
   jsx: boolean;
-}): Result<ParseOutput2, { diagnostics: string[] }> {
+}): Result<ParseOutput, { diagnostics: string[] }> {
   // access typescript AST via `ts.transpileModule` with custom transformer
   // cf. https://gist.github.com/hi-ogawa/cb338b4765d25321b120b2a47819abcc
 
-  let result: ParseOutput2;
+  let result: ParseOutput;
 
   const transpileOutput = ts.transpileModule(code, {
     compilerOptions: {},
@@ -42,50 +42,7 @@ export function parseImportExport({
   return Ok(result);
 }
 
-// TODO: rework structure
 export interface ParseOutput {
-  bareImports: BareImportInfo[];
-  namespaceImports: NamespaceImportInfo[];
-  namedImports: NamedImportInfo[];
-  namespaceReExports: NamespaceReExportInfo[];
-  namedReExports: NamedReExportInfo[];
-  namedExports: NamedExportInfo[];
-}
-
-interface BareImportInfo {
-  source: string;
-  position: number;
-}
-
-interface NamespaceImportInfo {
-  source: string;
-  position: number;
-}
-
-interface NamedImportInfo {
-  source: string;
-  name: string;
-  position: number;
-}
-
-interface NamespaceReExportInfo {
-  source: string;
-  position: number;
-}
-
-interface NamedReExportInfo {
-  source: string;
-  name: string;
-  nameBefore?: string;
-  position: number;
-}
-
-interface NamedExportInfo {
-  name: string;
-  position: number;
-}
-
-export interface ParseOutput2 {
   imports: ParsedImport[];
   exports: ParsedExport[];
 }
@@ -119,34 +76,13 @@ interface ParsedBase {
   comment: string; // aka. leading trivial (used for custom ignore comment)
 }
 
-// TODO: configurable?
-const IGNORE_COMMENT = "icheck-ignore";
-
-function checkIgnoreComment(node: ts.Node): boolean {
-  const trivia = node.getFullText().slice(0, node.getLeadingTriviaWidth());
-  return trivia.includes(IGNORE_COMMENT);
-}
-
-function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput2 {
-  const result: ParseOutput = {
-    bareImports: [],
-    namespaceImports: [],
-    namedImports: [],
-    namespaceReExports: [],
-    namedReExports: [],
-    namedExports: [],
-  };
-  const result2: ParseOutput2 = {
+function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
+  const result2: ParseOutput = {
     imports: [],
     exports: [],
   };
 
   for (const stmt of node.statements) {
-    // TODO: move logic outside
-    if (checkIgnoreComment(stmt)) {
-      continue;
-    }
-
     // import d1 from "./dep1";
     // import { d2 } from "./dep2";
     // import { d3 as d4 } from "./dep3";
@@ -170,22 +106,12 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput2 {
         // import d1 from "./dep1";
         if (stmt.importClause.name) {
           parsed.elements.push({ name: "default" });
-          result.namedImports.push({
-            source,
-            name: "default",
-            position: stmt.importClause.getStart(),
-          });
         }
         if (stmt.importClause.namedBindings) {
           // import { d2 } from "./dep2";
           // import { d3 as d4 } from "./dep3";
           if (ts.isNamedImports(stmt.importClause.namedBindings)) {
             for (const e of stmt.importClause.namedBindings.elements) {
-              result.namedImports.push({
-                source,
-                name: e.propertyName?.text ?? e.name.text,
-                position: e.getStart(),
-              });
               parsed.elements.push({
                 name: e.name.text,
                 propertyName: e.propertyName?.text,
@@ -195,18 +121,10 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput2 {
           // import * as d5 from "./dep4";
           if (ts.isNamespaceImport(stmt.importClause.namedBindings)) {
             parsed.namespace = true;
-            result.namespaceImports.push({
-              source,
-              position: stmt.importClause.getStart(),
-            });
           }
         }
       } else {
         parsed.sideEffect = true;
-        result.bareImports.push({
-          source,
-          position: stmt.getStart(),
-        });
       }
       continue;
     }
@@ -236,12 +154,6 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput2 {
           // export { r2 as r3 } from "./re-dep2";
           tinyassert(ts.isNamedExports(stmt.exportClause));
           for (const e of stmt.exportClause.elements) {
-            result.namedReExports.push({
-              source,
-              name: e.name.text,
-              nameBefore: e.propertyName?.text,
-              position: e.getStart(),
-            });
             parsed.elements.push({
               name: e.name.text,
               propertyName: e.propertyName?.text,
@@ -252,10 +164,6 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput2 {
         // export * from "./re-dep1";
         // (for namespace re-export, it seems `exportClause` becomes `undefined` instead of `NamespaceExport`)
         if (!stmt.exportClause) {
-          result.namespaceReExports.push({
-            source,
-            position: stmt.getStart(),
-          });
           parsed.namespace = true;
         }
         continue;
@@ -273,10 +181,6 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput2 {
       result2.exports.push(parsed);
 
       for (const e of stmt.exportClause.elements) {
-        result.namedExports.push({
-          name: e.propertyName?.text ?? e.name.text,
-          position: e.getStart(),
-        });
         parsed.elements.push({
           name: e.name.text,
           propertyName: e.propertyName?.text,
@@ -287,10 +191,6 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput2 {
 
     // export default () => {}
     if (ts.isExportAssignment(stmt)) {
-      result.namedExports.push({
-        name: "default",
-        position: stmt.getStart(),
-      });
       result2.exports.push({
         elements: [{ name: "default" }],
         position: resolvePosition(inputCode, stmt.getStart()),
@@ -305,10 +205,6 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput2 {
       if (modifiers && modifiers.includes(ts.SyntaxKind.ExportKeyword)) {
         for (const decl of stmt.declarationList.declarations) {
           tinyassert(ts.isIdentifier(decl.name));
-          result.namedExports.push({
-            name: decl.name.text,
-            position: decl.getStart(),
-          });
           result2.exports.push({
             elements: [{ name: decl.name.text }],
             position: resolvePosition(inputCode, stmt.getStart()),
@@ -328,10 +224,6 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput2 {
           ? "default"
           : stmt.name?.text;
         tinyassert(name);
-        result.namedExports.push({
-          name,
-          position: stmt.getStart(),
-        });
         result2.exports.push({
           elements: [{ name }],
           position: resolvePosition(inputCode, stmt.getStart()),

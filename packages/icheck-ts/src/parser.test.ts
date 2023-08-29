@@ -312,6 +312,20 @@ export default {};
             },
             {
               "comment": "
+      // icheck-ignore
+      ",
+              "elements": [
+                {
+                  "name": "no1",
+                },
+              ],
+              "position": [
+                4,
+                0,
+              ],
+            },
+            {
+              "comment": "
 
       ",
               "elements": [
@@ -321,6 +335,35 @@ export default {};
               ],
               "position": [
                 6,
+                0,
+              ],
+            },
+            {
+              "comment": "
+      /* icheck-ignore */
+      ",
+              "elements": [
+                {
+                  "name": "no2",
+                },
+              ],
+              "position": [
+                8,
+                0,
+              ],
+            },
+            {
+              "comment": "
+
+      // icheck-ignore
+      ",
+              "elements": [
+                {
+                  "name": "default",
+                },
+              ],
+              "position": [
+                11,
                 0,
               ],
             },

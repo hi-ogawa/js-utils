@@ -20,6 +20,7 @@ import "./dir2/dir3";
 import { x3 } from "./dir1/f3";
 export const x2 = x3 + 1;
 export const x4 = x3 + 2;
+// icheck-ignore
 export const x4_1 = x3 + 3;
 `,
 
@@ -100,6 +101,8 @@ import * as j from "..";
       Map {
         "f1.ts" => [
           {
+            "comment": "
+      ",
             "name": "z2",
             "position": [
               3,
@@ -110,6 +113,8 @@ import * as j from "..";
         ],
         "f2.tsx" => [
           {
+            "comment": "
+      ",
             "name": "x2",
             "position": [
               3,
@@ -118,6 +123,8 @@ import * as j from "..";
             "used": true,
           },
           {
+            "comment": "
+      ",
             "name": "x4",
             "position": [
               4,
@@ -126,9 +133,12 @@ import * as j from "..";
             "used": true,
           },
           {
+            "comment": "
+      // icheck-ignore
+      ",
             "name": "x4_1",
             "position": [
-              5,
+              6,
               0,
             ],
             "used": false,
@@ -136,6 +146,8 @@ import * as j from "..";
         ],
         "dir1/f3.ts" => [
           {
+            "comment": "
+      ",
             "name": "x3",
             "position": [
               5,
