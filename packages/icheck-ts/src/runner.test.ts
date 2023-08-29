@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { resolveImportSource, run } from "./runner";
+import { resolveImportSource, runner } from "./runner";
 import { setupTestFixture } from "./tests/helper";
 
-describe("runner", () => {
+describe(runner, () => {
   const fixture = {
     "f1.ts": `
 import { x2 as y2, x4 } from "./f2";
@@ -42,9 +42,9 @@ import * as j from "..";
 
   beforeAll(() => setupTestFixture("runner", fixture));
 
-  it("importRelations", async () => {
-    const result = run(Object.keys(fixture));
-    expect(result.errors.length).toBe(0);
+  it("basic", async () => {
+    const result = runner(Object.keys(fixture));
+    expect(result.errors.size).toBe(0);
     expect(result.importUsages).toMatchInlineSnapshot(`
       Map {
         "f2.tsx" => [

@@ -8,7 +8,7 @@ import {
   version as packageVersion,
 } from "../package.json";
 import { parseImportExport } from "./parser";
-import { type ExportUsage, run } from "./runner";
+import { type ExportUsage, runner } from "./runner";
 
 const command = new TinyCliCommand(
   {
@@ -34,7 +34,7 @@ const command = new TinyCliCommand(
       file: args.cacheLocation,
     });
     cache.load();
-    const result = run(args.files, { parse });
+    const result = runner(args.files, { parse });
     cache.save();
 
     // apply extra unused rules
