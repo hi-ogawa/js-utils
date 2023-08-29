@@ -101,8 +101,7 @@ import * as j from "..";
       Map {
         "f1.ts" => [
           {
-            "comment": "
-      ",
+            "comment": "",
             "name": "z2",
             "position": [
               3,
@@ -113,8 +112,7 @@ import * as j from "..";
         ],
         "f2.tsx" => [
           {
-            "comment": "
-      ",
+            "comment": "",
             "name": "x2",
             "position": [
               3,
@@ -123,8 +121,7 @@ import * as j from "..";
             "used": true,
           },
           {
-            "comment": "
-      ",
+            "comment": "",
             "name": "x4",
             "position": [
               4,
@@ -133,9 +130,7 @@ import * as j from "..";
             "used": true,
           },
           {
-            "comment": "
-      // icheck-ignore
-      ",
+            "comment": "// icheck-ignore",
             "name": "x4_1",
             "position": [
               6,
@@ -146,8 +141,7 @@ import * as j from "..";
         ],
         "dir1/f3.ts" => [
           {
-            "comment": "
-      ",
+            "comment": "",
             "name": "x3",
             "position": [
               5,

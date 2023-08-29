@@ -2,7 +2,7 @@ import { Err, Ok, type Result, tinyassert } from "@hiogawa/utils";
 import ts from "typescript";
 
 //
-// parse AST to collect and normalize import/export information
+// collect and normalize import/export from typescript AST
 //
 
 export function parseImportExport({
@@ -24,7 +24,7 @@ export function parseImportExport({
     transformers: {
       before: [
         (_ctx) => (sourceFile) => {
-          result = analyzeInner(code, sourceFile);
+          result = parseInner(code, sourceFile);
           return sourceFile;
         },
       ],
@@ -51,7 +51,7 @@ interface ParsedImport extends ParsedBase {
   source: string;
   // import { x as y } from "a"
   // export { x as y } from "a"
-  elements: { name: string; propertyName?: string }[];
+  bindings: { name: string; nameBefore?: string }[];
   // import * as x from "a"
   // export * from "a"
   namespace: boolean;
@@ -68,7 +68,7 @@ interface ParsedExport extends ParsedBase {
   // export const x = () => {}
   // export default function x() {}
   // export function x() {}
-  elements: { name: string; propertyName?: string }[];
+  bindings: { name: string; nameBefore?: string }[];
 }
 
 interface ParsedBase {
@@ -76,7 +76,7 @@ interface ParsedBase {
   comment: string; // aka. leading trivial (used for custom ignore comment)
 }
 
-function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
+function parseInner(inputCode: string, node: ts.SourceFile): ParseOutput {
   const result2: ParseOutput = {
     imports: [],
     exports: [],
@@ -93,7 +93,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
 
       const parsed: ParsedImport = {
         source,
-        elements: [],
+        bindings: [],
         namespace: false,
         sideEffect: false,
         reExport: false,
@@ -105,16 +105,19 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
       if (stmt.importClause) {
         // import d1 from "./dep1";
         if (stmt.importClause.name) {
-          parsed.elements.push({ name: "default" });
+          parsed.bindings.push({
+            name: stmt.importClause.name.text,
+            nameBefore: "default",
+          });
         }
         if (stmt.importClause.namedBindings) {
           // import { d2 } from "./dep2";
           // import { d3 as d4 } from "./dep3";
           if (ts.isNamedImports(stmt.importClause.namedBindings)) {
             for (const e of stmt.importClause.namedBindings.elements) {
-              parsed.elements.push({
+              parsed.bindings.push({
                 name: e.name.text,
-                propertyName: e.propertyName?.text,
+                nameBefore: e.propertyName?.text,
               });
             }
           }
@@ -140,7 +143,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
 
         const parsed: ParsedImport = {
           source,
-          elements: [],
+          bindings: [],
           namespace: false,
           sideEffect: false,
           reExport: true,
@@ -154,9 +157,9 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
           // export { r2 as r3 } from "./re-dep2";
           tinyassert(ts.isNamedExports(stmt.exportClause));
           for (const e of stmt.exportClause.elements) {
-            parsed.elements.push({
+            parsed.bindings.push({
               name: e.name.text,
-              propertyName: e.propertyName?.text,
+              nameBefore: e.propertyName?.text,
             });
           }
         }
@@ -174,16 +177,16 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
       tinyassert(ts.isNamedExports(stmt.exportClause));
 
       const parsed: ParsedExport = {
-        elements: [],
+        bindings: [],
         position: resolvePosition(inputCode, stmt.getStart()),
         comment: parseComment(stmt),
       };
       result2.exports.push(parsed);
 
       for (const e of stmt.exportClause.elements) {
-        parsed.elements.push({
+        parsed.bindings.push({
           name: e.name.text,
-          propertyName: e.propertyName?.text,
+          nameBefore: e.propertyName?.text,
         });
       }
       continue;
@@ -192,7 +195,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
     // export default () => {}
     if (ts.isExportAssignment(stmt)) {
       result2.exports.push({
-        elements: [{ name: "default" }],
+        bindings: [{ name: "default" }],
         position: resolvePosition(inputCode, stmt.getStart()),
         comment: parseComment(stmt),
       });
@@ -206,7 +209,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
         for (const decl of stmt.declarationList.declarations) {
           tinyassert(ts.isIdentifier(decl.name));
           result2.exports.push({
-            elements: [{ name: decl.name.text }],
+            bindings: [{ name: decl.name.text }],
             position: resolvePosition(inputCode, stmt.getStart()),
             comment: parseComment(stmt),
           });
@@ -225,7 +228,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
           : stmt.name?.text;
         tinyassert(name);
         result2.exports.push({
-          elements: [{ name }],
+          bindings: [{ name }],
           position: resolvePosition(inputCode, stmt.getStart()),
           comment: parseComment(stmt),
         });
@@ -238,7 +241,7 @@ function analyzeInner(inputCode: string, node: ts.SourceFile): ParseOutput {
 }
 
 function parseComment(node: ts.Node) {
-  return node.getFullText().slice(0, node.getLeadingTriviaWidth());
+  return node.getFullText().slice(0, node.getLeadingTriviaWidth()).trim();
 }
 
 function resolvePosition(input: string, position: number): [number, number] {

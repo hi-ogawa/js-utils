@@ -97,8 +97,8 @@ export function run(
       if (e.namespace) {
         usages.push({ type: "namespace" });
       }
-      for (const el of e.elements) {
-        usages.push({ type: "named", name: el.propertyName ?? el.name });
+      for (const el of e.bindings) {
+        usages.push({ type: "named", name: el.nameBefore ?? el.name });
       }
       const source = resolveImportSource(entry.file, e.source, fs);
       importRelations
@@ -143,7 +143,7 @@ export function run(
       // TODO: need to resolve re-export chain
       // e.namespace;
 
-      for (const el of e.elements) {
+      for (const el of e.bindings) {
         exportUsages.get(entry.file).push({
           name: el.name,
           used: isUsedExport(entry.file, el.name),
@@ -154,7 +154,7 @@ export function run(
     }
 
     for (const e of entry.parseOutput.exports) {
-      for (const el of e.elements) {
+      for (const el of e.bindings) {
         exportUsages.get(entry.file).push({
           name: el.name,
           used: isUsedExport(entry.file, el.name),

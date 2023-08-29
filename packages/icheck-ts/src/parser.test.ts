@@ -34,68 +34,61 @@ import "./dep5";
         "value": {
           "exports": [
             {
-              "comment": "
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "f4",
-                  "propertyName": "f3",
+                  "nameBefore": "f3",
                 },
               ],
+              "comment": "",
               "position": [
                 14,
                 0,
               ],
             },
             {
-              "comment": "
-
-      // export other cases
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "default",
                 },
               ],
+              "comment": "// export other cases",
               "position": [
                 17,
                 0,
               ],
             },
             {
-              "comment": "
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "f1",
                 },
               ],
+              "comment": "",
               "position": [
                 18,
                 0,
               ],
             },
             {
-              "comment": "
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "default",
                 },
               ],
+              "comment": "",
               "position": [
                 19,
                 0,
               ],
             },
             {
-              "comment": "
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "f3",
                 },
               ],
+              "comment": "",
               "position": [
                 20,
                 0,
@@ -104,14 +97,13 @@ import "./dep5";
           ],
           "imports": [
             {
-              "comment": "
-      // import declarations
-      ",
-              "elements": [
+              "bindings": [
                 {
-                  "name": "default",
+                  "name": "d1",
+                  "nameBefore": "default",
                 },
               ],
+              "comment": "// import declarations",
               "namespace": false,
               "position": [
                 3,
@@ -122,14 +114,13 @@ import "./dep5";
               "source": "./dep1",
             },
             {
-              "comment": "
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "d2",
-                  "propertyName": undefined,
+                  "nameBefore": undefined,
                 },
               ],
+              "comment": "",
               "namespace": false,
               "position": [
                 4,
@@ -140,14 +131,13 @@ import "./dep5";
               "source": "./dep2",
             },
             {
-              "comment": "
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "d4",
-                  "propertyName": "d3",
+                  "nameBefore": "d3",
                 },
               ],
+              "comment": "",
               "namespace": false,
               "position": [
                 5,
@@ -158,14 +148,13 @@ import "./dep5";
               "source": "./dep3",
             },
             {
-              "comment": "
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "d3_1",
-                  "propertyName": "default",
+                  "nameBefore": "default",
                 },
               ],
+              "comment": "",
               "namespace": false,
               "position": [
                 6,
@@ -176,9 +165,8 @@ import "./dep5";
               "source": "./dep3-1",
             },
             {
-              "comment": "
-      ",
-              "elements": [],
+              "bindings": [],
+              "comment": "",
               "namespace": true,
               "position": [
                 7,
@@ -189,16 +177,13 @@ import "./dep5";
               "source": "./dep4",
             },
             {
-              "comment": "
-
-      // export declarations
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "r1",
-                  "propertyName": undefined,
+                  "nameBefore": undefined,
                 },
               ],
+              "comment": "// export declarations",
               "namespace": false,
               "position": [
                 10,
@@ -209,14 +194,13 @@ import "./dep5";
               "source": "./re-dep1",
             },
             {
-              "comment": "
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "r3",
-                  "propertyName": "r2",
+                  "nameBefore": "r2",
                 },
               ],
+              "comment": "",
               "namespace": false,
               "position": [
                 11,
@@ -227,14 +211,13 @@ import "./dep5";
               "source": "./re-dep2",
             },
             {
-              "comment": "
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "r2_1",
-                  "propertyName": "default",
+                  "nameBefore": "default",
                 },
               ],
+              "comment": "",
               "namespace": false,
               "position": [
                 12,
@@ -245,9 +228,8 @@ import "./dep5";
               "source": "./re-dep2-1",
             },
             {
-              "comment": "
-      ",
-              "elements": [],
+              "bindings": [],
+              "comment": "",
               "namespace": true,
               "position": [
                 13,
@@ -258,11 +240,8 @@ import "./dep5";
               "source": "./re-dep3",
             },
             {
-              "comment": "
-
-      // more cases
-      ",
-              "elements": [],
+              "bindings": [],
+              "comment": "// more cases",
               "namespace": false,
               "position": [
                 23,
@@ -298,70 +277,60 @@ export default {};
         "value": {
           "exports": [
             {
-              "comment": "
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "yes1",
                 },
               ],
+              "comment": "",
               "position": [
                 2,
                 0,
               ],
             },
             {
-              "comment": "
-      // icheck-ignore
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "no1",
                 },
               ],
+              "comment": "// icheck-ignore",
               "position": [
                 4,
                 0,
               ],
             },
             {
-              "comment": "
-
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "yes2",
                 },
               ],
+              "comment": "",
               "position": [
                 6,
                 0,
               ],
             },
             {
-              "comment": "
-      /* icheck-ignore */
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "no2",
                 },
               ],
+              "comment": "/* icheck-ignore */",
               "position": [
                 8,
                 0,
               ],
             },
             {
-              "comment": "
-
-      // icheck-ignore
-      ",
-              "elements": [
+              "bindings": [
                 {
                   "name": "default",
                 },
               ],
+              "comment": "// icheck-ignore",
               "position": [
                 11,
                 0,
