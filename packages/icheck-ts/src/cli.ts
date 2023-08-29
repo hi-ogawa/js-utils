@@ -37,13 +37,13 @@ const command = new TinyCliCommand(
       );
     }
 
-    const unused = [...result.exportUsages]
+    const unusedExports = [...result.exportUsages]
       .map(([k, vs]) => [k, vs.filter((v) => !isUsedExport(v))] as const)
       .filter(([_k, vs]) => vs.length > 0);
 
     // parse error
     if (result.errors.length > 0) {
-      console.log("* Parse errors");
+      console.log("** Parse errors **");
       for (const { file, error } of result.errors) {
         console.log(file, error);
       }
@@ -51,9 +51,9 @@ const command = new TinyCliCommand(
     }
 
     // unused exports error
-    if (unused.length > 0) {
-      console.log("* Unused exports");
-      for (const [file, entries] of unused) {
+    if (unusedExports.length > 0) {
+      console.log("** Unused exports **");
+      for (const [file, entries] of unusedExports) {
         for (const e of entries) {
           console.log(`${file}:${e.position[0]} - ${e.name}`);
         }
@@ -62,5 +62,9 @@ const command = new TinyCliCommand(
     }
   }
 );
+
+//
+// main
+//
 
 tinyCliMain(command);
