@@ -48,7 +48,7 @@ export function run(inputFiles: string[], options?: { cache?: boolean }) {
   const entries: { file: string; parseOutput: ParseOutput }[] = [];
   const errors: { file: string; error: unknown }[] = [];
 
-  // normalize relative path (e.g. "./x.ts" => "x.ts")
+  // normalize relative path to match with `resolveImportSource` (e.g. "./x.ts" => "x.ts")
   inputFiles = inputFiles.map((f) => path.normalize(f));
 
   const cachedParser = options?.cache ? createCachedParser() : undefined;
