@@ -40,7 +40,7 @@ export type ExportUsage = {
 // 1. parse files
 // 2. resolve import source
 // 3. check unused exports
-export function runner(
+export async function runner(
   inputFiles: string[],
   options?: { parse?: typeof parseImportExport }
 ) {

@@ -34,7 +34,7 @@ const command = new TinyCliCommand(
       file: args.cacheLocation,
     });
     cache.load();
-    const result = runner(args.files, { parse });
+    const result = await runner(args.files, { parse });
     cache.save();
 
     // apply extra unused rules
@@ -90,17 +90,18 @@ export function memoizeOnFile<F extends (...args: any[]) => any>(
 
   const cache = new LruCache<string, any>(options.maxSize);
 
-  function load() {
+  async function load() {
     if (fs.existsSync(options.file)) {
-      const data = JSON.parse(fs.readFileSync(options.file, "utf-8"));
+      const raw = await fs.promises.readFile(options.file, "utf-8")
+      const data = JSON.parse(raw);
       cache._map = new Map(data);
     }
   }
 
-  function save() {
+  async function save() {
     const data = JSON.stringify([...cache._map.entries()]);
-    fs.mkdirSync(path.dirname(options.file), { recursive: true });
-    fs.writeFileSync(options.file, data);
+    await fs.promises.mkdir(path.dirname(options.file), { recursive: true });
+    await fs.promises.writeFile(options.file, data);
   }
 
   const memoized = memoize(f, {

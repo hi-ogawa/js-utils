@@ -43,7 +43,7 @@ import * as j from "..";
   beforeAll(() => setupTestFixture("runner", fixture));
 
   it("basic", async () => {
-    const result = runner(Object.keys(fixture));
+    const result = await runner(Object.keys(fixture));
     expect(result.errors.size).toBe(0);
     expect(result.importUsages).toMatchInlineSnapshot(`
       Map {
