@@ -70,7 +70,6 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
 <!-- %template-out-begin:example% -->
 
 <details><summary>@hiogawa/json-extra</summary>
-
 <!-- prettier-ignore -->
 ```json
 [
@@ -185,12 +184,8 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
   ]
 ]
 ```
-
 </details>
-
-
 <details><summary>@brillout/json-serializer</summary>
-
 <!-- prettier-ignore -->
 ```json
 [
@@ -221,12 +216,8 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
   ]
 ]
 ```
-
 </details>
-
-
 <details><summary>superjson</summary>
-
 <!-- prettier-ignore -->
 ```json
 {
@@ -350,7 +341,6 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
   }
 }
 ```
-
 </details>
 
 <!-- %template-out-end:example% -->
