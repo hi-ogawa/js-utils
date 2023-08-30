@@ -1,15 +1,14 @@
+import fs from "node:fs";
 import { stringify as brilloutStringify } from "@brillout/json-serializer/stringify";
 import superjson from "superjson";
 import { createJsonExtra } from ".";
 
-const jsonExtra = createJsonExtra({ builtins: true });
+// print example for README.md
 
-// print example output for README.md
-//
 // usage:
-//   npx tsx ./packages/json-extra/src/example.ts
+//   npx tsx ./packages/json-extra/src/example.ts input json-extra @brillout/json-serializer superjson
 
-const original = [
+const input = [
   // standard json value
   null,
   true,
@@ -42,31 +41,28 @@ const original = [
   ["!NaN", "collision"],
 ];
 
-console.log(`
-<details><summary>@hiogawa/json-extra</summary>
+const args = process.argv.slice(2);
 
-<!-- prettier-ignore -->
-${"```"}json
-${jsonExtra.stringify(original, null, 2)}
-${"```"}
+if (args.includes("input")) {
+  const selfString = fs.readFileSync(new URL(import.meta.url), "utf-8");
+  const start = selfString.match(/^const input /m)?.index!;
+  const end = selfString.match(/^\];/m)?.index!;
+  const inputString = selfString.slice(start, end + 2);
+  console.log(inputString);
+}
 
-</details>
+if (args.includes("json-extra")) {
+  const jsonExtra = createJsonExtra({ builtins: true });
+  const stringfied = jsonExtra.stringify(input, null, 2);
+  console.log(stringfied);
+}
 
-<details><summary>@brillout/json-serializer</summary>
+if (args.includes("@brillout/json-serializer")) {
+  const stringfied = brilloutStringify(input, { space: 2 });
+  console.log(stringfied);
+}
 
-<!-- prettier-ignore -->
-${"```"}json
-${brilloutStringify(original, { space: 2 })}
-${"```"}
-
-</details>
-
-<details><summary>superjson</summary>
-
-<!-- prettier-ignore -->
-${"```"}json
-${JSON.stringify(superjson.serialize(original), null, 2)}
-${"```"}
-
-</details>
-`);
+if (args.includes("superjson")) {
+  const stringfied = JSON.stringify(superjson.serialize(input), null, 2);
+  console.log(stringfied);
+}
