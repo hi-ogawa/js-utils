@@ -1,8 +1,8 @@
 import child_process from "node:child_process";
-import { mapRegExp } from "@hiogawa/utils";
+import { groupBy, mapRegExp } from "@hiogawa/utils";
 
 interface TemplateOpitons {
-  cwd: string;
+  cwd?: string;
 }
 
 export function processInlineTemplate(
@@ -15,15 +15,22 @@ export function processInlineTemplate(
     (m) => m[1]
   );
 
-  // apply templates
+  const duplicates = [...groupBy(ids, (id) => id)]
+    .filter(([_k, vs]) => vs.length >= 2)
+    .map(([k]) => k);
+  if (duplicates.length > 0) {
+    throw new Error(`Found duplicate ID: ${duplicates.join(", ")}`);
+  }
+
+  // process by id
   for (const id of ids) {
-    input = processTemplateById(input, id, options);
+    input = processInlineTemplateById(input, id, options);
   }
 
   return input;
 }
 
-function processTemplateById(
+function processInlineTemplateById(
   input: string,
   id: string,
   options: TemplateOpitons
@@ -59,6 +66,7 @@ function processInterpolation(input: string, options: TemplateOpitons): string {
   let output = "";
   for (const chunk of chunks) {
     if (chunk.match) {
+      // TODO: check status?
       const spawnResult = child_process.spawnSync(chunk.value, {
         shell: true,
         encoding: "utf-8",
