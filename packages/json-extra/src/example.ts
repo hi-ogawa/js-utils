@@ -4,8 +4,10 @@ import { createJsonExtra } from ".";
 
 const jsonExtra = createJsonExtra({ builtins: true });
 
-// output example for README.md
-// npx tsx ./packages/json-extra/src/example.ts
+// print example output for README.md
+//
+// usage:
+//   npx tsx ./packages/json-extra/src/example.ts
 
 const original = [
   // standard json value
@@ -40,29 +42,31 @@ const original = [
   ["!NaN", "collision"],
 ];
 
-console.log(`<details><summary>@hiogawa/json-extra</summary>`);
-console.log();
-console.log("<!-- prettier-ignore -->");
-console.log("```json");
-console.log(jsonExtra.stringify(original, null, 2));
-console.log("```");
-console.log();
-console.log(`</details>`);
-console.log();
-console.log(`<details><summary>@brillout/json-serializer</summary>`);
-console.log();
-console.log("<!-- prettier-ignore -->");
-console.log("```json");
-console.log(brilloutStringify(original, { space: 2 }));
-console.log("```");
-console.log();
-console.log(`</details>`);
-console.log();
-console.log(`<details><summary>superjson</summary>`);
-console.log();
-console.log("<!-- prettier-ignore -->");
-console.log("```json");
-console.log(JSON.stringify(superjson.serialize(original), null, 2));
-console.log("```");
-console.log();
-console.log(`</details>`);
+console.log(`
+<details><summary>@hiogawa/json-extra</summary>
+
+<!-- prettier-ignore -->
+${"```"}json
+${jsonExtra.stringify(original, null, 2)}
+${"```"}
+
+</details>
+
+<details><summary>@brillout/json-serializer</summary>
+
+<!-- prettier-ignore -->
+${"```"}json
+${brilloutStringify(original, { space: 2 })}
+${"```"}
+
+</details>
+
+<details><summary>superjson</summary>
+
+<!-- prettier-ignore -->
+${"```"}json
+${JSON.stringify(superjson.serialize(original), null, 2)}
+${"```"}
+
+</details>
+`);
