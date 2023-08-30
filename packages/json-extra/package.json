@@ -29,6 +29,7 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest",
+    "docs": "inline-template ./README.md --inplace",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {

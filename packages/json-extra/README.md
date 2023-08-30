@@ -59,6 +59,16 @@ console.log(brilloutStringify(original, { space: 2 }));
 console.log(JSON.stringify(superjson.serialize(original), null, 2));
 ```
 
+<!--
+%template-in-begin:example%
+
+{% npx tsx ./src/example.ts %}
+
+%template-in-end:example%
+-->
+
+<!-- %template-out-begin:example% -->
+
 <details><summary>@hiogawa/json-extra</summary>
 
 ```json
@@ -215,3 +225,5 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
 ```
 
 </details>
+
+<!-- %template-out-end:example% -->
