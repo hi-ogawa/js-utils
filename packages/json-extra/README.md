@@ -71,32 +71,82 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
 
 <details><summary>@hiogawa/json-extra</summary>
 
+<!-- prettier-ignore -->
 ```json
 [
   null,
   true,
   123,
   "string",
-  ["array"],
+  [
+    "array"
+  ],
   {
     "k": "v"
   },
-  ["!undefined", 0],
-  ["!Infinity", 0],
-  ["!-Infinity", 0],
-  ["!NaN", 0],
+  [
+    "!undefined",
+    0
+  ],
+  [
+    "!Infinity",
+    0
+  ],
+  [
+    "!-Infinity",
+    0
+  ],
+  [
+    "!NaN",
+    0
+  ],
   0,
-  ["!-0", 0],
-  ["!Date", "2023-08-17T00:00:00.000Z"],
-  ["!BigInt", "1234"],
-  ["!RegExp", ["^\\d+", "gms"]],
+  [
+    "!-0",
+    0
+  ],
+  [
+    "!Date",
+    "2023-08-17T00:00:00.000Z"
+  ],
+  [
+    "!BigInt",
+    "1234"
+  ],
+  [
+    "!RegExp",
+    [
+      "^\\d+",
+      "gms"
+    ]
+  ],
   [
     "!Map",
     [
-      [0, ["!Date", "1970-01-01T00:00:00.000Z"]],
       [
-        ["!BigInt", "1"],
-        ["!Set", [["!RegExp", ["a", "g"]]]]
+        0,
+        [
+          "!Date",
+          "1970-01-01T00:00:00.000Z"
+        ]
+      ],
+      [
+        [
+          "!BigInt",
+          "1"
+        ],
+        [
+          "!Set",
+          [
+            [
+              "!RegExp",
+              [
+                "a",
+                "g"
+              ]
+            ]
+          ]
+        ]
       ]
     ]
   ],
@@ -104,33 +154,53 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
     "!Set",
     [
       0,
-      ["!Date", "1970-01-01T00:00:00.000Z"],
+      [
+        "!Date",
+        "1970-01-01T00:00:00.000Z"
+      ],
       [
         "!Map",
         [
           [
-            ["!BigInt", "1"],
-            ["!RegExp", ["a", "g"]]
+            [
+              "!BigInt",
+              "1"
+            ],
+            [
+              "!RegExp",
+              [
+                "a",
+                "g"
+              ]
+            ]
           ]
         ]
       ]
     ]
   ],
-  ["!", "!NaN", "collision"]
+  [
+    "!",
+    "!NaN",
+    "collision"
+  ]
 ]
 ```
 
 </details>
 
+
 <details><summary>@brillout/json-serializer</summary>
 
+<!-- prettier-ignore -->
 ```json
 [
   null,
   true,
   123,
   "string",
-  ["array"],
+  [
+    "array"
+  ],
   {
     "k": "v"
   },
@@ -145,14 +215,19 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
   "!RegExp:/^\\d+/gms",
   "!Map:[\n  [\n    0,\n    \"!Date:1970-01-01T00:00:00.000Z\"\n  ],\n  [\n    \"!BigInt:1\",\n    \"!Set:[\\n  \\\"!RegExp:/a/g\\\"\\n]\"\n  ]\n]",
   "!Set:[\n  0,\n  \"!Date:1970-01-01T00:00:00.000Z\",\n  \"!Map:[\\n  [\\n    \\\"!BigInt:1\\\",\\n    \\\"!RegExp:/a/g\\\"\\n  ]\\n]\"\n]",
-  ["!!NaN", "collision"]
+  [
+    "!!NaN",
+    "collision"
+  ]
 ]
 ```
 
 </details>
 
+
 <details><summary>superjson</summary>
 
+<!-- prettier-ignore -->
 ```json
 {
   "json": [
@@ -160,7 +235,9 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
     true,
     123,
     "string",
-    ["array"],
+    [
+      "array"
+    ],
     {
       "k": "v"
     },
@@ -174,31 +251,73 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
     "1234",
     "/^\\d+/gms",
     [
-      [0, "1970-01-01T00:00:00.000Z"],
-      ["1", ["/a/g"]]
+      [
+        0,
+        "1970-01-01T00:00:00.000Z"
+      ],
+      [
+        "1",
+        [
+          "/a/g"
+        ]
+      ]
     ],
-    [0, "1970-01-01T00:00:00.000Z", [["1", "/a/g"]]],
-    ["!NaN", "collision"]
+    [
+      0,
+      "1970-01-01T00:00:00.000Z",
+      [
+        [
+          "1",
+          "/a/g"
+        ]
+      ]
+    ],
+    [
+      "!NaN",
+      "collision"
+    ]
   ],
   "meta": {
     "values": {
-      "6": ["undefined"],
-      "7": ["number"],
-      "8": ["number"],
-      "9": ["number"],
-      "11": ["number"],
-      "12": ["Date"],
-      "13": ["bigint"],
-      "14": ["regexp"],
+      "6": [
+        "undefined"
+      ],
+      "7": [
+        "number"
+      ],
+      "8": [
+        "number"
+      ],
+      "9": [
+        "number"
+      ],
+      "11": [
+        "number"
+      ],
+      "12": [
+        "Date"
+      ],
+      "13": [
+        "bigint"
+      ],
+      "14": [
+        "regexp"
+      ],
       "15": [
         "map",
         {
-          "0.1": ["Date"],
-          "1.0": ["bigint"],
+          "0.1": [
+            "Date"
+          ],
+          "1.0": [
+            "bigint"
+          ],
           "1.1": [
             "set",
             {
-              "0": ["regexp"]
+              "0": [
+                "regexp"
+              ]
             }
           ]
         }
@@ -206,19 +325,27 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
       "16": [
         "set",
         {
-          "1": ["Date"],
+          "1": [
+            "Date"
+          ],
           "2": [
             "map",
             {
-              "0.0": ["bigint"],
-              "0.1": ["regexp"]
+              "0.0": [
+                "bigint"
+              ],
+              "0.1": [
+                "regexp"
+              ]
             }
           ]
         }
       ]
     },
     "referentialEqualities": {
-      "15.1.0": ["16.2.0.0"]
+      "15.1.0": [
+        "16.2.0.0"
+      ]
     }
   }
 }

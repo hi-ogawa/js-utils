@@ -2,6 +2,8 @@ import { stringify as brilloutStringify } from "@brillout/json-serializer/string
 import superjson from "superjson";
 import { createJsonExtra } from ".";
 
+const jsonExtra = createJsonExtra({ builtins: true });
+
 // output example for README.md
 // npx tsx ./packages/json-extra/src/example.ts
 
@@ -38,21 +40,22 @@ const original = [
   ["!NaN", "collision"],
 ];
 
-const jsonExtra = createJsonExtra({ builtins: true });
-
 console.log(`\n<details><summary>@hiogawa/json-extra</summary>\n`);
+console.log("<!-- prettier-ignore -->");
 console.log("```json");
 console.log(jsonExtra.stringify(original, null, 2));
 console.log("```");
 console.log(`\n</details>\n`);
 
 console.log(`\n<details><summary>@brillout/json-serializer</summary>\n`);
+console.log("<!-- prettier-ignore -->");
 console.log("```json");
 console.log(brilloutStringify(original, { space: 2 }));
 console.log("```");
 console.log(`\n</details>\n`);
 
 console.log(`\n<details><summary>superjson</summary>\n`);
+console.log("<!-- prettier-ignore -->");
 console.log("```json");
 console.log(JSON.stringify(superjson.serialize(original), null, 2));
 console.log("```");
