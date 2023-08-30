@@ -19,7 +19,7 @@ $ icheck-ts --help
 
 ```txt
 $ icheck-ts --help
-icheck-ts/0.0.1-pre.1
+icheck-ts/0.0.1-pre.2
 
 Usage:
   $ icheck-ts [options] <files...>
