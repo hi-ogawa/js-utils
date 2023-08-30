@@ -11,6 +11,9 @@ importers:
       '@changesets/cli':
         specifier: ^2.26.2
         version: 2.26.2
+      '@hiogawa/inline-template':
+        specifier: workspace:*
+        version: link:packages/inline-template
       '@hiogawa/isort-ts':
         specifier: 1.1.1
         version: 1.1.1(prettier@2.8.8)(typescript@5.1.6)
