@@ -18,7 +18,6 @@
     "cli": "node ./bin/cli.js",
     "cli-dev": "tsx ./src/cli.ts",
     "test": "vitest",
-    "docs": "pnpm -s cli-dev ./README.md --inplace",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
