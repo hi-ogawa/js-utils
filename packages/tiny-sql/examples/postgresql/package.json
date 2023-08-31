@@ -1,0 +1,14 @@
+{
+  "name": "tiny-sql-examples-postgresql",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "repl": "tsx -r ./src/repl.ts",
+    "migrate": "tsx ./src/migrate.ts"
+  },
+  "devDependencies": {
+    "@hiogawa/tiny-sql": "workspace:*",
+    "@hiogawa/utils": "workspace:*",
+    "postgres": "^3.3.5"
+  }
+}

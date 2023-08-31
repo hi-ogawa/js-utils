@@ -1,0 +1,18 @@
+version: "3.5"
+
+services:
+  postgres:
+    image: postgres:alpine
+    ports:
+      - 6432:5432
+    environment:
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+
+  dockerize:
+    image: jwilder/dockerize:0.6.1
+    profiles: ["tools"]
+
+volumes:
+  postgres-volume:
