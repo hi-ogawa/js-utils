@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
-import { processInlineTemplate } from ".";
+import { InlineTemplateProcessor } from ".";
 import { version as packageVersion } from "../package.json";
 
 const cli = new TinyCliCommand(
@@ -19,7 +19,8 @@ const cli = new TinyCliCommand(
   },
   async ({ args }) => {
     const input = await fs.promises.readFile(args.file, "utf-8");
-    const output = processInlineTemplate(input, { cwd: args.cwd });
+    const processor = new InlineTemplateProcessor({ spawn: { cwd: args.cwd } });
+    const output = processor.process(input);
     if (args.inplace) {
       await fs.promises.writeFile(args.file, output);
     } else {
