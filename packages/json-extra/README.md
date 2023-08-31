@@ -11,7 +11,7 @@ and also provides human-readibility for custom containers.
 
 ## examples
 
-See `./src/example.ts`.
+See `./misc/example.mjs`.
 
 <!--
 

@@ -4,10 +4,12 @@ import superjson from "superjson";
 import { createJsonExtra } from "../dist/index.js";
 import { tinyassert } from "@hiogawa/utils";
 
-// print example for README.md
+/*
+print example for README.md
 
-// usage:
-//   node ./packages/json-extra/src/example.mjs input json-extra @brillout/json-serializer superjson
+usage:
+  node ./packages/json-extra/misc/example.mjs input json-extra @brillout/json-serializer superjson
+*/
 
 const input = [
   // standard json value
