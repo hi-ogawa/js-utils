@@ -33,7 +33,7 @@ anything here will be overwritten
     expect(logFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "[some-id:shell] echo hello",
+          "* processing {% echo hello %}",
         ],
       ]
     `);
