@@ -112,7 +112,7 @@ function getMatchOffset(input: string, re: RegExp, addMatchLength: boolean) {
   return m.index + (addMatchLength ? m[0].length : 0);
 }
 
-// simplified version of `ChildProcessPromise` from packages/utils-node/src/script.ts
+// simplified version of packages/utils-node/src/script.ts
 function promisifyChildProcess(child: ChildProcess) {
   let stdout = "";
   let stderr = "";
