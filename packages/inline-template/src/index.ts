@@ -3,10 +3,10 @@ import { groupBy, mapRegExp } from "@hiogawa/utils";
 import { ChildProcessPromise } from "@hiogawa/utils-node";
 
 const MARKERS = {
-  inputStart: "template-in-begin",
-  inputEnd: "template-in-end",
-  outputStart: "template-out-begin",
-  outputEnd: "template-out-end",
+  inputStart: "template-input-start",
+  inputEnd: "template-input-end",
+  outputStart: "template-output-start",
+  outputEnd: "template-output-end",
 };
 
 export class InlineTemplateProcessor {

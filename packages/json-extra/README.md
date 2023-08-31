@@ -16,7 +16,7 @@ See `./misc/example.mjs`.
 <!--
 
 -------------------------------------
----- %template-in-begin:example% ----
+---- %template-input-start:example% ----
 
 ```js
 {% node ./misc/example.mjs input %}
@@ -46,12 +46,12 @@ See `./misc/example.mjs`.
 
 </details>
 
----- %template-in-end:example% ----
+---- %template-input-end:example% ----
 -----------------------------------
 
 -->
 
-<!-- %template-out-begin:example% -->
+<!-- %template-output-start:example% -->
 
 ```js
 const input = [
@@ -245,4 +245,4 @@ const input = [
 
 </details>
 
-<!-- %template-out-end:example% -->
+<!-- %template-output-end:example% -->

@@ -5,14 +5,14 @@ describe(InlineTemplateProcessor, () => {
   it("basic", async () => {
     const input = `\
 <!--
-%template-in-begin:some-id%
+%template-input-start:some-id%
 {% echo hello %}
-%template-in-end:some-id%
+%template-input-end:some-id%
 -->
 
-<!-- %template-out-begin:some-id% -->
+<!-- %template-output-start:some-id% -->
 anything here will be overwritten
-<!-- %template-out-end:some-id% -->
+<!-- %template-output-end:some-id% -->
 `;
     const logFn = vi.fn();
     const output = await new InlineTemplateProcessor({ log: logFn }).process(
@@ -20,14 +20,14 @@ anything here will be overwritten
     );
     expect(output).toMatchInlineSnapshot(`
       "<!--
-      %template-in-begin:some-id%
+      %template-input-start:some-id%
       {% echo hello %}
-      %template-in-end:some-id%
+      %template-input-end:some-id%
       -->
 
-      <!-- %template-out-begin:some-id% -->
+      <!-- %template-output-start:some-id% -->
       hello
-      <!-- %template-out-end:some-id% -->
+      <!-- %template-output-end:some-id% -->
       "
     `);
     expect(logFn.mock.calls).toMatchInlineSnapshot(`

@@ -5,17 +5,17 @@ simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative.
 ## usage
 
 <!--
-%template-in-begin:help%
+%template-input-start:help%
 
 ```txt
 $ icheck-ts --help
 {% node ./bin/cli.js --help %}
 ```
 
-%template-in-end:help%
+%template-input-end:help%
 -->
 
-<!-- %template-out-begin:help% -->
+<!-- %template-output-start:help% -->
 
 ```txt
 $ icheck-ts --help
@@ -35,7 +35,7 @@ Options:
   --debug         Debug output
 ```
 
-<!-- %template-out-end:help% -->
+<!-- %template-output-end:help% -->
 
 ## features
 

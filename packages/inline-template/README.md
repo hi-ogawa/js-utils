@@ -3,17 +3,17 @@
 Based on four `%template-...:ID%` markers, `(OUTPUT)` will be replaced with `(INPUT)` after `{% (shell code) %}` interpolations are applied.
 
 ```txt
-%template-in-begin:ID%
+%template-input-start:ID%
 
 ...(INPUT with {% ... %})...
 
-%template-in-end:ID%
+%template-input-end:ID%
 
-%template-out-begin:ID%
+%template-output-start:ID%
 
 ...(OUTPUT)...
 
-%template-out-end:ID%
+%template-output-end:ID%
 ```
 
 ## examples
