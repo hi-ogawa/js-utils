@@ -18,14 +18,14 @@ See `./src/example.ts`.
 -------------------------------------
 ---- %template-in-begin:example% ----
 
-```ts
-{% npx tsx ./src/example.ts input %}
+```js
+{% node ./misc/example.mjs input %}
 ```
 
 <details><summary>@hiogawa/json-extra</summary>
 
 ```json
-{% npx tsx ./src/example.ts json-extra %}
+{% node ./misc/example.mjs json-extra %}
 ```
 
 </details>
@@ -33,7 +33,7 @@ See `./src/example.ts`.
 <details><summary>@brillout/json-serializer</summary>
 
 ```json
-{% npx tsx ./src/example.ts @brillout/json-serializer %}
+{% node ./misc/example.mjs @brillout/json-serializer %}
 ```
 
 </details>
@@ -41,7 +41,7 @@ See `./src/example.ts`.
 <details><summary>superjson</summary>
 
 ```json
-{% npx tsx ./src/example.ts superjson %}
+{% node ./misc/example.mjs superjson %}
 ```
 
 </details>
@@ -53,7 +53,7 @@ See `./src/example.ts`.
 
 <!-- %template-out-begin:example% -->
 
-```ts
+```js
 const input = [
   // standard json value
   null,
@@ -77,11 +77,11 @@ const input = [
   /^\d+/gms,
 
   // extra containers
-  new Map<any, any>([
+  new Map([
     [0, new Date(0)],
     [1n, new Set([/a/g])],
   ]),
-  new Set<any>([0, new Date(0), new Map([[1n, /a/g]])]),
+  new Set([0, new Date(0), new Map([[1n, /a/g]])]),
 
   // escape encoding collision
   ["!NaN", "collision"],
