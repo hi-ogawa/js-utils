@@ -11,14 +11,50 @@ and also provides human-readibility for custom containers.
 
 ## examples
 
-See also `./src/*.test.ts`
+See `./misc/example.mjs`.
 
-```ts
-import { stringify as brilloutStringify } from "@brillout/json-serializer/stringify";
-import { createJsonExtra } from "@hiogawa/json-extra";
-import superjson from "superjson";
+<!--
 
-const original = [
+-------------------------------------
+---- %template-input-start:example% ----
+
+```js
+{%shell node ./misc/example.mjs input %}
+```
+
+<details><summary>@hiogawa/json-extra</summary>
+
+```json
+{%shell node ./misc/example.mjs json-extra %}
+```
+
+</details>
+
+<details><summary>@brillout/json-serializer</summary>
+
+```json
+{%shell node ./misc/example.mjs @brillout/json-serializer %}
+```
+
+</details>
+
+<details><summary>superjson</summary>
+
+```json
+{%shell node ./misc/example.mjs superjson %}
+```
+
+</details>
+
+---- %template-input-end:example% ----
+-----------------------------------
+
+-->
+
+<!-- %template-output-start:example% -->
+
+```js
+const input = [
   // standard json value
   null,
   true,
@@ -41,22 +77,15 @@ const original = [
   /^\d+/gms,
 
   // extra containers
-  new Map<any, any>([
+  new Map([
     [0, new Date(0)],
     [1n, new Set([/a/g])],
   ]),
-  new Set<any>([0, new Date(0), new Map([[1n, /a/g]])]),
+  new Set([0, new Date(0), new Map([[1n, /a/g]])]),
 
   // escape encoding collision
   ["!NaN", "collision"],
 ];
-
-const jsonExtra = createJsonExtra({ builtins: true });
-console.log(jsonExtra.stringify(original, null, 2));
-
-console.log(brilloutStringify(original, { space: 2 }));
-
-console.log(JSON.stringify(superjson.serialize(original), null, 2));
 ```
 
 <details><summary>@hiogawa/json-extra</summary>
@@ -215,3 +244,5 @@ console.log(JSON.stringify(superjson.serialize(original), null, 2));
 ```
 
 </details>
+
+<!-- %template-output-end:example% -->

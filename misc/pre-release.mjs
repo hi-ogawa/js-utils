@@ -7,6 +7,7 @@ import fs from "node:fs";
 //   node misc/pre-release.mjs packages/utils-node
 
 $._.verbose = true;
+const $$ = $.new({ stdio: "inherit" });
 
 async function main() {
   const packageDir = process.argv[2];
@@ -33,13 +34,13 @@ async function main() {
   );
 
   // push
-  console.log(await $`git diff ${packageJsonPath}`);
+  await $$`git diff ${packageJsonPath}`;
   const input = await promptQuestion("* proceed to push changes? (y/n) ");
   if (input !== "y") process.exit(1);
 
-  await $`git add ${packageJsonPath}`;
-  await $`git commit -m 'chore: pre release (${pakcageJson.name}@${pakcageJson.version})'`;
-  await $`git push origin HEAD`;
+  await $$`git add ${packageJsonPath}`;
+  await $$`git commit -m 'chore: pre release (${pakcageJson.name}@${pakcageJson.version})'`;
+  await $$`git push origin HEAD`;
 }
 
 /**

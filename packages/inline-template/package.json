@@ -1,5 +1,5 @@
 {
-  "name": "@hiogawa/icheck-ts",
+  "name": "@hiogawa/inline-template",
   "version": "0.0.1-pre.4",
   "type": "module",
   "bin": "./bin/cli.js",
@@ -11,22 +11,18 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/icheck-ts"
+    "directory": "packages/inline-template"
   },
   "scripts": {
     "build": "tsup",
     "cli": "node ./bin/cli.js",
     "cli-dev": "tsx ./src/cli.ts",
     "test": "vitest",
-    "docs": "inline-template ./README.md",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
     "@hiogawa/tiny-cli": "workspace:*",
     "@hiogawa/utils": "workspace:*",
     "@types/node": "^18"
-  },
-  "peerDependencies": {
-    "typescript": "*"
   }
 }

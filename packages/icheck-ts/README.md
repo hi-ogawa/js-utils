@@ -4,9 +4,22 @@ simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative.
 
 ## usage
 
+<!--
+%template-input-start:help%
+
 ```txt
 $ icheck-ts --help
-icheck-ts/0.0.1-pre.1
+{%shell node ./bin/cli.js --help %}
+```
+
+%template-input-end:help%
+-->
+
+<!-- %template-output-start:help% -->
+
+```txt
+$ icheck-ts --help
+icheck-ts/0.0.1-pre.2
 
 Usage:
   $ icheck-ts [options] <files...>
@@ -21,6 +34,8 @@ Options:
   --ignore=...    RegExp pattern to ignore export names
   --debug         Debug output
 ```
+
+<!-- %template-output-end:help% -->
 
 ## features
 
