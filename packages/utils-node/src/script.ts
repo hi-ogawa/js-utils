@@ -20,9 +20,9 @@ type HelperOptions = {
 
 export const $ = /* @__PURE__ */ $new();
 
-export function $new(
-  options: SpawnOptions & { _?: Partial<HelperOptions> } = {}
-) {
+type NewOptions = SpawnOptions & { _?: Partial<HelperOptions> };
+
+export function $new(options: NewOptions = {}) {
   // currently there's no special quoting or escaping so it's equivalent to normal string literal template.
   // for now, limit to `string | number` since that's the same usage.
   function $(strings: TemplateStringsArray, ...params: (string | number)[]) {
@@ -56,7 +56,13 @@ export function $new(
   }
 
   // expose options in a self-referential way
-  const api = Object.assign($, { _: {}, ...options });
+  const api = Object.assign($, {
+    ...options,
+    _: { ...options._ },
+    // new instance with additive options
+    new: (options: NewOptions) =>
+      $new({ ...api, ...options, _: { ...api._, ...options._ } }),
+  });
   return api;
 }
 

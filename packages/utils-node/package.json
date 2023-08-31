@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/utils-node",
-  "version": "0.0.1-pre.4",
+  "version": "0.0.1-pre.5",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

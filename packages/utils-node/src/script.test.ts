@@ -1,6 +1,6 @@
 import { tinyassert, wrapErrorAsync } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
-import { $, $new } from "./script";
+import { $ } from "./script";
 
 describe("script", () => {
   it("basic", async () => {
@@ -8,13 +8,16 @@ describe("script", () => {
     expect(output).toMatchInlineSnapshot('"hello world"');
   });
 
-  it("helperOptions", async () => {
+  it("new", async () => {
     const logFn = vi.fn();
-    const $ = $new();
-    $._.noTrim = true;
-    $._.verbose = true;
-    $._.log = (v) => logFn(v.replace(/^\[\d{2}:\d{2}:\d{2}.\d{3}\]/, "[...]")); // reduct non-deterministic timestamp
-    const output = await $`echo ${"hello"} ${"world"}`;
+    const $$ = $.new({
+      _: {
+        noTrim: true,
+        verbose: true,
+        log: (v) => logFn(v.replace(/^\[\d{2}:\d{2}:\d{2}.\d{3}\]/, "[...]")), // reduct non-deterministic timestamp
+      },
+    });
+    const output = await $$`echo ${"hello"} ${"world"}`;
     expect(output).toMatchInlineSnapshot(`
       "hello world
       "
