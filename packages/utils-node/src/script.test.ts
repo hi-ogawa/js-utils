@@ -44,8 +44,8 @@ describe("script", () => {
       tinyassert(result.value instanceof Error);
       expect(result.value.cause).toMatchInlineSnapshot(`
         {
-          "code": 9,
           "command": "node --yelp",
+          "exitCode": 9,
           "stderr": "node: bad option: --yelp
         ",
           "stdout": "",
@@ -57,11 +57,8 @@ describe("script", () => {
   describe("ChildProcess", () => {
     it("basic", async () => {
       const proc = $`node -e 'console.log("abc"); console.error("def")'`;
-      expect(await proc.promise).toMatchInlineSnapshot('"abc"');
-      expect(proc.stdout).toMatchInlineSnapshot(`
-        "abc
-        "
-      `);
+      await proc.closed;
+      expect(proc.stdout).toMatchInlineSnapshot('"abc"');
       expect(proc.stderr).toMatchInlineSnapshot(`
         "def
         "
@@ -73,7 +70,9 @@ describe("script", () => {
       const proc = $`node -`;
       tinyassert(proc.child.stdin);
       proc.child.stdin.end("console.log(1 + 1)");
-      expect(await proc.promise).toMatchInlineSnapshot('"2"');
+      await proc.closed;
+      expect(proc.stdout).toMatchInlineSnapshot('"2"');
+      expect(proc.child.exitCode).toMatchInlineSnapshot("0");
     });
   });
 });

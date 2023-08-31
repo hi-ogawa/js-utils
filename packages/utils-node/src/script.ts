@@ -1,4 +1,3 @@
-import { Buffer } from "node:buffer";
 import {
   type ChildProcess,
   type SpawnOptions,
@@ -68,9 +67,9 @@ export function $new(options: NewOptions = {}) {
 
 class SpawnPromiseLike implements PromiseLike<string> {
   child: ChildProcess;
-  promise: Promise<string>;
-  stderr: string = "";
+  closed: Promise<void>;
   stdout: string = "";
+  stderr: string = "";
 
   constructor(
     private command: string,
@@ -79,57 +78,41 @@ class SpawnPromiseLike implements PromiseLike<string> {
   ) {
     const child = helperOptions.spawn(this.command, this.options);
     this.child = child;
-    this.promise = new Promise<string>((resolve, reject) => {
-      child.stdout?.on("data", (raw: unknown) => {
-        processOutput(raw, (v) => (this.stdout += v), reject);
+    this.closed = new Promise((resolve, reject) => {
+      child.stdout?.on("data", (v) => {
+        this.stdout += v.toString();
       });
-
-      child.stderr?.on("data", (raw: unknown) => {
-        processOutput(raw, (v) => (this.stderr += v), reject);
+      child.stderr?.on("data", (v) => {
+        this.stderr += v.toString();
       });
-
       child.on("close", (code) => {
-        if (code === 0) {
-          let stdout = this.stdout;
-          if (!this.helperOptions.noTrim) {
-            stdout = stdout.trim();
-          }
-          resolve(stdout);
-        } else {
+        if (!this.helperOptions.noTrim) {
+          this.stdout = this.stdout.trim();
+        }
+        if (code !== 0) {
           reject(
             new Error(`ScriptError`, {
               cause: {
-                command,
-                code,
+                command: this.command,
+                exitCode: child.exitCode,
                 stdout: this.stdout,
                 stderr: this.stderr,
               },
             })
           );
+          return;
         }
+        resolve();
       });
-
       child.on("error", (err) => {
         reject(err);
       });
     });
   }
 
-  // delegate promise api
-  then: PromiseLike<string>["then"] = (...args) => this.promise.then(...args);
-}
-
-function processOutput(
-  raw: unknown,
-  onSuccess: (v: string) => void,
-  onError: (v: unknown) => void
-) {
-  if (typeof raw === "string") {
-    return onSuccess(raw);
-  } else if (raw instanceof Buffer) {
-    return onSuccess(raw.toString());
-  }
-  onError(new Error("unknown data", { cause: raw }));
+  // expose stdout as PromiseLike api
+  then: PromiseLike<string>["then"] = (...args) =>
+    this.closed.then(() => this.stdout).then(...args);
 }
 
 function formatNow() {
