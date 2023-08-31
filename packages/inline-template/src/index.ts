@@ -24,7 +24,7 @@ export class InlineTemplateProcessor {
   async process(input: string) {
     // collect template markers
     const idMatches = input.matchAll(
-      RegExp(`%${MARKERS.inputStart}:(\\w+)%`, "g")
+      RegExp(`%${MARKERS.inputStart}:([a-zA-Z0-9_.-]+)%`, "g")
     );
     const ids = [...idMatches].map((m) => m[1]);
 
