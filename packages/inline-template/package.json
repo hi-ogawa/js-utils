@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/inline-template",
-  "version": "0.0.1-pre.1",
+  "version": "0.0.1-pre.2",
   "type": "module",
   "bin": "./bin/cli.js",
   "files": [
