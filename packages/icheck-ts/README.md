@@ -9,7 +9,7 @@ simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative.
 
 ```txt
 $ icheck-ts --help
-{% node ./bin/cli.js --help %}
+{%shell node ./bin/cli.js --help %}
 ```
 
 %template-input-end:help%

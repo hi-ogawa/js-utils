@@ -57,29 +57,33 @@ export class InlineTemplateProcessor {
     const outBegin = getMatchOffset(input, patterns[2], true);
     const outEnd = getMatchOffset(input, patterns[3], false);
     const templateIn = input.slice(inBegin, inEnd);
-    const templateOut = await this.processInterpolation(templateIn);
+    const templateOut = await this.processInterpolation(templateIn, id);
     const output = input.slice(0, outBegin) + templateOut + input.slice(outEnd);
     return output;
   }
 
-  async processInterpolation(input: string) {
-    const chunks: { match: boolean; value: string }[] = [];
+  async processInterpolation(input: string, id: string) {
+    const chunks: { shell: boolean; value: string; command: string }[] = [];
+    let found = false;
     mapRegExp(
       input,
-      /{%(.*?)%}/g,
+      /{%shell (.*?)%}/g,
       (match) => {
-        chunks.push({ match: true, value: match[0] });
+        chunks.push({ shell: true, value: match[0], command: match[1] });
+        found = true;
       },
       (nonMatch) => {
-        chunks.push({ match: false, value: nonMatch });
+        chunks.push({ shell: false, value: nonMatch, command: "" });
       }
     );
+    if (!found) {
+      this.log(`* interpolation not found for '${id}'`);
+    }
     let output = "";
     for (const chunk of chunks) {
-      if (chunk.match) {
+      if (chunk.shell) {
         this.log(`* processing ${chunk.value}`);
-        const command = chunk.value.slice(2, -2);
-        const child = child_process.spawn(command, {
+        const child = child_process.spawn(chunk.command, {
           shell: true,
           stdio: ["ignore", "pipe", "pipe"],
           ...this.options?.spawn,

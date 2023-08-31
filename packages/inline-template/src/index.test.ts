@@ -6,7 +6,7 @@ describe(InlineTemplateProcessor, () => {
     const input = `\
 <!--
 %template-input-start:some-id%
-{% echo hello %}
+{%shell echo hello %}
 %template-input-end:some-id%
 -->
 
@@ -21,7 +21,7 @@ anything here will be overwritten
     expect(output).toMatchInlineSnapshot(`
       "<!--
       %template-input-start:some-id%
-      {% echo hello %}
+      {%shell echo hello %}
       %template-input-end:some-id%
       -->
 
@@ -33,7 +33,7 @@ anything here will be overwritten
     expect(logFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "* processing {% echo hello %}",
+          "* processing {%shell echo hello %}",
         ],
       ]
     `);
@@ -43,7 +43,7 @@ anything here will be overwritten
     const input = `\
 <!--
 %template-input-start:some-id%
-{% node -hhelp %}
+{%shell node -hhelp %}
 %template-input-end:some-id%
 -->
 
@@ -58,7 +58,7 @@ anything here will be overwritten
     expect(output).toMatchInlineSnapshot(`
       "<!--
       %template-input-start:some-id%
-      {% node -hhelp %}
+      {%shell node -hhelp %}
       %template-input-end:some-id%
       -->
 
@@ -70,7 +70,7 @@ anything here will be overwritten
     expect(logFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "* processing {% node -hhelp %}",
+          "* processing {%shell node -hhelp %}",
         ],
         [
           "** exitCode: 9",

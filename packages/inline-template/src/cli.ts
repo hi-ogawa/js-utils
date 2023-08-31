@@ -11,7 +11,7 @@ const cli = new TinyCliCommand(
     description: "Expand inline template",
     args: {
       file: arg.string("Input file", { positional: true }),
-      dry: arg.boolean("Output instead of updating in-place"),
+      dry: arg.boolean("Print instead of updating in-place"),
       cwd: arg.string("Working directory to execute shell code interpolation", {
         default: process.cwd(),
       }),

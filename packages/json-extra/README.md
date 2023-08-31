@@ -19,13 +19,13 @@ See `./misc/example.mjs`.
 ---- %template-input-start:example% ----
 
 ```js
-{% node ./misc/example.mjs input %}
+{%shell node ./misc/example.mjs input %}
 ```
 
 <details><summary>@hiogawa/json-extra</summary>
 
 ```json
-{% node ./misc/example.mjs json-extra %}
+{%shell node ./misc/example.mjs json-extra %}
 ```
 
 </details>
@@ -33,7 +33,7 @@ See `./misc/example.mjs`.
 <details><summary>@brillout/json-serializer</summary>
 
 ```json
-{% node ./misc/example.mjs @brillout/json-serializer %}
+{%shell node ./misc/example.mjs @brillout/json-serializer %}
 ```
 
 </details>
@@ -41,7 +41,7 @@ See `./misc/example.mjs`.
 <details><summary>superjson</summary>
 
 ```json
-{% node ./misc/example.mjs superjson %}
+{%shell node ./misc/example.mjs superjson %}
 ```
 
 </details>

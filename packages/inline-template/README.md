@@ -1,11 +1,11 @@
 # inline-template
 
-Based on four `%template-...:ID%` markers, `(OUTPUT)` will be replaced with `(INPUT)` after `{% shell code %}` interpolations are applied.
+Based on four `%template-...:ID%` markers, `(OUTPUT)` will be replaced with `(INPUT)` after `{%shell ... %}` interpolations are applied.
 
 ```txt
 %template-input-start:ID%
 
-...(INPUT with {% ... %})...
+...(INPUT with {%shell ... %})...
 
 %template-input-end:ID%
 
