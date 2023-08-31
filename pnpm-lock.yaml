@@ -81,9 +81,6 @@ importers:
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../utils
-      '@hiogawa/utils-node':
-        specifier: workspace:0.0.1-pre.4
-        version: link:../utils-node
       '@types/node':
         specifier: ^18
         version: 18.17.1

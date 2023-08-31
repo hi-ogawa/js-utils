@@ -1,6 +1,8 @@
-import child_process, { type SpawnOptions } from "node:child_process";
+import child_process, {
+  ChildProcess,
+  type SpawnOptions,
+} from "node:child_process";
 import { groupBy, mapRegExp } from "@hiogawa/utils";
-import { ChildProcessPromise } from "@hiogawa/utils-node";
 
 const MARKERS = {
   inputStart: "template-input-start",
@@ -82,13 +84,12 @@ export class InlineTemplateProcessor {
           stdio: ["ignore", "pipe", "pipe"],
           ...this.options?.spawn,
         });
-        const childPromise = new ChildProcessPromise(child);
-        const stdout = await childPromise.stdoutPromise;
+        const { stdout, stderr } = await promisifyChildProcess(child);
         if (child.exitCode !== 0) {
           this.log(`** exitCode: ${child.exitCode}`);
         }
-        if (childPromise.stderr) {
-          this.log(`** stderr\n${childPromise.stderr}`);
+        if (stderr) {
+          this.log(`** stderr **\n${stderr}`);
         }
         output += stdout.trim();
       } else {
@@ -105,4 +106,24 @@ function getMatchOffset(input: string, re: RegExp, addMatchLength: boolean) {
     throw new Error(`Template pattern not found: '${re.source}'`);
   }
   return m.index + (addMatchLength ? m[0].length : 0);
+}
+
+// simplified version of `ChildProcessPromise` from packages/utils-node/src/script.ts
+function promisifyChildProcess(child: ChildProcess) {
+  let stdout = "";
+  let stderr = "";
+  return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
+    child.stdout?.on("data", (v) => {
+      stdout += v.toString();
+    });
+    child.stderr?.on("data", (v) => {
+      stderr += v.toString();
+    });
+    child.on("close", () => {
+      resolve({ stdout, stderr });
+    });
+    child.on("error", (err) => {
+      reject(err);
+    });
+  });
 }
