@@ -10,7 +10,16 @@ const MARKERS = {
 };
 
 export class InlineTemplateProcessor {
-  constructor(private options?: { spawn?: SpawnOptions }) {}
+  constructor(
+    private options?: {
+      spawn?: SpawnOptions;
+      log?: (...args: unknown[]) => void;
+    }
+  ) {}
+
+  get log() {
+    return this.options?.log ?? console.error;
+  }
 
   async process(input: string) {
     // collect template markers
@@ -46,16 +55,16 @@ export class InlineTemplateProcessor {
     const outBegin = getMatchOffset(input, patterns[2], true);
     const outEnd = getMatchOffset(input, patterns[3], false);
     const templateIn = input.slice(inBegin, inEnd);
-    const templateOut = await this.processInterpolation(templateIn);
+    const templateOut = await this.processInterpolation(templateIn, id);
     const output = input.slice(0, outBegin) + templateOut + input.slice(outEnd);
     return output;
   }
 
-  async processInterpolation(input: string) {
+  async processInterpolation(input: string, id: string) {
     const chunks: { match: boolean; value: string }[] = [];
     mapRegExp(
       input,
-      /{%(.*?)%}/g,
+      /{% (.*?) %}/g,
       (match) => {
         chunks.push({ match: true, value: match[1] });
       },
@@ -66,7 +75,7 @@ export class InlineTemplateProcessor {
     let output = "";
     for (const chunk of chunks) {
       if (chunk.match) {
-        // TODO: check status?
+        this.log(`[${id}:shell] ${chunk.value}`);
         const child = child_process.spawn(chunk.value, {
           shell: true,
           stdio: ["ignore", "pipe", "pipe"],
@@ -74,9 +83,11 @@ export class InlineTemplateProcessor {
         });
         const childPromise = new ChildProcessPromise(child);
         const stdout = await childPromise.stdoutPromise;
+        if (child.exitCode !== 0) {
+          this.log(`** exitCode: ${child.exitCode}`);
+        }
         if (childPromise.stderr) {
-          console.error("* [stderr]", chunk.value);
-          console.error(childPromise.stderr);
+          this.log(`** stderr\n${childPromise.stderr}`);
         }
         output += stdout.trim();
       } else {

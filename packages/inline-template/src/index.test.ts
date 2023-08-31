@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { InlineTemplateProcessor } from ".";
 
 describe(InlineTemplateProcessor, () => {
@@ -14,7 +14,10 @@ describe(InlineTemplateProcessor, () => {
 anything here will be overwritten
 <!-- %template-out-end:x% -->
 `;
-    const output = await new InlineTemplateProcessor().process(input);
+    const logFn = vi.fn();
+    const output = await new InlineTemplateProcessor({ log: logFn }).process(
+      input
+    );
     expect(output).toMatchInlineSnapshot(`
       "<!--
       %template-in-begin:x%
@@ -26,6 +29,13 @@ anything here will be overwritten
       hello
       <!-- %template-out-end:x% -->
       "
+    `);
+    expect(logFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "** [shell] echo hello",
+        ],
+      ]
     `);
   });
 });
