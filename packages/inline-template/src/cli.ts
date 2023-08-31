@@ -11,7 +11,7 @@ const cli = new TinyCliCommand(
     description: "Expand inline template",
     args: {
       file: arg.string("Input file", { positional: true }),
-      inplace: arg.boolean("Update file in-place"),
+      dry: arg.boolean("Output instead of updating in-place"),
       cwd: arg.string("Working directory to execute shell code interpolation", {
         default: process.cwd(),
       }),
@@ -23,10 +23,10 @@ const cli = new TinyCliCommand(
       spawn: { cwd: args.cwd },
     });
     const output = await processor.process(input);
-    if (args.inplace) {
-      await fs.promises.writeFile(args.file, output);
-    } else {
+    if (args.dry) {
       console.log(output);
+    } else {
+      await fs.promises.writeFile(args.file, output);
     }
   }
 );

@@ -18,7 +18,7 @@
     "cli": "node ./bin/cli.js",
     "cli-dev": "tsx ./src/cli.ts",
     "test": "vitest",
-    "docs": "inline-template ./README.md --inplace",
+    "docs": "inline-template ./README.md",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
