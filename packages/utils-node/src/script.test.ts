@@ -52,8 +52,9 @@ describe("script", () => {
 
   describe("ChildProcess", () => {
     it("basic", async () => {
-      const proc = $`node -e 'console.log("abc"); console.error("def")'`;
-      expect(await proc.stdoutPromise).toMatchInlineSnapshot('"abc"');
+      const proc = await $`node -e 'console.log("abc"); console.error("def")'`
+        .ready;
+      // expect(await proc).toMatchInlineSnapshot('"abc"');
       expect(proc.stdout).toMatchInlineSnapshot(`
         "abc
         "
@@ -69,7 +70,7 @@ describe("script", () => {
       const proc = $`node -`;
       tinyassert(proc.child.stdin);
       proc.child.stdin.end("console.log(1 + 1)");
-      expect(await proc.stdoutPromise).toMatchInlineSnapshot('"2"');
+      expect(await proc).toMatchInlineSnapshot('"2"');
     });
   });
 });

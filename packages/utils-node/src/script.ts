@@ -52,7 +52,8 @@ export function $new(
     }
 
     // spawn
-    return new SpawnPromise(command, spawnOptions, helperOptions);
+    const child = helperOptions.spawn(command, spawnOptions);
+    return new ChildProcessPromise(child, { noTrim: helperOptions.noTrim });
   }
 
   // expose options in a self-referential way
@@ -60,41 +61,17 @@ export function $new(
   return api;
 }
 
-// wrapper to implement PromiseLike, trim, etc...
-class SpawnPromise implements PromiseLike<string> {
-  child: ChildProcess;
-  stdoutPromise: Promise<string>;
+// ChildProcess promise wrapper to wait on stdout
+export class ChildProcessPromise implements PromiseLike<string> {
+  ready: Promise<Omit<this, "then">>;
   stdout: string = "";
   stderr: string = "";
 
   constructor(
-    command: string,
-    spawnOptions: SpawnOptions,
-    helperOptions: Pick<HelperOptions, "noTrim" | "spawn">
+    public child: ChildProcess,
+    private opitons?: { noTrim?: boolean; noCheckExitCode?: boolean }
   ) {
-    this.child = helperOptions.spawn(command, spawnOptions);
-    const childPromise = new ChildProcessPromise(this.child);
-    this.stdoutPromise = childPromise.stdoutPromise
-      .then((stdout) => (helperOptions.noTrim ? stdout : stdout.trim()))
-      .finally(() => {
-        this.stdout = childPromise.stdout;
-        this.stderr = childPromise.stderr;
-      });
-  }
-
-  // delegate promise api
-  then: PromiseLike<string>["then"] = (...args) =>
-    this.stdoutPromise.then(...args);
-}
-
-// ChildProcess promise wrapper to wait on stdout
-export class ChildProcessPromise {
-  stdoutPromise: Promise<string>;
-  stdout: string = "";
-  stderr: string = "";
-
-  constructor(public child: ChildProcess) {
-    this.stdoutPromise = new Promise<string>((resolve, reject) => {
+    this.ready = new Promise((resolve, reject) => {
       child.stdout?.on("data", (raw: unknown) => {
         processOutput(raw, (v) => (this.stdout += v), reject);
       });
@@ -104,8 +81,8 @@ export class ChildProcessPromise {
       });
 
       child.on("close", (code) => {
-        if (code === 0) {
-          resolve(this.stdout);
+        if (opitons?.noCheckExitCode || code === 0) {
+          resolve(this);
         } else {
           reject(
             new Error(`ChildProcessPromiseError`, {
@@ -124,6 +101,12 @@ export class ChildProcessPromise {
       });
     });
   }
+
+  // delegate `then` with trimmed stdout promise
+  then: PromiseLike<string>["then"] = (...args) =>
+    this.ready
+      .then(() => (this.opitons?.noTrim ? this.stdout : this.stdout.trim()))
+      .then(...args);
 }
 
 function processOutput(
