@@ -5,6 +5,9 @@
       "path": "packages/icheck-ts"
     },
     {
+      "path": "packages/inline-template"
+    },
+    {
       "path": "packages/json-extra"
     },
     {
