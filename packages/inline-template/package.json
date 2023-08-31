@@ -21,8 +21,9 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
-    "@hiogawa/utils": "workspace:*",
     "@hiogawa/tiny-cli": "workspace:*",
+    "@hiogawa/utils": "workspace:*",
+    "@hiogawa/utils-node": "workspace:*",
     "@types/node": "^18"
   }
 }

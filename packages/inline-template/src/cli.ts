@@ -20,7 +20,7 @@ const cli = new TinyCliCommand(
   async ({ args }) => {
     const input = await fs.promises.readFile(args.file, "utf-8");
     const processor = new InlineTemplateProcessor({ spawn: { cwd: args.cwd } });
-    const output = processor.process(input);
+    const output = await processor.process(input);
     if (args.inplace) {
       await fs.promises.writeFile(args.file, output);
     } else {

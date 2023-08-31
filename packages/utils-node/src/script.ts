@@ -52,7 +52,7 @@ export function $new(
     }
 
     // spawn
-    return new SpawnPromiseLike(command, spawnOptions, helperOptions);
+    return new SpawnPromise(command, spawnOptions, helperOptions);
   }
 
   // expose options in a self-referential way
@@ -60,7 +60,8 @@ export function $new(
   return api;
 }
 
-class SpawnPromiseLike implements PromiseLike<string> {
+// TODO: refactor with ChildProcessPromise?
+class SpawnPromise implements PromiseLike<string> {
   child: ChildProcess;
   promise: Promise<string>;
   stderr: string = "";
@@ -69,7 +70,7 @@ class SpawnPromiseLike implements PromiseLike<string> {
   constructor(
     private command: string,
     private options: SpawnOptions,
-    private helperOptions: HelperOptions
+    private helperOptions: Pick<HelperOptions, "noTrim" | "spawn">
   ) {
     const child = helperOptions.spawn(this.command, this.options);
     this.child = child;
@@ -111,6 +112,45 @@ class SpawnPromiseLike implements PromiseLike<string> {
 
   // delegate promise api
   then: PromiseLike<string>["then"] = (...args) => this.promise.then(...args);
+}
+
+// simple async ChildProcess wrapper
+export class ChildProcessPromise {
+  stdoutPromise: Promise<string>;
+  stderr: string = "";
+  stdout: string = "";
+
+  constructor(public child: ChildProcess) {
+    this.stdoutPromise = new Promise<string>((resolve, reject) => {
+      child.stdout?.on("data", (raw: unknown) => {
+        processOutput(raw, (v) => (this.stdout += v), reject);
+      });
+
+      child.stderr?.on("data", (raw: unknown) => {
+        processOutput(raw, (v) => (this.stderr += v), reject);
+      });
+
+      child.on("close", (code) => {
+        if (code === 0) {
+          resolve(this.stdout);
+        } else {
+          reject(
+            new Error(`ChildProcessPromiseError`, {
+              cause: {
+                code,
+                stdout: this.stdout,
+                stderr: this.stderr,
+              },
+            })
+          );
+        }
+      });
+
+      child.on("error", (err) => {
+        reject(err);
+      });
+    });
+  }
 }
 
 function processOutput(

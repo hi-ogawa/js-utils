@@ -1,5 +1,6 @@
 import child_process, { type SpawnOptions } from "node:child_process";
 import { groupBy, mapRegExp } from "@hiogawa/utils";
+import { ChildProcessPromise } from "@hiogawa/utils-node";
 
 const MARKERS = {
   inputStart: "template-in-begin",
@@ -11,7 +12,7 @@ const MARKERS = {
 export class InlineTemplateProcessor {
   constructor(private options?: { spawn?: SpawnOptions }) {}
 
-  process(input: string) {
+  async process(input: string) {
     // collect template markers
     const idMatches = input.matchAll(
       RegExp(`%${MARKERS.inputStart}:(\\w+)%`, "g")
@@ -28,12 +29,12 @@ export class InlineTemplateProcessor {
 
     // process each id
     for (const id of ids) {
-      input = this.processById(input, id);
+      input = await this.processById(input, id);
     }
     return input;
   }
 
-  processById(input: string, id: string) {
+  async processById(input: string, id: string) {
     const patterns = [
       RegExp(`.*%${MARKERS.inputStart}:${id}%.*`),
       RegExp(`.*%${MARKERS.inputEnd}:${id}%.*`),
@@ -45,12 +46,12 @@ export class InlineTemplateProcessor {
     const outBegin = getMatchOffset(input, patterns[2], true);
     const outEnd = getMatchOffset(input, patterns[3], false);
     const templateIn = input.slice(inBegin, inEnd);
-    const templateOut = this.processInterpolation(templateIn);
+    const templateOut = await this.processInterpolation(templateIn);
     const output = input.slice(0, outBegin) + templateOut + input.slice(outEnd);
     return output;
   }
 
-  processInterpolation(input: string) {
+  async processInterpolation(input: string) {
     const chunks: { match: boolean; value: string }[] = [];
     mapRegExp(
       input,
@@ -66,17 +67,18 @@ export class InlineTemplateProcessor {
     for (const chunk of chunks) {
       if (chunk.match) {
         // TODO: check status?
-        const spawnResult = child_process.spawnSync(chunk.value, {
+        const child = child_process.spawn(chunk.value, {
           shell: true,
-          encoding: "utf-8",
           stdio: ["ignore", "pipe", "pipe"],
           ...this.options?.spawn,
         });
-        if (spawnResult.stderr) {
+        const childPromise = new ChildProcessPromise(child);
+        const stdout = await childPromise.stdoutPromise;
+        if (childPromise.stderr) {
           console.error("* [stderr]", chunk.value);
-          console.error(spawnResult.stderr);
+          console.error(childPromise.stderr);
         }
-        output += spawnResult.stdout.trim();
+        output += stdout.trim();
       } else {
         output += chunk.value;
       }

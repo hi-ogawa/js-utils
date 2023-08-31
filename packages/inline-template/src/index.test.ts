@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { InlineTemplateProcessor } from ".";
 
 describe(InlineTemplateProcessor, () => {
-  it("basic", () => {
+  it("basic", async () => {
     const input = `\
 <!--
 %template-in-begin:x%
@@ -14,7 +14,7 @@ describe(InlineTemplateProcessor, () => {
 anything here will be overwritten
 <!-- %template-out-end:x% -->
 `;
-    const output = new InlineTemplateProcessor().process(input);
+    const output = await new InlineTemplateProcessor().process(input);
     expect(output).toMatchInlineSnapshot(`
       "<!--
       %template-in-begin:x%
