@@ -20,7 +20,7 @@ export class MigratorCli {
         const result = await this.migrator.status();
         console.log("[migration-status]");
         for (const [name, e] of result.map) {
-          console.log(name, ":", e.state?.executedAt ?? "(pending)");
+          console.log(name, ":", e.state?.executed_at ?? "(pending)");
         }
         return;
       }
