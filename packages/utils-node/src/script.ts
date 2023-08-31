@@ -60,65 +60,38 @@ export function $new(
   return api;
 }
 
-// TODO: refactor with ChildProcessPromise?
+// wrapper to implement PromiseLike, trim, etc...
 class SpawnPromise implements PromiseLike<string> {
   child: ChildProcess;
-  promise: Promise<string>;
-  stderr: string = "";
+  stdoutPromise: Promise<string>;
   stdout: string = "";
+  stderr: string = "";
 
   constructor(
-    private command: string,
-    private options: SpawnOptions,
-    private helperOptions: Pick<HelperOptions, "noTrim" | "spawn">
+    command: string,
+    spawnOptions: SpawnOptions,
+    helperOptions: Pick<HelperOptions, "noTrim" | "spawn">
   ) {
-    const child = helperOptions.spawn(this.command, this.options);
-    this.child = child;
-    this.promise = new Promise<string>((resolve, reject) => {
-      child.stdout?.on("data", (raw: unknown) => {
-        processOutput(raw, (v) => (this.stdout += v), reject);
+    this.child = helperOptions.spawn(command, spawnOptions);
+    const childPromise = new ChildProcessPromise(this.child);
+    this.stdoutPromise = childPromise.stdoutPromise
+      .then((stdout) => (helperOptions.noTrim ? stdout : stdout.trim()))
+      .finally(() => {
+        this.stdout = childPromise.stdout;
+        this.stderr = childPromise.stderr;
       });
-
-      child.stderr?.on("data", (raw: unknown) => {
-        processOutput(raw, (v) => (this.stderr += v), reject);
-      });
-
-      child.on("close", (code) => {
-        if (code === 0) {
-          let stdout = this.stdout;
-          if (!this.helperOptions.noTrim) {
-            stdout = stdout.trim();
-          }
-          resolve(stdout);
-        } else {
-          reject(
-            new Error(`ScriptError`, {
-              cause: {
-                command,
-                code,
-                stdout: this.stdout,
-                stderr: this.stderr,
-              },
-            })
-          );
-        }
-      });
-
-      child.on("error", (err) => {
-        reject(err);
-      });
-    });
   }
 
   // delegate promise api
-  then: PromiseLike<string>["then"] = (...args) => this.promise.then(...args);
+  then: PromiseLike<string>["then"] = (...args) =>
+    this.stdoutPromise.then(...args);
 }
 
-// simple async ChildProcess wrapper
+// ChildProcess promise wrapper to wait on stdout
 export class ChildProcessPromise {
   stdoutPromise: Promise<string>;
-  stderr: string = "";
   stdout: string = "";
+  stderr: string = "";
 
   constructor(public child: ChildProcess) {
     this.stdoutPromise = new Promise<string>((resolve, reject) => {
