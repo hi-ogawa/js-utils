@@ -9,10 +9,10 @@ services:
       - POSTGRES_PASSWORD=password
     volumes:
       - postgres-volume:/var/lib/postgresql/data
-
-  dockerize:
-    image: jwilder/dockerize:0.6.1
-    profiles: ["tools"]
+    healthcheck:
+      test:  psql postgres postgres -c 'SELECT 0'
+      interval: 1s
+      retries: 10
 
 volumes:
   postgres-volume:

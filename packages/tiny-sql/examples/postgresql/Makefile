@@ -2,8 +2,7 @@
 .PHONY: $(shell grep --no-filename -E '^([a-zA-Z_-]|/)+:' $(MAKEFILE_LIST) | sed 's/:.*//')
 
 docker/up:
-	docker compose up -d
-	docker compose run --rm dockerize -wait tcp://postgres:5432
+	docker compose up --wait
 
 docker/down:
 	docker compose down
