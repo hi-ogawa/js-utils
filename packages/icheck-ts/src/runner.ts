@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { DefaultMap } from "@hiogawa/utils";
+import { DefaultMap, wrapErrorAsync } from "@hiogawa/utils";
 import { type ParseOutput, parseImportExport } from "./parser";
 
 interface ImportTarget {
@@ -83,7 +83,7 @@ export async function runner(
       for (const el of e.bindings) {
         usages.push({ type: "named", name: el.nameBefore ?? el.name });
       }
-      const source = resolveImportSource(file, e.source);
+      const source = await resolveImportSource(file, e.source);
       importRelations
         .get(file)
         .push(...usages.map((usage) => ({ source, usage })));
@@ -158,10 +158,10 @@ export async function runner(
 // https://nodejs.org/api/esm.html#import-specifiers
 // https://nodejs.org/api/modules.html#all-together
 // https://www.typescriptlang.org/tsconfig#moduleResolution
-export function resolveImportSource(
+export async function resolveImportSource(
   containingFile: string,
   source: string
-): ImportSource {
+): Promise<ImportSource> {
   // TODO: memoize fs check?
 
   //
@@ -184,7 +184,8 @@ export function resolveImportSource(
 
   // "." => "./index"
   // "./dir" => "./dir/index"
-  if (fs.statSync(tmpSource, { throwIfNoEntry: false })?.isDirectory()) {
+  const stat = await wrapErrorAsync(() => fs.promises.stat(tmpSource));
+  if (stat.ok && stat.value.isDirectory()) {
     tmpSource = path.join(tmpSource, "index");
   }
 

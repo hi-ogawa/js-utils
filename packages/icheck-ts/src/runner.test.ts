@@ -306,7 +306,7 @@ describe(resolveImportSource, () => {
   );
 
   it("relative", async () => {
-    expect(resolveImportSource("x.ts", "./y")).toMatchInlineSnapshot(`
+    expect(await resolveImportSource("x.ts", "./y")).toMatchInlineSnapshot(`
       {
         "name": "y.ts",
         "type": "internal",

@@ -33,9 +33,9 @@ const command = new TinyCliCommand(
       maxSize: args.cacheSize,
       file: args.cacheLocation,
     });
-    cache.load();
+    await cache.load();
     const result = await runner(args.files, { parse });
-    cache.save();
+    await cache.save();
 
     // apply extra unused rules
     const ignoreRegExp = args.ignore && new RegExp(args.ignore);
@@ -85,14 +85,14 @@ export function memoizeOnFile<F extends (...args: any[]) => any>(
   options: { disabled?: boolean; file: string; maxSize: number }
 ) {
   if (options.disabled) {
-    return [f, { load: () => {}, save: () => {} }] as const;
+    return [f, { load: async () => {}, save: async () => {} }] as const;
   }
 
   const cache = new LruCache<string, any>(options.maxSize);
 
   async function load() {
     if (fs.existsSync(options.file)) {
-      const raw = await fs.promises.readFile(options.file, "utf-8")
+      const raw = await fs.promises.readFile(options.file, "utf-8");
       const data = JSON.parse(raw);
       cache._map = new Map(data);
     }
