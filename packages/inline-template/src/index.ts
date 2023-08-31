@@ -5,15 +5,22 @@ interface TemplateOpitons {
   cwd?: string;
 }
 
+const MARKERS = {
+  inputStart: "template-in-begin",
+  inputEnd: "template-in-end",
+  outputStart: "template-out-begin",
+  outputEnd: "template-out-end",
+};
+
 export function processInlineTemplate(
   input: string,
   options: TemplateOpitons
 ): string {
-  // collect templates
-  //   %template-in-begin:ID%
-  const ids = [...input.matchAll(/%template-in-begin:(\w+)%/g)].map(
-    (m) => m[1]
+  // collect template markers
+  const idMatches = input.matchAll(
+    RegExp(rawRe`%${MARKERS.inputStart}:(\w+)%`, "g")
   );
+  const ids = [...idMatches].map((m) => m[1]);
 
   const duplicates = [...groupBy(ids, (id) => id)]
     .filter(([_k, vs]) => vs.length >= 2)
@@ -36,10 +43,10 @@ function processInlineTemplateById(
   options: TemplateOpitons
 ): string {
   const patterns = [
-    rawRe`.*%template-in-begin:${id}%.*`,
-    rawRe`.*%template-in-end:${id}%.*`,
-    rawRe`.*%template-out-begin:${id}%.*`,
-    rawRe`.*%template-out-end:${id}%.*`,
+    rawRe`.*%${MARKERS.inputStart}:${id}%.*`,
+    rawRe`.*%${MARKERS.inputEnd}:${id}%.*`,
+    rawRe`.*%${MARKERS.outputStart}:${id}%.*`,
+    rawRe`.*%${MARKERS.outputEnd}:${id}%.*`,
   ];
   const inBegin = getMatchOffset(input, patterns[0], true);
   const inEnd = getMatchOffset(input, patterns[1], false);
@@ -94,9 +101,9 @@ function getMatchOffset(input: string, re: RegExp, addMatchLength: boolean) {
 }
 
 function rawRe(strings: TemplateStringsArray, ...params: string[]) {
-  let source = strings[0];
+  let source = strings.raw[0];
   params.forEach((param, i) => {
-    source += param + strings[i + 1];
+    source += param + strings.raw[i + 1];
   });
   return new RegExp(source);
 }

@@ -11,6 +11,7 @@ describe(processInlineTemplate, () => {
 -->
 
 <!-- %template-out-begin:x% -->
+anything here will be overwritten
 <!-- %template-out-end:x% -->
 `;
     const output = processInlineTemplate(input, {});
