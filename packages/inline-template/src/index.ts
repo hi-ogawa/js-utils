@@ -14,7 +14,7 @@ export class InlineTemplateProcessor {
   process(input: string) {
     // collect template markers
     const idMatches = input.matchAll(
-      RegExp(rawRe`%${MARKERS.inputStart}:(\w+)%`, "g")
+      RegExp(`%${MARKERS.inputStart}:(\\w+)%`, "g")
     );
     const ids = [...idMatches].map((m) => m[1]);
 
@@ -26,7 +26,7 @@ export class InlineTemplateProcessor {
       throw new Error(`Found duplicate ID: ${duplicates.join(", ")}`);
     }
 
-    // process by id
+    // process each id
     for (const id of ids) {
       input = this.processById(input, id);
     }
@@ -35,10 +35,10 @@ export class InlineTemplateProcessor {
 
   processById(input: string, id: string) {
     const patterns = [
-      rawRe`.*%${MARKERS.inputStart}:${id}%.*`,
-      rawRe`.*%${MARKERS.inputEnd}:${id}%.*`,
-      rawRe`.*%${MARKERS.outputStart}:${id}%.*`,
-      rawRe`.*%${MARKERS.outputEnd}:${id}%.*`,
+      RegExp(`.*%${MARKERS.inputStart}:${id}%.*`),
+      RegExp(`.*%${MARKERS.inputEnd}:${id}%.*`),
+      RegExp(`.*%${MARKERS.outputStart}:${id}%.*`),
+      RegExp(`.*%${MARKERS.outputEnd}:${id}%.*`),
     ];
     const inBegin = getMatchOffset(input, patterns[0], true);
     const inEnd = getMatchOffset(input, patterns[1], false);
@@ -91,12 +91,4 @@ function getMatchOffset(input: string, re: RegExp, addMatchLength: boolean) {
     throw new Error(`Template pattern not found: '${re.source}'`);
   }
   return m.index + (addMatchLength ? m[0].length : 0);
-}
-
-function rawRe(strings: TemplateStringsArray, ...params: string[]) {
-  let source = strings.raw[0];
-  params.forEach((param, i) => {
-    source += param + strings.raw[i + 1];
-  });
-  return new RegExp(source);
 }
