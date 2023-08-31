@@ -52,8 +52,7 @@ export function $new(
     }
 
     // spawn
-    const child = helperOptions.spawn(command, spawnOptions);
-    return new ChildProcessPromise(child, { noTrim: helperOptions.noTrim });
+    return new SpawnPromiseLike(command, spawnOptions, helperOptions);
   }
 
   // expose options in a self-referential way
@@ -61,17 +60,20 @@ export function $new(
   return api;
 }
 
-// ChildProcess promise wrapper to wait on stdout
-export class ChildProcessPromise implements PromiseLike<string> {
-  ready: Promise<Omit<this, "then">>;
-  stdout: string = "";
+class SpawnPromiseLike implements PromiseLike<string> {
+  child: ChildProcess;
+  promise: Promise<string>;
   stderr: string = "";
+  stdout: string = "";
 
   constructor(
-    public child: ChildProcess,
-    private opitons?: { noTrim?: boolean; noCheckExitCode?: boolean }
+    private command: string,
+    private options: SpawnOptions,
+    private helperOptions: HelperOptions
   ) {
-    this.ready = new Promise((resolve, reject) => {
+    const child = helperOptions.spawn(this.command, this.options);
+    this.child = child;
+    this.promise = new Promise<string>((resolve, reject) => {
       child.stdout?.on("data", (raw: unknown) => {
         processOutput(raw, (v) => (this.stdout += v), reject);
       });
@@ -81,12 +83,17 @@ export class ChildProcessPromise implements PromiseLike<string> {
       });
 
       child.on("close", (code) => {
-        if (opitons?.noCheckExitCode || code === 0) {
-          resolve(this);
+        if (code === 0) {
+          let stdout = this.stdout;
+          if (!this.helperOptions.noTrim) {
+            stdout = stdout.trim();
+          }
+          resolve(stdout);
         } else {
           reject(
-            new Error(`ChildProcessPromiseError`, {
+            new Error(`ScriptError`, {
               cause: {
+                command,
                 code,
                 stdout: this.stdout,
                 stderr: this.stderr,
@@ -102,11 +109,8 @@ export class ChildProcessPromise implements PromiseLike<string> {
     });
   }
 
-  // delegate `then` with trimmed stdout promise
-  then: PromiseLike<string>["then"] = (...args) =>
-    this.ready
-      .then(() => (this.opitons?.noTrim ? this.stdout : this.stdout.trim()))
-      .then(...args);
+  // delegate promise api
+  then: PromiseLike<string>["then"] = (...args) => this.promise.then(...args);
 }
 
 function processOutput(
