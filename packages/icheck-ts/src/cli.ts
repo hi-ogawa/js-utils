@@ -1,22 +1,20 @@
-import fs from "node:fs";
-import path from "node:path";
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
-import { LruCache, hashString, memoize } from "@hiogawa/utils";
 import {
   name as packageName,
   version as packageVersion,
 } from "../package.json";
 import { parseImportExport } from "./parser";
 import { type ExportUsage, runner } from "./runner";
+import { memoizeOnFile } from "./utils";
 
 const command = new TinyCliCommand(
   {
     program: "icheck-ts",
     version: packageVersion,
-    description: "Lint import and export usages",
+    description: "Report unused exports",
     args: {
-      files: arg.stringArray("Typescript files to lint"),
+      files: arg.stringArray("Files to check exports"),
       cache: arg.boolean("Enable caching"),
       cacheLocation: arg.string("Cache directory location", {
         default: `node_modules/.cache/${packageName}/v${packageVersion}`,
@@ -74,46 +72,5 @@ const command = new TinyCliCommand(
     }
   }
 );
-
-//
-// cache
-//
-
-// TOOD: to utils?
-export function memoizeOnFile<F extends (...args: any[]) => any>(
-  f: F,
-  options: { disabled?: boolean; file: string; maxSize: number }
-) {
-  if (options.disabled) {
-    return [f, { load: async () => {}, save: async () => {} }] as const;
-  }
-
-  const cache = new LruCache<string, any>(options.maxSize);
-
-  async function load() {
-    if (fs.existsSync(options.file)) {
-      const raw = await fs.promises.readFile(options.file, "utf-8");
-      const data = JSON.parse(raw);
-      cache._map = new Map(data);
-    }
-  }
-
-  async function save() {
-    const data = JSON.stringify([...cache._map.entries()]);
-    await fs.promises.mkdir(path.dirname(options.file), { recursive: true });
-    await fs.promises.writeFile(options.file, data);
-  }
-
-  const memoized = memoize(f, {
-    keyFn: (...arg) => hashString(JSON.stringify(arg)),
-    cache,
-  });
-
-  return [memoized, { load, save }] as const;
-}
-
-//
-// main
-//
 
 tinyCliMain(command);
