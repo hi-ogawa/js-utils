@@ -610,5 +610,8 @@ describe("colors", () => {
   it("basic", () => {
     expect(colors.red("hey")).toMatchInlineSnapshot('"[31mhey[39m"');
     expect(colors.bgRed("yo")).toMatchInlineSnapshot('"[41myo[49m"');
+    expect(
+      colors.cyan(`nesting ${colors.red("not")} supported`)
+    ).toMatchInlineSnapshot('"[36mnesting [31mnot[39m supported[39m"');
   });
 });
