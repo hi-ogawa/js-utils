@@ -24,10 +24,10 @@ icheck-ts/0.0.1-pre.4
 Usage:
   $ icheck-ts [options] <files...>
 
-Lint import and export usages
+Report unused exports
 
 Positional arguments:
-  files    Typescript files to lint
+  files    Files to check exports
 
 Options:
   --cache                Enable caching
