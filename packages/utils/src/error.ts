@@ -44,7 +44,7 @@ function formatErrorInner(
 
   if (color) {
     label = colors.bgRed(` ${label} `);
-    stack = colors.cyan(stack);
+    stack = stack && colors.cyan(stack);
   } else {
     label = `[${label}]`;
   }
