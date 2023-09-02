@@ -1,3 +1,5 @@
+import { colors } from "./colors";
+
 // traverse and error Error.cause chain
 export function flattenErrorCauses(e: unknown): unknown[] {
   let errors: unknown[] = [e];
@@ -33,11 +35,7 @@ export function formatError(
   return errorsString.join("\n");
 }
 
-// cf. consola.error
-// https://github.com/unjs/consola/blob/e4a37c1cd2c8d96b5f30d8c13ff2df32244baa6a/src/utils/color.ts#L93
-// https://github.com/unjs/consola/blob/e4a37c1cd2c8d96b5f30d8c13ff2df32244baa6a/src/reporters/fancy.ts#L49
-// https://github.com/unjs/consola/blob/e4a37c1cd2c8d96b5f30d8c13ff2df32244baa6a/src/reporters/fancy.ts#L64-L65
-// https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+// based on consola.error https://github.com/unjs/consola
 function formatErrorInner(
   label: string,
   e: Pick<Error, "message" | "stack">,
@@ -46,8 +44,8 @@ function formatErrorInner(
   let stack = e.stack?.split("\n").slice(1).join("\n") ?? "";
 
   if (color) {
-    label = `\u001B[41m ${label} \u001B[49m`;
-    stack = stack && `\u001B[36m${stack}\u001B[39m`;
+    label = colors.bgRed(` ${label} `);
+    stack = stack && colors.cyan(stack);
   } else {
     label = `[${label}]`;
   }

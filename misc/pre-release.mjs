@@ -1,5 +1,5 @@
 import process from "node:process";
-import { tinyassert } from "@hiogawa/utils";
+import { tinyassert, colors, formatError } from "@hiogawa/utils";
 import { $, promptQuestion } from "@hiogawa/utils-node";
 import fs from "node:fs";
 
@@ -60,9 +60,4 @@ function getNextVersion(
   return vs.slice(0, -1).join(".") + "-pre." + vs[3];
 }
 
-const colors = {
-  red: (v) => `\u001B[31m${v}\u001B[39m`,
-  green: (v) => `\u001B[32m${v}\u001B[39m`,
-};
-
-main();
+main().catch((e) => console.error(formatError(e)));
