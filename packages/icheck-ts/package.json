@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/icheck-ts",
-  "version": "0.0.1-pre.2",
+  "version": "0.0.1-pre.5",
   "type": "module",
   "bin": "./bin/cli.js",
   "files": [
@@ -24,9 +24,7 @@
   "devDependencies": {
     "@hiogawa/tiny-cli": "workspace:*",
     "@hiogawa/utils": "workspace:*",
-    "@types/node": "^18",
-    "fast-glob": "^3.3.1",
-    "memfs": "^4.2.1"
+    "@types/node": "^18"
   },
   "peerDependencies": {
     "typescript": "*"

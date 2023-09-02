@@ -1,12 +1,10 @@
-import { Volume } from "memfs";
-import { describe, expect, it } from "vitest";
-import { resolveImportSource, run } from "./runner";
+import { beforeAll, describe, expect, it } from "vitest";
+import { resolveImportSource, runner } from "./runner";
+import { setupTestFixture } from "./tests/helper";
 
-describe("runner", () => {
-  it("importRelations", async () => {
-    // https://github.com/streamich/memfs/blob/master/docs/node/usage.md
-    const volumeJson = {
-      "f1.ts": `
+describe(runner, () => {
+  const fixture = {
+    "f1.ts": `
 import { x2 as y2, x4 } from "./f2";
 export { x2 as z2 } from "./f2";
 import * as f5 from "./dir2/f5";
@@ -16,46 +14,39 @@ import "./dir1/unknown";
 import "./dir2/dir3";
 `,
 
-      "f2.tsx": `
+    "f2.tsx": `
 import { x3 } from "./dir1/f3";
 export const x2 = x3 + 1;
 export const x4 = x3 + 2;
+// icheck-ignore
 export const x4_1 = x3 + 3;
 `,
 
-      "dir1/index.ts": "",
+    "dir1/index.ts": "",
 
-      "dir1/f3.ts": `
+    "dir1/f3.ts": `
 import * as i from ".";
 import * as j from "./";
 import * as k from "./index";
 export const x3 =  0;
 `,
 
-      "dir2/index.tsx": "",
-      "dir2/f5.ts": "",
+    "dir2/index.tsx": "",
+    "dir2/f5.ts": "",
 
-      "dir2/dir3/f7.ts": `
+    "dir2/dir3/f7.ts": `
 import * as i from "../f5";
 import * as j from "..";
 `,
-    };
-    const volume = Volume.fromJSON(volumeJson);
-    const result = run(Object.keys(volumeJson), {
-      fs: volume as any,
-    });
-    expect(result.errors.length).toBe(0);
+  };
+
+  beforeAll(() => setupTestFixture("runner", fixture));
+
+  it("basic", async () => {
+    const result = await runner(Object.keys(fixture));
+    expect(result.errors.size).toBe(0);
     expect(result.importUsages).toMatchInlineSnapshot(`
       Map {
-        "dir1/f3.ts" => [
-          {
-            "type": "sideEffect",
-          },
-          {
-            "name": "x3",
-            "type": "named",
-          },
-        ],
         "f2.tsx" => [
           {
             "name": "x2",
@@ -76,6 +67,15 @@ import * as j from "..";
           },
           {
             "type": "namespace",
+          },
+        ],
+        "dir1/f3.ts" => [
+          {
+            "type": "sideEffect",
+          },
+          {
+            "name": "x3",
+            "type": "named",
           },
         ],
         "dir1/index.ts" => [
@@ -100,32 +100,52 @@ import * as j from "..";
       Map {
         "f1.ts" => [
           {
+            "comment": "",
             "name": "z2",
-            "position": 47,
+            "position": [
+              3,
+              0,
+            ],
             "used": false,
           },
         ],
         "f2.tsx" => [
           {
+            "comment": "",
             "name": "x2",
-            "position": 46,
+            "position": [
+              3,
+              0,
+            ],
             "used": true,
           },
           {
+            "comment": "",
             "name": "x4",
-            "position": 72,
+            "position": [
+              4,
+              0,
+            ],
             "used": true,
           },
           {
+            "comment": "// icheck-ignore",
             "name": "x4_1",
-            "position": 98,
+            "position": [
+              6,
+              0,
+            ],
             "used": false,
           },
         ],
         "dir1/f3.ts" => [
           {
+            "comment": "",
             "name": "x3",
-            "position": 93,
+            "position": [
+              5,
+              0,
+            ],
             "used": true,
           },
         ],
@@ -134,6 +154,55 @@ import * as j from "..";
     expect(result.importRelations).toMatchInlineSnapshot(`
       Map {
         "f1.ts" => [
+          {
+            "source": {
+              "name": "f2.tsx",
+              "type": "internal",
+            },
+            "usage": {
+              "name": "x2",
+              "type": "named",
+            },
+          },
+          {
+            "source": {
+              "name": "f2.tsx",
+              "type": "internal",
+            },
+            "usage": {
+              "name": "x4",
+              "type": "named",
+            },
+          },
+          {
+            "source": {
+              "name": "f2.tsx",
+              "type": "internal",
+            },
+            "usage": {
+              "name": "x2",
+              "type": "named",
+            },
+          },
+          {
+            "source": {
+              "name": "dir2/f5.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "type": "namespace",
+            },
+          },
+          {
+            "source": {
+              "name": "node:process",
+              "type": "external",
+            },
+            "usage": {
+              "name": "default",
+              "type": "named",
+            },
+          },
           {
             "source": {
               "name": "dir1/f3.ts",
@@ -159,55 +228,6 @@ import * as j from "..";
             },
             "usage": {
               "type": "sideEffect",
-            },
-          },
-          {
-            "source": {
-              "name": "f2.tsx",
-              "type": "internal",
-            },
-            "usage": {
-              "name": "x2",
-              "type": "named",
-            },
-          },
-          {
-            "source": {
-              "name": "f2.tsx",
-              "type": "internal",
-            },
-            "usage": {
-              "name": "x4",
-              "type": "named",
-            },
-          },
-          {
-            "source": {
-              "name": "node:process",
-              "type": "external",
-            },
-            "usage": {
-              "name": "default",
-              "type": "named",
-            },
-          },
-          {
-            "source": {
-              "name": "dir2/f5.ts",
-              "type": "internal",
-            },
-            "usage": {
-              "type": "namespace",
-            },
-          },
-          {
-            "source": {
-              "name": "f2.tsx",
-              "type": "internal",
-            },
-            "usage": {
-              "name": "x2",
-              "type": "named",
             },
           },
         ],
@@ -278,13 +298,15 @@ import * as j from "..";
 });
 
 describe(resolveImportSource, () => {
-  it("relative", () => {
-    const fs = Volume.fromJSON({
+  beforeAll(() =>
+    setupTestFixture(resolveImportSource.name, {
       "x.ts": "",
       "y.ts": "",
-    });
-    expect(resolveImportSource("x.ts", "./y", fs as any))
-      .toMatchInlineSnapshot(`
+    })
+  );
+
+  it("relative", async () => {
+    expect(await resolveImportSource("x.ts", "./y")).toMatchInlineSnapshot(`
       {
         "name": "y.ts",
         "type": "internal",

@@ -1,28 +1,19 @@
-import nodeFs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
-import { DefaultMap, LruCache, hashString, memoize } from "@hiogawa/utils";
-import {
-  name as packageName,
-  version as packageVersion,
-} from "../package.json";
+import { DefaultMap, wrapErrorAsync } from "@hiogawa/utils";
 import { type ParseOutput, parseImportExport } from "./parser";
 
-type Fs = typeof import("node:fs");
-
-// TODO: rework structure
-
-// TODO: track code position for error message
 interface ImportTarget {
-  source: ModuleSource;
-  usage: ModuleUsage;
+  source: ImportSource;
+  usage: ImportUsage;
 }
 
-type ModuleSource = {
+type ImportSource = {
   type: "external" | "internal" | "unknown";
   name: string; // resolved file path if "internal"
 };
 
-type ModuleUsage =
+type ImportUsage =
   | {
       // import { x as y } from "a"
       // export { x as y } from "a"
@@ -39,97 +30,63 @@ type ModuleUsage =
       type: "sideEffect";
     };
 
-type ModuleExportUsage = {
+export type ExportUsage = {
   name: string;
   used: boolean;
-  position: number;
+  position: [number, number];
+  comment: string;
 };
 
-export function run(
+// 1. parse files
+// 2. resolve import source
+// 3. check unused exports
+export async function runner(
   inputFiles: string[],
-  options?: { fs?: Fs; cache?: boolean }
+  options?: { parse?: typeof parseImportExport }
 ) {
-  const fs = options?.fs ?? nodeFs;
-
-  const entries: { file: string; parseOutput: ParseOutput }[] = [];
-  const errors: { file: string; error: unknown }[] = [];
-
-  // normalize relative path (e.g. "./x.ts" => "x.ts")
+  // normalize relative path to match with `resolveImportSource` (e.g. "./x.ts" => "x.ts")
   inputFiles = inputFiles.map((f) => path.normalize(f));
-
-  const cachedParser = options?.cache ? createCachedParser() : undefined;
-  let parse = cachedParser?.parse ?? parseImportExport;
-  cachedParser?.load();
 
   //
   // extract import/export
   //
-
+  const parsedFiles = new Map<string, ParseOutput>();
+  const errors = new Map<string, unknown>();
+  const parse = options?.parse ?? parseImportExport;
   for (const file of inputFiles) {
     const code = fs.readFileSync(file, "utf-8");
     const jsx = file.endsWith("x");
     const result = parse({ code, jsx });
     if (!result.ok) {
-      errors.push({ file, error: result.value });
+      errors.set(file, result.value);
       continue;
     }
-    entries.push({
-      file,
-      parseOutput: result.value,
-    });
+    parsedFiles.set(file, result.value);
   }
-  cachedParser?.save();
 
   //
   // resolve import module
   //
 
-  // as adjacency list
+  // import graph as adjacency list
   const importRelations = new DefaultMap<string, ImportTarget[]>(() => []);
 
-  for (const entry of entries) {
-    // TODO: cache resolveImportSource?
-    for (const e of entry.parseOutput.bareImports) {
-      importRelations.get(entry.file).push({
-        source: resolveImportSource(entry.file, e.source, fs),
-        usage: {
-          type: "sideEffect",
-        },
-      });
-    }
-    for (const e of entry.parseOutput.namedImports) {
-      importRelations.get(entry.file).push({
-        source: resolveImportSource(entry.file, e.source, fs),
-        usage: {
-          type: "named",
-          name: e.name,
-        },
-      });
-    }
-    for (const e of entry.parseOutput.namespaceImports) {
-      importRelations.get(entry.file).push({
-        source: resolveImportSource(entry.file, e.source, fs),
-        usage: {
-          type: "namespace",
-        },
-      });
-    }
-    for (const e of entry.parseOutput.namedReExports) {
-      importRelations.get(entry.file).push({
-        source: resolveImportSource(entry.file, e.source, fs),
-        usage: {
-          type: "named",
-          name: e.nameBefore ?? e.name,
-        },
-      });
-    }
-    for (const e of entry.parseOutput.namespaceReExports) {
-      importRelations.get(entry.file).push({
-        source: resolveImportSource(entry.file, e.source, fs),
-        usage: {
-          type: "namespace",
-        },
-      });
+  for (const [file, parseOutput] of parsedFiles) {
+    for (const e of parseOutput.imports) {
+      const usages: ImportUsage[] = [];
+      if (e.sideEffect) {
+        usages.push({ type: "sideEffect" });
+      }
+      if (e.namespace) {
+        usages.push({ type: "namespace" });
+      }
+      for (const el of e.bindings) {
+        usages.push({ type: "named", name: el.nameBefore ?? el.name });
+      }
+      const source = await resolveImportSource(file, e.source);
+      importRelations
+        .get(file)
+        .push(...usages.map((usage) => ({ source, usage })));
     }
   }
 
@@ -137,7 +94,7 @@ export function run(
   // collect internal import usages
   //
 
-  const importUsages = new DefaultMap<string, ModuleUsage[]>(() => []);
+  const importUsages = new DefaultMap<string, ImportUsage[]>(() => []);
   for (const target of [...importRelations.values()].flat()) {
     if (target.source.type === "internal") {
       importUsages.get(target.source.name).push(target.usage);
@@ -159,30 +116,37 @@ export function run(
   //
   // resolve export usages
   //
-  const exportUsages = new DefaultMap<string, ModuleExportUsage[]>(() => []);
+  const exportUsages = new DefaultMap<string, ExportUsage[]>(() => []);
 
-  for (const entry of entries) {
-    // TODO: resolve re-export chain?
-    // entry.parseOutput.namespaceReExports
+  for (const [file, parseOutput] of parsedFiles) {
+    for (const e of parseOutput.imports.filter((e) => e.reExport)) {
+      // TODO: need to resolve re-export chain
+      // e.namespace;
 
-    for (const e of entry.parseOutput.namedReExports) {
-      exportUsages.get(entry.file).push({
-        name: e.name,
-        used: isUsedExport(entry.file, e.name),
-        position: e.position,
-      });
+      for (const el of e.bindings) {
+        exportUsages.get(file).push({
+          name: el.name,
+          used: isUsedExport(file, el.name),
+          position: e.position,
+          comment: e.comment,
+        });
+      }
     }
-    for (const e of entry.parseOutput.namedExports) {
-      exportUsages.get(entry.file).push({
-        name: e.name,
-        used: isUsedExport(entry.file, e.name),
-        position: e.position,
-      });
+
+    for (const e of parseOutput.exports) {
+      for (const el of e.bindings) {
+        exportUsages.get(file).push({
+          name: el.name,
+          used: isUsedExport(file, el.name),
+          position: e.position,
+          comment: e.comment,
+        });
+      }
     }
   }
 
   return {
-    entries,
+    parsedFiles,
     errors,
     importRelations,
     importUsages,
@@ -194,11 +158,12 @@ export function run(
 // https://nodejs.org/api/esm.html#import-specifiers
 // https://nodejs.org/api/modules.html#all-together
 // https://www.typescriptlang.org/tsconfig#moduleResolution
-export function resolveImportSource(
+export async function resolveImportSource(
   containingFile: string,
-  source: string,
-  fs: Fs
-): ModuleSource {
+  source: string
+): Promise<ImportSource> {
+  // TODO: memoize fs check?
+
   //
   // poor-man's module path resolusion
   //
@@ -219,7 +184,8 @@ export function resolveImportSource(
 
   // "." => "./index"
   // "./dir" => "./dir/index"
-  if (fs.statSync(tmpSource, { throwIfNoEntry: false })?.isDirectory()) {
+  const stat = await wrapErrorAsync(() => fs.promises.stat(tmpSource));
+  if (stat.ok && stat.value.isDirectory()) {
     tmpSource = path.join(tmpSource, "index");
   }
 
@@ -243,37 +209,4 @@ export function resolveImportSource(
         type: "unknown",
         name: source,
       };
-}
-
-//
-// cache (TODO: move this logic to cli.ts)
-//
-
-// configurable?
-const CACHE_FILE = `node_modules/.cache/${packageName}/v${packageVersion}/parseImportExport`;
-const CACHE_SIZE = 1000_000;
-
-function createCachedParser() {
-  const fs = nodeFs;
-  const cache = new LruCache<string, any>(CACHE_SIZE);
-
-  function load() {
-    if (fs.existsSync(CACHE_FILE)) {
-      const data = JSON.parse(fs.readFileSync(CACHE_FILE, "utf-8"));
-      cache._map = new Map(data);
-    }
-  }
-
-  function save() {
-    const data = JSON.stringify([...cache._map.entries()]);
-    fs.mkdirSync(path.dirname(CACHE_FILE), { recursive: true });
-    fs.writeFileSync(CACHE_FILE, data);
-  }
-
-  const parse = memoize(parseImportExport, {
-    keyFn: (arg) => hashString(JSON.stringify(arg)),
-    cache,
-  });
-
-  return { parse, load, save };
 }

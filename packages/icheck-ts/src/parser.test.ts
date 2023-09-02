@@ -32,86 +32,224 @@ import "./dep5";
       {
         "ok": true,
         "value": {
-          "bareImports": [
+          "exports": [
             {
-              "position": 525,
-              "source": "./dep5",
+              "bindings": [
+                {
+                  "name": "f4",
+                  "nameBefore": "f3",
+                },
+              ],
+              "comment": "",
+              "position": [
+                14,
+                0,
+              ],
+            },
+            {
+              "bindings": [
+                {
+                  "name": "default",
+                },
+              ],
+              "comment": "// export other cases",
+              "position": [
+                17,
+                0,
+              ],
+            },
+            {
+              "bindings": [
+                {
+                  "name": "f1",
+                },
+              ],
+              "comment": "",
+              "position": [
+                18,
+                0,
+              ],
+            },
+            {
+              "bindings": [
+                {
+                  "name": "default",
+                },
+              ],
+              "comment": "",
+              "position": [
+                19,
+                0,
+              ],
+            },
+            {
+              "bindings": [
+                {
+                  "name": "f3",
+                },
+              ],
+              "comment": "",
+              "position": [
+                20,
+                0,
+              ],
             },
           ],
-          "namedExports": [
+          "imports": [
             {
-              "name": "f3",
-              "position": 364,
-            },
-            {
-              "name": "default",
-              "position": 399,
-            },
-            {
-              "name": "f1",
-              "position": 437,
-            },
-            {
-              "name": "default",
-              "position": 452,
-            },
-            {
-              "name": "f3",
-              "position": 485,
-            },
-          ],
-          "namedImports": [
-            {
-              "name": "default",
-              "position": 31,
+              "bindings": [
+                {
+                  "name": "d1",
+                  "nameBefore": "default",
+                },
+              ],
+              "comment": "// import declarations",
+              "namespace": false,
+              "position": [
+                3,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": false,
               "source": "./dep1",
             },
             {
-              "name": "d2",
-              "position": 58,
+              "bindings": [
+                {
+                  "name": "d2",
+                  "nameBefore": undefined,
+                },
+              ],
+              "comment": "",
+              "namespace": false,
+              "position": [
+                4,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": false,
               "source": "./dep2",
             },
             {
-              "name": "d3",
-              "position": 87,
+              "bindings": [
+                {
+                  "name": "d4",
+                  "nameBefore": "d3",
+                },
+              ],
+              "comment": "",
+              "namespace": false,
+              "position": [
+                5,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": false,
               "source": "./dep3",
             },
             {
-              "name": "default",
-              "position": 122,
+              "bindings": [
+                {
+                  "name": "d3_1",
+                  "nameBefore": "default",
+                },
+              ],
+              "comment": "",
+              "namespace": false,
+              "position": [
+                6,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": false,
               "source": "./dep3-1",
             },
-          ],
-          "namedReExports": [
             {
-              "name": "r1",
-              "nameBefore": undefined,
-              "position": 220,
+              "bindings": [],
+              "comment": "",
+              "namespace": true,
+              "position": [
+                7,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": false,
+              "source": "./dep4",
+            },
+            {
+              "bindings": [
+                {
+                  "name": "r1",
+                  "nameBefore": undefined,
+                },
+              ],
+              "comment": "// export declarations",
+              "namespace": false,
+              "position": [
+                10,
+                0,
+              ],
+              "reExport": true,
+              "sideEffect": false,
               "source": "./re-dep1",
             },
             {
-              "name": "r3",
-              "nameBefore": "r2",
-              "position": 252,
+              "bindings": [
+                {
+                  "name": "r3",
+                  "nameBefore": "r2",
+                },
+              ],
+              "comment": "",
+              "namespace": false,
+              "position": [
+                11,
+                0,
+              ],
+              "reExport": true,
+              "sideEffect": false,
               "source": "./re-dep2",
             },
             {
-              "name": "r2_1",
-              "nameBefore": "default",
-              "position": 290,
+              "bindings": [
+                {
+                  "name": "r2_1",
+                  "nameBefore": "default",
+                },
+              ],
+              "comment": "",
+              "namespace": false,
+              "position": [
+                12,
+                0,
+              ],
+              "reExport": true,
+              "sideEffect": false,
               "source": "./re-dep2-1",
             },
-          ],
-          "namespaceImports": [
             {
-              "position": 164,
-              "source": "./dep4",
-            },
-          ],
-          "namespaceReExports": [
-            {
-              "position": 328,
+              "bindings": [],
+              "comment": "",
+              "namespace": true,
+              "position": [
+                13,
+                0,
+              ],
+              "reExport": true,
+              "sideEffect": false,
               "source": "./re-dep3",
+            },
+            {
+              "bindings": [],
+              "comment": "// more cases",
+              "namespace": false,
+              "position": [
+                23,
+                0,
+              ],
+              "reExport": false,
+              "sideEffect": true,
+              "source": "./dep5",
             },
           ],
         },
@@ -137,21 +275,69 @@ export default {};
       {
         "ok": true,
         "value": {
-          "bareImports": [],
-          "namedExports": [
+          "exports": [
             {
-              "name": "yes1",
-              "position": 14,
+              "bindings": [
+                {
+                  "name": "yes1",
+                },
+              ],
+              "comment": "",
+              "position": [
+                2,
+                0,
+              ],
             },
             {
-              "name": "yes2",
-              "position": 64,
+              "bindings": [
+                {
+                  "name": "no1",
+                },
+              ],
+              "comment": "// icheck-ignore",
+              "position": [
+                4,
+                0,
+              ],
+            },
+            {
+              "bindings": [
+                {
+                  "name": "yes2",
+                },
+              ],
+              "comment": "",
+              "position": [
+                6,
+                0,
+              ],
+            },
+            {
+              "bindings": [
+                {
+                  "name": "no2",
+                },
+              ],
+              "comment": "/* icheck-ignore */",
+              "position": [
+                8,
+                0,
+              ],
+            },
+            {
+              "bindings": [
+                {
+                  "name": "default",
+                },
+              ],
+              "comment": "// icheck-ignore",
+              "position": [
+                11,
+                0,
+              ],
             },
           ],
-          "namedImports": [],
-          "namedReExports": [],
-          "namespaceImports": [],
-          "namespaceReExports": [],
+          "imports": [],
         },
       }
     `);
