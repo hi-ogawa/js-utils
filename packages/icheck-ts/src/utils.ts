@@ -7,7 +7,7 @@ export function memoizeOnFile<F extends (...args: any[]) => any>(
   options: { disabled?: boolean; file: string; maxSize: number }
 ) {
   if (options.disabled) {
-    return [f, { load: async () => {}, save: async () => {} }] as const;
+    return [f, undefined] as const;
   }
 
   const cache = new LruCache<string, any>(options.maxSize);
@@ -27,7 +27,7 @@ export function memoizeOnFile<F extends (...args: any[]) => any>(
   }
 
   const memoized = memoize(f, {
-    keyFn: (...arg) => hashString(JSON.stringify(arg)),
+    keyFn: (...args) => hashString(JSON.stringify(args)),
     cache,
   });
 

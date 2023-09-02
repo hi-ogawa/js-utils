@@ -26,14 +26,14 @@ const command = new TinyCliCommand(
     },
   },
   async ({ args }) => {
-    const [parse, cache] = memoizeOnFile(parseImportExport, {
+    const [parse, cacheOp] = memoizeOnFile(parseImportExport, {
       disabled: !args.cache,
       maxSize: args.cacheSize,
       file: args.cacheLocation,
     });
-    await cache.load();
+    await cacheOp?.load();
     const result = await runner(args.files, { parse });
-    await cache.save();
+    await cacheOp?.save();
 
     // apply extra unused rules
     const ignoreRegExp = args.ignore && new RegExp(args.ignore);
