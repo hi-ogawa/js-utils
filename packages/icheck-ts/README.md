@@ -19,7 +19,7 @@ $ icheck-ts --help
 
 ```txt
 $ icheck-ts --help
-icheck-ts/0.0.1-pre.2
+icheck-ts/0.0.1-pre.4
 
 Usage:
   $ icheck-ts [options] <files...>
@@ -30,9 +30,10 @@ Positional arguments:
   files    Typescript files to lint
 
 Options:
-  --cache         enable caching
-  --ignore=...    RegExp pattern to ignore export names
-  --debug         Debug output
+  --cache                Enable caching
+  --cacheLocation=...    Cache directory location
+  --cacheSize=...        LRU cache size
+  --ignore=...           RegExp pattern to ignore export names
 ```
 
 <!-- %template-output-end:help% -->

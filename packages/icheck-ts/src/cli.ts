@@ -21,7 +21,7 @@ const command = new TinyCliCommand(
       cacheLocation: arg.string("Cache directory location", {
         default: `node_modules/.cache/${packageName}/v${packageVersion}`,
       }),
-      cacheSize: arg.number("LRU cache size", { default: 1000_000 }),
+      cacheSize: arg.number("LRU cache size", { default: 100_000 }),
       ignore: arg.string("RegExp pattern to ignore export names", {
         optional: true,
       }),
