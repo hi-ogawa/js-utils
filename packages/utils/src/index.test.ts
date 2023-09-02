@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { colors } from "./colors";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
 import { groupBy, range } from "./lodash";
@@ -602,5 +603,12 @@ describe(mapRegExp, () => {
     expect(transform("x = {{ 1 + 2 }}, y = {{ 4 * 5 }}")).toMatchInlineSnapshot(
       '"x = 3, y = 20"'
     );
+  });
+});
+
+describe("colors", () => {
+  it("basic", () => {
+    expect(colors.red("hey")).toMatchInlineSnapshot('"[31mhey[39m"');
+    expect(colors.bgRed("yo")).toMatchInlineSnapshot('"[41myo[49m"');
   });
 });
