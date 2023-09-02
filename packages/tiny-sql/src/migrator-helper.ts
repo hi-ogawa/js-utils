@@ -57,13 +57,13 @@ export function rawSqlMigrationDriver(options: {
   execute: (query: string) => Promise<unknown[]>;
   executeRaw: (query: string) => Promise<void>;
 }): MigratorOptions<string>["driver"] {
-  // TODO: escape/binding?
+  // TODO: quote/escape/binding?
   return {
     init: async () => {
       await options.execute(`\
         CREATE TABLE ${options.table} (
-          name       VARCHAR(128) NOT NULL PRIMARY KEY,
-          executedAt VARCHAR(128) NOT NULL
+          name        VARCHAR(128) NOT NULL PRIMARY KEY,
+          executed_at VARCHAR(128) NOT NULL
         )
       `);
     },
@@ -81,7 +81,7 @@ export function rawSqlMigrationDriver(options: {
 
     insert: async (state) => {
       await options.execute(
-        `INSERT INTO ${options.table} (name, executedAt) VALUES ('${state.name}', '${state.executedAt}')`
+        `INSERT INTO ${options.table} (name, executed_at) VALUES ('${state.name}', '${state.executed_at}')`
       );
     },
 

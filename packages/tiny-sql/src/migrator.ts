@@ -26,7 +26,7 @@ export type MigrationRequest<I> = {
 
 export interface MigrationState {
   name: string;
-  executedAt: string;
+  executed_at: string;
 }
 
 export type MigrationRequestStateMap<I> = Map<
@@ -149,8 +149,8 @@ export class Migrator<T = unknown> {
   ) {
     if (direction === "up") {
       await this.options.driver.run(request.up);
-      const executedAt = new Date().toISOString();
-      await this.options.driver.insert({ name: request.name, executedAt });
+      const executed_at = new Date().toISOString();
+      await this.options.driver.insert({ name: request.name, executed_at });
     } else {
       if (request.down) {
         await this.options.driver.run(request.down);

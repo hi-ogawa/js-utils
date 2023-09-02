@@ -229,6 +229,18 @@ importers:
         specifier: ^20.4.1
         version: 20.4.1
 
+  packages/tiny-sql/examples/postgresql:
+    devDependencies:
+      '@hiogawa/tiny-sql':
+        specifier: workspace:*
+        version: link:../..
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../../../utils
+      postgres:
+        specifier: ^3.3.5
+        version: 3.3.5
+
   packages/tiny-sql/examples/sqlite:
     devDependencies:
       '@hiogawa/tiny-sql':
@@ -4451,6 +4463,10 @@ packages:
       nanoid: 3.3.6
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
+
+  /postgres@3.3.5:
+    resolution: {integrity: sha512-+JD93VELV9gHkqpV5gdL5/70HdGtEw4/XE1S4BC8f1mcPmdib3K5XsKVbnR1XcAyC41zOnifJ+9YRKxdIsXiUw==}
     dev: true
 
   /prebuild-install@7.1.1:
