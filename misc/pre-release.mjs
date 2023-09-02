@@ -1,5 +1,5 @@
 import process from "node:process";
-import { tinyassert } from "@hiogawa/utils";
+import { tinyassert, colors, formatError } from "@hiogawa/utils";
 import { $, promptQuestion } from "@hiogawa/utils-node";
 import fs from "node:fs";
 
@@ -19,34 +19,37 @@ async function main() {
   if (gitStatus) {
     console.log(gitStatus);
     const input = await promptQuestion(
-      "* proceed regardless of dirty 'git status'? (y/n) "
+      "* proceed regardless of dirty 'git status'? (Y/n) "
     );
-    if (input !== "y") process.exit(1);
+    if (!["", "y"].includes(input)) process.exit(1);
   }
 
   // update version
-  /** @type {{ version: string }} */
   const pakcageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
-  pakcageJson.version = getNextVersion(pakcageJson.version);
+  const nextVersion = getNextVersion(pakcageJson.version);
+  console.log("* version change");
+  console.log(colors.red(`- ${pakcageJson.version}`));
+  console.log(colors.green(`+ ${nextVersion}`));
+  const input = await promptQuestion("* proceed to push changes? (y/n) ");
+  if (!["", "y"].includes(input)) process.exit(1);
+
+  // write file
+  pakcageJson.version = nextVersion;
   fs.writeFileSync(
     packageJsonPath,
     JSON.stringify(pakcageJson, null, 2) + "\n"
   );
 
   // push
-  await $$`git diff ${packageJsonPath}`;
-  const input = await promptQuestion("* proceed to push changes? (y/n) ");
-  if (input !== "y") process.exit(1);
-
   await $$`git add ${packageJsonPath}`;
   await $$`git commit -m 'chore: pre release (${pakcageJson.name}@${pakcageJson.version})'`;
   await $$`git push origin HEAD`;
 }
 
-/**
- * @param {string} version
- */
-function getNextVersion(version) {
+function getNextVersion(
+  /** @type {string} */
+  version
+) {
   const vs = version.match(/(\d+).(\d+).(\d+)(?:-pre.(\d+))?/).slice(1);
   if (vs[3]) {
     vs[3] = Number(vs[3]) + 1;
@@ -57,4 +60,4 @@ function getNextVersion(version) {
   return vs.slice(0, -1).join(".") + "-pre." + vs[3];
 }
 
-main();
+main().catch((e) => console.error(formatError(e)));

@@ -125,7 +125,7 @@ describe(Migrator, () => {
               "up": "up:create-user",
             },
             "state": {
-              "executedAt": "1970-01-01T00:00:01.000Z",
+              "executed_at": "1970-01-01T00:00:01.000Z",
               "name": "create-user",
             },
           },
@@ -163,7 +163,7 @@ describe(Migrator, () => {
     expect(table).toMatchInlineSnapshot(`
       [
         {
-          "executedAt": "1970-01-01T00:00:01.000Z",
+          "executed_at": "1970-01-01T00:00:01.000Z",
           "name": "create-user",
         },
       ]
@@ -189,11 +189,11 @@ describe(Migrator, () => {
     expect(table).toMatchInlineSnapshot(`
       [
         {
-          "executedAt": "1970-01-01T00:00:01.000Z",
+          "executed_at": "1970-01-01T00:00:01.000Z",
           "name": "create-user",
         },
         {
-          "executedAt": "1970-01-01T00:00:02.000Z",
+          "executed_at": "1970-01-01T00:00:02.000Z",
           "name": "up-only",
         },
       ]
@@ -220,7 +220,7 @@ describe(Migrator, () => {
     expect(table).toMatchInlineSnapshot(`
       [
         {
-          "executedAt": "1970-01-01T00:00:01.000Z",
+          "executed_at": "1970-01-01T00:00:01.000Z",
           "name": "create-user",
         },
       ]
@@ -252,15 +252,15 @@ describe(Migrator, () => {
     expect(table).toMatchInlineSnapshot(`
       [
         {
-          "executedAt": "1970-01-01T00:00:01.000Z",
+          "executed_at": "1970-01-01T00:00:01.000Z",
           "name": "create-user",
         },
         {
-          "executedAt": "1970-01-01T00:00:04.000Z",
+          "executed_at": "1970-01-01T00:00:04.000Z",
           "name": "up-only",
         },
         {
-          "executedAt": "1970-01-01T00:00:04.000Z",
+          "executed_at": "1970-01-01T00:00:04.000Z",
           "name": "create-profile",
         },
       ]
@@ -289,11 +289,11 @@ describe(Migrator, () => {
     expect(table).toMatchInlineSnapshot(`
       [
         {
-          "executedAt": "1970-01-01T00:00:01.000Z",
+          "executed_at": "1970-01-01T00:00:01.000Z",
           "name": "create-user",
         },
         {
-          "executedAt": "1970-01-01T00:00:04.000Z",
+          "executed_at": "1970-01-01T00:00:04.000Z",
           "name": "up-only",
         },
       ]
@@ -464,7 +464,7 @@ describe(Migrator, () => {
                 "up": "up:m2",
               },
               "state": {
-                "executedAt": "1970-01-01T00:00:00.000Z",
+                "executed_at": "1970-01-01T00:00:00.000Z",
                 "name": "m2",
               },
             },
@@ -517,7 +517,7 @@ describe(Migrator, () => {
                 "up": "up:m1",
               },
               "state": {
-                "executedAt": "1970-01-01T00:00:00.000Z",
+                "executed_at": "1970-01-01T00:00:00.000Z",
                 "name": "m1",
               },
             },
@@ -528,7 +528,7 @@ describe(Migrator, () => {
                 "up": "up:m2",
               },
               "state": {
-                "executedAt": "1970-01-01T00:00:00.000Z",
+                "executed_at": "1970-01-01T00:00:00.000Z",
                 "name": "m2",
               },
             },
@@ -565,7 +565,7 @@ describe(Migrator, () => {
                 "up": "up:m1",
               },
               "state": {
-                "executedAt": "1970-01-01T00:00:00.000Z",
+                "executed_at": "1970-01-01T00:00:00.000Z",
                 "name": "m1",
               },
             },
