@@ -35,6 +35,7 @@ export function formatError(
   return errorsString.join("\n");
 }
 
+// based on consola.error https://github.com/unjs/consola
 function formatErrorInner(
   label: string,
   e: Pick<Error, "message" | "stack">,
