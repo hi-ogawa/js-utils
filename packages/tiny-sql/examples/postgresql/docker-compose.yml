@@ -10,7 +10,7 @@ services:
     volumes:
       - postgres-volume:/var/lib/postgresql/data
     healthcheck:
-      test:  psql postgres postgres -c 'SELECT 0'
+      test: pg_isready
       interval: 1s
       retries: 10
 

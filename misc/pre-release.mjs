@@ -19,9 +19,9 @@ async function main() {
   if (gitStatus) {
     console.log(gitStatus);
     const input = await promptQuestion(
-      "* proceed regardless of dirty 'git status'? (y/n) "
+      "* proceed regardless of dirty 'git status'? (Y/n) "
     );
-    if (input !== "y") process.exit(1);
+    if (["", "y"].includes(input)) process.exit(1);
   }
 
   // update version
@@ -36,7 +36,7 @@ async function main() {
   // push
   await $$`git diff ${packageJsonPath}`;
   const input = await promptQuestion("* proceed to push changes? (y/n) ");
-  if (input !== "y") process.exit(1);
+  if (["", "y"].includes(input)) process.exit(1);
 
   await $$`git add ${packageJsonPath}`;
   await $$`git commit -m 'chore: pre release (${pakcageJson.name}@${pakcageJson.version})'`;
