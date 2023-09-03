@@ -23,6 +23,7 @@ import {
   pickBy,
   range,
   sortBy,
+  splitByChunk,
   uniqBy,
   zip,
   zipMax,
@@ -46,6 +47,58 @@ describe(range, () => {
       ]
     `);
     expect(range(3, 3)).toMatchInlineSnapshot("[]");
+  });
+});
+
+describe(splitByChunk, () => {
+  it("basic", () => {
+    expect(splitByChunk(range(10), 3)).toMatchInlineSnapshot(`
+      [
+        [
+          0,
+          1,
+          2,
+        ],
+        [
+          3,
+          4,
+          5,
+        ],
+        [
+          6,
+          7,
+          8,
+        ],
+        [
+          9,
+        ],
+      ]
+    `);
+    expect(splitByChunk(range(10), 5)).toMatchInlineSnapshot(`
+      [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+        ],
+        [
+          5,
+          6,
+          7,
+          8,
+          9,
+        ],
+      ]
+    `);
+  });
+
+  it("exotic", () => {
+    expect(splitByChunk(range(10), 0)).toMatchInlineSnapshot("[]");
+    expect(splitByChunk(range(10), -1)).toMatchInlineSnapshot("[]");
+    expect(splitByChunk(range(10), 0.5)).toMatchInlineSnapshot("[]");
+    expect(splitByChunk(range(10), 1.5)).toMatchInlineSnapshot("[]");
   });
 });
 
