@@ -1,28 +1,36 @@
-// 3 bit ansi colors (nested usage are not supported)
+// ansi escape codes
 // https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
-// https://en.wikipedia.org/wiki/ANSI_escape_code#3-bit_and_4-bit
 // https://github.com/chalk/chalk
 // https://github.com/alexeyraspopov/picocolors
-const baseColors = [
-  "black",
-  "red",
-  "green",
-  "yellow",
-  "blue",
-  "magenta",
-  "cyan",
-  "white",
+const codes = [
+  // 3 bit fg/bg colors
+  ["black", 30, 39],
+  ["red", 31, 39],
+  ["green", 32, 39],
+  ["yellow", 33, 39],
+  ["blue", 34, 39],
+  ["magenta", 35, 39],
+  ["cyan", 36, 39],
+  ["white", 37, 39],
+  ["bgBlack", 40, 49],
+  ["bgRed", 41, 49],
+  ["bgGreen", 42, 49],
+  ["bgYellow", 43, 49],
+  ["bgBlue", 44, 49],
+  ["bgMagenta", 45, 49],
+  ["bgCyan", 46, 49],
+  ["bgWhite", 47, 49],
+  // styles
+  ["bold", 1, 22],
+  ["dim", 2, 22],
+  ["underline", 4, 24],
+  ["inverse", 7, 27],
 ] as const;
-type BaseColor = (typeof baseColors)[number];
-type Color = BaseColor | `bg${Capitalize<BaseColor>}`;
 
 export const colors = /* @__PURE__ */ (() =>
   Object.fromEntries(
-    baseColors.flatMap((fg, i) => {
-      const bg = `bg${fg.slice(0, 1).toUpperCase()}${fg.slice(1)}`;
-      return [
-        [fg, (v: string) => `\u001B[${30 + i}m${v}\u001B[39m`],
-        [bg, (v: string) => `\u001B[${40 + i}m${v}\u001B[49m`],
-      ];
-    })
-  ) as Record<Color, (v: string) => string>)();
+    codes.map(([name, start, end]) => [
+      name,
+      (v: string) => `\u001B[${start}m${v}\u001B[${end}m`,
+    ])
+  ) as Record<(typeof codes)[number][0], (v: string) => string>)();
