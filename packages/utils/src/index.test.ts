@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { colors } from "./colors";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
-import { groupBy, range } from "./lodash";
+import { groupBy, range, sortBy, splitByChunk } from "./lodash";
 import {
   arrayToEnum,
   assertUnreachable,
@@ -606,10 +606,27 @@ describe(mapRegExp, () => {
   });
 });
 
+// see colors on terminal e.g. by
+//   cat packages/utils/src/index.test.ts
 describe("colors", () => {
   it("basic", () => {
     expect(colors.red("hey")).toMatchInlineSnapshot('"[31mhey[39m"');
     expect(colors.bgRed("yo")).toMatchInlineSnapshot('"[41myo[49m"');
+  });
+
+  it("all", () => {
+    let strings = Object.entries(colors).map(([k, v]) => v(k));
+    strings = sortBy(strings, (v) => v.includes("bg"));
+    const formated = splitByChunk(strings, 8)
+      .map((vs) => vs.join(" "))
+      .join("\n");
+    expect(formated).toMatchInlineSnapshot(`
+      "[30mblack[39m [31mred[39m [32mgreen[39m [33myellow[39m [34mblue[39m [35mmagenta[39m [36mcyan[39m [37mwhite[39m
+      [40mbgBlack[49m [41mbgRed[49m [42mbgGreen[49m [43mbgYellow[49m [44mbgBlue[49m [45mbgMagenta[49m [46mbgCyan[49m [47mbgWhite[49m"
+    `);
+  });
+
+  it("no nested reset handling", () => {
     expect(
       colors.cyan(`nesting ${colors.red("not")} supported`)
     ).toMatchInlineSnapshot('"[36mnesting [31mnot[39m supported[39m"');

@@ -23,6 +23,6 @@ export const colors = /* @__PURE__ */ (() =>
       return [
         [fg, (v: string) => `\u001B[${30 + i}m${v}\u001B[39m`],
         [bg, (v: string) => `\u001B[${40 + i}m${v}\u001B[49m`],
-      ] as any;
+      ];
     })
   ) as Record<Color, (v: string) => string>)();

@@ -4,6 +4,8 @@ import { safeFunctionCast } from "./misc";
 // lodash-like utilities
 //
 
+// TODO: put always `readonly` for array arguments?
+
 export function range(start: number, end?: number): number[] {
   if (typeof end === "undefined") {
     return Array.from(Array(start), (_, i) => i);
@@ -13,6 +15,19 @@ export function range(start: number, end?: number): number[] {
 
 export function sortBy<T>(ls: T[], ...keyFns: ((x: T) => any)[]): T[] {
   return sortByMap(ls, (x) => keyFns.map((f) => f(x)), arrayCompareFn);
+}
+
+// aka. lodash's chunk
+export function splitByChunk<T>(ls: readonly T[], size: number): T[][] {
+  // guard nonsense cases, which could end up infinite loop below
+  if (!(Number.isInteger(size) && size > 0)) {
+    return [];
+  }
+  let result: T[][] = [];
+  for (let i = 0; i < ls.length; i += size) {
+    result.push(ls.slice(i, i + size));
+  }
+  return result;
 }
 
 export function groupBy<T, K>(ls: T[], f: (x: T) => K): Map<K, T[]> {
