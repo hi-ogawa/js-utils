@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { colors } from "./colors";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
-import { groupBy, range, sortBy, splitByChunk, zip } from "./lodash";
+import { groupBy, range, sortBy, splitByChunk } from "./lodash";
 import {
   arrayToEnum,
   assertUnreachable,
