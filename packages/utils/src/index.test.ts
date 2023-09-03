@@ -612,14 +612,38 @@ describe("colors", () => {
   it("basic", () => {
     expect(colors.red("hey")).toMatchInlineSnapshot('"[31mhey[39m"');
     expect(colors.bgRed("yo")).toMatchInlineSnapshot('"[41myo[49m"');
-    expect(
-      colors.bold(colors.inverse(colors.magenta(" ERROR ")))
-    ).toMatchInlineSnapshot('"[1m[7m[35m ERROR [39m[27m[22m"');
+    expect(colors.bold.inverse.magenta(" ERROR ")).toMatchInlineSnapshot(
+      '"[35m[7m[1m ERROR [22m[27m[39m"'
+    );
   });
 
   it("all", () => {
-    const strings = Object.entries(colors).map(([k, v]) => v(k));
-    const formated = splitByChunk(strings, 8)
+    const codes = [
+      "black",
+      "red",
+      "green",
+      "yellow",
+      "blue",
+      "magenta",
+      "cyan",
+      "white",
+      "bgBlack",
+      "bgRed",
+      "bgGreen",
+      "bgYellow",
+      "bgBlue",
+      "bgMagenta",
+      "bgCyan",
+      "bgWhite",
+      "bold",
+      "dim",
+      "underline",
+      "inverse",
+    ] as const;
+    const formated = splitByChunk(
+      codes.map((k) => colors[k](k)),
+      8
+    )
       .map((vs) => vs.join(" "))
       .join("\n");
     expect(formated).toMatchInlineSnapshot(`
