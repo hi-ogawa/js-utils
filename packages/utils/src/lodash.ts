@@ -257,11 +257,10 @@ export function delay<F extends (...args: any[]) => void>(
 }
 
 //
-// unsafe but convenient plain object key manipulation
+// unsound but convenient plain object key/value manipulation
 // https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
 //
 
-// TODO: better DX with objectPick(o, ...keys: K[]) ?
 export function objectPick<T extends object, K extends keyof T>(
   o: T,
   keys: K[]
@@ -294,6 +293,12 @@ export function objectOmitBy<K extends PropertyKey, V>(
 
 export function objectKeys<T extends object>(o: T): (keyof T)[] {
   return Object.keys(o) as any;
+}
+
+export function objectEntries<T extends object>(
+  o: T
+): { [K in keyof T]: [K, T[K]] }[keyof T][] {
+  return Object.entries(o) as any;
 }
 
 export function objectHas<Prop extends keyof any>(

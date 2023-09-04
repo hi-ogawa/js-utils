@@ -12,6 +12,7 @@ import {
   mapKeys,
   mapValues,
   memoize,
+  objectEntries,
   objectHas,
   objectKeys,
   objectOmit,
@@ -376,6 +377,19 @@ describe(objectKeys, () => {
         "y",
       ]
     `);
+  });
+});
+
+describe(objectEntries, () => {
+  it("basic", () => {
+    const o = {
+      x: 0,
+      y: 1,
+    };
+    const result = objectEntries(o);
+    result satisfies ["x" | "y", number][];
+    result satisfies (["x", number] | ["y", number])[];
+    expect(result).toMatchInlineSnapshot();
   });
 });
 
