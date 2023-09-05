@@ -69,7 +69,7 @@ describe(useStableCallback, () => {
   it("basic", async () => {
     function useDocumentEvent<K extends keyof DocumentEventMap>(
       type: K,
-      handler: (e: DocumentEventMap[K]) => void
+      handler: (e: DocumentEventMap[K]) => void,
     ) {
       const stableHandler = useStableCallback(handler);
 
@@ -184,7 +184,7 @@ describe(usePrevious, () => {
         const prev = usePrevious(value);
         return { value, prev };
       },
-      { initialProps: { value: 0 } }
+      { initialProps: { value: 0 } },
     );
     expect(result.current).toMatchInlineSnapshot(`
       {

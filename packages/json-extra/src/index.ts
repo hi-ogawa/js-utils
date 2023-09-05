@@ -48,7 +48,7 @@ export function createJsonExtra(options: Options) {
 
 function applyReplacer(
   data: unknown,
-  replacer: ReturnType<typeof createReplacer>
+  replacer: ReturnType<typeof createReplacer>,
 ) {
   function recurse(v: unknown) {
     const vToJson =
@@ -74,7 +74,7 @@ function applyReplacer(
 
 function applyReviver(
   data: unknown,
-  reviver: ReturnType<typeof createReviver>
+  reviver: ReturnType<typeof createReviver>,
 ) {
   function recurse(v: unknown) {
     if (v && typeof v === "object") {
@@ -218,7 +218,7 @@ const builtins = {
       tinyassert(
         Array.isArray(v) &&
           v.length === 2 &&
-          v.every((s) => typeof s === "string")
+          v.every((s) => typeof s === "string"),
       );
       const [source, flags] = v;
       return new RegExp(source, flags);

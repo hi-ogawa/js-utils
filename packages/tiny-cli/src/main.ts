@@ -11,7 +11,7 @@ export async function tinyCliMain(
       exitCode?: number | undefined;
     };
     log?: (v: string) => void;
-  }
+  },
 ): Promise<Result<unknown, unknown>> {
   // @ts-ignore silence type error on tsup
   const process = opts?.process ?? globalThis.process;

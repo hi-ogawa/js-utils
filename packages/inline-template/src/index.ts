@@ -16,7 +16,7 @@ export class InlineTemplateProcessor {
     private options?: {
       spawn?: SpawnOptions;
       log?: (...args: unknown[]) => void;
-    }
+    },
   ) {}
 
   get log() {
@@ -26,7 +26,7 @@ export class InlineTemplateProcessor {
   async process(input: string) {
     // collect template markers
     const idMatches = input.matchAll(
-      RegExp(`%${MARKERS.inputStart}:([a-zA-Z0-9_.-]+)%`, "g")
+      RegExp(`%${MARKERS.inputStart}:([a-zA-Z0-9_.-]+)%`, "g"),
     );
     const ids = [...idMatches].map((m) => m[1]);
 
@@ -74,7 +74,7 @@ export class InlineTemplateProcessor {
       },
       (nonMatch) => {
         chunks.push({ shell: false, value: nonMatch, command: "" });
-      }
+      },
     );
     if (!found) {
       this.log(`* interpolation not found for '${id}'`);

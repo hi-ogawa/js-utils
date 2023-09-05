@@ -51,7 +51,7 @@ export function proxyTinyRpc<R extends TinyRpcRoutes>({
       get(_target, path, _receiver) {
         tinyassert(
           typeof path === "string",
-          new TinyRpcError("invalid path", { cause: path })
+          new TinyRpcError("invalid path", { cause: path }),
         );
         return async (...args: unknown[]) => {
           // automatically wrap all client error as RpcError
@@ -62,7 +62,7 @@ export function proxyTinyRpc<R extends TinyRpcRoutes>({
           }
         };
       },
-    }
+    },
   ) as any;
 }
 

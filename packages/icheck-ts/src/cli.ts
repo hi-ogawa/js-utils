@@ -43,7 +43,7 @@ const command = new TinyCliCommand(
       return Boolean(
         e.used ||
           (ignoreRegExp && e.name.match(ignoreRegExp)) ||
-          e.comment.includes(ignoreComment)
+          e.comment.includes(ignoreComment),
       );
     }
 
@@ -70,7 +70,7 @@ const command = new TinyCliCommand(
       }
       process.exitCode = 1;
     }
-  }
+  },
 );
 
 tinyCliMain(command);

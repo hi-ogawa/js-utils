@@ -42,7 +42,7 @@ export type ExportUsage = {
 // 3. check unused exports
 export async function runner(
   inputFiles: string[],
-  options?: { parse?: typeof parseImportExport }
+  options?: { parse?: typeof parseImportExport },
 ) {
   // normalize relative path to match with `resolveImportSource` (e.g. "./x.ts" => "x.ts")
   inputFiles = inputFiles.map((f) => path.normalize(f));
@@ -108,7 +108,7 @@ export async function runner(
         .get(file)
         .some(
           (e) =>
-            e.type === "namespace" || (e.type === "named" && e.name === name)
+            e.type === "namespace" || (e.type === "named" && e.name === name),
         )
     );
   }
@@ -160,7 +160,7 @@ export async function runner(
 // https://www.typescriptlang.org/tsconfig#moduleResolution
 export async function resolveImportSource(
   containingFile: string,
-  source: string
+  source: string,
 ): Promise<ImportSource> {
   // TODO: memoize fs check?
 
@@ -179,7 +179,7 @@ export async function resolveImportSource(
 
   // normalize relative path
   let tmpSource = path.normalize(
-    path.join(path.dirname(containingFile), source)
+    path.join(path.dirname(containingFile), source),
   );
 
   // "." => "./index"

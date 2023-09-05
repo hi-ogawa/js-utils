@@ -28,7 +28,7 @@ export class HashRng {
 export function hashString(
   input: string,
   n: number = 4,
-  textEncoder = new TextEncoder()
+  textEncoder = new TextEncoder(),
 ): string {
   let h = "";
   let seed = new Uint32Array([0x6a09e667]); // python -c 'import math; print(math.sqrt(2).hex())'

@@ -19,7 +19,7 @@ async function main() {
   if (gitStatus) {
     console.log(gitStatus);
     const input = await promptQuestion(
-      "* proceed regardless of dirty 'git status'? (Y/n) "
+      "* proceed regardless of dirty 'git status'? (Y/n) ",
     );
     if (!["", "y"].includes(input)) process.exit(1);
   }
@@ -37,7 +37,7 @@ async function main() {
   pakcageJson.version = nextVersion;
   fs.writeFileSync(
     packageJsonPath,
-    JSON.stringify(pakcageJson, null, 2) + "\n"
+    JSON.stringify(pakcageJson, null, 2) + "\n",
   );
 
   // push
@@ -48,7 +48,7 @@ async function main() {
 
 function getNextVersion(
   /** @type {string} */
-  version
+  version,
 ) {
   const vs = version.match(/(\d+).(\d+).(\d+)(?:-pre.(\d+))?/).slice(1);
   if (vs[3]) {

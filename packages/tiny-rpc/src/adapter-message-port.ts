@@ -113,7 +113,7 @@ function mathRandomId() {
     .map((bits) =>
       Math.floor(Math.random() * 2 ** bits)
         .toString(16)
-        .padStart(bits / 4, "0")
+        .padStart(bits / 4, "0"),
     )
     .join("-");
 }

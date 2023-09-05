@@ -204,7 +204,7 @@ describe(DefaultMap, () => {
   it("constructor-Iterable", () => {
     const map = new DefaultMap(
       () => [],
-      groupBy(range(10), (x) => x % 3)
+      groupBy(range(10), (x) => x % 3),
     );
     map satisfies DefaultMap<number, number[]>;
     expect(map).toMatchInlineSnapshot(`
@@ -552,10 +552,10 @@ describe(regExpRaw, () => {
   it("basic", () => {
     const re = regExpRaw`/username/${/\w+/}/profile`;
     expect(re).toMatchInlineSnapshot(
-      "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
+      "/\\\\/username\\\\/\\\\w\\+\\\\/profile/",
     );
     expect(re.source).toMatchInlineSnapshot(
-      '"\\\\/username\\\\/\\\\w+\\\\/profile"'
+      '"\\\\/username\\\\/\\\\w+\\\\/profile"',
     );
     expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
       [
@@ -570,7 +570,7 @@ describe(escapeRegExp, () => {
   it("basic", () => {
     const re = escapeRegExp("/remix/$id/hello.ts");
     expect(re).toMatchInlineSnapshot(
-      '"\\\\/remix\\\\/\\\\$id\\\\/hello\\\\.ts"'
+      '"\\\\/remix\\\\/\\\\$id\\\\/hello\\\\.ts"',
     );
     expect("/remix/$id/hello.ts".match(re)).toMatchInlineSnapshot(`
       [
@@ -593,7 +593,7 @@ describe(mapRegExp, () => {
         },
         (other) => {
           output += other;
-        }
+        },
       );
       return output;
     }
@@ -601,7 +601,7 @@ describe(mapRegExp, () => {
     expect(transform("hello")).toMatchInlineSnapshot('"hello"');
     expect(transform("x = {{ 1 + 2 }}")).toMatchInlineSnapshot('"x = 3"');
     expect(transform("x = {{ 1 + 2 }}, y = {{ 4 * 5 }}")).toMatchInlineSnapshot(
-      '"x = 3, y = 20"'
+      '"x = 3, y = 20"',
     );
   });
 });
@@ -613,7 +613,7 @@ describe("colors", () => {
     expect(colors.red("hey")).toMatchInlineSnapshot('"[31mhey[39m"');
     expect(colors.bgRed("yo")).toMatchInlineSnapshot('"[41myo[49m"');
     expect(
-      colors.bold(colors.inverse(colors.magenta(" ERROR ")))
+      colors.bold(colors.inverse(colors.magenta(" ERROR "))),
     ).toMatchInlineSnapshot('"[1m[7m[35m ERROR [39m[27m[22m"');
   });
 
@@ -631,7 +631,7 @@ describe("colors", () => {
 
   it("no nested reset handling", () => {
     expect(
-      colors.cyan(`nesting ${colors.red("not")} supported`)
+      colors.cyan(`nesting ${colors.red("not")} supported`),
     ).toMatchInlineSnapshot('"[36mnesting [31mnot[39m supported[39m"');
   });
 });

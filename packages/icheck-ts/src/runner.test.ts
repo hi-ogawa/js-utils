@@ -302,7 +302,7 @@ describe(resolveImportSource, () => {
     setupTestFixture(resolveImportSource.name, {
       "x.ts": "",
       "y.ts": "",
-    })
+    }),
   );
 
   it("relative", async () => {

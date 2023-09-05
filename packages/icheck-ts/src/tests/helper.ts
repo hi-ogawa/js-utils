@@ -3,7 +3,7 @@ import path from "node:path";
 
 export async function setupTestFixture(
   base: string,
-  files: Record<string, string>
+  files: Record<string, string>,
 ) {
   const cwd = `./fixtures/${base}`;
   const cwdBefore = process.cwd();

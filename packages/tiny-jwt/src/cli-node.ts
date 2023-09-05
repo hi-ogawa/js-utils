@@ -21,7 +21,7 @@ const keygenFns: Record<string, () => Promise<unknown>> = {
     const key = await crypto.subtle.generateKey(
       { name: "HMAC", hash: "SHA-256" },
       true,
-      ["sign", "verify"]
+      ["sign", "verify"],
     );
     const jwk = await crypto.subtle.exportKey("jwk", key);
     return jwk;
@@ -31,7 +31,7 @@ const keygenFns: Record<string, () => Promise<unknown>> = {
     const keyPair = await crypto.subtle.generateKey(
       { name: "ECDSA", namedCurve: "P-256" },
       true,
-      ["sign", "verify"]
+      ["sign", "verify"],
     );
     const privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
     const publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
@@ -42,7 +42,7 @@ const keygenFns: Record<string, () => Promise<unknown>> = {
     const key = await crypto.subtle.generateKey(
       { name: "AES-GCM", length: 256 },
       true,
-      ["encrypt", "decrypt"]
+      ["encrypt", "decrypt"],
     );
     const jwk = await crypto.subtle.exportKey("jwk", key);
     return jwk;
@@ -65,7 +65,7 @@ cli.defineCommand(
     }
     const result = await keygenFn();
     console.log(JSON.stringify(result, null, 2));
-  }
+  },
 );
 
 //

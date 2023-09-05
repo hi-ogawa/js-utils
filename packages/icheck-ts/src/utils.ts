@@ -4,7 +4,7 @@ import { LruCache, hashString, memoize } from "@hiogawa/utils";
 
 export function memoizeOnFile<F extends (...args: any[]) => any>(
   f: F,
-  options: { disabled?: boolean; file: string; maxSize: number }
+  options: { disabled?: boolean; file: string; maxSize: number },
 ) {
   if (options.disabled) {
     return [f, undefined] as const;

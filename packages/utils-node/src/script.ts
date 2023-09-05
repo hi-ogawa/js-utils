@@ -75,7 +75,7 @@ class SpawnPromiseLike implements PromiseLike<string> {
   constructor(
     private command: string,
     private options: SpawnOptions,
-    private helperOptions: HelperOptions
+    private helperOptions: HelperOptions,
   ) {
     const child = helperOptions.spawn(this.command, this.options);
     this.child = child;
@@ -104,7 +104,7 @@ class SpawnPromiseLike implements PromiseLike<string> {
                 stdout: this.stdout,
                 stderr: this.stderr,
               },
-            })
+            }),
           );
         }
       });
@@ -122,7 +122,7 @@ class SpawnPromiseLike implements PromiseLike<string> {
 function processOutput(
   raw: unknown,
   onSuccess: (v: string) => void,
-  onError: (v: unknown) => void
+  onError: (v: unknown) => void,
 ) {
   if (typeof raw === "string") {
     return onSuccess(raw);

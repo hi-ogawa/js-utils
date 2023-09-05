@@ -15,12 +15,12 @@ export function regExpRaw(
     [
       ...zip(
         raw,
-        params.map((p) => p.source)
+        params.map((p) => p.source),
       ),
       raw.slice(-1),
     ]
       .flat()
-      .join("")
+      .join(""),
   );
 }
 
@@ -34,7 +34,7 @@ export function mapRegExp(
   input: string,
   regex: RegExp,
   onMatch: (match: RegExpMatchArray) => void,
-  onNonMatch: (part: string) => void
+  onNonMatch: (part: string) => void,
 ) {
   let lastIndex = 0;
   for (const m of input.matchAll(regex)) {

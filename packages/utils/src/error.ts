@@ -18,7 +18,7 @@ export function flattenErrorCauses(e: unknown): unknown[] {
 // simple but effective error printing inspired by consola.error + flattenErrorCauses
 export function formatError(
   v: unknown,
-  config?: { noColor?: boolean; noCause?: boolean }
+  config?: { noColor?: boolean; noCause?: boolean },
 ) {
   const errors = config?.noCause ? [v] : flattenErrorCauses(v);
   const errorsString = errors.map((e, i) => {
@@ -39,7 +39,7 @@ export function formatError(
 function formatErrorInner(
   label: string,
   e: Pick<Error, "message" | "stack">,
-  color?: boolean
+  color?: boolean,
 ) {
   let stack = e.stack?.split("\n").slice(1).join("\n") ?? "";
 

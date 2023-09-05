@@ -1,7 +1,7 @@
 export class DefaultMap<K, V> extends Map<K, V> {
   constructor(
     private defaultFn: (key: K) => V,
-    entries?: Iterable<readonly [K, V]>
+    entries?: Iterable<readonly [K, V]>,
   ) {
     super(entries);
   }
@@ -54,7 +54,10 @@ export class HashKeyMap<K, V> {
 }
 
 export class HashKeyDefaultMap<K, V> extends HashKeyMap<K, V> {
-  constructor(private defaultFn: (key: K) => V, keyFn?: (key: K) => unknown) {
+  constructor(
+    private defaultFn: (key: K) => V,
+    keyFn?: (key: K) => unknown,
+  ) {
     super(keyFn);
   }
 

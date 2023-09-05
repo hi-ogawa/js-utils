@@ -34,7 +34,7 @@ describe(hashInt32, () => {
         "01110101000000100001000110100000",
         "10000101101110101000010011001110",
       ]
-    `
+    `,
     );
   });
 });
@@ -56,7 +56,7 @@ describe(HashRng, () => {
         "10010101001000110100111000111110",
         "10001101111000100010101010001100",
       ]
-    `
+    `,
     );
     expect(range(10).map(() => rng.float())).toMatchInlineSnapshot(`
       [
@@ -79,7 +79,7 @@ describe(HashRng, () => {
     const bins = mapGroupBy(
       range(1000).map(() => rng.float()),
       (v) => Math.floor(v * 10),
-      (vs) => vs.length
+      (vs) => vs.length,
     );
     const sorted = new Map([...bins.entries()].sort());
     expect(sorted).toMatchInlineSnapshot(`
@@ -103,12 +103,12 @@ describe(hashString, () => {
   it("basic", () => {
     expect(hashString("hello").length).toMatchInlineSnapshot("32");
     expect(hashString("hello")).toMatchInlineSnapshot(
-      '"33404c8ffab857730077534ecea96ab0"'
+      '"33404c8ffab857730077534ecea96ab0"',
     );
     expect(
       range(10)
         .map(String)
-        .map((v) => hashString(v))
+        .map((v) => hashString(v)),
     ).toMatchInlineSnapshot(`
       [
         "c058ceb51a9b50de5960d20780e4ecf8",

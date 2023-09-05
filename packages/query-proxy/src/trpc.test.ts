@@ -56,7 +56,7 @@ describe(createFnRecordQueryProxy, () => {
 
     // caller is just FnRecord but requires a small type hacking
     const callerQuery = createFnRecordQueryProxy(
-      trpcCallerFnRecordCompat(caller)
+      trpcCallerFnRecordCompat(caller),
     );
 
     // type-check

@@ -25,7 +25,7 @@ describe(zArg, () => {
           files: string[];
           fix: boolean;
           mode: number;
-        }
+        },
     );
 
     expect(cli.help()).toMatchInlineSnapshot(`

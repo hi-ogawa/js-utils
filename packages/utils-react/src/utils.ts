@@ -24,7 +24,7 @@ export function useStableRef<T>(value: T): React.MutableRefObject<T> {
 }
 
 export function useStableCallback<F extends (...args: any[]) => any>(
-  callback: F
+  callback: F,
 ): F {
   const ref = useStableRef(callback);
   const wrapper = ((...args: any[]) => ref.current(...args)) as F;
@@ -37,7 +37,7 @@ export function useRerender() {
 
 // create RefCallback via useEffect-like api
 export function useRefCallbackEffect<T>(
-  effect: (value: T) => (() => void) | void | undefined
+  effect: (value: T) => (() => void) | void | undefined,
 ): React.RefCallback<T> {
   const stableEffect = useStableCallback(effect);
 

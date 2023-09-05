@@ -7,7 +7,7 @@ import { $ } from "@hiogawa/utils-node";
 $._.verbose = true;
 
 const pnpmList = JSON.parse(
-  await $`pnpm ls --filter './packages/**' --depth -1 --json`
+  await $`pnpm ls --filter './packages/**' --depth -1 --json`,
 );
 const cwdLen = process.cwd().length;
 const paths = pnpmList.map((e) => e.path.slice(cwdLen + 1));

@@ -79,7 +79,7 @@ export async function jwsVerify({
       typeof header === "object" &&
       "alg" in header &&
       typeof header.alg === "string",
-    "invalid header 'alg'"
+    "invalid header 'alg'",
   );
   const algorithm = ALGORITHM_MAP.get(header.alg);
   tinyassert(includesGuard(algorithms, header.alg), "disallowed 'alg'");

@@ -55,7 +55,7 @@ export function defineTestRpcRoutes() {
         input satisfies { delta: number };
         counter += input.delta;
         return counter;
-      }
+      },
     ),
 
     // access context

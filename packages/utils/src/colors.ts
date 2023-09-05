@@ -32,5 +32,5 @@ export const colors = /* @__PURE__ */ (() =>
     codes.map(([name, start, end]) => [
       name,
       (v: string) => `\u001B[${start}m${v}\u001B[${end}m`,
-    ])
+    ]),
   ) as Record<(typeof codes)[number][0], (v: string) => string>)();

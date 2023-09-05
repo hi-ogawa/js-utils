@@ -17,9 +17,9 @@ describe("fuzz", () => {
           const l = bundle.murmur3_32(input, seed);
           const r = murmur3_32(input, seed);
           expect(l).toBe(r);
-        }
+        },
       ),
-      { verbose: true, numRuns: 10 ** 4 }
+      { verbose: true, numRuns: 10 ** 4 },
     );
   });
 });

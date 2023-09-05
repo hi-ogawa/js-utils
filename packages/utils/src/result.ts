@@ -19,7 +19,7 @@ export function wrapError<T>(getValue: () => T): Result<T, unknown> {
 }
 
 export async function wrapErrorAsync<T>(
-  getValue: () => Promise<T>
+  getValue: () => Promise<T>,
 ): Promise<Result<T, unknown>> {
   try {
     return Ok(await getValue());
@@ -36,7 +36,7 @@ export function okToOption<T>(result: Result<T, unknown>): T | undefined {
  * @deprecated use `wrapErrorAsync` instead
  */
 export async function wrapPromise<T>(
-  value: Promise<T>
+  value: Promise<T>,
 ): Promise<Result<T, unknown>> {
   try {
     return Ok(await value);

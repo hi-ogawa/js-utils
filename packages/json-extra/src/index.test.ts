@@ -279,7 +279,7 @@ describe(createJsonExtra, () => {
           ]
         ]
       }"
-    `
+    `,
     );
     const revived = jsonExtra.parse(stringified);
     expect(revived).toMatchInlineSnapshot(`
@@ -305,7 +305,7 @@ describe(createJsonExtra, () => {
     const jsonExtra = createJsonExtra({ builtins: ["undefined", "Date"] });
     const result = testStringifyAndParse(
       [undefined, new Date("2023-08-17"), NaN, new Set([0, 1])],
-      jsonExtra
+      jsonExtra,
     );
     expect(result).toMatchInlineSnapshot(`
       {
@@ -991,7 +991,7 @@ describe(createJsonExtra, () => {
           expect(result.revivedUndefined).toEqual(result.original);
         }),
         // TODO: more runs on CI?
-        { verbose: true, numRuns: 10 ** 3 }
+        { verbose: true, numRuns: 10 ** 3 },
       );
     });
 
@@ -1008,9 +1008,9 @@ describe(createJsonExtra, () => {
             const result = testStringifyAndParse(data, jsonExtra);
             expect(result.revived).toEqual(result.original);
             expect(result.revivedUndefined).toEqual(result.original);
-          }
+          },
         ),
-        { verbose: true, numRuns: 10 ** 3 }
+        { verbose: true, numRuns: 10 ** 3 },
       );
     });
 
@@ -1021,7 +1021,7 @@ describe(createJsonExtra, () => {
           expect(result.deserialized).toEqual(result.original);
         }),
         // TODO: more runs on CI?
-        { verbose: true, numRuns: 10 ** 3 }
+        { verbose: true, numRuns: 10 ** 3 },
       );
     });
 
@@ -1037,9 +1037,9 @@ describe(createJsonExtra, () => {
           (data) => {
             const result = testSerializeAndDeserialize(data, jsonExtra);
             expect(result.deserialized).toEqual(result.original);
-          }
+          },
         ),
-        { verbose: true, numRuns: 10 ** 3 }
+        { verbose: true, numRuns: 10 ** 3 },
       );
     });
   });
@@ -1047,7 +1047,7 @@ describe(createJsonExtra, () => {
 
 function testStringifyAndParse(
   original: unknown,
-  jsonExtra: ReturnType<typeof createJsonExtra>
+  jsonExtra: ReturnType<typeof createJsonExtra>,
 ) {
   const stringified = jsonExtra.stringify(original, null, 2);
   const revived = jsonExtra.parse(stringified);
@@ -1057,7 +1057,7 @@ function testStringifyAndParse(
 
 function testSerializeAndDeserialize(
   original: unknown,
-  jsonExtra: ReturnType<typeof createJsonExtra>
+  jsonExtra: ReturnType<typeof createJsonExtra>,
 ) {
   const serialized = jsonExtra.serialize(original);
   const deserialized = jsonExtra.deserialize(serialized);

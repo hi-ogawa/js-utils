@@ -16,7 +16,7 @@ export function checkExpirationTime(header: unknown) {
       typeof header === "object" &&
       "exp" in header &&
       typeof header.exp === "number",
-    "invalid token"
+    "invalid token",
   );
   tinyassert(Date.now() / 1000 < header.exp, "token expired");
 }

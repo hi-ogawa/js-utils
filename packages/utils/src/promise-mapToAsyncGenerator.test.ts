@@ -9,7 +9,7 @@ describe(mapToAsyncGenerator, () => {
   }
 
   async function arrayFromAsyncGenerator<T>(
-    generator: AsyncGenerator<T>
+    generator: AsyncGenerator<T>,
   ): Promise<T[]> {
     const result: T[] = [];
     for await (const v of generator) {
@@ -27,7 +27,7 @@ describe(mapToAsyncGenerator, () => {
       },
       {
         concurrency: 3,
-      }
+      },
     );
 
     const result = await arrayFromAsyncGenerator(generator);
@@ -65,7 +65,7 @@ describe(mapToAsyncGenerator, () => {
       },
       {
         concurrency: 3,
-      }
+      },
     );
 
     const result = await arrayFromAsyncGenerator(generator);
@@ -107,7 +107,7 @@ describe(mapToAsyncGenerator, () => {
       },
       {
         concurrency: 3,
-      }
+      },
     );
 
     let generated: unknown[] = [];
@@ -146,7 +146,7 @@ describe(mapToAsyncGenerator, () => {
       },
       {
         concurrency: 3,
-      }
+      },
     );
 
     await arrayFromAsyncGenerator(generator);
@@ -173,7 +173,7 @@ describe(mapToAsyncGenerator, () => {
       },
       {
         concurrency: 10,
-      }
+      },
     );
 
     await arrayFromAsyncGenerator(generator);
@@ -227,13 +227,13 @@ describe(mapToAsyncGenerator, () => {
       },
       {
         concurrency: 10,
-      }
+      },
     );
 
     await arrayFromAsyncGenerator(generator);
 
     expect(inflightCounts.join(",")).toMatchInlineSnapshot(
-      '"0,1,2,3,4,5,6,7,8,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,8,7,6,5,4,3,2,1,0"'
+      '"0,1,2,3,4,5,6,7,8,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,8,7,6,5,4,3,2,1,0"',
     );
   });
 });

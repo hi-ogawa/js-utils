@@ -23,7 +23,7 @@
     "@hiogawa/utils-node": "workspace:*",
     "@tsconfig/strictest": "^2.0.1",
     "esbuild": "^0.18.10",
-    "prettier": "^2.8.8",
+    "prettier": "^3.0.3",
     "tsup": "^7.1.0",
     "tsx": "^3.12.7",
     "typedoc": "^0.24.8",

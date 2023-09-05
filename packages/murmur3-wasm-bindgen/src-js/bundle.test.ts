@@ -74,13 +74,13 @@ describe("bundle", () => {
         const output_128_x64 = new Uint32Array(4);
         murmur3_x64_128(input, seed, output_128_x64);
         expect(Array.from(new Uint8Array(output_128_x64.buffer))).toEqual(
-          e.hash_128_x64
+          e.hash_128_x64,
         );
 
         const output_128_x86 = new Uint32Array(4);
         murmur3_x86_128(input, seed, output_128_x86);
         expect(Array.from(new Uint8Array(output_128_x86.buffer))).toEqual(
-          e.hash_128_x86
+          e.hash_128_x86,
         );
       });
     }

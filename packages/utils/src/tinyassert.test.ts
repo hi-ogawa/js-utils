@@ -55,7 +55,7 @@ describe(tinyassert, () => {
 
   it("error with message", () => {
     expect(() => tinyassert(false, "boom")).toThrowErrorMatchingInlineSnapshot(
-      '"boom"'
+      '"boom"',
     );
   });
 });

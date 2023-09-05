@@ -27,7 +27,7 @@ describe(TinyCli, () => {
         args satisfies {
           host: string;
           port: number;
-        }
+        },
     );
 
     cli.defineCommand(
@@ -46,7 +46,7 @@ describe(TinyCli, () => {
         args satisfies {
           file?: string;
           outDir: string;
-        }
+        },
     );
 
     // invalid usage
@@ -58,10 +58,10 @@ describe(TinyCli, () => {
             a: { parse: () => "", positional: true, flag: true },
           },
         },
-        () => {}
-      )
+        () => {},
+      ),
     ).toThrowErrorMatchingInlineSnapshot(
-      "\"argument must be either one of 'positional', 'flag', or 'key-value'\""
+      "\"argument must be either one of 'positional', 'flag', or 'key-value'\"",
     );
 
     // version
@@ -158,11 +158,11 @@ describe(TinyCli, () => {
 
     // error
     expect(() => cli.parse([])).toThrowErrorMatchingInlineSnapshot(
-      '"missing command"'
+      '"missing command"',
     );
 
     expect(() => cli.parse(["publish"])).toThrowErrorMatchingInlineSnapshot(
-      "\"invalid command: 'publish'\""
+      "\"invalid command: 'publish'\"",
     );
 
     // dev
@@ -179,7 +179,7 @@ describe(TinyCli, () => {
       }
     `);
     expect(() =>
-      cli.parse(["dev", "--port", "one-two-three"])
+      cli.parse(["dev", "--port", "one-two-three"]),
     ).toThrowErrorMatchingInlineSnapshot('"failed to parse --port"');
 
     // build
@@ -217,7 +217,7 @@ describe(TinyCliCommand, () => {
         args satisfies {
           host: string;
           port: number;
-        }
+        },
     );
 
     // version
@@ -254,7 +254,7 @@ describe(TinyCliCommand, () => {
       }
     `);
     expect(() =>
-      cli.parse(["--port", "one-two-three"])
+      cli.parse(["--port", "one-two-three"]),
     ).toThrowErrorMatchingInlineSnapshot('"failed to parse --port"');
   });
 
@@ -288,7 +288,7 @@ describe(TinyCliCommand, () => {
           boolFlag: boolean;
         };
         return args;
-      }
+      },
     );
 
     expect(cli.help()).toMatchInlineSnapshot(`
@@ -324,19 +324,19 @@ describe(TinyCliCommand, () => {
       `);
 
     expect(() => cli.parse(["x", "y", "z"])).toThrowErrorMatchingInlineSnapshot(
-      '"too many arguments: x, y, z"'
+      '"too many arguments: x, y, z"',
     );
 
     expect(() =>
-      cli.parse(["x", "--hehe", "he", "--foo"])
+      cli.parse(["x", "--hehe", "he", "--foo"]),
     ).toThrowErrorMatchingInlineSnapshot('"unknown options: --hehe, --foo"');
 
     expect(() =>
-      cli.parse(["x", "--hehe", "--hehe"])
+      cli.parse(["x", "--hehe", "--hehe"]),
     ).toThrowErrorMatchingInlineSnapshot('"duplicate options: --hehe"');
 
     expect(() => cli.parse(["x"])).toThrowErrorMatchingInlineSnapshot(
-      '"failed to parse --num"'
+      '"failed to parse --num"',
     );
 
     expect(cli.parse(["--help"])).toMatchInlineSnapshot("undefined");
@@ -388,7 +388,7 @@ describe(TinyCliCommand, () => {
             fix: boolean;
           };
           return args;
-        }
+        },
       );
 
       expect(example.help()).toMatchInlineSnapshot(`
@@ -445,10 +445,10 @@ describe(TinyCliCommand, () => {
               rest: string[];
             };
             return args;
-          }
+          },
         );
       expect(() => example()).toThrowErrorMatchingInlineSnapshot(
-        '"variadic command with multiple positionals are unsupported"'
+        '"variadic command with multiple positionals are unsupported"',
       );
     });
   });
@@ -463,11 +463,11 @@ describe(TinyCliCommand, () => {
           },
         },
       },
-      ({ args }) => args
+      ({ args }) => args,
     );
 
     expect(() => command.parse([])).toThrowErrorMatchingInlineSnapshot(
-      '"failed to parse <arg>"'
+      '"failed to parse <arg>"',
     );
   });
 });
