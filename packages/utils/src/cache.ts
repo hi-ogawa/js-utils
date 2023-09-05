@@ -51,3 +51,18 @@ export class LruCache<K, V> {
     }
   }
 }
+
+export function onceTtl<F extends (...args: any[]) => any>(
+  f: F,
+  ttlMs: number
+): F {
+  let cache: { t: number; v: ReturnType<F> } | undefined;
+  function wrapper(this: any, ...args: any[]) {
+    const now = Date.now();
+    if (!cache || cache.t + ttlMs < now) {
+      cache = { t: now, v: f.apply(this, args) };
+    }
+    return cache.v;
+  }
+  return wrapper as any;
+}
