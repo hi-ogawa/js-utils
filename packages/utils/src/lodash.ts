@@ -257,7 +257,7 @@ export function delay<F extends (...args: any[]) => void>(
 }
 
 //
-// unsound but convenient for uniform string enum/union based record object
+// famously unsound but too convenient for string enum/union based record
 // https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
 //
 

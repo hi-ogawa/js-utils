@@ -13,8 +13,11 @@ import {
   mapValues,
   memoize,
   objectEntries,
+  objectFromEntries,
   objectHas,
   objectKeys,
+  objectMapKeys,
+  objectMapValues,
   objectOmit,
   objectOmitBy,
   objectPick,
@@ -380,16 +383,16 @@ describe(objectKeys, () => {
   });
 });
 
-describe(objectEntries, () => {
+describe(`${objectEntries.name}/${objectFromEntries.name}`, () => {
   it("basic", () => {
     const o = {
       x: 0,
       y: 1,
     };
-    const result = objectEntries(o);
-    result satisfies ["x" | "y", number][];
-    result satisfies (["x", number] | ["y", number])[];
-    expect(result).toMatchInlineSnapshot(`
+    const entries = objectEntries(o);
+    entries satisfies ["x" | "y", number][];
+    entries satisfies (["x", number] | ["y", number])[];
+    expect(entries).toMatchInlineSnapshot(`
       [
         [
           "x",
@@ -400,6 +403,48 @@ describe(objectEntries, () => {
           1,
         ],
       ]
+    `);
+    const o2 = objectFromEntries(entries);
+    o2 satisfies Record<"x" | "y", number>;
+    expect(o2).toMatchInlineSnapshot(`
+      {
+        "x": 0,
+        "y": 1,
+      }
+    `);
+  });
+});
+
+describe(objectMapValues, () => {
+  it("basic", () => {
+    const o = {
+      x: 1,
+      y: 2,
+    };
+    const result = objectMapValues(o, (v, k) => k.repeat(v));
+    result satisfies Record<"x" | "y", string>;
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "x": "x",
+        "y": "yy",
+      }
+    `);
+  });
+});
+
+describe(objectMapKeys, () => {
+  it("basic", () => {
+    const o = {
+      x: 1,
+      y: 2,
+    };
+    const result = objectMapKeys(o, (v) => (v === 1 ? "w" : "z"));
+    result satisfies Record<"z" | "w", number>;
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "w": 1,
+        "z": 2,
+      }
     `);
   });
 });
