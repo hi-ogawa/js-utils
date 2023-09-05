@@ -30,7 +30,7 @@
   },
   "scripts": {
     "clean": "rm -rf pkg dist",
-    "build": "run-s build:*",
+    "build": "pnpm run --seq /^build:/",
     "build:wasm": "wasm-pack build --target web --out-name index ${BUILD_TYPE:---release}",
     "build:fix-pkg": "rm -f pkg/package.json pkg/.gitignore pkg/README.md",
     "build:tsup": "tsup",
