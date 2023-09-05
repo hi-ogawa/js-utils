@@ -2,4 +2,4 @@
 "@hiogawa/utils": minor
 ---
 
-feat: add `objectEntries`
+feat: add `objectEntries`, `objectFromEntries`, `objectMapValues`, `objectMapKeys`
