@@ -389,7 +389,18 @@ describe(objectEntries, () => {
     const result = objectEntries(o);
     result satisfies ["x" | "y", number][];
     result satisfies (["x", number] | ["y", number])[];
-    expect(result).toMatchInlineSnapshot();
+    expect(result).toMatchInlineSnapshot(`
+      [
+        [
+          "x",
+          0,
+        ],
+        [
+          "y",
+          1,
+        ],
+      ]
+    `);
   });
 });
 
