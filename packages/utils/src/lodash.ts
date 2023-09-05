@@ -257,11 +257,10 @@ export function delay<F extends (...args: any[]) => void>(
 }
 
 //
-// unsafe but convenient plain object key manipulation
+// famously unsound but too convenient for string enum/union based record
 // https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
 //
 
-// TODO: better DX with objectPick(o, ...keys: K[]) ?
 export function objectPick<T extends object, K extends keyof T>(
   o: T,
   keys: K[]
@@ -280,9 +279,7 @@ export function objectPickBy<K extends PropertyKey, V>(
   o: Record<K, V>,
   f: (v: V, k: K) => boolean
 ): Record<K, V> {
-  return Object.fromEntries(
-    Object.entries<V>(o).filter(([k, v]) => f(v, k as any))
-  ) as any;
+  return objectFromEntries(objectEntries(o).filter(([k, v]) => f(v, k as any)));
 }
 
 export function objectOmitBy<K extends PropertyKey, V>(
@@ -294,6 +291,39 @@ export function objectOmitBy<K extends PropertyKey, V>(
 
 export function objectKeys<T extends object>(o: T): (keyof T)[] {
   return Object.keys(o) as any;
+}
+
+export function objectEntries<T extends object>(
+  o: T
+): { [K in keyof T]: [K, T[K]] }[keyof T][] {
+  return Object.entries(o) as any;
+}
+
+export function objectFromEntries<K extends PropertyKey, V>(
+  kvs: [K, V][]
+): Record<K, V> {
+  return Object.fromEntries(kvs) as any;
+}
+
+function objectMapEntries<K extends PropertyKey, V, K2 extends PropertyKey, V2>(
+  o: Record<K, V>,
+  f: (kv: [k: K, v: V]) => [K2, V2]
+): Record<K2, V2> {
+  return objectFromEntries(objectEntries(o).map((kv) => f(kv)));
+}
+
+export function objectMapValues<K extends PropertyKey, V, V2>(
+  o: Record<K, V>,
+  f: (v: V, k: K) => V2
+): Record<K, V2> {
+  return objectMapEntries(o, ([k, v]) => [k, f(v, k)]);
+}
+
+export function objectMapKeys<K extends PropertyKey, V, K2 extends PropertyKey>(
+  o: Record<K, V>,
+  f: (v: V, k: K) => K2
+): Record<K2, V> {
+  return objectMapEntries(o, ([k, v]) => [f(v, k), v]);
 }
 
 export function objectHas<Prop extends keyof any>(
