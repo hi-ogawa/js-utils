@@ -7,6 +7,7 @@ import {
   arrayToEnum,
   assertUnreachable,
   includesGuard,
+  subscribeEventListenerFactory,
   typedBoolean,
 } from "./misc";
 import { mapOption } from "./option";
@@ -633,5 +634,24 @@ describe("colors", () => {
     expect(
       colors.cyan(`nesting ${colors.red("not")} supported`)
     ).toMatchInlineSnapshot('"[36mnesting [31mnot[39m supported[39m"');
+  });
+});
+
+describe(subscribeEventListenerFactory, () => {
+  it("basic", () => {
+    // type-check only
+    () => {
+      const subscribeDocumentEvent =
+        subscribeEventListenerFactory<DocumentEventMap>(document);
+      subscribeDocumentEvent("keyup", (e) => {
+        e satisfies KeyboardEvent;
+      });
+
+      const subscribeWindowEvent =
+        subscribeEventListenerFactory<WindowEventMap>(window);
+      subscribeWindowEvent("storage", (e) => {
+        e satisfies StorageEvent;
+      });
+    };
   });
 });
