@@ -36,7 +36,7 @@ export function exposeTinyRpc<T>({
   return adapter.register(async ({ path, args }) => {
     const fn = routes[path];
     tinyassert(fn, new TinyRpcError("invalid path", { cause: path }));
-    return await fn(...args);
+    return fn.apply(routes, args);
   });
 }
 
