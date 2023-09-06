@@ -639,18 +639,46 @@ describe("colors", () => {
 
 describe(subscribeEventListenerFactory, () => {
   it("basic", () => {
+
+    class TestEventTarget {
+      listeners = new DefaultMap<string, Set<(v: unknown) => void>>(() => new Set());
+
+      addEventListener(type: string, listener: (v: unknown) => void): void {
+        this.listeners.get(type).add(listener);
+      }
+
+      removeEventListener(type: string, listener: (v: unknown) => void): void {
+        this.listeners.get(type).delete(listener);
+      }
+    }
+
+    const testEventTarget = new TestEventTarget();
+
+    // const dispose =
+  });
+
+  it("example", () => {
     // type-check only
     () => {
       const subscribeDocumentEvent =
         subscribeEventListenerFactory<DocumentEventMap>(document);
+
       subscribeDocumentEvent("keyup", (e) => {
         e satisfies KeyboardEvent;
       });
 
-      const subscribeWindowEvent =
-        subscribeEventListenerFactory<WindowEventMap>(window);
-      subscribeWindowEvent("storage", (e) => {
+      subscribeDocumentEvent("wheel", (e) => {
+        e satisfies WheelEvent;
+      });
+
+      subscribeEventListenerFactory<WindowEventMap>(window)("storage", (e) => {
         e satisfies StorageEvent;
+      });
+
+      subscribeEventListenerFactory<HTMLElementEventMap>(
+        document.documentElement
+      )("mousemove", (e) => {
+        e satisfies MouseEvent;
       });
     };
   });
