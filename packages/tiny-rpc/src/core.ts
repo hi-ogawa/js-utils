@@ -4,6 +4,8 @@ import { objectHas, tinyassert } from "@hiogawa/utils";
 // it can expose and proxy all methods as async functions
 //
 
+// TODO: support "no-reply" call?
+
 export type TinyRpcProxy<R> = {
   [K in keyof R]: R[K] extends (...args: any[]) => any
     ? ToAsyncFn<R[K]>
