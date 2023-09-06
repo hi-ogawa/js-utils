@@ -1,16 +1,18 @@
 import { objectHas, tinyassert } from "@hiogawa/utils";
 
 //
-// TinyRpc routes schema
+// it can expose and proxy all methods as async functions
 //
 
-export type TinyRpcRoutes = Record<string, (...args: any[]) => any>;
-
-export type TinyRpcProxy<R extends TinyRpcRoutes> = {
-  [K in keyof R]: (
-    ...args: Parameters<R[K]>
-  ) => Promise<Awaited<ReturnType<R[K]>>>;
+export type TinyRpcProxy<R> = {
+  [K in keyof R]: R[K] extends (...args: any[]) => any
+    ? ToAsyncFn<R[K]>
+    : never;
 };
+
+type ToAsyncFn<F extends (...args: any[]) => any> = (
+  ...args: Parameters<F>
+) => Promise<Awaited<ReturnType<F>>>;
 
 //
 // Adapter interface
@@ -30,17 +32,20 @@ export function exposeTinyRpc<T>({
   routes,
   adapter,
 }: {
-  routes: TinyRpcRoutes;
+  routes: unknown;
   adapter: TinyRpcServerAdapter<T>;
 }): T {
   return adapter.register(async ({ path, args }) => {
-    const fn = routes[path];
-    tinyassert(fn, new TinyRpcError("invalid path", { cause: path }));
+    const fn = objectHas(routes, path) && routes[path];
+    tinyassert(
+      typeof fn === "function",
+      new TinyRpcError("invalid path", { cause: path })
+    );
     return fn.apply(routes, args);
   });
 }
 
-export function proxyTinyRpc<R extends TinyRpcRoutes>({
+export function proxyTinyRpc<R>({
   adapter,
 }: {
   adapter: TinyRpcClientAdapter;
