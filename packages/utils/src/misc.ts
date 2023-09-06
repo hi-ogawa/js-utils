@@ -35,15 +35,18 @@ export function safeFunctionCast<F extends (...args: any[]) => any>(
   return f as any;
 }
 
-// helpers for doing addEventListener/removeEventListener with infering event type
+// helpers for paring addEventListener/removeEventListener where listener event is inferred by event type
 export function subscribeEventListenerFactory<EventMap>(target: {
-  addEventListener(k: keyof EventMap, listener: (e: any) => unknown): unknown;
+  addEventListener(
+    eventType: string,
+    listener: (event: any) => unknown
+  ): unknown;
   removeEventListener(
-    k: keyof EventMap,
-    listener: (e: any) => unknown
+    eventType: string,
+    listener: (event: any) => unknown
   ): unknown;
 }) {
-  return function <K extends keyof EventMap>(
+  return function <K extends keyof EventMap & string>(
     k: K,
     listener: (e: EventMap[K]) => unknown
   ) {
