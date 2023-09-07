@@ -35,7 +35,7 @@ export function safeFunctionCast<F extends (...args: any[]) => any>(
   return f as any;
 }
 
-// helpers for paring addEventListener/removeEventListener where listener argument is inferred based on EventMap
+// helpers for easily paring addEventListener/removeEventListener where listener argument is inferred based on EventMap
 export function subscribeEventListenerFactory<EventMap>(target: {
   addEventListener(
     eventType: string,
