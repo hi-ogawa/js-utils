@@ -1,8 +1,4 @@
 {
   "extends": "../../tsconfig.base.json",
   "include": ["src"]
-  // TODO: remove DOM dependency
-  // "compilerOptions": {
-  //   "lib": ["ESNext"]
-  // }
 }
