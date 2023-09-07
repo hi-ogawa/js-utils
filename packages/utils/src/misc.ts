@@ -46,7 +46,7 @@ export function subscribeEventListenerFactory<EventMap>(target: {
     listener: (event: any) => unknown
   ): unknown;
 }) {
-  return function <K extends keyof EventMap & string>(
+  return function subscribeEventListener<K extends keyof EventMap & string>(
     k: K,
     listener: (e: EventMap[K]) => unknown
   ) {
