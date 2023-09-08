@@ -319,6 +319,13 @@ export function objectMapValues<K extends PropertyKey, V, V2>(
   return objectMapEntries(o, ([k, v]) => [k, f(v, k)]);
 }
 
+export function objectMapValues2<T extends object, V>(
+  o: T,
+  f: (v: T[keyof T], k: keyof T) => V
+): { [K in keyof T]: V } {
+  return objectMapEntries(o, ([k, v]) => [k, f(v, k)]) as any;
+}
+
 export function objectMapKeys<K extends PropertyKey, V, K2 extends PropertyKey>(
   o: Record<K, V>,
   f: (v: V, k: K) => K2

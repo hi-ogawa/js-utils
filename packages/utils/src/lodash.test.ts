@@ -18,6 +18,7 @@ import {
   objectKeys,
   objectMapKeys,
   objectMapValues,
+  objectMapValues2,
   objectOmit,
   objectOmitBy,
   objectPick,
@@ -427,6 +428,30 @@ describe(objectMapValues, () => {
       {
         "x": "x",
         "y": "yy",
+      }
+    `);
+  });
+
+  it("optional", () => {
+    interface TestOptional {
+      x: number;
+      y?: number;
+      z?: number;
+    }
+    const o: TestOptional = {
+      x: 3,
+      z: undefined,
+    };
+    const result = objectMapValues2(o, (v, k) => (v ? k.repeat(v) : "bad"));
+    result satisfies {
+      x: string;
+      y?: string;
+      z?: string;
+    };
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "x": "xxx",
+        "z": "bad",
       }
     `);
   });
