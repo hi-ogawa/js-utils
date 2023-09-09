@@ -415,37 +415,68 @@ describe(`${objectEntries.name}/${objectFromEntries.name}`, () => {
   });
 });
 
-describe(objectMapValues, () => {
+describe(`${objectMapValues.name}/${objectMapKeys.name}`, () => {
   it("basic", () => {
     const o = {
       x: 1,
       y: 2,
     };
-    const result = objectMapValues(o, (v, k) => k.repeat(v));
-    result satisfies Record<"x" | "y", string>;
-    expect(result).toMatchInlineSnapshot(`
-      {
-        "x": "x",
-        "y": "yy",
-      }
-    `);
+    {
+      const result = objectMapValues(o, (v, k) => k.repeat(v));
+      result satisfies Record<"x" | "y", string>;
+      expect(result).toMatchInlineSnapshot(`
+        {
+          "x": "x",
+          "y": "yy",
+        }
+      `);
+    }
+    {
+      const result = objectMapKeys(o, (v) => (v === 1 ? "w" : "z"));
+      result satisfies Record<"z" | "w", number>;
+      expect(result).toMatchInlineSnapshot(`
+        {
+          "w": 1,
+          "z": 2,
+        }
+      `);
+    }
   });
-});
 
-describe(objectMapKeys, () => {
-  it("basic", () => {
-    const o = {
-      x: 1,
-      y: 2,
+  it("optional", () => {
+    interface TestOptional {
+      x: number;
+      y?: number;
+      z?: number;
+    }
+    const o: TestOptional = {
+      x: 3,
+      z: undefined,
     };
-    const result = objectMapKeys(o, (v) => (v === 1 ? "w" : "z"));
-    result satisfies Record<"z" | "w", number>;
-    expect(result).toMatchInlineSnapshot(`
-      {
-        "w": 1,
-        "z": 2,
-      }
-    `);
+    {
+      const result = objectMapValues(o, (v, k) => (v ? k.repeat(v) : "bad-v"));
+      result satisfies {
+        x: string;
+        y?: string;
+        z?: string;
+      };
+      expect(result).toMatchInlineSnapshot(`
+        {
+          "x": "xxx",
+          "z": "bad-v",
+        }
+      `);
+    }
+    {
+      const result = objectMapKeys(o, (v, k) => (v ? k.repeat(v) : "bad-k"));
+      result satisfies Partial<Record<string, number>>;
+      expect(result).toMatchInlineSnapshot(`
+        {
+          "bad-k": undefined,
+          "xxx": 3,
+        }
+      `);
+    }
   });
 });
 

@@ -293,36 +293,35 @@ export function objectKeys<T extends object>(o: T): (keyof T)[] {
   return Object.keys(o) as any;
 }
 
-export function objectEntries<T extends object>(
-  o: T
-): { [K in keyof T]: [K, T[K]] }[keyof T][] {
+export function objectEntries<T extends object>(o: T): ObjectEntry<T>[] {
   return Object.entries(o) as any;
 }
+
+type ObjectEntry<T extends object> = { [K in keyof T]: [K, T[K]] }[keyof T];
 
 export function objectFromEntries<K extends PropertyKey, V>(
   kvs: [K, V][]
 ): Record<K, V> {
   return Object.fromEntries(kvs) as any;
 }
-
-function objectMapEntries<K extends PropertyKey, V, K2 extends PropertyKey, V2>(
-  o: Record<K, V>,
-  f: (kv: [k: K, v: V]) => [K2, V2]
+function objectMapEntries<T extends object, K2 extends PropertyKey, V2>(
+  o: T,
+  f: (kv: ObjectEntry<T>) => [K2, V2]
 ): Record<K2, V2> {
   return objectFromEntries(objectEntries(o).map((kv) => f(kv)));
 }
 
-export function objectMapValues<K extends PropertyKey, V, V2>(
-  o: Record<K, V>,
-  f: (v: V, k: K) => V2
-): Record<K, V2> {
+export function objectMapValues<T extends object, V>(
+  o: T,
+  f: (v: T[keyof T], k: keyof T) => V
+): Record<keyof T, V> {
   return objectMapEntries(o, ([k, v]) => [k, f(v, k)]);
 }
 
-export function objectMapKeys<K extends PropertyKey, V, K2 extends PropertyKey>(
-  o: Record<K, V>,
-  f: (v: V, k: K) => K2
-): Record<K2, V> {
+export function objectMapKeys<T extends object, K extends PropertyKey>(
+  o: T,
+  f: (v: T[keyof T], k: keyof T) => K
+): Record<K, T[keyof T]> {
   return objectMapEntries(o, ([k, v]) => [f(v, k), v]);
 }
 
