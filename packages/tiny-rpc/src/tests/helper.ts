@@ -2,7 +2,6 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { type RequestHandler } from "@hattip/compose";
 import { tinyassert } from "@hiogawa/utils";
 import { z } from "zod";
-import type { TinyRpcRoutes } from "../core";
 import { validateFn } from "../validation";
 
 export function defineTestRpcRoutes() {
@@ -63,7 +62,7 @@ export function defineTestRpcRoutes() {
       const { request } = useContext();
       return request.headers.get("x-auth") === "good";
     },
-  } satisfies TinyRpcRoutes;
+  };
 
   return { routes, contextProviderHandler };
 }
