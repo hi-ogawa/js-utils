@@ -2,4 +2,4 @@
 "@hiogawa/tiny-rpc": major
 ---
 
-feat: relax routes typing
+feat!: relax routes typing
