@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { colors } from "./colors";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
@@ -7,6 +7,7 @@ import {
   arrayToEnum,
   assertUnreachable,
   includesGuard,
+  subscribeEventListenerFactory,
   typedBoolean,
 } from "./misc";
 import { mapOption } from "./option";
@@ -633,5 +634,93 @@ describe("colors", () => {
     expect(
       colors.cyan(`nesting ${colors.red("not")} supported`)
     ).toMatchInlineSnapshot('"[36mnesting [31mnot[39m supported[39m"');
+  });
+});
+
+describe(subscribeEventListenerFactory, () => {
+  it("basic", () => {
+    class TestEventTarget {
+      private listeners = new DefaultMap<string, Set<(v: unknown) => void>>(
+        () => new Set()
+      );
+
+      addEventListener(type: string, listener: (v: unknown) => void): void {
+        this.listeners.get(type).add(listener);
+      }
+
+      removeEventListener(type: string, listener: (v: unknown) => void): void {
+        this.listeners.get(type).delete(listener);
+      }
+
+      emit<T extends keyof TestEventMap>(type: T, data: TestEventMap[T]) {
+        this.listeners.get(type).forEach((l) => l(data));
+      }
+    }
+
+    type TestEventMap = {
+      x: number;
+      y: string;
+    };
+
+    const target = new TestEventTarget();
+    const subscribe = subscribeEventListenerFactory<TestEventMap>(target);
+
+    const listener = vi.fn();
+    const unsubscribe = subscribe("x", listener);
+    subscribe("y", listener);
+    target.emit("x", 123);
+    target.emit("y", "hello");
+    expect(listener.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          123,
+        ],
+        [
+          "hello",
+        ],
+      ]
+    `);
+    unsubscribe();
+    target.emit("x", 456);
+    target.emit("y", "world");
+    expect(listener.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          123,
+        ],
+        [
+          "hello",
+        ],
+        [
+          "world",
+        ],
+      ]
+    `);
+  });
+
+  it("example", () => {
+    // type test
+    () => {
+      const subscribeDocumentEvent =
+        subscribeEventListenerFactory<DocumentEventMap>(document);
+
+      subscribeDocumentEvent("keyup", (e) => {
+        e satisfies KeyboardEvent;
+      });
+
+      subscribeDocumentEvent("wheel", (e) => {
+        e satisfies WheelEvent;
+      });
+
+      subscribeEventListenerFactory<WindowEventMap>(window)("storage", (e) => {
+        e satisfies StorageEvent;
+      });
+
+      subscribeEventListenerFactory<HTMLElementEventMap>(
+        document.documentElement
+      )("mousemove", (e) => {
+        e satisfies MouseEvent;
+      });
+    };
   });
 });

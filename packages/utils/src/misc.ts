@@ -34,3 +34,25 @@ export function safeFunctionCast<F extends (...args: any[]) => any>(
   //   '(...args: Parameters<F>) => ReturnType<F>' is assignable to the constraint of type 'F', but 'F' could be instantiated with a different subtype of constraint '(...args: any[]) => any'.
   return f as any;
 }
+
+// helpers for easily paring addEventListener/removeEventListener where listener argument is inferred based on EventMap
+export function subscribeEventListenerFactory<EventMap>(target: {
+  addEventListener(
+    eventType: string,
+    listener: (event: any) => unknown
+  ): unknown;
+  removeEventListener(
+    eventType: string,
+    listener: (event: any) => unknown
+  ): unknown;
+}) {
+  return function subscribeEventListener<K extends keyof EventMap & string>(
+    k: K,
+    listener: (e: EventMap[K]) => unknown
+  ) {
+    target.addEventListener(k, listener);
+    return () => {
+      target.removeEventListener(k, listener);
+    };
+  };
+}
