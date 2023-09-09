@@ -4,12 +4,7 @@ import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { ZodError, z } from "zod";
 import { httpClientAdapter, httpServerAdapter } from "./adapter-http";
-import {
-  TinyRpcError,
-  type TinyRpcRoutes,
-  exposeTinyRpc,
-  proxyTinyRpc,
-} from "./core";
+import { TinyRpcError, exposeTinyRpc, proxyTinyRpc } from "./core";
 import { defineTestRpcRoutes } from "./tests/helper";
 import { validateFn } from "./validation";
 
@@ -204,7 +199,7 @@ describe("adapter-http", () => {
     const routes = {
       identity: (v: any) => v,
       validate: validateFn(z.number().int())((x) => 2 * x),
-    } satisfies TinyRpcRoutes;
+    };
 
     const testObject = {
       date: new Date("2023-08-17"),
