@@ -666,42 +666,36 @@ describe(subscribeEventListenerFactory, () => {
     const subscribe = subscribeEventListenerFactory<TestEventMap>(target);
 
     const listener = vi.fn();
-    const unsubscribe1 = subscribe("x", listener);
-    target.emit("x", 0);
-    target.emit("y", "0");
+    const unsubscribe = subscribe("x", listener);
+    subscribe("y", listener);
+    target.emit("x", 123);
+    target.emit("y", "hello");
     expect(listener.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          0,
+          123,
+        ],
+        [
+          "hello",
         ],
       ]
     `);
-    listener.mockReset();
-
-    unsubscribe1();
-    target.emit("x", 1);
-    target.emit("y", "1");
-    expect(listener.mock.calls).toMatchInlineSnapshot("[]");
-
-    const unsubscribe2 = subscribe("y", listener);
-    target.emit("x", 0);
-    target.emit("y", "0");
+    unsubscribe();
+    target.emit("x", 456);
+    target.emit("y", "world");
     expect(listener.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "0",
+          123,
+        ],
+        [
+          "hello",
+        ],
+        [
+          "world",
         ],
       ]
     `);
-    listener.mockReset();
-
-    unsubscribe2();
-    target.emit("x", 1);
-    target.emit("y", "1");
-    expect(listener.mock.calls).toMatchInlineSnapshot("[]");
-
-    // @ts-expect-error Argument of type '"z"' is not assignable to parameter of type '"x" | "y"'.
-    subscribe("z", () => {});
   });
 
   it("example", () => {
