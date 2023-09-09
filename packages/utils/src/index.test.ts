@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { colors } from "./colors";
 import { defaultDict } from "./default-dict";
 import { DefaultMap, HashKeyDefaultMap, UncheckedMap } from "./default-map";
@@ -638,6 +638,72 @@ describe("colors", () => {
 });
 
 describe(subscribeEventListenerFactory, () => {
+  it("basic", () => {
+    class TestEventTarget {
+      private listeners = new DefaultMap<string, Set<(v: unknown) => void>>(
+        () => new Set()
+      );
+
+      addEventListener(type: string, listener: (v: unknown) => void): void {
+        this.listeners.get(type).add(listener);
+      }
+
+      removeEventListener(type: string, listener: (v: unknown) => void): void {
+        this.listeners.get(type).delete(listener);
+      }
+
+      emit<T extends keyof TestEventMap>(type: T, data: TestEventMap[T]) {
+        this.listeners.get(type).forEach((l) => l(data));
+      }
+    }
+
+    type TestEventMap = {
+      x: number;
+      y: string;
+    };
+
+    const target = new TestEventTarget();
+    const subscribe = subscribeEventListenerFactory<TestEventMap>(target);
+
+    const listener = vi.fn();
+    const unsubscribe1 = subscribe("x", listener);
+    target.emit("x", 0);
+    target.emit("y", "0");
+    expect(listener.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          0,
+        ],
+      ]
+    `);
+    listener.mockReset();
+
+    unsubscribe1();
+    target.emit("x", 1);
+    target.emit("y", "1");
+    expect(listener.mock.calls).toMatchInlineSnapshot("[]");
+
+    const unsubscribe2 = subscribe("y", listener);
+    target.emit("x", 0);
+    target.emit("y", "0");
+    expect(listener.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "0",
+        ],
+      ]
+    `);
+    listener.mockReset();
+
+    unsubscribe2();
+    target.emit("x", 1);
+    target.emit("y", "1");
+    expect(listener.mock.calls).toMatchInlineSnapshot("[]");
+
+    // @ts-expect-error Argument of type '"z"' is not assignable to parameter of type '"x" | "y"'.
+    subscribe("z", () => {});
+  });
+
   it("example", () => {
     // type test
     () => {
@@ -651,9 +717,6 @@ describe(subscribeEventListenerFactory, () => {
       subscribeDocumentEvent("wheel", (e) => {
         e satisfies WheelEvent;
       });
-
-      // @ts-expect-error Argument of type '"no-such-event"' is not assignable to parameter ...
-      subscribeDocumentEvent("no-such-event", () => {});
 
       subscribeEventListenerFactory<WindowEventMap>(window)("storage", (e) => {
         e satisfies StorageEvent;
