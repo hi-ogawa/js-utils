@@ -4,7 +4,7 @@ import React from "react";
 import { describe, expect, it } from "vitest";
 import { createTinyStore, tinyStoreSelect } from "./core";
 import { createTinyStoreWithStorage } from "./local-storage";
-import { useTinyStore } from "./react";
+import { useTinyStore, useTinyStoreStorage } from "./react";
 
 // cf. https://github.com/pmndrs/jotai/blob/2526039ea4da082749adc8a449c33422c53d9819/tests/react/basic.test.tsx
 
@@ -112,7 +112,10 @@ describe(useTinyStore, () => {
   });
 
   it(createTinyStoreWithStorage, async () => {
-    const store = createTinyStoreWithStorage("tiny-store:react.test", {
+    const KEY = "tiny-store:react.test";
+    window.localStorage.removeItem(KEY);
+
+    const store = createTinyStoreWithStorage(KEY, {
       x: 0,
     });
 
@@ -140,7 +143,7 @@ describe(useTinyStore, () => {
     //
     // recreate store and rener
     //
-    const store2 = createTinyStoreWithStorage("tiny-store:react.test", {
+    const store2 = createTinyStoreWithStorage(KEY, {
       x: 0,
     });
     cleanup();
@@ -151,6 +154,43 @@ describe(useTinyStore, () => {
     );
     expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":1}"');
 
+    await userEvent.click(await screen.findByRole("button"));
+    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":2}"');
+  });
+
+  it(useTinyStoreStorage, async () => {
+    const KEY = "tiny-store:react.test";
+    window.localStorage.removeItem(KEY);
+
+    function Demo() {
+      const [state, setState] = useTinyStoreStorage(KEY, {
+        x: 0,
+      });
+      return (
+        <>
+          <div data-testid="demo">{JSON.stringify(state)}</div>
+          <button onClick={() => setState(({ x }) => ({ x: x + 1 }))}>
+            +1
+          </button>
+        </>
+      );
+    }
+    render(
+      <>
+        <Demo />
+      </>
+    );
+    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":0}"');
+    await userEvent.click(await screen.findByRole("button"));
+    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":1}"');
+
+    cleanup();
+    render(
+      <>
+        <Demo />
+      </>
+    );
+    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":1}"');
     await userEvent.click(await screen.findByRole("button"));
     expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":2}"');
   });

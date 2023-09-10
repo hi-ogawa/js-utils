@@ -9,7 +9,7 @@ export function useTinyStore<T, IsReadonly extends boolean>(
   return [store.get(), store.set] as const;
 }
 
-export function useTinyLocalStorage<T>(key: string, defaultValue: T) {
+export function useTinyStoreStorage<T>(key: string, defaultValue: T) {
   const store = React.useMemo(
     () => createTinyStoreWithStorage(key, defaultValue),
     [key]
