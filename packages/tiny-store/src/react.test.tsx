@@ -2,11 +2,8 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { describe, expect, it } from "vitest";
-import {
-  createSimpleStore,
-  createSimpleStoreWithLocalStorage,
-  storeSelect,
-} from "./core";
+import { createSimpleStore, storeSelect } from "./core";
+import { createSimpleStoreWithLocalStorage } from "./local-storage";
 import { useSimpleStore } from "./react";
 
 // cf. https://github.com/pmndrs/jotai/blob/2526039ea4da082749adc8a449c33422c53d9819/tests/react/basic.test.tsx

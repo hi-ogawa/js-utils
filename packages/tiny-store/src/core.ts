@@ -56,30 +56,12 @@ function memoizeOne<F extends (arg: any) => any>(f: F): F {
 }
 
 //
-// basic factory
+// base store implementation
 //
 
 export function createSimpleStore<T>(defaultValue: T): SimpleStore<T> {
   return new SimpleStoreBase(new MemoryAdapter<T>(defaultValue));
 }
-
-// ssr fallbacks to `defaultValue` which can cause hydration mismatch
-export function createSimpleStoreWithLocalStorage<T>(
-  key: string,
-  defaultValue: T,
-  parse = JSON.parse,
-  stringify = JSON.stringify
-): SimpleStore<T> {
-  return storeTransform<string | null, T>(
-    new SimpleStoreBase(new LocalStorageAdapter(key)),
-    (s: string | null): T => (s === null ? defaultValue : parse(s)),
-    (t: T): string | null => stringify(t)
-  );
-}
-
-//
-// base store implementation
-//
 
 export class SimpleStoreBase<T> implements SimpleStore<T> {
   private listeners = new Set<() => void>();
@@ -118,7 +100,7 @@ function applyAction<T>(v: () => T, action: SetAction<T>): T {
 // abstract adapter to naturally support LocalStorage
 //
 
-interface SimpleStoreAdapter<T> {
+export interface SimpleStoreAdapter<T> {
   get: () => T;
   set: (value: T) => void;
   subscribe?: (onStoreChange: () => void) => () => void;
@@ -128,40 +110,4 @@ class MemoryAdapter<T> implements SimpleStoreAdapter<T> {
   constructor(private value: T) {}
   get = () => this.value;
   set = (value: T) => (this.value = value);
-}
-
-class LocalStorageAdapter implements SimpleStoreAdapter<string | null> {
-  constructor(private key: string) {}
-
-  get() {
-    if (typeof window === "undefined") {
-      return null;
-    }
-    return window.localStorage.getItem(this.key);
-  }
-
-  set(value: string | null) {
-    if (value === null) {
-      window.localStorage.removeItem(this.key);
-    } else {
-      window.localStorage.setItem(this.key, value);
-    }
-  }
-
-  // TODO: this will register event listener for each observer of each store, which might be excessive.
-  subscribe = (listener: () => void) => {
-    if (typeof window === "undefined") {
-      return () => {};
-    }
-    const handler = (e: StorageEvent) => {
-      // key is null when localStorage.clear
-      if (e.key === this.key || e.key === null) {
-        listener();
-      }
-    };
-    window.addEventListener("storage", handler);
-    return () => {
-      window.removeEventListener("storage", handler);
-    };
-  };
 }
