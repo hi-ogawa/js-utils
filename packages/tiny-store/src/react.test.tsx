@@ -1,8 +1,12 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { describe, expect, it } from "vitest";
-import { createSimpleStore, storeSelect } from "./core";
+import {
+  createSimpleStore,
+  createSimpleStoreWithLocalStorage,
+  storeSelect,
+} from "./core";
 import { useSimpleStore } from "./react";
 
 // cf. https://github.com/pmndrs/jotai/blob/2526039ea4da082749adc8a449c33422c53d9819/tests/react/basic.test.tsx
@@ -108,6 +112,50 @@ describe(useSimpleStore, () => {
             "commit = 2, state = {\\"first\\":\\"John\\"}",
           ]
         `);
+  });
+
+  it(createSimpleStoreWithLocalStorage, async () => {
+    const store = createSimpleStoreWithLocalStorage("tiny-store:react.test", {
+      x: 0,
+    });
+
+    function Demo(props: { store: typeof store }) {
+      const [state, setState] = useSimpleStore(props.store);
+      return (
+        <>
+          <div data-testid="demo">{JSON.stringify(state)}</div>
+          <button onClick={() => setState(({ x }) => ({ x: x + 1 }))}>
+            +1
+          </button>
+        </>
+      );
+    }
+    render(
+      <>
+        <Demo store={store} />
+      </>
+    );
+    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":0}"');
+
+    await userEvent.click(await screen.findByRole("button"));
+    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":1}"');
+
+    //
+    // recreate store and rener
+    //
+    const store2 = createSimpleStoreWithLocalStorage("tiny-store:react.test", {
+      x: 0,
+    });
+    cleanup();
+    render(
+      <>
+        <Demo store={store2} />
+      </>
+    );
+    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":1}"');
+
+    await userEvent.click(await screen.findByRole("button"));
+    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":2}"');
   });
 });
 
