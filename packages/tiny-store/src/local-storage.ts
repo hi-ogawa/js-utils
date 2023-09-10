@@ -1,25 +1,25 @@
 import {
-  type SimpleStore,
-  type SimpleStoreAdapter,
-  SimpleStoreBase,
-  storeTransform,
+  TinyStore,
+  type TinyStoreAdapter,
+  type TinyStoreApi,
+  tinyStoreTransform,
 } from "./core";
 
 // ssr fallbacks to `defaultValue` which can cause hydration mismatch
-export function createSimpleStoreWithLocalStorage<T>(
+export function createTinyStoreWithStorage<T>(
   key: string,
   defaultValue: T,
   parse = JSON.parse,
   stringify = JSON.stringify
-): SimpleStore<T> {
-  return storeTransform<string | null, T>(
-    new SimpleStoreBase(new LocalStorageAdapter(key)),
+): TinyStoreApi<T> {
+  return tinyStoreTransform<string | null, T>(
+    new TinyStore(new TinyScoreLocalStorageAdapter(key)),
     (s: string | null): T => (s === null ? defaultValue : parse(s)),
     (t: T): string | null => stringify(t)
   );
 }
 
-class LocalStorageAdapter implements SimpleStoreAdapter<string | null> {
+class TinyScoreLocalStorageAdapter implements TinyStoreAdapter<string | null> {
   constructor(private key: string) {}
 
   get() {

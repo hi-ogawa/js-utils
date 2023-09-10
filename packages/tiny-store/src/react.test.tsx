@@ -2,17 +2,17 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { describe, expect, it } from "vitest";
-import { createSimpleStore, storeSelect } from "./core";
-import { createSimpleStoreWithLocalStorage } from "./local-storage";
-import { useSimpleStore } from "./react";
+import { createTinyStore, tinyStoreSelect } from "./core";
+import { createTinyStoreWithStorage } from "./local-storage";
+import { useTinyStore } from "./react";
 
 // cf. https://github.com/pmndrs/jotai/blob/2526039ea4da082749adc8a449c33422c53d9819/tests/react/basic.test.tsx
 
-describe(useSimpleStore, () => {
+describe(useTinyStore, () => {
   it("basic", async () => {
-    const store = createSimpleStore(1);
+    const store = createTinyStore(1);
     function Demo() {
-      const [state, setState] = useSimpleStore(store);
+      const [state, setState] = useTinyStore(store);
       return (
         <>
           <div data-testid="demo">{state}</div>
@@ -31,8 +31,8 @@ describe(useSimpleStore, () => {
     expect(await getTestidText("demo")).toMatchInlineSnapshot('"2"');
   });
 
-  it(storeSelect, async () => {
-    const store1 = createSimpleStore({
+  it(tinyStoreSelect, async () => {
+    const store1 = createTinyStore({
       name: {
         first: "Jane",
       },
@@ -40,10 +40,10 @@ describe(useSimpleStore, () => {
         year: 2000,
       },
     });
-    const store2 = storeSelect(store1, (v) => v.name);
+    const store2 = tinyStoreSelect(store1, (v) => v.name);
 
     function Demo1() {
-      const [state, setState] = useSimpleStore(store1);
+      const [state, setState] = useTinyStore(store1);
       return (
         <>
           <div data-testid="demo1">
@@ -68,7 +68,7 @@ describe(useSimpleStore, () => {
     }
 
     function Demo2() {
-      const [state] = useSimpleStore(store2);
+      const [state] = useTinyStore(store2);
       return (
         <>
           <div data-testid="demo2">
@@ -111,13 +111,13 @@ describe(useSimpleStore, () => {
         `);
   });
 
-  it(createSimpleStoreWithLocalStorage, async () => {
-    const store = createSimpleStoreWithLocalStorage("tiny-store:react.test", {
+  it(createTinyStoreWithStorage, async () => {
+    const store = createTinyStoreWithStorage("tiny-store:react.test", {
       x: 0,
     });
 
     function Demo(props: { store: typeof store }) {
-      const [state, setState] = useSimpleStore(props.store);
+      const [state, setState] = useTinyStore(props.store);
       return (
         <>
           <div data-testid="demo">{JSON.stringify(state)}</div>
@@ -140,7 +140,7 @@ describe(useSimpleStore, () => {
     //
     // recreate store and rener
     //
-    const store2 = createSimpleStoreWithLocalStorage("tiny-store:react.test", {
+    const store2 = createTinyStoreWithStorage("tiny-store:react.test", {
       x: 0,
     });
     cleanup();

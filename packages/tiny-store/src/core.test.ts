@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { createSimpleStore, storeSelect, storeTransform } from "./core";
+import { createTinyStore, tinyStoreSelect, tinyStoreTransform } from "./core";
 
-describe(createSimpleStore, () => {
+describe(createTinyStore, () => {
   it("basic", () => {
-    const store = createSimpleStore(0);
+    const store = createTinyStore(0);
     const onStoreChangeFn = vi.fn();
     const unsubscribe = store.subscribe(onStoreChangeFn);
 
@@ -21,10 +21,10 @@ describe(createSimpleStore, () => {
   });
 });
 
-describe(storeTransform, () => {
+describe(tinyStoreTransform, () => {
   it("basic", () => {
-    const store1 = createSimpleStore("0");
-    const store2 = storeTransform<string, number>(
+    const store1 = createTinyStore("0");
+    const store2 = tinyStoreTransform<string, number>(
       store1,
       JSON.parse,
       JSON.stringify
@@ -68,8 +68,8 @@ describe(storeTransform, () => {
   });
 
   it("memoized", () => {
-    const store = storeTransform<string, { x: number }>(
-      createSimpleStore(JSON.stringify({ x: 0 })),
+    const store = tinyStoreTransform<string, { x: number }>(
+      createTinyStore(JSON.stringify({ x: 0 })),
       JSON.parse,
       JSON.stringify
     );
@@ -100,9 +100,9 @@ describe(storeTransform, () => {
   });
 });
 
-describe(storeSelect, () => {
+describe(tinyStoreSelect, () => {
   it("basic", () => {
-    const store1 = createSimpleStore({
+    const store1 = createTinyStore({
       name: {
         first: "Jane",
         last: "Doe",
@@ -113,10 +113,10 @@ describe(storeSelect, () => {
         day: 1,
       },
     });
-    const store2 = storeSelect(store1, (v) => v.name);
+    const store2 = tinyStoreSelect(store1, (v) => v.name);
     store2.set satisfies null;
 
-    const store3 = storeSelect(store2, (v) => v.first);
+    const store3 = tinyStoreSelect(store2, (v) => v.first);
     store3.set satisfies null;
 
     const snapshots = [store2.get()];

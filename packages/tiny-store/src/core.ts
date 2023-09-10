@@ -2,7 +2,7 @@
 // platform agnostic store api
 //
 
-export interface SimpleStore<T, IsReadonly extends boolean = false> {
+export interface TinyStoreApi<T, IsReadonly extends boolean = false> {
   get: () => T;
   set: IsReadonly extends true ? null : (newValue: SetAction<T>) => void;
   subscribe: (onStoreChange: () => void) => () => void;
@@ -13,11 +13,11 @@ export interface SimpleStore<T, IsReadonly extends boolean = false> {
 //
 
 // transform read/write (e.g. for JSON.parse/stringify based local storage)
-export function storeTransform<T1, T2>(
-  store: SimpleStore<T1>,
+export function tinyStoreTransform<T1, T2>(
+  store: TinyStoreApi<T1>,
   decode: (v1: T1) => T2,
   encode: (v2: T2) => T1
-): SimpleStore<T2> {
+): TinyStoreApi<T2> {
   const decodeMemo = memoizeOne(decode);
   return {
     get: () => decodeMemo(store.get()),
@@ -30,10 +30,10 @@ export function storeTransform<T1, T2>(
 }
 
 // transform readonly (for memoized selection)
-export function storeSelect<T1, T2>(
-  store: Omit<SimpleStore<T1>, "set">,
+export function tinyStoreSelect<T1, T2>(
+  store: Omit<TinyStoreApi<T1>, "set">,
   decode: (v: T1) => T2
-): SimpleStore<T2, true> {
+): TinyStoreApi<T2, true> {
   // `subscribe` based on original store, but as long as `get` returns memoized value,
   // `useSyncExternalStore` won't cause re-rendering
   const decodeMemo = memoizeOne(decode);
@@ -59,14 +59,14 @@ function memoizeOne<F extends (arg: any) => any>(f: F): F {
 // base store implementation
 //
 
-export function createSimpleStore<T>(defaultValue: T): SimpleStore<T> {
-  return new SimpleStoreBase(new MemoryAdapter<T>(defaultValue));
+export function createTinyStore<T>(defaultValue: T): TinyStoreApi<T> {
+  return new TinyStore(new TinyStoreMemoryAdapter<T>(defaultValue));
 }
 
-export class SimpleStoreBase<T> implements SimpleStore<T> {
+export class TinyStore<T> implements TinyStoreApi<T> {
   private listeners = new Set<() => void>();
 
-  constructor(private adapter: SimpleStoreAdapter<T>) {}
+  constructor(private adapter: TinyStoreAdapter<T>) {}
 
   get = () => this.adapter.get();
 
@@ -100,13 +100,13 @@ function applyAction<T>(v: () => T, action: SetAction<T>): T {
 // abstract adapter to naturally support LocalStorage
 //
 
-export interface SimpleStoreAdapter<T> {
+export interface TinyStoreAdapter<T> {
   get: () => T;
   set: (value: T) => void;
   subscribe?: (onStoreChange: () => void) => () => void;
 }
 
-class MemoryAdapter<T> implements SimpleStoreAdapter<T> {
+class TinyStoreMemoryAdapter<T> implements TinyStoreAdapter<T> {
   constructor(private value: T) {}
   get = () => this.value;
   set = (value: T) => (this.value = value);
