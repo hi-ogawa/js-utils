@@ -253,6 +253,18 @@ importers:
         specifier: ^3.12.7
         version: 3.12.7
 
+  packages/tiny-store:
+    devDependencies:
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@types/react':
+        specifier: ^18.2.14
+        version: 18.2.14
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+
   packages/utils: {}
 
   packages/utils-hattip: {}
