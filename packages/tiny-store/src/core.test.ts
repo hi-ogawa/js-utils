@@ -119,6 +119,10 @@ describe(storeSelect, () => {
       },
     });
     const store2 = storeSelect(store1, (v) => v.name);
+    store2.set satisfies null;
+
+    const store3 = storeSelect(store2, (v) => v.first);
+    store3.set satisfies null;
 
     const snapshots = [store2.get()];
     expect(snapshots.at(-1)).toMatchInlineSnapshot(`
@@ -127,6 +131,7 @@ describe(storeSelect, () => {
         "last": "Doe",
       }
     `);
+    expect(store3.get()).toMatchInlineSnapshot('"Jane"');
 
     store1.set((v) => ({ ...v, birth: { ...v.birth, day: 2 } }));
     snapshots.push(store2.get());
@@ -158,10 +163,8 @@ describe(storeSelect, () => {
         "last": "Doe",
       }
     `);
+    expect(store3.get()).toMatchInlineSnapshot('"John"');
     expect(snapshots[0]).not.toBe(snapshots.at(-1));
     expect(snapshots[0]).not.toEqual(snapshots.at(-1));
-
-    // @ts-expect-error not assignable to never
-    () => store2.set(snapshots[0]);
   });
 });
