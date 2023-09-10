@@ -1,12 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  SimpleStoreBase,
-  createSimpleStore,
-  storeSelect,
-  storeTransform,
-} from "./core";
+import { createSimpleStore, storeSelect, storeTransform } from "./core";
 
-describe(SimpleStoreBase, () => {
+describe(createSimpleStore, () => {
   it("basic", () => {
     const store = createSimpleStore(0);
     const onStoreChangeFn = vi.fn();
