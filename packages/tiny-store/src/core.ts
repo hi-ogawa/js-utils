@@ -148,6 +148,7 @@ class LocalStorageAdapter implements SimpleStoreAdapter<string | null> {
     }
   }
 
+  // TODO: this will register event listener for each observer of each store, which might be excessive.
   subscribe = (listener: () => void) => {
     if (typeof window === "undefined") {
       return () => {};
