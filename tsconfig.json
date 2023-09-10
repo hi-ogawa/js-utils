@@ -35,7 +35,13 @@
       "path": "packages/tiny-sql"
     },
     {
+      "path": "packages/tiny-sql/examples/postgresql"
+    },
+    {
       "path": "packages/tiny-sql/examples/sqlite"
+    },
+    {
+      "path": "packages/tiny-store"
     },
     {
       "path": "packages/utils"
