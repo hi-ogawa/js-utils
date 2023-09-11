@@ -86,7 +86,8 @@ const command = new TinyCliCommand(
           circularResult.parentMap
         );
         result.lines.forEach((line, i) => {
-          console.log(("    ".repeat(i) + " -> ").slice(4) + line);
+          const prefix = i > 0 ? "    ".repeat(i - 1) + " -> " : "";
+          console.log(prefix + line);
         });
       }
       process.exitCode = 1;
