@@ -13,6 +13,7 @@ type ImportSource = {
   name: string; // resolved file path if "internal"
 };
 
+// TODO: keep comment here for "icheck-ignore"
 type ImportUsage =
   | {
       // import { x as y } from "a"
@@ -36,6 +37,8 @@ export type ExportUsage = {
   position: [number, number];
   comment: string;
 };
+
+export type ImportRelations = DefaultMap<string, ImportTarget[]>;
 
 // 1. parse files
 // 2. resolve import source
@@ -209,4 +212,44 @@ export async function resolveImportSource(
         type: "unknown",
         name: source,
       };
+}
+
+// TOOD: test
+export function findCircularImport(relations: ImportRelations) {
+  // dfs on directed graph
+  const adj = new Map(relations.entries());
+  const visited = new Set<string>();
+  const path = new Set<string>(); // dfs tree path
+  const parentMap = new Map<string, ImportTarget>();
+  const backEdges: [string, ImportTarget][] = [];
+
+  function dfs(v: string) {
+    visited.add(v);
+    path.add(v);
+    for (const target of adj.get(v) ?? []) {
+      if (target.source.type !== "internal") {
+        continue;
+      }
+      const u = target.source.name;
+      if (path.has(u)) {
+        backEdges.push([v, target]);
+        continue;
+      }
+      if (visited.has(u)) {
+        continue;
+      }
+      parentMap.set(u, target);
+      dfs(u);
+    }
+    path.delete(v);
+  }
+
+  for (const v of adj.keys()) {
+    if (!visited.has(v)) {
+      dfs(v);
+    }
+  }
+
+  // cycle can be traversed and formatted separately based on minimal data
+  return { parentMap, backEdges };
 }

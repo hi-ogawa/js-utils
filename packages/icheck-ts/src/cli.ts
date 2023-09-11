@@ -5,7 +5,7 @@ import {
   version as packageVersion,
 } from "../package.json";
 import { parseImportExport } from "./parser";
-import { type ExportUsage, runner } from "./runner";
+import { type ExportUsage, findCircularImport, runner } from "./runner";
 import { memoizeOnFile } from "./utils";
 
 const command = new TinyCliCommand(
@@ -68,6 +68,14 @@ const command = new TinyCliCommand(
           console.log(`${file}:${e.position[0]} - ${e.name}`);
         }
       }
+      process.exitCode = 1;
+    }
+
+    // circular import
+    const circularResult = findCircularImport(result.importRelations);
+    if (circularResult.backEdges.length > 0) {
+      console.log("** Circular import **");
+      console.log(JSON.stringify(circularResult.backEdges, null, 2));
       process.exitCode = 1;
     }
   }
