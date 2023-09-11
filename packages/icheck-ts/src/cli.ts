@@ -5,7 +5,12 @@ import {
   version as packageVersion,
 } from "../package.json";
 import { parseImportExport } from "./parser";
-import { type ExportUsage, findCircularImport, runner } from "./runner";
+import {
+  type ExportUsage,
+  findCircularImport,
+  formatCircularImportError,
+  runner,
+} from "./runner";
 import { memoizeOnFile } from "./utils";
 
 const command = new TinyCliCommand(
@@ -75,7 +80,15 @@ const command = new TinyCliCommand(
     const circularResult = findCircularImport(result.importRelations);
     if (circularResult.backEdges.length > 0) {
       console.log("** Circular import **");
-      console.log(JSON.stringify(circularResult.backEdges, null, 2));
+      for (const edge of circularResult.backEdges) {
+        const result = formatCircularImportError(
+          edge,
+          circularResult.parentMap
+        );
+        result.lines.forEach((line, i) => {
+          console.log(("    ".repeat(i) + " -> ").slice(4) + line);
+        });
+      }
       process.exitCode = 1;
     }
   }

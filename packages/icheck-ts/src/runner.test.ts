@@ -1,5 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { findCircularImport, resolveImportSource, runner } from "./runner";
+import {
+  findCircularImport,
+  formatCircularImportError,
+  resolveImportSource,
+  runner,
+} from "./runner";
 import { setupTestFixture } from "./tests/helper";
 
 describe(runner, () => {
@@ -443,7 +448,8 @@ export default "z";
 
   it("basic", async () => {
     const result = await runner(Object.keys(fixture));
-    expect(findCircularImport(result.importRelations)).toMatchInlineSnapshot(`
+    const circularResult = findCircularImport(result.importRelations);
+    expect(circularResult).toMatchInlineSnapshot(`
       {
         "backEdges": [
           [
@@ -468,8 +474,9 @@ export default "z";
           ],
         ],
         "parentMap": Map {
-          "y.ts" => {
-            "edge": {
+          "y.ts" => [
+            "x.ts",
+            {
               "node": {
                 "comment": "",
                 "position": [
@@ -486,10 +493,10 @@ export default "z";
                 "type": "named",
               },
             },
-            "parent": "x.ts",
-          },
-          "z.ts" => {
-            "edge": {
+          ],
+          "z.ts" => [
+            "y.ts",
+            {
               "node": {
                 "comment": "",
                 "position": [
@@ -505,9 +512,83 @@ export default "z";
                 "type": "sideEffect",
               },
             },
-            "parent": "y.ts",
-          },
+          ],
         },
+      }
+    `);
+
+    const cycle = formatCircularImportError(
+      circularResult.backEdges[0],
+      circularResult.parentMap
+    );
+    expect(cycle).toMatchInlineSnapshot(`
+      {
+        "cycle": [
+          [
+            "x.ts",
+            {
+              "node": {
+                "comment": "",
+                "position": [
+                  2,
+                  0,
+                ],
+              },
+              "source": {
+                "name": "y.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "name": "default",
+                "type": "named",
+              },
+            },
+          ],
+          [
+            "y.ts",
+            {
+              "node": {
+                "comment": "",
+                "position": [
+                  2,
+                  0,
+                ],
+              },
+              "source": {
+                "name": "z.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "type": "sideEffect",
+              },
+            },
+          ],
+          [
+            "z.ts",
+            {
+              "node": {
+                "comment": "",
+                "position": [
+                  2,
+                  0,
+                ],
+              },
+              "source": {
+                "name": "x.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "name": "x",
+                "type": "named",
+              },
+            },
+          ],
+        ],
+        "lines": [
+          "x.ts:2 - default",
+          "y.ts:2 - (side effect)",
+          "z.ts:2 - x",
+        ],
       }
     `);
   });
