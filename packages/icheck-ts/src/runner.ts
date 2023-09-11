@@ -34,8 +34,7 @@ type ImportUsage =
 export type ExportUsage = {
   name: string;
   used: boolean;
-  position: [number, number];
-  comment: string;
+  node: ParsedBase;
 };
 
 export type ImportRelations = DefaultMap<string, ImportTarget[]>;
@@ -134,8 +133,10 @@ export async function runner(
         exportUsages.get(file).push({
           name: el.name,
           used: isUsedExport(file, el.name),
-          position: e.position,
-          comment: e.comment,
+          node: {
+            position: e.position,
+            comment: e.comment,
+          },
         });
       }
     }
@@ -145,8 +146,10 @@ export async function runner(
         exportUsages.get(file).push({
           name: el.name,
           used: isUsedExport(file, el.name),
-          position: e.position,
-          comment: e.comment,
+          node: {
+            position: e.position,
+            comment: e.comment,
+          },
         });
       }
     }

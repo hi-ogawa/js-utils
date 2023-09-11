@@ -43,7 +43,7 @@ const command = new TinyCliCommand(
       return Boolean(
         e.used ||
           (ignoreRegExp && e.name.match(ignoreRegExp)) ||
-          e.comment.includes(ignoreComment)
+          e.node.comment.includes(ignoreComment)
       );
     }
 
@@ -65,7 +65,7 @@ const command = new TinyCliCommand(
       console.log("** Unused exports **");
       for (const [file, entries] of unusedExports) {
         for (const e of entries) {
-          console.log(`${file}:${e.position[0]} - ${e.name}`);
+          console.log(`${file}:${e.node.position[0]} - ${e.name}`);
         }
       }
       process.exitCode = 1;

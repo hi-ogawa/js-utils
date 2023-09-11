@@ -100,52 +100,62 @@ import * as j from "..";
       Map {
         "f1.ts" => [
           {
-            "comment": "",
             "name": "z2",
-            "position": [
-              3,
-              0,
-            ],
+            "node": {
+              "comment": "",
+              "position": [
+                3,
+                0,
+              ],
+            },
             "used": false,
           },
         ],
         "f2.tsx" => [
           {
-            "comment": "",
             "name": "x2",
-            "position": [
-              3,
-              0,
-            ],
+            "node": {
+              "comment": "",
+              "position": [
+                3,
+                0,
+              ],
+            },
             "used": true,
           },
           {
-            "comment": "",
             "name": "x4",
-            "position": [
-              4,
-              0,
-            ],
+            "node": {
+              "comment": "",
+              "position": [
+                4,
+                0,
+              ],
+            },
             "used": true,
           },
           {
-            "comment": "// icheck-ignore",
             "name": "x4_1",
-            "position": [
-              6,
-              0,
-            ],
+            "node": {
+              "comment": "// icheck-ignore",
+              "position": [
+                6,
+                0,
+              ],
+            },
             "used": false,
           },
         ],
         "dir1/f3.ts" => [
           {
-            "comment": "",
             "name": "x3",
-            "position": [
-              5,
-              0,
-            ],
+            "node": {
+              "comment": "",
+              "position": [
+                5,
+                0,
+              ],
+            },
             "used": true,
           },
         ],
