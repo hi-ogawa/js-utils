@@ -354,23 +354,29 @@ export default "z";
         ],
         "parentMap": Map {
           "y.ts" => {
-            "source": {
-              "name": "y.ts",
-              "type": "internal",
+            "edge": {
+              "source": {
+                "name": "y.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "name": "default",
+                "type": "named",
+              },
             },
-            "usage": {
-              "name": "default",
-              "type": "named",
-            },
+            "parent": "x.ts",
           },
           "z.ts" => {
-            "source": {
-              "name": "z.ts",
-              "type": "internal",
+            "edge": {
+              "source": {
+                "name": "z.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "type": "sideEffect",
+              },
             },
-            "usage": {
-              "type": "sideEffect",
-            },
+            "parent": "y.ts",
           },
         },
       }

@@ -219,7 +219,7 @@ export function findCircularImport(relations: ImportRelations) {
   const adj = new Map(relations.entries());
   const visited = new Set<string>();
   const path = new Set<string>(); // dfs tree path
-  const parentMap = new Map<string, ImportTarget>();
+  const parentMap = new Map<string, { parent: string; edge: ImportTarget }>();
   const backEdges: [string, ImportTarget][] = [];
 
   function dfs(v: string) {
@@ -237,7 +237,7 @@ export function findCircularImport(relations: ImportRelations) {
       if (visited.has(u)) {
         continue;
       }
-      parentMap.set(u, target);
+      parentMap.set(u, { parent: v, edge: target });
       dfs(u);
     }
     path.delete(v);
