@@ -280,8 +280,8 @@ export function formatCircularImportError(
     cycle.push(p);
     v = p[0];
   }
+  cycle.push(backEdge);
   cycle.reverse();
-  cycle.unshift(backEdge);
 
   const lines: string[] = [];
   for (const [v, target] of cycle) {
