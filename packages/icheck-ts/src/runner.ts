@@ -1,11 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import {
-  DefaultMap,
-  assertUnreachable,
-  tinyassert,
-  wrapErrorAsync,
-} from "@hiogawa/utils";
+import { DefaultMap, wrapErrorAsync } from "@hiogawa/utils";
 import { type ParseOutput, type ParsedBase, parseImportExport } from "./parser";
 
 interface ImportTarget {
@@ -224,85 +219,4 @@ export async function resolveImportSource(
         type: "unknown",
         name: source,
       };
-}
-
-type ImportEdge = [importer: string, edge: ImportTarget];
-
-export function findCircularImport(relations: ImportRelations) {
-  // dfs on directed graph
-  const adj = new Map(relations.entries());
-  const visited = new Set<string>();
-  const path = new Set<string>(); // dfs tree path
-  const parentMap = new Map<string, ImportEdge>();
-  const backEdges: ImportEdge[] = [];
-
-  function dfs(v: string) {
-    visited.add(v);
-    path.add(v);
-    for (const target of adj.get(v) ?? []) {
-      if (target.source.type !== "internal") {
-        continue;
-      }
-      const u = target.source.name;
-      if (path.has(u)) {
-        backEdges.push([v, target]);
-        continue;
-      }
-      if (visited.has(u)) {
-        continue;
-      }
-      parentMap.set(u, [v, target]);
-      dfs(u);
-    }
-    path.delete(v);
-  }
-
-  for (const v of adj.keys()) {
-    if (!visited.has(v)) {
-      dfs(v);
-    }
-  }
-
-  // cycle can be traversed and formatted separately based on this minimal data
-  return { parentMap, backEdges };
-}
-
-export function formatCircularImportError(
-  backEdge: ImportEdge,
-  parentMap: Map<string, ImportEdge>
-) {
-  const cycle: [string, ImportTarget][] = [];
-  const root = backEdge[1].source.name;
-  let v = backEdge[0];
-  while (v !== root) {
-    const p = parentMap.get(v);
-    tinyassert(p);
-    cycle.push(p);
-    v = p[0];
-  }
-  cycle.reverse();
-  cycle.unshift(backEdge);
-
-  const lines: string[] = [];
-  for (const [v, target] of cycle) {
-    const line = `${v}:${target.node.position[0]} - ${formatImportUsage(
-      target.usage
-    )}`;
-    lines.push(line);
-  }
-
-  return { cycle, lines };
-}
-
-function formatImportUsage(usage: ImportUsage) {
-  if (usage.type === "named") {
-    return usage.name;
-  }
-  if (usage.type === "namespace") {
-    return "*";
-  }
-  if (usage.type === "sideEffect") {
-    return "(side effect)";
-  }
-  assertUnreachable(usage);
 }

@@ -1,17 +1,11 @@
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
-import { uniqBy } from "@hiogawa/utils";
 import {
   name as packageName,
   version as packageVersion,
 } from "../package.json";
 import { parseImportExport } from "./parser";
-import {
-  type ExportUsage,
-  findCircularImport,
-  formatCircularImportError,
-  runner,
-} from "./runner";
+import { type ExportUsage, runner } from "./runner";
 import { memoizeOnFile } from "./utils";
 
 const command = new TinyCliCommand(
@@ -73,27 +67,6 @@ const command = new TinyCliCommand(
         for (const e of entries) {
           console.log(`${file}:${e.node.position[0]} - ${e.name}`);
         }
-      }
-      process.exitCode = 1;
-    }
-
-    // circular import
-    const circularResult = findCircularImport(result.importRelations);
-    if (circularResult.backEdges.length > 0) {
-      console.log("** Circular imports **");
-      // TODO: group/sort by [edge[0], edge[1].source.name]
-      const uniqBackEdges = uniqBy(circularResult.backEdges, (edge) =>
-        JSON.stringify([edge[0], edge[1].source.name])
-      );
-      for (const edge of uniqBackEdges) {
-        const formatted = formatCircularImportError(
-          edge,
-          circularResult.parentMap
-        );
-        formatted.lines.forEach((line, i) => {
-          const prefix = i > 0 ? "    ".repeat(i - 1) + " -> " : "";
-          console.log(prefix + line);
-        });
       }
       process.exitCode = 1;
     }
