@@ -271,7 +271,7 @@ export function formatCircularImportError(
   backEdge: ImportEdge,
   parentMap: Map<string, ImportEdge>
 ) {
-  const cycle: [string, ImportTarget][] = [backEdge];
+  const cycle: [string, ImportTarget][] = [];
   const root = backEdge[1].source.name;
   let v = backEdge[0];
   while (v !== root) {
@@ -281,6 +281,7 @@ export function formatCircularImportError(
     v = p[0];
   }
   cycle.reverse();
+  cycle.unshift(backEdge);
 
   const lines: string[] = [];
   for (const [v, target] of cycle) {

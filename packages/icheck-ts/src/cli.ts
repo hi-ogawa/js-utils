@@ -81,6 +81,7 @@ const command = new TinyCliCommand(
     const circularResult = findCircularImport(result.importRelations);
     if (circularResult.backEdges.length > 0) {
       console.log("** Circular imports **");
+      // TODO: group/sort by [edge[0], edge[1].source.name]
       const uniqBackEdges = uniqBy(circularResult.backEdges, (edge) =>
         JSON.stringify([edge[0], edge[1].source.name])
       );

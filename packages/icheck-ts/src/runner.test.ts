@@ -525,6 +525,26 @@ export default "z";
       {
         "cycle": [
           [
+            "z.ts",
+            {
+              "node": {
+                "comment": "",
+                "position": [
+                  2,
+                  0,
+                ],
+              },
+              "source": {
+                "name": "x.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "name": "x",
+                "type": "named",
+              },
+            },
+          ],
+          [
             "x.ts",
             {
               "node": {
@@ -563,31 +583,11 @@ export default "z";
               },
             },
           ],
-          [
-            "z.ts",
-            {
-              "node": {
-                "comment": "",
-                "position": [
-                  2,
-                  0,
-                ],
-              },
-              "source": {
-                "name": "x.ts",
-                "type": "internal",
-              },
-              "usage": {
-                "name": "x",
-                "type": "named",
-              },
-            },
-          ],
         ],
         "lines": [
+          "z.ts:2 - x",
           "x.ts:2 - default",
           "y.ts:2 - (side effect)",
-          "z.ts:2 - x",
         ],
       }
     `);
