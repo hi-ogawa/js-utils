@@ -79,7 +79,7 @@ const command = new TinyCliCommand(
     // circular import
     const circularResult = findCircularImport(result.importRelations);
     if (circularResult.backEdges.length > 0) {
-      console.log("** Circular import **");
+      console.log("** Circular imports **");
       for (const edge of circularResult.backEdges) {
         const result = formatCircularImportError(
           edge,
