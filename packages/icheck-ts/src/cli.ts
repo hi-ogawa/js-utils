@@ -1,6 +1,6 @@
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
-import { uniqBy } from "@hiogawa/utils";
+import { groupBy, sortBy } from "@hiogawa/utils";
 import {
   name as packageName,
   version as packageVersion,
@@ -81,11 +81,17 @@ const command = new TinyCliCommand(
     const circularResult = findCircularImport(result.importRelations);
     if (circularResult.backEdges.length > 0) {
       console.log("** Circular imports **");
-      // TODO: group/sort by [edge[0], edge[1].source.name]
-      const uniqBackEdges = uniqBy(circularResult.backEdges, (edge) =>
-        JSON.stringify([edge[0], edge[1].source.name])
+      // group/sort by initial cyclic edge
+      const edgeWithKeys = circularResult.backEdges.map((e) => ({
+        edge: e,
+        key: JSON.stringify([e[0], e[1].source.name]),
+      }));
+      const groups = groupBy(
+        sortBy(edgeWithKeys, (e) => e.key),
+        (e) => e.key
       );
-      for (const edge of uniqBackEdges) {
+      const uniqEdges = [...groups.values()].map((group) => group[0].edge);
+      for (const edge of uniqEdges) {
         const formatted = formatCircularImportError(
           edge,
           circularResult.parentMap
