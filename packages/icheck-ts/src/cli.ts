@@ -106,4 +106,5 @@ const command = new TinyCliCommand(
   }
 );
 
+colors._enable(process.stdout.isTTY);
 tinyCliMain(command);

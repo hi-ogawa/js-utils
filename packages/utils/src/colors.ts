@@ -27,10 +27,15 @@ const codes = [
   ["inverse", 7, 27],
 ] as const;
 
-export const colors = /* @__PURE__ */ (() =>
-  Object.fromEntries(
-    codes.map(([name, start, end]) => [
-      name,
-      (v: string) => `\u001B[${start}m${v}\u001B[${end}m`,
-    ])
-  ) as Record<(typeof codes)[number][0], (v: string) => string>)();
+export const colors = /* @__PURE__ */ (() => {
+  let enabled = false;
+  return {
+    _enable: (v: boolean) => (enabled = v),
+    ...(Object.fromEntries(
+      codes.map(([name, start, end]) => [
+        name,
+        (v: string) => (enabled ? `\u001B[${start}m${v}\u001B[${end}m` : v),
+      ])
+    ) as Record<(typeof codes)[number][0], (v: string) => string>),
+  };
+})();
