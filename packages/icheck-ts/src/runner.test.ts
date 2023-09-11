@@ -1,5 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { resolveImportSource, runner } from "./runner";
+import {
+  findCircularImport,
+  formatCircularImportError,
+  resolveImportSource,
+  runner,
+} from "./runner";
 import { setupTestFixture } from "./tests/helper";
 
 describe(runner, () => {
@@ -418,6 +423,172 @@ describe(resolveImportSource, () => {
       {
         "name": "y.ts",
         "type": "internal",
+      }
+    `);
+  });
+});
+
+describe(findCircularImport, () => {
+  const fixture = {
+    "x.ts": `
+import y from "./y";
+export const x = "x";
+`,
+    "y.ts": `
+import "./z";
+export default "y";
+`,
+    "z.ts": `
+import { x } from "./x";
+export default "z";
+`,
+  };
+
+  beforeAll(() => setupTestFixture(findCircularImport.name, fixture));
+
+  it("basic", async () => {
+    const result = await runner(Object.keys(fixture));
+    const circularResult = findCircularImport(result.importRelations);
+    expect(circularResult).toMatchInlineSnapshot(`
+      {
+        "backEdges": [
+          [
+            "z.ts",
+            {
+              "node": {
+                "comment": "",
+                "position": [
+                  2,
+                  0,
+                ],
+              },
+              "source": {
+                "name": "x.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "name": "x",
+                "type": "named",
+              },
+            },
+          ],
+        ],
+        "parentMap": Map {
+          "y.ts" => [
+            "x.ts",
+            {
+              "node": {
+                "comment": "",
+                "position": [
+                  2,
+                  0,
+                ],
+              },
+              "source": {
+                "name": "y.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "name": "default",
+                "type": "named",
+              },
+            },
+          ],
+          "z.ts" => [
+            "y.ts",
+            {
+              "node": {
+                "comment": "",
+                "position": [
+                  2,
+                  0,
+                ],
+              },
+              "source": {
+                "name": "z.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "type": "sideEffect",
+              },
+            },
+          ],
+        },
+      }
+    `);
+
+    const cycle = formatCircularImportError(
+      circularResult.backEdges[0],
+      circularResult.parentMap
+    );
+    expect(cycle).toMatchInlineSnapshot(`
+      {
+        "cycle": [
+          [
+            "z.ts",
+            {
+              "node": {
+                "comment": "",
+                "position": [
+                  2,
+                  0,
+                ],
+              },
+              "source": {
+                "name": "x.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "name": "x",
+                "type": "named",
+              },
+            },
+          ],
+          [
+            "x.ts",
+            {
+              "node": {
+                "comment": "",
+                "position": [
+                  2,
+                  0,
+                ],
+              },
+              "source": {
+                "name": "y.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "name": "default",
+                "type": "named",
+              },
+            },
+          ],
+          [
+            "y.ts",
+            {
+              "node": {
+                "comment": "",
+                "position": [
+                  2,
+                  0,
+                ],
+              },
+              "source": {
+                "name": "z.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "type": "sideEffect",
+              },
+            },
+          ],
+        ],
+        "lines": [
+          "z.ts:2 - x",
+          "x.ts:2 - default",
+          "y.ts:2 - (side effect)",
+        ],
       }
     `);
   });
