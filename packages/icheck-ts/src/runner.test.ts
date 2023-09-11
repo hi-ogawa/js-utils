@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { resolveImportSource, runner } from "./runner";
+import { findCircularImport, resolveImportSource, runner } from "./runner";
 import { setupTestFixture } from "./tests/helper";
 
 describe(runner, () => {
@@ -310,6 +310,69 @@ describe(resolveImportSource, () => {
       {
         "name": "y.ts",
         "type": "internal",
+      }
+    `);
+  });
+});
+
+describe(findCircularImport, () => {
+  const fixture = {
+    "x.ts": `
+import y from "./y";
+export const x = "x";
+`,
+    "y.ts": `
+import "./z";
+export default "y";
+`,
+    "z.ts": `
+import { x } from "./x";
+export default "z";
+`,
+  };
+
+  beforeAll(() => setupTestFixture(findCircularImport.name, fixture));
+
+  it("basic", async () => {
+    const result = await runner(Object.keys(fixture));
+    expect(findCircularImport(result.importRelations)).toMatchInlineSnapshot(`
+      {
+        "backEdges": [
+          [
+            "z.ts",
+            {
+              "source": {
+                "name": "x.ts",
+                "type": "internal",
+              },
+              "usage": {
+                "name": "x",
+                "type": "named",
+              },
+            },
+          ],
+        ],
+        "parentMap": Map {
+          "y.ts" => {
+            "source": {
+              "name": "y.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "name": "default",
+              "type": "named",
+            },
+          },
+          "z.ts" => {
+            "source": {
+              "name": "z.ts",
+              "type": "internal",
+            },
+            "usage": {
+              "type": "sideEffect",
+            },
+          },
+        },
       }
     `);
   });

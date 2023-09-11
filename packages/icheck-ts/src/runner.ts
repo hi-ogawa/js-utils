@@ -214,7 +214,6 @@ export async function resolveImportSource(
       };
 }
 
-// TOOD: test
 export function findCircularImport(relations: ImportRelations) {
   // dfs on directed graph
   const adj = new Map(relations.entries());
@@ -250,6 +249,6 @@ export function findCircularImport(relations: ImportRelations) {
     }
   }
 
-  // cycle can be traversed and formatted separately based on minimal data
+  // cycle can be traversed and formatted separately based on this minimal data
   return { parentMap, backEdges };
 }
