@@ -1,11 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import { DefaultMap, wrapErrorAsync } from "@hiogawa/utils";
-import { type ParseOutput, parseImportExport } from "./parser";
+import { type ParseOutput, type ParsedBase, parseImportExport } from "./parser";
 
 interface ImportTarget {
   source: ImportSource;
   usage: ImportUsage;
+  node: ParsedBase;
 }
 
 type ImportSource = {
@@ -33,9 +34,10 @@ type ImportUsage =
 export type ExportUsage = {
   name: string;
   used: boolean;
-  position: [number, number];
-  comment: string;
+  node: ParsedBase;
 };
+
+export type ImportRelations = DefaultMap<string, ImportTarget[]>;
 
 // 1. parse files
 // 2. resolve import source
@@ -84,9 +86,13 @@ export async function runner(
         usages.push({ type: "named", name: el.nameBefore ?? el.name });
       }
       const source = await resolveImportSource(file, e.source);
+      const node: ParsedBase = {
+        position: e.position,
+        comment: e.comment,
+      };
       importRelations
         .get(file)
-        .push(...usages.map((usage) => ({ source, usage })));
+        .push(...usages.map((usage) => ({ source, usage, node })));
     }
   }
 
@@ -127,8 +133,10 @@ export async function runner(
         exportUsages.get(file).push({
           name: el.name,
           used: isUsedExport(file, el.name),
-          position: e.position,
-          comment: e.comment,
+          node: {
+            position: e.position,
+            comment: e.comment,
+          },
         });
       }
     }
@@ -138,8 +146,10 @@ export async function runner(
         exportUsages.get(file).push({
           name: el.name,
           used: isUsedExport(file, el.name),
-          position: e.position,
-          comment: e.comment,
+          node: {
+            position: e.position,
+            comment: e.comment,
+          },
         });
       }
     }

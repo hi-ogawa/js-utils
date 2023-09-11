@@ -100,52 +100,62 @@ import * as j from "..";
       Map {
         "f1.ts" => [
           {
-            "comment": "",
             "name": "z2",
-            "position": [
-              3,
-              0,
-            ],
+            "node": {
+              "comment": "",
+              "position": [
+                3,
+                0,
+              ],
+            },
             "used": false,
           },
         ],
         "f2.tsx" => [
           {
-            "comment": "",
             "name": "x2",
-            "position": [
-              3,
-              0,
-            ],
+            "node": {
+              "comment": "",
+              "position": [
+                3,
+                0,
+              ],
+            },
             "used": true,
           },
           {
-            "comment": "",
             "name": "x4",
-            "position": [
-              4,
-              0,
-            ],
+            "node": {
+              "comment": "",
+              "position": [
+                4,
+                0,
+              ],
+            },
             "used": true,
           },
           {
-            "comment": "// icheck-ignore",
             "name": "x4_1",
-            "position": [
-              6,
-              0,
-            ],
+            "node": {
+              "comment": "// icheck-ignore",
+              "position": [
+                6,
+                0,
+              ],
+            },
             "used": false,
           },
         ],
         "dir1/f3.ts" => [
           {
-            "comment": "",
             "name": "x3",
-            "position": [
-              5,
-              0,
-            ],
+            "node": {
+              "comment": "",
+              "position": [
+                5,
+                0,
+              ],
+            },
             "used": true,
           },
         ],
@@ -155,6 +165,13 @@ import * as j from "..";
       Map {
         "f1.ts" => [
           {
+            "node": {
+              "comment": "",
+              "position": [
+                2,
+                0,
+              ],
+            },
             "source": {
               "name": "f2.tsx",
               "type": "internal",
@@ -165,6 +182,13 @@ import * as j from "..";
             },
           },
           {
+            "node": {
+              "comment": "",
+              "position": [
+                2,
+                0,
+              ],
+            },
             "source": {
               "name": "f2.tsx",
               "type": "internal",
@@ -175,6 +199,13 @@ import * as j from "..";
             },
           },
           {
+            "node": {
+              "comment": "",
+              "position": [
+                3,
+                0,
+              ],
+            },
             "source": {
               "name": "f2.tsx",
               "type": "internal",
@@ -185,6 +216,13 @@ import * as j from "..";
             },
           },
           {
+            "node": {
+              "comment": "",
+              "position": [
+                4,
+                0,
+              ],
+            },
             "source": {
               "name": "dir2/f5.ts",
               "type": "internal",
@@ -194,6 +232,13 @@ import * as j from "..";
             },
           },
           {
+            "node": {
+              "comment": "",
+              "position": [
+                5,
+                0,
+              ],
+            },
             "source": {
               "name": "node:process",
               "type": "external",
@@ -204,6 +249,13 @@ import * as j from "..";
             },
           },
           {
+            "node": {
+              "comment": "",
+              "position": [
+                6,
+                0,
+              ],
+            },
             "source": {
               "name": "dir1/f3.ts",
               "type": "internal",
@@ -213,6 +265,13 @@ import * as j from "..";
             },
           },
           {
+            "node": {
+              "comment": "",
+              "position": [
+                7,
+                0,
+              ],
+            },
             "source": {
               "name": "./dir1/unknown",
               "type": "unknown",
@@ -222,6 +281,13 @@ import * as j from "..";
             },
           },
           {
+            "node": {
+              "comment": "",
+              "position": [
+                8,
+                0,
+              ],
+            },
             "source": {
               "name": "./dir2/dir3",
               "type": "unknown",
@@ -233,6 +299,13 @@ import * as j from "..";
         ],
         "f2.tsx" => [
           {
+            "node": {
+              "comment": "",
+              "position": [
+                2,
+                0,
+              ],
+            },
             "source": {
               "name": "dir1/f3.ts",
               "type": "internal",
@@ -245,6 +318,13 @@ import * as j from "..";
         ],
         "dir1/f3.ts" => [
           {
+            "node": {
+              "comment": "",
+              "position": [
+                2,
+                0,
+              ],
+            },
             "source": {
               "name": "dir1/index.ts",
               "type": "internal",
@@ -254,6 +334,13 @@ import * as j from "..";
             },
           },
           {
+            "node": {
+              "comment": "",
+              "position": [
+                3,
+                0,
+              ],
+            },
             "source": {
               "name": "dir1/index.ts",
               "type": "internal",
@@ -263,6 +350,13 @@ import * as j from "..";
             },
           },
           {
+            "node": {
+              "comment": "",
+              "position": [
+                4,
+                0,
+              ],
+            },
             "source": {
               "name": "dir1/index.ts",
               "type": "internal",
@@ -274,6 +368,13 @@ import * as j from "..";
         ],
         "dir2/dir3/f7.ts" => [
           {
+            "node": {
+              "comment": "",
+              "position": [
+                2,
+                0,
+              ],
+            },
             "source": {
               "name": "dir2/f5.ts",
               "type": "internal",
@@ -283,6 +384,13 @@ import * as j from "..";
             },
           },
           {
+            "node": {
+              "comment": "",
+              "position": [
+                3,
+                0,
+              ],
+            },
             "source": {
               "name": "dir2/index.tsx",
               "type": "internal",
