@@ -1,5 +1,6 @@
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
+import { uniqBy } from "@hiogawa/utils";
 import {
   name as packageName,
   version as packageVersion,
@@ -80,12 +81,15 @@ const command = new TinyCliCommand(
     const circularResult = findCircularImport(result.importRelations);
     if (circularResult.backEdges.length > 0) {
       console.log("** Circular imports **");
-      for (const edge of circularResult.backEdges) {
-        const result = formatCircularImportError(
+      const uniqBackEdges = uniqBy(circularResult.backEdges, (edge) =>
+        JSON.stringify([edge[0], edge[1].source.name])
+      );
+      for (const edge of uniqBackEdges) {
+        const formatted = formatCircularImportError(
           edge,
           circularResult.parentMap
         );
-        result.lines.forEach((line, i) => {
+        formatted.lines.forEach((line, i) => {
           const prefix = i > 0 ? "    ".repeat(i - 1) + " -> " : "";
           console.log(prefix + line);
         });
