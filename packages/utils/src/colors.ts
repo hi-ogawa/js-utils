@@ -28,7 +28,7 @@ const codes = [
 ] as const;
 
 export const colors = /* @__PURE__ */ (() => {
-  let enabled = false;
+  let enabled = true;
   return {
     _enable: (v: boolean) => (enabled = v),
     ...(Object.fromEntries(
