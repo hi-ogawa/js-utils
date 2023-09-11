@@ -75,7 +75,7 @@ interface ParsedExport extends ParsedBase {
   bindings: { name: string; nameBefore?: string }[];
 }
 
-interface ParsedBase {
+export interface ParsedBase {
   position: [number, number]; // [line, column]
   comment: string; // aka. leading trivial (used for custom ignore comment)
 }

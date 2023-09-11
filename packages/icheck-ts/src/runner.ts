@@ -1,11 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import { DefaultMap, wrapErrorAsync } from "@hiogawa/utils";
-import { type ParseOutput, parseImportExport } from "./parser";
+import { type ParseOutput, type ParsedBase, parseImportExport } from "./parser";
 
 interface ImportTarget {
   source: ImportSource;
   usage: ImportUsage;
+  node: ParsedBase;
 }
 
 type ImportSource = {
@@ -13,7 +14,6 @@ type ImportSource = {
   name: string; // resolved file path if "internal"
 };
 
-// TODO: keep comment here for "icheck-ignore"
 type ImportUsage =
   | {
       // import { x as y } from "a"
@@ -87,9 +87,13 @@ export async function runner(
         usages.push({ type: "named", name: el.nameBefore ?? el.name });
       }
       const source = await resolveImportSource(file, e.source);
+      const node: ParsedBase = {
+        position: e.position,
+        comment: e.comment,
+      };
       importRelations
         .get(file)
-        .push(...usages.map((usage) => ({ source, usage })));
+        .push(...usages.map((usage) => ({ source, usage, node })));
     }
   }
 
