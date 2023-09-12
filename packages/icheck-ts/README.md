@@ -19,7 +19,7 @@ $ icheck-ts --help
 
 ```txt
 $ icheck-ts --help
-icheck-ts/0.0.1-pre.4
+icheck-ts/0.0.1-pre.13
 
 Usage:
   $ icheck-ts [options] <files...>
@@ -34,6 +34,7 @@ Options:
   --cacheLocation=...    Cache directory location
   --cacheSize=...        LRU cache size
   --ignore=...           RegExp pattern to ignore export names
+  --noCheckCircular      Diable checking circular import
 ```
 
 <!-- %template-output-end:help% -->

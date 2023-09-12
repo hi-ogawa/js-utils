@@ -29,6 +29,7 @@ const command = new TinyCliCommand(
       ignore: arg.string("RegExp pattern to ignore export names", {
         optional: true,
       }),
+      noCheckCircular: arg.boolean("Disable checking circular import"),
     },
   },
   async ({ args }) => {
@@ -78,30 +79,32 @@ const command = new TinyCliCommand(
     }
 
     // circular import
-    const circularResult = findCircularImport(result.importRelations);
-    if (circularResult.backEdges.length > 0) {
-      console.log(colors.red("** Circular imports **"));
-      // group/sort by initial cyclic edge
-      const edgeWithKeys = circularResult.backEdges.map((e) => ({
-        edge: e,
-        key: JSON.stringify([e[0], e[1].source.name]),
-      }));
-      const groups = groupBy(
-        sortBy(edgeWithKeys, (e) => e.key),
-        (e) => e.key
-      );
-      const uniqEdges = [...groups.values()].map((group) => group[0].edge);
-      for (const edge of uniqEdges) {
-        const formatted = formatCircularImportError(
-          edge,
-          circularResult.parentMap
+    if (!args.noCheckCircular) {
+      const circularResult = findCircularImport(result.importRelations);
+      if (circularResult.backEdges.length > 0) {
+        console.log(colors.red("** Circular imports **"));
+        // group/sort by initial cyclic edge
+        const edgeWithKeys = circularResult.backEdges.map((e) => ({
+          edge: e,
+          key: JSON.stringify([e[0], e[1].source.name]),
+        }));
+        const groups = groupBy(
+          sortBy(edgeWithKeys, (e) => e.key),
+          (e) => e.key
         );
-        formatted.lines.forEach((line, i) => {
-          const prefix = i > 0 ? "    ".repeat(i - 1) + " -> " : "";
-          console.log(prefix + line);
-        });
+        const uniqEdges = [...groups.values()].map((group) => group[0].edge);
+        for (const edge of uniqEdges) {
+          const formatted = formatCircularImportError(
+            edge,
+            circularResult.parentMap
+          );
+          formatted.lines.forEach((line, i) => {
+            const prefix = i > 0 ? "    ".repeat(i - 1) + " -> " : "";
+            console.log(prefix + line);
+          });
+        }
+        process.exitCode = 1;
       }
-      process.exitCode = 1;
     }
   }
 );
