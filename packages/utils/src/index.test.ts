@@ -619,7 +619,9 @@ describe("colors", () => {
   });
 
   it("all", () => {
-    const strings = Object.entries(colors).map(([k, v]) => v(k));
+    const strings: string[] = Object.entries(colors)
+      .filter(([k]) => !k.startsWith("_"))
+      .map(([k, v]: any) => v(k));
     const formated = splitByChunk(strings, 8)
       .map((vs) => vs.join(" "))
       .join("\n");
