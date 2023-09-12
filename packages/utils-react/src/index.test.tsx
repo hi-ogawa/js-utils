@@ -7,7 +7,12 @@ import { Debug } from "./debug";
 import { toArraySetState, toSetSetState } from "./set-state";
 import { renderToJson } from "./test/helper";
 import { useDebounce, useDelay } from "./timer";
-import { usePrevious, useRefCallbackEffect, useStableCallback } from "./utils";
+import {
+  useMergeRefs,
+  usePrevious,
+  useRefCallbackEffect,
+  useStableCallback,
+} from "./utils";
 
 describe(Debug, () => {
   it("basic", () => {
@@ -173,6 +178,105 @@ describe(useRefCallbackEffect, () => {
       <main>
         [{"begin":"SPAN"},{"end":"SPAN"},{"begin":"DIV"},{"end":"DIV"}]
       </main>
+    `);
+  });
+});
+
+describe(useMergeRefs, () => {
+  it("basic", async () => {
+    const fn = vi.fn();
+
+    const DemoInner = React.forwardRef(
+      (
+        props: { label: string },
+        forwarded: React.ForwardedRef<HTMLElement>
+      ) => {
+        const mut = React.useRef<HTMLElement>();
+
+        const fun = React.useCallback<(el: HTMLElement | null) => void>(
+          (el) => fn(props.label, "fun", el),
+          []
+        );
+
+        React.useEffect(() => {
+          fn(props.label, "mut", mut.current);
+          fn(props.label, "forwarded", forwarded);
+        }, []);
+
+        const ref = useMergeRefs(mut, fun, forwarded);
+
+        return <main ref={ref}></main>;
+      }
+    );
+
+    function Demo() {
+      const mut = React.useRef<HTMLElement>(null);
+      const fun = React.useCallback<(el: HTMLElement | null) => void>(
+        (el) => fn("outer-fun", el),
+        []
+      );
+
+      React.useEffect(() => {
+        fn("outer-mut", mut.current);
+      }, []);
+
+      const [show, setShow] = React.useState(true);
+
+      return (
+        <div>
+          {show && (
+            <>
+              <DemoInner label="inner-none" />
+              <DemoInner label="inner-mut" ref={mut} />
+              <DemoInner label="inner-fun" ref={fun} />
+            </>
+          )}
+          <button onClick={() => setShow((v) => !v)}></button>
+        </div>
+      );
+    }
+
+    render(<Demo />);
+    expect(fn.mock.calls.map((c) => c.join(":"))).toMatchInlineSnapshot(`
+      [
+        "inner-none:fun:[object HTMLElement]",
+        "inner-mut:fun:[object HTMLElement]",
+        "inner-fun:fun:[object HTMLElement]",
+        "outer-fun:[object HTMLElement]",
+        "inner-none:mut:[object HTMLElement]",
+        "inner-none:forwarded:",
+        "inner-mut:mut:[object HTMLElement]",
+        "inner-mut:forwarded:[object Object]",
+        "inner-fun:mut:[object HTMLElement]",
+        "inner-fun:forwarded:(el) => fn(\\"outer-fun\\", el)",
+        "outer-mut:[object HTMLElement]",
+      ]
+    `);
+    fn.mockReset();
+    await userEvent.click(screen.getByRole("button"));
+    expect(fn.mock.calls.map((c) => c.join(":"))).toMatchInlineSnapshot(`
+      [
+        "inner-none:fun:",
+        "inner-mut:fun:",
+        "inner-fun:fun:",
+        "outer-fun:",
+      ]
+    `);
+    fn.mockReset();
+    await userEvent.click(screen.getByRole("button"));
+    expect(fn.mock.calls.map((c) => c.join(":"))).toMatchInlineSnapshot(`
+      [
+        "inner-none:fun:[object HTMLElement]",
+        "inner-mut:fun:[object HTMLElement]",
+        "inner-fun:fun:[object HTMLElement]",
+        "outer-fun:[object HTMLElement]",
+        "inner-none:mut:[object HTMLElement]",
+        "inner-none:forwarded:",
+        "inner-mut:mut:[object HTMLElement]",
+        "inner-mut:forwarded:[object Object]",
+        "inner-fun:mut:[object HTMLElement]",
+        "inner-fun:forwarded:(el) => fn(\\"outer-fun\\", el)",
+      ]
     `);
   });
 });
