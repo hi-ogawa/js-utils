@@ -8,11 +8,9 @@ simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative.
 %template-input-start:help%
 
 ```txt
-# help
 $ icheck-ts --help
 {%shell node ./bin/cli.js --help %}
 
-# example
 $ icheck-ts fixtures/cli/*.ts
 {%shell node ./bin/cli.js fixtures/cli/*.ts %}
 ```
@@ -23,7 +21,6 @@ $ icheck-ts fixtures/cli/*.ts
 <!-- %template-output-start:help% -->
 
 ```txt
-# help
 $ icheck-ts --help
 icheck-ts/0.0.1-pre.14
 
@@ -42,7 +39,6 @@ Options:
   --ignore=...           RegExp pattern to ignore export names
   --noCheckCircular      Disable checking circular import
 
-# example
 $ icheck-ts fixtures/cli/*.ts
 ** Unused exports **
 fixtures/cli/x2.ts:3 - b
@@ -56,6 +52,8 @@ fixtures/cli/cycle4.ts:2 - x
 
 ## features
 
+- check unused exports
+- check circular dependencies
 - only dependency is `typescript` (`peerDependencies`) for parsing
 - support `// icheck-ignore` to silence specific export line
 
