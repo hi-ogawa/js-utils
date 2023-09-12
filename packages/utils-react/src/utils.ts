@@ -27,8 +27,7 @@ export function useStableCallback<F extends (...args: any[]) => any>(
   callback: F
 ): F {
   const ref = useStableRef(callback);
-  const wrapper = ((...args: any[]) => ref.current(...args)) as F;
-  return React.useCallback(wrapper, []);
+  return React.useCallback((...args: any[]) => ref.current(...args), []) as F;
 }
 
 export function useRerender() {
@@ -52,4 +51,19 @@ export function useRefCallbackEffect<T>(
   };
 
   return React.useCallback(refCallback, []);
+}
+
+export function useMergeRefs<T>(...refs: React.Ref<T>[]): React.RefCallback<T> {
+  return useStableCallback((el) => {
+    for (const ref of refs) {
+      if (ref) {
+        if (typeof ref === "function") {
+          ref(el);
+        } else {
+          // @ts-expect-error workaround readonly
+          ref.current = el;
+        }
+      }
+    }
+  });
 }
