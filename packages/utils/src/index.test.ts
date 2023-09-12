@@ -618,8 +618,17 @@ describe("colors", () => {
     ).toMatchInlineSnapshot('"[1m[7m[35m ERROR [39m[27m[22m"');
   });
 
+  it("enable", () => {
+    colors._enable(false);
+    expect(colors.red("hey")).toMatchInlineSnapshot('"hey"');
+    colors._enable(true);
+    expect(colors.red("hey")).toMatchInlineSnapshot('"[31mhey[39m"');
+  });
+
   it("all", () => {
-    const strings = Object.entries(colors).map(([k, v]) => v(k));
+    const strings: string[] = Object.entries(colors)
+      .filter(([k]) => !k.startsWith("_"))
+      .map(([k, v]: any) => v(k));
     const formated = splitByChunk(strings, 8)
       .map((vs) => vs.join(" "))
       .join("\n");

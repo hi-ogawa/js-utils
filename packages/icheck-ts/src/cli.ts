@@ -1,5 +1,6 @@
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
+import { colors } from "@hiogawa/utils";
 import {
   name as packageName,
   version as packageVersion,
@@ -53,7 +54,7 @@ const command = new TinyCliCommand(
 
     // parse error
     if (result.errors.size > 0) {
-      console.log("** Parse errors **");
+      console.log(colors.red("** Parse errors **"));
       for (const [file, error] of result.errors) {
         console.log(file, error);
       }
@@ -62,7 +63,7 @@ const command = new TinyCliCommand(
 
     // unused exports error
     if (unusedExports.length > 0) {
-      console.log("** Unused exports **");
+      console.log(colors.red("** Unused exports **"));
       for (const [file, entries] of unusedExports) {
         for (const e of entries) {
           console.log(`${file}:${e.node.position[0]} - ${e.name}`);
@@ -73,4 +74,5 @@ const command = new TinyCliCommand(
   }
 );
 
+colors._enable(process.stdout.isTTY);
 tinyCliMain(command);
