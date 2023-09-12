@@ -46,7 +46,7 @@ Options:
 ### not supported
 
 - namespace re-export usages are not checked (e.g. `export * from "./abc"`)
-- typescript custom resolution e.g. tsconfig `baseUrl`, `paths`, etc...
+- no typescript custom resolution e.g. tsconfig `baseUrl`, `paths`, etc...
 
 ## development
 
