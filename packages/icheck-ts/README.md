@@ -10,6 +10,9 @@ simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative.
 ```txt
 $ icheck-ts --help
 {%shell node ./bin/cli.js --help %}
+
+$ icheck-ts fixtures/cli/*.ts
+{%shell node ./bin/cli.js fixtures/cli/*.ts %}
 ```
 
 %template-input-end:help%
@@ -19,7 +22,7 @@ $ icheck-ts --help
 
 ```txt
 $ icheck-ts --help
-icheck-ts/0.0.1-pre.4
+icheck-ts/0.0.1-pre.15
 
 Usage:
   $ icheck-ts [options] <files...>
@@ -34,19 +37,30 @@ Options:
   --cacheLocation=...    Cache directory location
   --cacheSize=...        LRU cache size
   --ignore=...           RegExp pattern to ignore export names
+  --noCheckCircular      Disable checking circular import
+
+$ icheck-ts fixtures/cli/*.ts
+** Unused exports **
+fixtures/cli/x2.ts:3 - b
+** Circular imports **
+fixtures/cli/cycle4.ts:2 - x
+ -> fixtures/cli/cycle2.ts:2 - (side effect)
+     -> fixtures/cli/cycle3.ts:2 - *
 ```
 
 <!-- %template-output-end:help% -->
 
 ## features
 
+- check unused exports
+- check circular dependencies
 - only dependency is `typescript` (`peerDependencies`) for parsing
 - support `// icheck-ignore` to silence specific export line
 
 ### not supported
 
 - namespace re-export usages are not checked (e.g. `export * from "./abc"`)
-- typescript custom resolution e.g. tsconfig `baseUrl`, `paths`, etc...
+- no typescript custom resolution e.g. tsconfig `baseUrl`, `paths`, etc...
 
 ## development
 
