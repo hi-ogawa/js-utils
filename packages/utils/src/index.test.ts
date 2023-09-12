@@ -623,7 +623,7 @@ describe("colors", () => {
     expect(colors.red("hey")).toMatchInlineSnapshot('"hey"');
     colors._enable(true);
     expect(colors.red("hey")).toMatchInlineSnapshot('"[31mhey[39m"');
-  })
+  });
 
   it("all", () => {
     const strings: string[] = Object.entries(colors)
