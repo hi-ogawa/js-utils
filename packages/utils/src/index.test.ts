@@ -618,6 +618,13 @@ describe("colors", () => {
     ).toMatchInlineSnapshot('"[1m[7m[35m ERROR [39m[27m[22m"');
   });
 
+  it("enable", () => {
+    colors._enable(false);
+    expect(colors.red("hey")).toMatchInlineSnapshot('"hey"');
+    colors._enable(true);
+    expect(colors.red("hey")).toMatchInlineSnapshot('"[31mhey[39m"');
+  })
+
   it("all", () => {
     const strings: string[] = Object.entries(colors)
       .filter(([k]) => !k.startsWith("_"))
