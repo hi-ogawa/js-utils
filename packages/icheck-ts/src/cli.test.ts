@@ -5,14 +5,14 @@ import { setupTestFixture } from "./tests/helper";
 describe("cli", () => {
   const fixture = {
     "x1.ts": `
-import { used } from "./x2";
+import { a } from "./x2";
 import * as z from "./x3";
 `,
     "x2.ts": `
-export const used = 0;
-export const unused = 0;
+export const a = 0;
+export const b = 0;
 // icheck-ignore
-export const unusedIgnored = 0;
+export const c = 0;
 `,
     "x3.ts": `
 export const a = 0;
@@ -45,7 +45,7 @@ import { x } from "./cycle2";
     );
     expect(res.stdout).toMatchInlineSnapshot(`
       "** Unused exports **
-      fixtures/cli/x2.ts:3 - unused
+      fixtures/cli/x2.ts:3 - b
       ** Circular imports **
       fixtures/cli/cycle4.ts:2 - x
        -> fixtures/cli/cycle2.ts:2 - (side effect)

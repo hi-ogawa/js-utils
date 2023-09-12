@@ -8,8 +8,13 @@ simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative.
 %template-input-start:help%
 
 ```txt
+# help
 $ icheck-ts --help
 {%shell node ./bin/cli.js --help %}
+
+# example
+$ icheck-ts fixtures/cli/*.ts
+{%shell node ./bin/cli.js fixtures/cli/*.ts %}
 ```
 
 %template-input-end:help%
@@ -18,8 +23,9 @@ $ icheck-ts --help
 <!-- %template-output-start:help% -->
 
 ```txt
+# help
 $ icheck-ts --help
-icheck-ts/0.0.1-pre.13
+icheck-ts/0.0.1-pre.14
 
 Usage:
   $ icheck-ts [options] <files...>
@@ -34,7 +40,16 @@ Options:
   --cacheLocation=...    Cache directory location
   --cacheSize=...        LRU cache size
   --ignore=...           RegExp pattern to ignore export names
-  --noCheckCircular      Diable checking circular import
+  --noCheckCircular      Disable checking circular import
+
+# example
+$ icheck-ts fixtures/cli/*.ts
+** Unused exports **
+fixtures/cli/x2.ts:3 - b
+** Circular imports **
+fixtures/cli/cycle4.ts:2 - x
+ -> fixtures/cli/cycle2.ts:2 - (side effect)
+     -> fixtures/cli/cycle3.ts:2 - *
 ```
 
 <!-- %template-output-end:help% -->
