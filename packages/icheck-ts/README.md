@@ -22,7 +22,7 @@ $ icheck-ts fixtures/cli/*.ts
 
 ```txt
 $ icheck-ts --help
-icheck-ts/0.0.1-pre.14
+icheck-ts/0.0.1-pre.15
 
 Usage:
   $ icheck-ts [options] <files...>
