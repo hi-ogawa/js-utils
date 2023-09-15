@@ -2,9 +2,9 @@
 // platform agnostic store api
 //
 
-export interface TinyStoreApi<T, IsReadonly extends boolean = false> {
+export interface TinyStoreApi<T, RO extends boolean = false> {
   get: () => T;
-  set: IsReadonly extends true ? null : (newValue: SetAction<T>) => void;
+  set: RO extends true ? null : (newValue: SetAction<T>) => void; // hide method when RO (readonly)
   subscribe: (onStoreChange: () => void) => () => void;
 }
 

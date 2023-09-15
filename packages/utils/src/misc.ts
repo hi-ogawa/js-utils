@@ -25,14 +25,14 @@ export function includesGuard<T>(ls: readonly T[], v: unknown): v is T {
   return ls.includes(v as T);
 }
 
-/** silence "error TSTS2322" but practically this is safer and more convenient than resorting to `any` */
+/** silence "error TSTS2322" but practically this is safer and more convenient than resorting to `any` in a random place */
 export function safeFunctionCast<F extends (...args: any[]) => any>(
   f: (...args: Parameters<F>) => ReturnType<F>
 ): F {
-  // silence type error:
+  // @ts-expect-error
   //   error TS2322: Type '(...args: Parameters<F>) => ReturnType<F>' is not assignable to type 'F'.
   //   '(...args: Parameters<F>) => ReturnType<F>' is assignable to the constraint of type 'F', but 'F' could be instantiated with a different subtype of constraint '(...args: any[]) => any'.
-  return f as any;
+  return f;
 }
 
 // helpers for easily paring addEventListener/removeEventListener where listener argument is inferred based on EventMap
