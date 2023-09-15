@@ -1,7 +1,13 @@
-import { act, render, renderHook, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  render,
+  renderHook,
+  screen,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Compose } from "./compose";
 import { Debug } from "./debug";
 import { toArraySetState, toSetSetState } from "./set-state";
@@ -13,6 +19,8 @@ import {
   useRefCallbackEffect,
   useStableCallback,
 } from "./utils";
+
+afterEach(cleanup);
 
 describe(Debug, () => {
   it("basic", () => {
