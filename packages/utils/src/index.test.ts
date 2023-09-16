@@ -500,7 +500,12 @@ describe(none, () => {
       email: string;
       age: number | undefined;
     };
-    expect(v).toMatchInlineSnapshot();
+    expect(v).toMatchInlineSnapshot(`
+      {
+        "age": undefined,
+        "email": "",
+      }
+    `);
   });
 });
 
