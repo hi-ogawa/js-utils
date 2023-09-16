@@ -10,7 +10,7 @@ import {
   subscribeEventListenerFactory,
   typedBoolean,
 } from "./misc";
-import { mapOption } from "./option";
+import { mapOption, none } from "./option";
 import { newPromiseWithResolvers } from "./promise";
 import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
 import {
@@ -488,6 +488,19 @@ describe(mapOption, () => {
       | number
       | undefined;
     expect(result).toMatchInlineSnapshot("3");
+  });
+});
+
+describe(none, () => {
+  it("basic", () => {
+    const v = {
+      email: "",
+      age: none<number>(),
+    } satisfies {
+      email: string;
+      age: number | undefined;
+    };
+    expect(v).toMatchInlineSnapshot();
   });
 });
 
