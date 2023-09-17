@@ -127,6 +127,15 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
 
+  packages/sort-package-json:
+    devDependencies:
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@types/node':
+        specifier: ^18
+        version: 18.17.1
+
   packages/theme-script:
     devDependencies:
       '@types/node':
