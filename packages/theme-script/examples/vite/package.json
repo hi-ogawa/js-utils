@@ -15,5 +15,8 @@
     "react-dom": "^18.2.0",
     "unocss": "^0.53.6",
     "vite": "^4.4.6"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

@@ -1,10 +1,14 @@
 {
   "name": "@hiogawa/query-proxy",
   "version": "0.1.1-pre.1",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/query-proxy",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/query-proxy"
+  },
+  "license": "MIT",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -12,20 +16,12 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/query-proxy"
-  },
-  "typedoc": {
-    "displayName": "@hiogawa/query-proxy",
-    "readmeFile": "./README.md",
-    "entryPoint": "./src/index.ts"
-  },
   "scripts": {
     "build": "tsup",
     "test": "vitest",
@@ -45,5 +41,13 @@
     "@trpc/server": {
       "optional": true
     }
+  },
+  "volta": {
+    "extends": "../../package.json"
+  },
+  "typedoc": {
+    "displayName": "@hiogawa/query-proxy",
+    "readmeFile": "./README.md",
+    "entryPoint": "./src/index.ts"
   }
 }

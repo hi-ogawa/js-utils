@@ -1,18 +1,19 @@
 {
   "name": "@hiogawa/inline-template",
   "version": "0.0.1-pre.4",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/inline-template",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/inline-template"
+  },
+  "license": "MIT",
   "type": "module",
   "bin": "./bin/cli.js",
   "files": [
     "dist",
     "bin"
   ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/inline-template"
-  },
   "scripts": {
     "build": "tsup",
     "cli": "node ./bin/cli.js",
@@ -24,5 +25,8 @@
     "@hiogawa/tiny-cli": "workspace:*",
     "@hiogawa/utils": "workspace:*",
     "@types/node": "^18"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

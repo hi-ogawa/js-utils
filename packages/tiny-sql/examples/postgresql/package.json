@@ -10,5 +10,8 @@
     "@hiogawa/tiny-sql": "workspace:*",
     "@hiogawa/utils": "workspace:*",
     "postgres": "^3.3.5"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }
