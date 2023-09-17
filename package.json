@@ -8,6 +8,7 @@
     "tsc": "tsc -b",
     "dev:tsc": "pnpm tsc --watch --preserveWatchOutput",
     "test": "pnpm -r --seq test run",
+    "sort-package-json": "pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path' | xargs -i node misc/sort-package-json.mjs {}/package.json",
     "lint": "run-s lint:*",
     "lint-check": "run-s lint-check:*",
     "lint:isort": "pnpm lint-check:isort --fix",
