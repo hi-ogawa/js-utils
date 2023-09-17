@@ -1,10 +1,13 @@
 {
   "name": "@hiogawa/json-extra",
   "version": "0.0.2-pre.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/json-extra"
+  },
+  "license": "MIT",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -12,20 +15,12 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/json-extra"
-  },
-  "typedoc": {
-    "displayName": "@hiogawa/json-extra",
-    "readmeFile": "./README.md",
-    "entryPoint": "./src/index.ts"
-  },
   "scripts": {
     "build": "tsup",
     "test": "vitest",
@@ -38,5 +33,10 @@
     "fast-check": "^3.12.0",
     "superjson": "^1.13.1",
     "zod": "^3.21.4"
+  },
+  "typedoc": {
+    "displayName": "@hiogawa/json-extra",
+    "readmeFile": "./README.md",
+    "entryPoint": "./src/index.ts"
   }
 }

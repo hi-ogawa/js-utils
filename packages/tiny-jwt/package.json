@@ -1,11 +1,13 @@
 {
   "name": "@hiogawa/tiny-jwt",
   "version": "0.2.8-pre.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/tiny-jwt"
+  },
+  "license": "MIT",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "bin": "./bin/cli.js",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -18,16 +20,14 @@
       "types": "./dist/polyfill-node.d.ts"
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": "./bin/cli.js",
   "files": [
     "bin",
     "dist"
   ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/tiny-jwt"
-  },
   "scripts": {
     "build": "tsup",
     "test": "vitest",
