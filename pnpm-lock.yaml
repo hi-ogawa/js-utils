@@ -17,6 +17,9 @@ importers:
       '@hiogawa/isort-ts':
         specifier: 1.1.1
         version: 1.1.1(prettier@2.8.8)(typescript@5.1.6)
+      '@hiogawa/sort-package-json':
+        specifier: workspace:*
+        version: link:packages/sort-package-json
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:packages/utils
@@ -126,6 +129,15 @@ importers:
       zod:
         specifier: ^3.21.4
         version: 3.21.4
+
+  packages/sort-package-json:
+    devDependencies:
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@types/node':
+        specifier: ^18
+        version: 18.17.1
 
   packages/theme-script:
     devDependencies:

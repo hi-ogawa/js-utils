@@ -1,0 +1,32 @@
+{
+  "name": "@hiogawa/sort-package-json",
+  "version": "0.0.0",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/sort-package-json",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/sort-package-json"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bin": "./bin/cli.js",
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "cli": "node ./bin/cli.js",
+    "cli-dev": "tsx ./src/cli.ts",
+    "docs": "inline-template ./README.md",
+    "scrape": "tsx src/scrape.ts > src/scrape-output.json",
+    "release": "pnpm publish --no-git-checks --access public"
+  },
+  "devDependencies": {
+    "@hiogawa/utils": "workspace:*",
+    "@types/node": "^18"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}
