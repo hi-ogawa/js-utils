@@ -1,6 +1,7 @@
 {
   "name": "@hiogawa/tiny-rpc",
   "version": "0.2.3-pre.11",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/tiny-rpc",
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
@@ -34,6 +35,9 @@
     "@hiogawa/utils": "workspace:*",
     "superjson": "^1.13.1",
     "zod": "^3.21.4"
+  },
+  "volta": {
+    "extends": "../../package.json"
   },
   "typedoc": {
     "displayName": "@hiogawa/tiny-rpc",

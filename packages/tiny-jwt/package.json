@@ -1,6 +1,7 @@
 {
   "name": "@hiogawa/tiny-jwt",
   "version": "0.2.8-pre.2",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/tiny-jwt",
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
@@ -38,5 +39,8 @@
     "@hiogawa/utils": "workspace:*",
     "@hiogawa/tiny-cli": "workspace:*",
     "@types/node": "^18.17.1"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

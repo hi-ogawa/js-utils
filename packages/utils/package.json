@@ -1,6 +1,7 @@
 {
   "name": "@hiogawa/utils",
   "version": "1.6.1-pre.8",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/utils",
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
@@ -25,6 +26,9 @@
     "build": "tsup",
     "test": "vitest",
     "release": "pnpm publish --no-git-checks --access public"
+  },
+  "volta": {
+    "extends": "../../package.json"
   },
   "typedoc": {
     "displayName": "@hiogawa/utils",

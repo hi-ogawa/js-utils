@@ -1,6 +1,7 @@
 {
   "name": "@hiogawa/query-proxy",
   "version": "0.1.1-pre.1",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/query-proxy",
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
@@ -40,6 +41,9 @@
     "@trpc/server": {
       "optional": true
     }
+  },
+  "volta": {
+    "extends": "../../package.json"
   },
   "typedoc": {
     "displayName": "@hiogawa/query-proxy",

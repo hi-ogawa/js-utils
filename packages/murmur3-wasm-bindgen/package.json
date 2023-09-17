@@ -41,5 +41,8 @@
     "@hiogawa/utils": "workspace:*",
     "fast-check": "^3.12.0",
     "wasm-pack": "^0.12.1"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

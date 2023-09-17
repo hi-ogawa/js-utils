@@ -1,6 +1,7 @@
 {
   "name": "@hiogawa/tiny-sql",
   "version": "0.0.5-pre.0",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/tiny-sql",
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
@@ -29,6 +30,9 @@
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",
     "@types/node": "^20.4.1"
+  },
+  "volta": {
+    "extends": "../../package.json"
   },
   "typedoc": {
     "displayName": "@hiogawa/tiny-sql",

@@ -1,6 +1,7 @@
 {
   "name": "@hiogawa/tiny-cli",
   "version": "0.0.4-pre.1",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/tiny-cli",
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
@@ -29,6 +30,9 @@
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",
     "zod": "^3.21.4"
+  },
+  "volta": {
+    "extends": "../../package.json"
   },
   "typedoc": {
     "displayName": "@hiogawa/tiny-cli",
