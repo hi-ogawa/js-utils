@@ -1,7 +1,7 @@
 import process from "node:process";
 import fs from "node:fs";
 
-// sort top-level keys of package.json based on
+// sort only top-level keys of package.json based on
 //   https://github.com/keithamus/sort-package-json/blob/main/defaultRules.md
 
 // generate RULE by
