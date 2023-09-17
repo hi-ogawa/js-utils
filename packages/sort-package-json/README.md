@@ -1,6 +1,6 @@
 # sort-package-json
 
-Simpler version of https://github.com/keithamus/sort-package-json/
+Slim version of https://github.com/keithamus/sort-package-json
 
 ## usage
 
