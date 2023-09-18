@@ -256,6 +256,21 @@ export function delay<F extends (...args: any[]) => void>(
   return Object.assign(wrapper, { cancel }) as any;
 }
 
+export function isEqualShallow(x: unknown, y: unknown): boolean {
+  if (Array.isArray(x) && Array.isArray(y)) {
+    return x.length === y.length && x.every((v, i) => v === y[i]);
+  }
+  if (x && y && typeof x === "object" && typeof y === "object") {
+    const xEntries = Object.entries(x);
+    const yKeys = new Set(Object.keys(y));
+    return (
+      xEntries.length === yKeys.size &&
+      xEntries.every(([k, v]) => yKeys.has(k) && v === (y as any)[k])
+    );
+  }
+  return x === y;
+}
+
 //
 // famously unsound but too convenient for string enum/union based record
 // https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
