@@ -199,6 +199,12 @@ importers:
         specifier: ^18.17.1
         version: 18.17.1
 
+  packages/tiny-react:
+    devDependencies:
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+
   packages/tiny-rpc:
     devDependencies:
       '@brillout/json-serializer':
