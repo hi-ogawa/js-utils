@@ -5,7 +5,11 @@ describe(render, () => {
   it("host", async () => {
     const el = document.createElement("main");
     render(h("div", {}), el);
-    expect(el).toMatchInlineSnapshot("<main />");
+    expect(el).toMatchInlineSnapshot(`
+      <main>
+        <div />
+      </main>
+    `);
   });
 
   it("custom", async () => {

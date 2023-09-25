@@ -6,9 +6,13 @@ import { tinyassert } from "@hiogawa/utils";
 // - just insert/overwrite without diff
 
 export function render(vnode: VirtualNode, parentDom: HostNode) {
-  // TODO: need to wrap vnode since `diff` doesn't insert bare `HostComponentType` at the top level.
-  // cf. https://github.com/preactjs/preact/blob/aed9150999e9960f0b3c7e62d4c18fc09faa03de/src/render.js#L32-L33
-  diff(parentDom, vnode, EMPTY_VNODE);
+  diff(
+    parentDom,
+    // need to wrap vnode since `diff` doesn't insert bare `HostComponentType` at the top level.
+    // cf. https://github.com/preactjs/preact/blob/aed9150999e9960f0b3c7e62d4c18fc09faa03de/src/render.js#L32-L33
+    h(() => vnode, {}),
+    EMPTY_VNODE
+  );
 }
 
 export function h(type: ComponentType, props: BaseProps): VirtualNode {
@@ -124,11 +128,14 @@ type VirtualChildren = VirtualChild[];
 
 type HostNode = HTMLElement;
 
-type ComponentType = HostComponentType | UserComponentType | typeof FragmentType;
+type ComponentType =
+  | HostComponentType
+  | UserComponentType
+  | typeof FragmentType;
 type HostComponentType = string;
 type UserComponentType = (props: unknown) => VirtualChild;
 
-const FragmentType = Symbol.for('react.fragment');
+const FragmentType = Symbol.for("react.fragment");
 
 // hook state?
 // update queue?
