@@ -6,10 +6,12 @@ import { tinyassert } from "@hiogawa/utils";
 // - just insert/overwrite without diff
 
 export function render(vnode: VirtualNode, parentDom: HostNode) {
+  // TODO: need to wrap vnode since `diff` doesn't insert bare `HostComponentType` at the top level.
+  // cf. https://github.com/preactjs/preact/blob/aed9150999e9960f0b3c7e62d4c18fc09faa03de/src/render.js#L32-L33
   diff(parentDom, vnode, EMPTY_VNODE);
 }
 
-export function h(type: ComponentType, props: unknown): VirtualNode {
+export function h(type: ComponentType, props: BaseProps): VirtualNode {
   return {
     type,
     props,
@@ -27,7 +29,7 @@ function diff(
   if (typeof newVnode.type === "function") {
     newVnode.type satisfies UserComponentType;
     const innerVnode = newVnode.type(newVnode.props);
-    diffChildren(parentDom, innerVnode, newVnode, oldVnode);
+    diffChildren(parentDom, [innerVnode], newVnode, oldVnode);
   } else {
     newVnode.type satisfies HostComponentType;
     newVnode._dom = diffElementNodes(oldVnode._dom, newVnode, oldVnode);
@@ -40,13 +42,18 @@ function diff(
 function diffChildren(
   parentDom: HostNode,
   children: VirtualChildren,
-  newParentVnode: VirtualNode,
-  oldParentVnode: VirtualNode
+  _newParentVnode: VirtualNode,
+  _oldParentVnode: VirtualNode
 ) {
-  parentDom;
-  children;
-  newParentVnode;
-  oldParentVnode;
+  let oldDom: HostNode | null = null;
+  for (const newVnode of children) {
+    const oldVnode = EMPTY_VNODE;
+    diff(parentDom, newVnode, oldVnode);
+    if (newVnode._dom) {
+      parentDom.insertBefore(newVnode._dom, oldDom?.nextSibling ?? null);
+      oldDom = newVnode._dom;
+    }
+  }
 }
 
 // diff host nodes
@@ -60,7 +67,9 @@ function diffElementNodes(
 
   dom ??= document.createElement(newVnode.type);
   diffProps(dom, newVnode.props, oldVnode.props);
-  diffChildren(dom, newVnode.props.children, newVnode, oldVnode);
+  if (newVnode.props.children) {
+    diffChildren(dom, newVnode.props.children, newVnode, oldVnode);
+  }
   return dom;
 }
 
@@ -70,6 +79,7 @@ function diffProps(dom: HostNode, newProps: any, oldProps: any) {
   newProps;
   oldProps;
   for (const k in newProps) {
+    if (k === "children") continue;
     dom.setAttribute(k, newProps[k]);
   }
 }
@@ -82,7 +92,7 @@ const EMPTY_VNODE = {} as VirtualNode;
 
 type VirtualNode = {
   type: ComponentType;
-  props: any; // TODO: key, ref, children?
+  props: BaseProps;
 
   // component?: any; // instance of "type"? don't need if functional component?
 
@@ -90,13 +100,20 @@ type VirtualNode = {
   _parentDom?: HostNode;
 };
 
-type VirtualChildren = any;
+type BaseProps = {
+  children?: VirtualChildren | undefined;
+  [k: string]: unknown;
+};
+
+// type VirtualChild = VirtualNode | boolean | number | string | null | undefined;
+type VirtualChild = VirtualNode;
+type VirtualChildren = VirtualChild[];
 
 type HostNode = HTMLElement;
 
 type ComponentType = HostComponentType | UserComponentType;
 type HostComponentType = string;
-type UserComponentType = (props: unknown) => VirtualNode;
+type UserComponentType = (props: unknown) => VirtualChild;
 
 // hook state?
 // update queue?
