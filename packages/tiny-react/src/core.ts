@@ -31,6 +31,7 @@ function diff(
     // TODO: init hook state for render call
     const innerVnode = newVnode.type(newVnode.props);
     diffChildren(parentDom, [innerVnode], newVnode, oldVnode);
+  } else if (newVnode.type === FragmentType) {
   } else {
     newVnode.type satisfies HostComponentType;
     newVnode._dom = diffElementNodes(oldVnode._dom, newVnode, oldVnode);
@@ -123,9 +124,11 @@ type VirtualChildren = VirtualChild[];
 
 type HostNode = HTMLElement;
 
-type ComponentType = HostComponentType | UserComponentType;
+type ComponentType = HostComponentType | UserComponentType | typeof FragmentType;
 type HostComponentType = string;
 type UserComponentType = (props: unknown) => VirtualChild;
+
+const FragmentType = Symbol.for('react.fragment');
 
 // hook state?
 // update queue?
