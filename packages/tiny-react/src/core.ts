@@ -28,6 +28,7 @@ function diff(
 
   if (typeof newVnode.type === "function") {
     newVnode.type satisfies UserComponentType;
+    // TODO: init hook state for render call
     const innerVnode = newVnode.type(newVnode.props);
     diffChildren(parentDom, [innerVnode], newVnode, oldVnode);
   } else {
@@ -48,6 +49,7 @@ function diffChildren(
   let oldDom: Node | null = null;
   for (const child of children) {
     if (typeof child === "string" || typeof child === "number") {
+      // TODO: preact uses vnode with `props = null` for text node
       const textNode = document.createTextNode(String(child));
       parentDom.insertBefore(textNode, oldDom?.nextSibling ?? null);
       oldDom = textNode;
@@ -111,6 +113,7 @@ type VirtualNode = {
 };
 
 type BaseProps = {
+  // TODO: key, ref?
   children?: VirtualChildren | undefined;
   [k: string]: unknown;
 };
