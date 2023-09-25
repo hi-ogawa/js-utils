@@ -45,8 +45,18 @@ function diffChildren(
   _newParentVnode: VirtualNode,
   _oldParentVnode: VirtualNode
 ) {
-  let oldDom: HostNode | null = null;
-  for (const newVnode of children) {
+  let oldDom: Node | null = null;
+  for (const child of children) {
+    if (typeof child === "string" || typeof child === "number") {
+      const textNode = document.createTextNode(String(child));
+      parentDom.insertBefore(textNode, oldDom?.nextSibling ?? null);
+      oldDom = textNode;
+      continue;
+    }
+    if (typeof child === "boolean" || !child) {
+      continue;
+    }
+    const newVnode = child;
     const oldVnode = EMPTY_VNODE;
     diff(parentDom, newVnode, oldVnode);
     if (newVnode._dom) {
@@ -105,8 +115,7 @@ type BaseProps = {
   [k: string]: unknown;
 };
 
-// type VirtualChild = VirtualNode | boolean | number | string | null | undefined;
-type VirtualChild = VirtualNode;
+type VirtualChild = VirtualNode | string | number | boolean | null | undefined;
 type VirtualChildren = VirtualChild[];
 
 type HostNode = HTMLElement;

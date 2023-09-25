@@ -38,4 +38,33 @@ describe(render, () => {
       </main>
     `);
   });
+
+  it("text", async () => {
+    const el = document.createElement("main");
+    function Custom() {
+      return h("div", {
+        children: [
+          undefined,
+          "123",
+          true,
+          456,
+          false,
+          h("span", { children: ["789"] }),
+          null,
+        ],
+      });
+    }
+    render(h(Custom, {}), el);
+    expect(el).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          123
+          456
+          <span>
+            789
+          </span>
+        </div>
+      </main>
+    `);
+  });
 });
