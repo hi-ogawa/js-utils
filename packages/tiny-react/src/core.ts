@@ -9,19 +9,28 @@ export function render(vnode: VirtualNode, parentDom: HostNode) {
   diff(parentDom, vnode, EMPTY_VNODE);
 }
 
+export function h(type: ComponentType, props: unknown): VirtualNode {
+  return {
+    type,
+    props,
+  };
+}
+
 // diff virtual nodes
-function diff(parentDom: HostNode, vnode: VirtualNode, oldVnode: VirtualNode) {
-  vnode._parentDom = parentDom;
+function diff(
+  parentDom: HostNode,
+  newVnode: VirtualNode,
+  oldVnode: VirtualNode
+) {
+  newVnode._parentDom = parentDom;
 
-  if (typeof vnode.type === "function") {
-    vnode.type satisfies UserComponentType;
-
-    const innerVnode = vnode.type(vnode.props);
-    diffChildren(parentDom, innerVnode, vnode, oldVnode);
+  if (typeof newVnode.type === "function") {
+    newVnode.type satisfies UserComponentType;
+    const innerVnode = newVnode.type(newVnode.props);
+    diffChildren(parentDom, innerVnode, newVnode, oldVnode);
   } else {
-    vnode.type satisfies HostComponentType;
-
-    vnode._dom = diffElementNodes(oldVnode._dom, vnode, oldVnode);
+    newVnode.type satisfies HostComponentType;
+    newVnode._dom = diffElementNodes(oldVnode._dom, newVnode, oldVnode);
   }
 }
 
@@ -30,35 +39,40 @@ function diff(parentDom: HostNode, vnode: VirtualNode, oldVnode: VirtualNode) {
 // - `props.children` of `HostComponent` vnode (called by `diffElementNodes`)
 function diffChildren(
   parentDom: HostNode,
-  vnode: VirtualNode,
-  parentVnode: VirtualNode,
-  _oldParentVnode: VirtualNode
+  children: VirtualChildren,
+  newParentVnode: VirtualNode,
+  oldParentVnode: VirtualNode
 ) {
   parentDom;
-  vnode;
-  parentVnode;
+  children;
+  newParentVnode;
+  oldParentVnode;
 }
 
 // diff host nodes
 function diffElementNodes(
   dom: HostNode | undefined,
-  vnode: VirtualNode,
-  _oldVnode: VirtualNode
+  newVnode: VirtualNode,
+  oldVnode: VirtualNode
 ): HostNode {
-  tinyassert(typeof vnode.type === "string");
-  tinyassert(vnode._parentDom);
+  tinyassert(typeof newVnode.type === "string");
+  tinyassert(newVnode._parentDom);
 
-  dom ??= document.createElement(vnode.type);
-
-  // diffChildren(dom, vnode, )
-
-  diffProps;
-  vnode.props.children;
+  dom ??= document.createElement(newVnode.type);
+  diffProps(dom, newVnode.props, oldVnode.props);
+  diffChildren(dom, newVnode.props.children, newVnode, oldVnode);
   return dom;
 }
 
 // diff host node props except `props.children`
-function diffProps() {}
+function diffProps(dom: HostNode, newProps: any, oldProps: any) {
+  dom;
+  newProps;
+  oldProps;
+  for (const k in newProps) {
+    dom.setAttribute(k, newProps[k]);
+  }
+}
 
 //
 // types
@@ -68,9 +82,9 @@ const EMPTY_VNODE = {} as VirtualNode;
 
 type VirtualNode = {
   type: ComponentType;
-  props: any; // TODO: key, ref?
+  props: any; // TODO: key, ref, children?
 
-  // component?: any; // instance of "type"?
+  // component?: any; // instance of "type"? don't need if functional component?
 
   _dom?: HostNode;
   _parentDom?: HostNode;
