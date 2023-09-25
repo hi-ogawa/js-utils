@@ -68,6 +68,25 @@ describe(render, () => {
     `);
   });
 
+  it("children", () => {
+    const Custom = () => h("span", {});
+    const vnode = h("div", {
+      children: ["123", h(Custom, {}), "456"],
+    });
+    const el = document.createElement("main");
+    render(vnode, el);
+    // TODO: "span" should between "123" and "456"
+    expect(el).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          123
+          456
+          <span />
+        </div>
+      </main>
+    `);
+  });
+
   it("fragment", () => {
     const vnode = h(Fragment, {
       children: [
