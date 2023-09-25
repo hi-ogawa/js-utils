@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { h, render } from "./core";
+import { Fragment, h, render } from "./core";
 
 describe(render, () => {
-  it("host", async () => {
+  it("host", () => {
     const el = document.createElement("main");
     render(h("div", {}), el);
     expect(el).toMatchInlineSnapshot(`
@@ -12,7 +12,7 @@ describe(render, () => {
     `);
   });
 
-  it("custom", async () => {
+  it("custom", () => {
     const el = document.createElement("main");
     function Custom() {
       return h("div", { class: "flex items-center gap-2" });
@@ -27,12 +27,10 @@ describe(render, () => {
     `);
   });
 
-  it("nest", async () => {
+  it("nest", () => {
+    const vnode = h("div", { children: [h("p", {}), h("span", {})] });
     const el = document.createElement("main");
-    function Custom() {
-      return h("div", { children: [h("p", {}), h("span", {})] });
-    }
-    render(h(Custom, {}), el);
+    render(vnode, el);
     expect(el).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -43,31 +41,51 @@ describe(render, () => {
     `);
   });
 
-  it("text", async () => {
+  it("primitive", () => {
+    const vnode = h("div", {
+      children: [
+        undefined,
+        "123",
+        true,
+        h("span", { children: ["789"] }),
+        false,
+        456,
+        null,
+      ],
+    });
     const el = document.createElement("main");
-    function Custom() {
-      return h("div", {
-        children: [
-          undefined,
-          "123",
-          true,
-          456,
-          false,
-          h("span", { children: ["789"] }),
-          null,
-        ],
-      });
-    }
-    render(h(Custom, {}), el);
+    render(vnode, el);
     expect(el).toMatchInlineSnapshot(`
       <main>
         <div>
           123
-          456
           <span>
             789
           </span>
+          456
         </div>
+      </main>
+    `);
+  });
+
+  it("fragment", () => {
+    const vnode = h(Fragment, {
+      children: [
+        "123",
+        h(Fragment, { children: ["abc", h("span", { children: ["def"] })] }),
+        "456",
+      ],
+    });
+    const el = document.createElement("main");
+    render(vnode, el);
+    expect(el).toMatchInlineSnapshot(`
+      <main>
+        123
+        456
+        abc
+        <span>
+          def
+        </span>
       </main>
     `);
   });

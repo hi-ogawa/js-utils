@@ -6,6 +6,8 @@ import { tinyassert } from "@hiogawa/utils";
 // - just insert/overwrite without diff
 
 export function render(vnode: VirtualNode, parentDom: HostNode) {
+  h(Fragment, { children: [vnode] });
+
   diff(
     parentDom,
     // need to wrap vnode since `diff` doesn't insert bare `HostComponentType` at the top level.
@@ -28,14 +30,15 @@ function diff(
   newVnode: VirtualNode,
   oldVnode: VirtualNode
 ) {
-  newVnode._parentDom = parentDom;
+  // newVnode._parentDom = parentDom;
 
   if (typeof newVnode.type === "function") {
     newVnode.type satisfies UserComponentType;
     // TODO: init hook state for render call
     const innerVnode = newVnode.type(newVnode.props);
     diffChildren(parentDom, [innerVnode], newVnode, oldVnode);
-  } else if (newVnode.type === FragmentType) {
+  } else if (newVnode.type === Fragment) {
+    diffChildren(parentDom, newVnode.props.children ?? [], newVnode, oldVnode);
   } else {
     newVnode.type satisfies HostComponentType;
     newVnode._dom = diffElementNodes(oldVnode._dom, newVnode, oldVnode);
@@ -80,7 +83,7 @@ function diffElementNodes(
   oldVnode: VirtualNode
 ): HostNode {
   tinyassert(typeof newVnode.type === "string");
-  tinyassert(newVnode._parentDom);
+  // tinyassert(newVnode._parentDom);
 
   dom ??= document.createElement(newVnode.type);
   diffProps(dom, newVnode.props, oldVnode.props);
@@ -114,7 +117,7 @@ type VirtualNode = {
   // component?: any; // instance of "type"? don't need if functional component?
 
   _dom?: HostNode;
-  _parentDom?: HostNode;
+  // _parentDom?: HostNode;
 };
 
 type BaseProps = {
@@ -128,14 +131,11 @@ type VirtualChildren = VirtualChild[];
 
 type HostNode = HTMLElement;
 
-type ComponentType =
-  | HostComponentType
-  | UserComponentType
-  | typeof FragmentType;
+type ComponentType = HostComponentType | UserComponentType | typeof Fragment;
 type HostComponentType = string;
 type UserComponentType = (props: unknown) => VirtualChild;
 
-const FragmentType = Symbol.for("react.fragment");
+export const Fragment = Symbol.for("react.fragment");
 
 // hook state?
 // update queue?
