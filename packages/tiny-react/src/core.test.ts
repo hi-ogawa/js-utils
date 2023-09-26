@@ -69,7 +69,7 @@ describe(render, () => {
   });
 
   it("children", () => {
-    const Custom = () => h("span", {});
+    const Custom = () => h("span", { children: ["abc"] });
     const vnode = h("div", {
       children: ["123", h(Custom, {}), "456"],
     });
@@ -80,8 +80,10 @@ describe(render, () => {
       <main>
         <div>
           123
+          <span>
+            abc
+          </span>
           456
-          <span />
         </div>
       </main>
     `);
@@ -100,11 +102,11 @@ describe(render, () => {
     expect(el).toMatchInlineSnapshot(`
       <main>
         123
-        456
         abc
         <span>
           def
         </span>
+        456
       </main>
     `);
   });
