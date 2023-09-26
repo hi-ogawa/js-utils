@@ -119,6 +119,7 @@ type VirtualNode = {
   props: BaseProps;
 
   // TODO: separate structure for "diff" result? (make VirtualNode immutable?)
+  //       cf. yew's `bnode` idea?
   _dom?: HostNode;
   _children?: VirtualChildren;
 };
