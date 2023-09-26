@@ -27,8 +27,8 @@ function diff(
 ) {
   if (typeof newVnode.type === "function") {
     newVnode.type satisfies UserComponentType;
-    const innerVnode = newVnode.type(newVnode.props);
-    diffChildren(parentDom, [innerVnode], newVnode, oldVnode);
+    const child = newVnode.type(newVnode.props);
+    diffChildren(parentDom, [child], newVnode, oldVnode);
   } else if (newVnode.type === Fragment) {
     if (newVnode.props.children) {
       diffChildren(parentDom, newVnode.props.children, newVnode, oldVnode);
@@ -87,13 +87,25 @@ function diffElementNodes(
 }
 
 // diff host node props except `props.children`
-function diffProps(dom: HostNode, newProps: any, _oldProps: any) {
+function diffProps(dom: HostNode, newProps: any, oldProps: any) {
+  if (!(dom instanceof Element)) {
+    return;
+  }
+  for (const k in oldProps) {
+    if (k !== "children" && !(k in newProps)) {
+      dom.removeAttribute(k);
+    }
+  }
   for (const k in newProps) {
-    if (k === "children") continue;
-    if (dom instanceof Element) {
+    if (k !== "children") {
       dom.setAttribute(k, newProps[k]);
     }
   }
+}
+
+unmount;
+function unmount(vnode: VirtualNode) {
+  vnode;
 }
 
 //
@@ -105,6 +117,10 @@ const EMPTY_VNODE = {} as VirtualNode;
 type VirtualNode = {
   type: ComponentType;
   props: BaseProps;
+
+  // TODO: separate structure for "diff" result? (make VirtualNode immutable?)
+  _dom?: HostNode;
+  _children?: VirtualChildren;
 };
 
 type BaseProps = {
