@@ -75,7 +75,6 @@ describe(render, () => {
     });
     const el = document.createElement("main");
     render(vnode, el);
-    // TODO: "span" should between "123" and "456"
     expect(el).toMatchInlineSnapshot(`
       <main>
         <div>
