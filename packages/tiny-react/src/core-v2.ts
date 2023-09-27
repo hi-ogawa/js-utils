@@ -59,6 +59,8 @@ export function reconcile(
     case "fragment": {
       if (bnode.type === "fragment" && bnode.key === vnode.key) {
         // TODO: match bnode.children order by key
+        vnode.children;
+        bnode.children;
       } else {
         unmount(bnode);
         bnode = { ...vnode, children: [] } satisfies BFragment;
@@ -118,11 +120,11 @@ function unmount(bnode: BNode) {
     }
     case "tag": {
       unmount(bnode.child); // TODO: can skip actual remove since parent removes all anyways
-      removeHnode(bnode.hnode);
+      bnode.hnode.remove();
       break;
     }
     case "text": {
-      removeHnode(bnode.hnode);
+      bnode.hnode.remove();
       break;
     }
     case "fragment": {
@@ -138,10 +140,6 @@ function unmount(bnode: BNode) {
   }
 }
 
-function removeHnode(hnode: HNode) {
-  hnode.parentNode?.removeChild(hnode);
-}
-
 //
 // types
 //
@@ -150,7 +148,8 @@ type NodeKey = string;
 type Props = Record<string, unknown>;
 
 // host node
-type HNode = Node;
+type HNode = Element;
+type HText = Text;
 
 //
 // virtual node
@@ -207,7 +206,7 @@ type BTag = Omit<VTag, "child"> & {
 };
 
 type BText = VText & {
-  hnode: Text;
+  hnode: HText;
 };
 
 type BCustom = VCustom & {
