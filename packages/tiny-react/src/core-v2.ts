@@ -1,6 +1,12 @@
 // architecture inspired by yew
 // https://github.com/yewstack/yew
 
+// TODO:
+// - event listener
+// - sub-tree reconcilation
+// - hook
+// - children key reconcilation
+
 import { range } from "@hiogawa/utils";
 
 export function render(vnode: VNode, parent: HNode) {
@@ -153,18 +159,35 @@ function moveBnodesByKey(
 }
 
 function reconcileTagProps(hnode: HNode, props: Props, oldProps: Props) {
-  if (!(hnode instanceof Element)) {
-    return;
-  }
   for (const k in oldProps) {
     if (!(k in props)) {
-      hnode.removeAttribute(k);
+      removeTagProp(hnode, k);
     }
   }
   for (const k in props) {
     if (props[k] !== oldProps[k]) {
-      hnode.setAttribute(k, props[k] as any);
+      setTagProp(hnode, k, props[k]);
     }
+  }
+}
+
+function setTagProp(hnode: HNode, key: string, value: unknown) {
+  if (key.startsWith("on")) {
+    // TODO: preact inject properties in HTMLElement to track listeners
+    const type = key.slice(2).toLowerCase();
+    hnode.addEventListener(type, () => {});
+  } else {
+    hnode.setAttribute(key, value as any);
+  }
+}
+
+function removeTagProp(hnode: HNode, key: string) {
+  if (key.startsWith("on")) {
+    // TODO:
+    const type = key.slice(2).toLowerCase();
+    hnode.removeEventListener(type, () => {});
+  } else {
+    hnode.removeAttribute(key);
   }
 }
 
