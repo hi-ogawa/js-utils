@@ -104,13 +104,14 @@ export function reconcile(
         bnode.render === vnode.render
       ) {
         const vchild = vnode.render(vnode.props);
-        bnode.props = vnode.props;
         bnode.child = reconcile(vchild, bnode.child, parent, slot);
+        bnode.props = vnode.props;
+        bnode.parent = parent;
       } else {
         unmount(bnode);
         const vchild = vnode.render(vnode.props);
         const child = reconcile(vchild, emptyNode(), parent, slot);
-        bnode = { ...vnode, child } satisfies BCustom;
+        bnode = { ...vnode, child, parent } satisfies BCustom;
       }
       bnode.slot = getSlot(bnode.child);
       break;
@@ -282,10 +283,10 @@ type BText = VText & {
   hnode: HText;
 };
 
-// TODO: need pointer to parent for sub tree reconcilation?
 type BCustom = VCustom & {
   child: BNode;
   slot?: HNode;
+  parent: HNode; // need back pointer for self re-rendering?
 };
 
 type BFragment = Omit<VFragment, "children"> & {

@@ -191,6 +191,12 @@ describe(reconcile, () => {
           "slot": world,
           "type": "fragment",
         },
+        "parent": <main>
+          <span>
+            hello
+          </span>
+          world
+        </main>,
         "props": {
           "value": "hello",
         },
