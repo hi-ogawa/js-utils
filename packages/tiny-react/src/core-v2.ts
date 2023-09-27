@@ -14,6 +14,14 @@ export function reconcile(
   parent: HNode // TODO: + where to append
 ): BNode {
   switch (vnode.type) {
+    case "empty": {
+      if (bnode.type === "empty") {
+      } else {
+        unmount(bnode);
+        bnode = { ...vnode };
+      }
+      break;
+    }
     case "tag": {
       if (
         bnode.type === "tag" &&
@@ -105,6 +113,9 @@ function reconcileTagProps(hnode: HNode, props: Props, oldProps: Props) {
 function unmount(bnode: BNode) {
   // TODO: unmount/ref callback
   switch (bnode.type) {
+    case "empty": {
+      break;
+    }
     case "tag": {
       unmount(bnode.child); // TODO: can skip actual remove since parent removes all anyways
       removeHnode(bnode.hnode);
@@ -146,11 +157,11 @@ type HNode = Node;
 //
 
 // TODO: optimize object shape?
-export type VNode = VTag | VText | VCustom | VFragment;
+export type VNode = VEmpty | VTag | VText | VCustom | VFragment;
 
-// TODO: optimize empty case?
-// type VEmpty = null;
-// type BEmpty = null;
+type VEmpty = {
+  type: "empty";
+};
 
 // dom element with tag name
 // TODO: ref?
@@ -186,7 +197,9 @@ type VFragment = {
 // bundle node (mutated through reconcilation and works both as input and output)
 //
 
-type BNode = BTag | BText | BCustom | BFragment;
+type BNode = BEmpty | BTag | BText | BCustom | BFragment;
+
+type BEmpty = VEmpty;
 
 type BTag = Omit<VTag, "child"> & {
   child: BNode;
@@ -194,7 +207,7 @@ type BTag = Omit<VTag, "child"> & {
 };
 
 type BText = VText & {
-  hnode: Text; // TODO: optimize empty string
+  hnode: Text;
 };
 
 type BCustom = VCustom & {
@@ -263,8 +276,7 @@ function hComponentChild(child: ComponentChild): VNode {
     typeof child === "boolean"
   ) {
     return {
-      type: "text",
-      data: "",
+      type: "empty",
     };
   }
   if (typeof child === "string" || typeof child === "number") {

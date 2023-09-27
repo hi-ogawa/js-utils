@@ -169,6 +169,7 @@ describe(h, () => {
       "div",
       { class: "flex" },
       h(Custom, { value: "hello" }),
+      null,
       h("span", { class: "text-red" }, "world")
     );
     expect(vnode).toMatchInlineSnapshot(`
@@ -182,6 +183,9 @@ describe(h, () => {
               },
               "render": [Function],
               "type": "custom",
+            },
+            {
+              "type": "empty",
             },
             {
               "child": {
