@@ -1,5 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Fragment, type VNode, h, reconcile, render } from "./core-v2";
 
 describe(reconcile, () => {
@@ -63,6 +63,7 @@ describe(reconcile, () => {
               >
                 world
               </span>,
+              "listeners": Map {},
               "name": "span",
               "props": {
                 "class": "text-red",
@@ -87,6 +88,7 @@ describe(reconcile, () => {
             world
           </span>
         </div>,
+        "listeners": Map {},
         "name": "div",
         "props": {
           "class": "flex items-center gap-2",
@@ -123,6 +125,7 @@ describe(reconcile, () => {
         >
           reconcile
         </div>,
+        "listeners": Map {},
         "name": "div",
         "props": {
           "class": "flex items-center gap-2",
@@ -178,6 +181,7 @@ describe(reconcile, () => {
               "hnode": <span>
                 hello
               </span>,
+              "listeners": Map {},
               "name": "span",
               "props": {},
               "type": "tag",
@@ -345,6 +349,36 @@ describe(reconcile, () => {
         c
       </main>
     `);
+  });
+
+  it("event-listener", () => {
+    const mockFn = vi.fn();
+    let vnode = h("button", {
+      onclick: () => {
+        mockFn("click");
+      },
+    });
+    const parent = document.createElement("main");
+    let bnode = render(vnode, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <button />
+      </main>
+    `);
+    (parent.firstChild as HTMLElement).click();
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "click",
+        ],
+      ]
+    `);
+    mockFn.mockReset();
+
+    vnode = h("button", {});
+    bnode = reconcile(vnode, bnode, parent);
+    (parent.firstChild as HTMLElement).click();
+    expect(mockFn.mock.calls).toMatchInlineSnapshot("[]");
   });
 });
 

@@ -1,8 +1,10 @@
+import { tinyassert } from "@hiogawa/utils";
+
 // architecture inspired by yew
 // https://github.com/yewstack/yew
 
 // TODO:
-// - event listener
+// - re-render scheduling
 // - hook
 
 export function render(vnode: VNode, parent: HNode) {
@@ -33,7 +35,7 @@ export function reconcile(
         bnode.key === vnode.key &&
         bnode.name === vnode.name
       ) {
-        reconcileTagProps(bnode.hnode, vnode.props, bnode.props);
+        reconcileTagProps(bnode, vnode.props, bnode.props);
         bnode.props = vnode.props;
         bnode.child = reconcile(vnode.child, bnode.child, bnode.hnode);
         if (slot !== bnode.hnode.previousSibling) {
@@ -44,9 +46,9 @@ export function reconcile(
         // TODO: ref effect
         const hnode = document.createElement(vnode.name);
         const child = reconcile(vnode.child, emptyNode(), hnode);
-        reconcileTagProps(hnode, vnode.props, {});
+        bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
+        reconcileTagProps(bnode, vnode.props, {});
         parent.insertBefore(hnode, slot?.nextSibling ?? null);
-        bnode = { ...vnode, child, hnode } satisfies BTag;
       }
       break;
     }
@@ -150,36 +152,46 @@ function moveBnodesByKey(
   });
 }
 
-function reconcileTagProps(hnode: HTag, props: Props, oldProps: Props) {
+function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
   for (const k in oldProps) {
     if (!(k in props)) {
-      removeTagProp(hnode, k);
+      removeTagProp(bnode, k);
     }
   }
   for (const k in props) {
     if (props[k] !== oldProps[k]) {
-      setTagProp(hnode, k, props[k]);
+      setTagProp(bnode, k, props[k]);
     }
   }
 }
 
-function setTagProp(hnode: HTag, key: string, value: unknown) {
+function setTagProp(bnode: BTag, key: string, value: unknown) {
   if (key.startsWith("on")) {
-    // TODO: preact inject properties in HTMLElement to track listeners
-    const type = key.slice(2).toLowerCase();
-    hnode.addEventListener(type, () => {});
+    const eventType = key.slice(2).toLowerCase();
+    const listener = bnode.listeners.get(eventType);
+    if (listener) {
+      bnode.hnode.removeEventListener(eventType, listener);
+    }
+    tinyassert(
+      typeof value === "function",
+      `Invalid event listener prop for '${eventType}'`
+    );
+    bnode.listeners.set(eventType, value as any);
+    bnode.hnode.addEventListener(eventType, value as any);
   } else {
-    hnode.setAttribute(key, value as any);
+    bnode.hnode.setAttribute(key, value as any);
   }
 }
 
-function removeTagProp(hnode: HTag, key: string) {
+function removeTagProp(bnode: BTag, key: string) {
   if (key.startsWith("on")) {
-    // TODO:
-    const type = key.slice(2).toLowerCase();
-    hnode.removeEventListener(type, () => {});
+    const eventType = key.slice(2).toLowerCase();
+    const listener = bnode.listeners.get(eventType);
+    if (listener) {
+      bnode.hnode.removeEventListener(eventType, listener);
+    }
   } else {
-    hnode.removeAttribute(key);
+    bnode.hnode.removeAttribute(key);
   }
 }
 
@@ -277,6 +289,7 @@ type BEmpty = VEmpty & {
 type BTag = Omit<VTag, "child"> & {
   child: BNode;
   hnode: HTag;
+  listeners: Map<string, () => void>;
 };
 
 type BText = VText & {
