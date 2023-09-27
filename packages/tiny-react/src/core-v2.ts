@@ -99,7 +99,7 @@ export function reconcile(
           child.remove();
         }
         for (const child of newChildNodes) {
-          parent.append(child);
+          parent.appendChild(child);
         }
       }
       break;
@@ -158,7 +158,7 @@ function moveBnodesByKey(
   return moves;
 }
 
-function reconcileTagProps(hnode: HNode, props: Props, oldProps: Props) {
+function reconcileTagProps(hnode: HTag, props: Props, oldProps: Props) {
   for (const k in oldProps) {
     if (!(k in props)) {
       removeTagProp(hnode, k);
@@ -171,7 +171,7 @@ function reconcileTagProps(hnode: HNode, props: Props, oldProps: Props) {
   }
 }
 
-function setTagProp(hnode: HNode, key: string, value: unknown) {
+function setTagProp(hnode: HTag, key: string, value: unknown) {
   if (key.startsWith("on")) {
     // TODO: preact inject properties in HTMLElement to track listeners
     const type = key.slice(2).toLowerCase();
@@ -181,7 +181,7 @@ function setTagProp(hnode: HNode, key: string, value: unknown) {
   }
 }
 
-function removeTagProp(hnode: HNode, key: string) {
+function removeTagProp(hnode: HTag, key: string) {
   if (key.startsWith("on")) {
     // TODO:
     const type = key.slice(2).toLowerCase();
@@ -227,7 +227,8 @@ type NodeKey = string;
 type Props = Record<string, unknown>;
 
 // host node
-type HNode = Element;
+type HNode = Node;
+type HTag = Element;
 type HText = Text;
 
 //
@@ -282,7 +283,7 @@ type BEmpty = VEmpty;
 
 type BTag = Omit<VTag, "child"> & {
   child: BNode;
-  hnode: HNode;
+  hnode: HTag;
 };
 
 type BText = VText & {
