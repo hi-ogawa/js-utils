@@ -308,6 +308,34 @@ describe(reconcile, () => {
       </main>
     `);
   });
+
+  it("subtree", () => {
+    let vnode = h(Fragment, {}, "a", "b", "c");
+    const parent = document.createElement("main");
+
+    let bnode = reconcile(vnode, { type: "empty" }, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        a
+        b
+        c
+      </main>
+    `);
+
+    vnode = h(Fragment, {}, "a", h("span", {}, "b"), "c");
+    bnode = reconcile(vnode, bnode, parent);
+
+    // TODO: broken sub-tree reconcilation
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        a
+        c
+        <span>
+          b
+        </span>
+      </main>
+    `);
+  });
 });
 
 describe(h, () => {
