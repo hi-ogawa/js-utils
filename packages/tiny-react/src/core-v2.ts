@@ -305,12 +305,13 @@ export function h(
   inProps: Props,
   ...children: ComponentChild[]
 ): VNode {
-  const child: VNode =
+  const vchildren = children.map((c) => normalizeComponentChild(c));
+  const vchild: VNode =
     children.length === 0
       ? emptyNode()
       : {
           type: "fragment",
-          children: children.map((c) => normalizeComponentChild(c)),
+          children: vchildren,
         };
 
   const { key, ...props } = inProps as { key?: NodeKey };
@@ -321,13 +322,13 @@ export function h(
       name: t,
       key,
       props,
-      child,
+      child: vchild,
     };
   } else if (t === Fragment) {
     return {
       type: "fragment",
       key,
-      children: children.map((c) => normalizeComponentChild(c)),
+      children: vchildren,
     };
   } else if (typeof t === "function") {
     return {
@@ -335,7 +336,7 @@ export function h(
       key,
       props: {
         ...props,
-        children: child,
+        children: vchild,
       },
       render: t,
     };
