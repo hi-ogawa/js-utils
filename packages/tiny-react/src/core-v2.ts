@@ -267,7 +267,6 @@ type VFragment = {
 // bundle node (mutated through reconcilation and works both as input and output)
 //
 
-// TODO: need pointer to parent for sub tree reconcilation?
 type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
 type BEmpty = VEmpty & {
@@ -283,6 +282,7 @@ type BText = VText & {
   hnode: HText;
 };
 
+// TODO: need pointer to parent for sub tree reconcilation?
 type BCustom = VCustom & {
   child: BNode;
   slot?: HNode;
