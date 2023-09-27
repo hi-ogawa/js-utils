@@ -57,6 +57,9 @@ export function reconcile(
       break;
     }
     case "fragment": {
+      // TODO: learn from
+      // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
+      // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
       let moves: [number, number][] | undefined;
       if (bnode.type === "fragment" && bnode.key === vnode.key) {
         moves = moveBnodesByKey(vnode.children, bnode.children);

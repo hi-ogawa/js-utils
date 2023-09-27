@@ -193,10 +193,8 @@ describe(reconcile, () => {
       }
     `);
   });
-});
 
-describe("children-key", () => {
-  it("basic", () => {
+  it("children-key", () => {
     const keys = [..."abcde"];
     const vnode = h(
       Fragment,
