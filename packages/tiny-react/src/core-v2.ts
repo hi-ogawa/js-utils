@@ -3,11 +3,7 @@
 
 // TODO:
 // - event listener
-// - sub-tree reconcilation
 // - hook
-// - children key reconcilation
-
-import { range } from "@hiogawa/utils";
 
 export function render(vnode: VNode, parent: HNode) {
   const bnode = reconcile(vnode, emptyNode(), parent);
@@ -40,6 +36,9 @@ export function reconcile(
         reconcileTagProps(bnode.hnode, vnode.props, bnode.props);
         bnode.props = vnode.props;
         bnode.child = reconcile(vnode.child, bnode.child, bnode.hnode);
+        if (slot !== bnode.hnode.previousSibling) {
+          parent.insertBefore(bnode.hnode, slot?.nextSibling ?? null);
+        }
       } else {
         unmount(bnode);
         // TODO: ref effect
@@ -57,6 +56,9 @@ export function reconcile(
           bnode.hnode.data = vnode.data;
           bnode.data = vnode.data;
         }
+        if (slot !== bnode.hnode.previousSibling) {
+          parent.insertBefore(bnode.hnode, slot?.nextSibling ?? null);
+        }
       } else {
         unmount(bnode);
         const hnode = document.createTextNode(vnode.data);
@@ -69,9 +71,8 @@ export function reconcile(
       // TODO: learn from
       // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
       // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
-      let moves: [number, number][] | undefined;
       if (bnode.type === "fragment" && bnode.key === vnode.key) {
-        moves = moveBnodesByKey(vnode.children, bnode.children);
+        moveBnodesByKey(vnode.children, bnode.children);
       } else {
         unmount(bnode);
         bnode = { ...vnode, children: [] } satisfies BFragment;
@@ -92,26 +93,6 @@ export function reconcile(
         slot = getSlot(bchild);
         return bchild;
       });
-      // TODO
-      // this would not be so easy since each bchild doesn't necessary contribute to single host node (e.g. empty, fragment, custom)
-      // probably, each bchild needs to track the range of affecting host nodes under parent.
-      if (moves) {
-        // TODO: partition childNodes by each bnode.children's range (which can also change for each child's reconcilation)
-        // TODO: no way this is a right way to move child nodes...
-        const oldChildNodes = range(parent.childNodes.length).map(
-          (i) => parent.childNodes[i]
-        );
-        const newChildNodes = [...oldChildNodes];
-        for (const [from, to] of moves) {
-          newChildNodes[to] = oldChildNodes[from];
-        }
-        for (const child of newChildNodes) {
-          child.remove();
-        }
-        for (const child of newChildNodes) {
-          parent.appendChild(child);
-        }
-      }
       bnode.slot = slot;
       break;
     }
@@ -150,7 +131,7 @@ function moveBnodesByKey(
     }
   });
 
-  let moves: [number, number][] = [];
+  const moves: [number, number][] = [];
   vchildren.forEach((vchild, i) => {
     const vkey = getNodeKey(vchild);
     if (typeof vkey !== "undefined") {
@@ -161,13 +142,15 @@ function moveBnodesByKey(
     }
   });
 
+  // fill bnodes to ensure bchildren.length >= vchildren.length
+  vchildren.forEach((_v, i) => {
+    bchildren[i] ??= emptyNode();
+  });
+
   const oldChildren = [...bchildren];
   for (const [j, i] of moves) {
-    // this swap migth create "empty holes" in `bchildren` when `bchildren.length < vchildren.length`
     bchildren[i] = oldChildren[j];
   }
-
-  return moves;
 }
 
 function reconcileTagProps(hnode: HTag, props: Props, oldProps: Props) {

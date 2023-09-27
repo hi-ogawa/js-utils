@@ -259,7 +259,6 @@ describe(reconcile, () => {
     // re-render should keep mutated dom
     reconcile(vnode, bnode, parent);
 
-    // TODO: reconcilation still needs to mutate parent to re-order
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <span
@@ -305,13 +304,12 @@ describe(reconcile, () => {
     );
     bnode = reconcile(vnode, bnode, parent);
 
-    // TODO: broken nested fragment re-ordering
     expect(parent).toMatchInlineSnapshot(`
       <main>
-        2
-        1
         3
         4
+        1
+        2
       </main>
     `);
   });
