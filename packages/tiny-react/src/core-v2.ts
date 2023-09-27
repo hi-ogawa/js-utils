@@ -211,3 +211,67 @@ function emptyBnode(): BNode {
     children: [],
   };
 }
+
+//
+// hyperscript helper
+//
+
+export const Fragment = Symbol.for("Fragment");
+
+type ComponentType = VTag["name"] | VCustom["render"] | typeof Fragment;
+
+type ComponentChild = VNode | string | number | null | undefined | boolean;
+
+export function h(
+  t: ComponentType,
+  inProps: Props,
+  ...children: ComponentChild[]
+): VNode {
+  const { key, ...props } = inProps as { key?: NodeKey };
+  if (typeof t === "string") {
+    return {
+      type: "tag",
+      name: t,
+      key,
+      props,
+      child: {
+        type: "fragment",
+        children: children.map((c) => hComponentChild(c)),
+      },
+    };
+  } else if (t === Fragment) {
+    return {
+      type: "fragment",
+      key,
+      children: children.map((c) => hComponentChild(c)),
+    };
+  } else if (typeof t === "function") {
+    return {
+      type: "custom",
+      key,
+      props,
+      render: t,
+    };
+  }
+  return t satisfies never;
+}
+
+function hComponentChild(child: ComponentChild): VNode {
+  if (
+    child === null ||
+    typeof child === "undefined" ||
+    typeof child === "boolean"
+  ) {
+    return {
+      type: "text",
+      data: "",
+    };
+  }
+  if (typeof child === "string" || typeof child === "number") {
+    return {
+      type: "text",
+      data: String(child),
+    };
+  }
+  return child;
+}

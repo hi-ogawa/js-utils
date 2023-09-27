@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type VNode, render } from "./core-v2";
+import { type VNode, h, render } from "./core-v2";
 
 describe(render, () => {
   it("basic", () => {
@@ -154,6 +154,79 @@ describe(render, () => {
         "render": [Function],
         "type": "custom",
       }
+    `);
+  });
+});
+
+describe(h, () => {
+  it("basic", () => {
+    h("div", {});
+    const parent = document.createElement("main");
+    function Custom(props: any) {
+      return h("input", { placeholder: props.value });
+    }
+    const vnode = h(
+      "div",
+      { class: "flex" },
+      h(Custom, { value: "hello" }),
+      h("span", { class: "text-red" }, "world")
+    );
+    expect(vnode).toMatchInlineSnapshot(`
+      {
+        "child": {
+          "children": [
+            {
+              "key": undefined,
+              "props": {
+                "value": "hello",
+              },
+              "render": [Function],
+              "type": "custom",
+            },
+            {
+              "child": {
+                "children": [
+                  {
+                    "data": "world",
+                    "type": "text",
+                  },
+                ],
+                "type": "fragment",
+              },
+              "key": undefined,
+              "name": "span",
+              "props": {
+                "class": "text-red",
+              },
+              "type": "tag",
+            },
+          ],
+          "type": "fragment",
+        },
+        "key": undefined,
+        "name": "div",
+        "props": {
+          "class": "flex",
+        },
+        "type": "tag",
+      }
+    `);
+    render(vnode, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div
+          class="flex"
+        >
+          <input
+            placeholder="hello"
+          />
+          <span
+            class="text-red"
+          >
+            world
+          </span>
+        </div>
+      </main>
     `);
   });
 });
