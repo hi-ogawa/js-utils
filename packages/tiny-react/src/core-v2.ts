@@ -80,6 +80,7 @@ export function reconcile(
       // this would not be so easy since each bchild doesn't necessary contribute to single host node (e.g. empty, fragment, custom)
       // probably, each bchild needs to track the range of affecting host nodes under parent.
       if (moves) {
+        // TODO: partition childNodes by each bnode.children's range (which can also change for each child's reconcilation)
         // TODO: no way this is a right way to move child nodes...
         const oldChildNodes = range(parent.childNodes.length).map(
           (i) => parent.childNodes[i]
