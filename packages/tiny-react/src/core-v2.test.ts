@@ -257,9 +257,13 @@ describe("children-key", () => {
       </main>
     `);
 
-    // reverse input order of vnode
+    // update fragment children while keeping key
     tinyassert(vnode.type === "fragment");
     vnode.children.reverse();
+    tinyassert(vnode.children[0].type === "tag");
+    vnode.children[0].props = {
+      "data-prop-x": "boom",
+    };
 
     // re-render should keep mutated dom
     reconcile(vnode, bnode, parent);
@@ -268,24 +272,24 @@ describe("children-key", () => {
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <span
-          data-mutate="a"
-          data-prop="a"
-        />
-        <span
-          data-mutate="b"
-          data-prop="b"
-        />
-        <span
-          data-mutate="c"
-          data-prop="c"
+          data-mutate="e"
+          data-prop-x="boom"
         />
         <span
           data-mutate="d"
           data-prop="d"
         />
         <span
-          data-mutate="e"
-          data-prop="e"
+          data-mutate="c"
+          data-prop="c"
+        />
+        <span
+          data-mutate="b"
+          data-prop="b"
+        />
+        <span
+          data-mutate="a"
+          data-prop="a"
         />
       </main>
     `);

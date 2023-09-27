@@ -57,9 +57,9 @@ export function reconcile(
       break;
     }
     case "fragment": {
+      let moves: [number, number][] | undefined;
       if (bnode.type === "fragment" && bnode.key === vnode.key) {
-        // TODO: need to move `bnode.children` within `parent`
-        moveBnodesByKey(vnode.children, bnode.children);
+        moves = moveBnodesByKey(vnode.children, bnode.children);
       } else {
         unmount(bnode);
         bnode = { ...vnode, children: [] } satisfies BFragment;
@@ -73,6 +73,25 @@ export function reconcile(
       bnode.children = vnode.children.map((vchild, i) =>
         reconcile(vchild, bchildren[i] ?? emptyNode(), parent)
       );
+      // TODO
+      // this would not be so easy since each bchild doesn't necessary contribute to single host node (e.g. empty, fragment, custom)
+      // probably, each bchild needs to track the range of affecting host nodes under parent.
+      if (moves) {
+        // TODO: no way this is a right way to move child nodes...
+        const oldChildNodes = range(parent.childNodes.length).map(
+          (i) => parent.childNodes[i]
+        );
+        const newChildNodes = [...oldChildNodes];
+        for (const [from, to] of moves) {
+          newChildNodes[to] = oldChildNodes[from];
+        }
+        for (const child of newChildNodes) {
+          child.remove();
+        }
+        for (const child of newChildNodes) {
+          parent.append(child);
+        }
+      }
       break;
     }
     case "custom": {
@@ -97,42 +116,43 @@ export function reconcile(
   return bnode;
 }
 
-function moveBnodesByKey(vchildren: VNode[], bchildren: BNode[]) {
-  const bKeyMap = new Map<NodeKey, [number, BNode]>();
+function moveBnodesByKey(
+  vchildren: VNode[],
+  bchildren: BNode[] // mutated
+) {
+  const bKeyIndex = new Map<NodeKey, number>();
   bchildren.forEach((bchild, i) => {
     const bkey = getNodeKey(bchild);
     if (typeof bkey !== "undefined") {
-      bKeyMap.set(bkey, [i, bchild]);
+      bKeyIndex.set(bkey, i);
     }
   });
 
-  // for simplicity, align length (TODO: optimize by dealing with array with holes)
+  // align length for simplicity (we could optimize by dealing with array with holes?)
   if (bchildren.length < vchildren.length) {
     bchildren.push(
       ...range(vchildren.length - bchildren.length).map(() => emptyNode())
     );
   }
 
+  let moves: [number, number][] = [];
+
   vchildren.forEach((vchild, i) => {
     const vkey = getNodeKey(vchild);
     if (typeof vkey !== "undefined") {
-      const found = bKeyMap.get(vkey);
-      if (found) {
-        const [j, jchild] = found;
-        if (i !== j) {
-          const ichild = bchildren[i];
-          bchildren[i] = jchild;
-          if (ichild) {
-            bchildren[j] = ichild;
-            const ikey = getNodeKey(ichild);
-            if (typeof ikey !== "undefined") {
-              bKeyMap.set(ikey, [j, ichild]);
-            }
-          }
-        }
+      const j = bKeyIndex.get(vkey);
+      if (typeof j !== "undefined" && i !== j) {
+        moves.push([j, i]);
       }
     }
   });
+
+  const oldChildren = [...bchildren];
+  for (const [j, i] of moves) {
+    bchildren[i] = oldChildren[j];
+  }
+
+  return moves;
 }
 
 function reconcileTagProps(hnode: HNode, props: Props, oldProps: Props) {
@@ -145,7 +165,9 @@ function reconcileTagProps(hnode: HNode, props: Props, oldProps: Props) {
     }
   }
   for (const k in props) {
-    hnode.setAttribute(k, props[k] as any);
+    if (props[k] !== oldProps[k]) {
+      hnode.setAttribute(k, props[k] as any);
+    }
   }
 }
 
@@ -292,7 +314,7 @@ export function h(
       ? emptyNode()
       : {
           type: "fragment",
-          children: children.map((c) => hComponentChild(c)),
+          children: children.map((c) => normalizeComponentChild(c)),
         };
 
   const { key, ...props } = inProps as { key?: NodeKey };
@@ -318,7 +340,7 @@ export function h(
   return t satisfies never;
 }
 
-function hComponentChild(child: ComponentChild): VNode {
+function normalizeComponentChild(child: ComponentChild): VNode {
   if (
     child === null ||
     typeof child === "undefined" ||
