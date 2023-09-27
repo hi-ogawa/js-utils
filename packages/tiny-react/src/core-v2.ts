@@ -123,22 +123,11 @@ function moveBnodesByKey(
   vchildren: VNode[],
   bchildren: BNode[] // mutated
 ) {
-  const bKeyIndex = new Map<NodeKey, number>();
+  const keyToIndex = new Map<NodeKey, number>();
   bchildren.forEach((bchild, i) => {
     const bkey = getNodeKey(bchild);
     if (typeof bkey !== "undefined") {
-      bKeyIndex.set(bkey, i);
-    }
-  });
-
-  const moves: [number, number][] = [];
-  vchildren.forEach((vchild, i) => {
-    const vkey = getNodeKey(vchild);
-    if (typeof vkey !== "undefined") {
-      const j = bKeyIndex.get(vkey);
-      if (typeof j !== "undefined" && i !== j) {
-        moves.push([j, i]);
-      }
+      keyToIndex.set(bkey, i);
     }
   });
 
@@ -148,9 +137,16 @@ function moveBnodesByKey(
   });
 
   const oldChildren = [...bchildren];
-  for (const [j, i] of moves) {
-    bchildren[i] = oldChildren[j];
-  }
+
+  vchildren.forEach((vchild, i) => {
+    const vkey = getNodeKey(vchild);
+    if (typeof vkey !== "undefined") {
+      const j = keyToIndex.get(vkey);
+      if (typeof j !== "undefined" && i !== j) {
+        bchildren[i] = oldChildren[j];
+      }
+    }
+  });
 }
 
 function reconcileTagProps(hnode: HTag, props: Props, oldProps: Props) {
