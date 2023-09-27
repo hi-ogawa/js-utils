@@ -324,12 +324,19 @@ export function h(
       child,
     };
   } else if (t === Fragment) {
-    return child;
+    return {
+      type: "fragment",
+      key,
+      children: children.map((c) => normalizeComponentChild(c)),
+    };
   } else if (typeof t === "function") {
     return {
       type: "custom",
       key,
-      props,
+      props: {
+        ...props,
+        children: child,
+      },
       render: t,
     };
   }

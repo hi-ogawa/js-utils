@@ -194,7 +194,7 @@ describe(reconcile, () => {
     `);
   });
 
-  it("children-key", () => {
+  it("fragment children key", () => {
     const keys = [..."abc"];
     const vnode = h(
       Fragment,
@@ -270,6 +270,44 @@ describe(reconcile, () => {
       </main>
     `);
   });
+
+  it("nested fragment", () => {
+    let vnode = h(
+      Fragment,
+      {},
+      h(Fragment, { key: "x" }, "1", "2"),
+      h(Fragment, { key: "y" }, "3", "4")
+    );
+    const parent = document.createElement("main");
+
+    let bnode = reconcile(vnode, { type: "empty" }, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        1
+        2
+        3
+        4
+      </main>
+    `);
+
+    vnode = h(
+      Fragment,
+      {},
+      h(Fragment, { key: "y" }, "3", "4"),
+      h(Fragment, { key: "x" }, "1", "2")
+    );
+    bnode = reconcile(vnode, bnode, parent);
+
+    // TODO: broken nested fragment re-ordering
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        2
+        1
+        3
+        4
+      </main>
+    `);
+  });
 });
 
 describe(h, () => {
@@ -292,6 +330,9 @@ describe(h, () => {
             {
               "key": undefined,
               "props": {
+                "children": {
+                  "type": "empty",
+                },
                 "value": "hello",
               },
               "render": [Function],
