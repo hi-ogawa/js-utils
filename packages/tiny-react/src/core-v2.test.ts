@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { type VNode, h, render } from "./core-v2";
+import { type VNode, h, reconcile, render } from "./core-v2";
 
-describe(render, () => {
+describe(reconcile, () => {
   it("basic", () => {
-    const vnode: VNode = {
+    let vnode: VNode = {
       type: "tag",
       name: "div",
       props: { class: "flex items-center gap-2" },
@@ -27,7 +27,7 @@ describe(render, () => {
       },
     };
     const parent = document.createElement("main");
-    const bnode = render(vnode, parent);
+    let bnode = render(vnode, parent);
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div
@@ -80,6 +80,42 @@ describe(render, () => {
           >
             world
           </span>
+        </div>,
+        "name": "div",
+        "props": {
+          "class": "flex items-center gap-2",
+        },
+        "type": "tag",
+      }
+    `);
+    vnode = {
+      ...vnode,
+      child: {
+        type: "text",
+        data: "reconcile",
+      },
+    };
+    bnode = reconcile(vnode, bnode, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div
+          class="flex items-center gap-2"
+        >
+          reconcile
+        </div>
+      </main>
+    `);
+    expect(bnode).toMatchInlineSnapshot(`
+      {
+        "child": {
+          "data": "reconcile",
+          "hnode": reconcile,
+          "type": "text",
+        },
+        "hnode": <div
+          class="flex items-center gap-2"
+        >
+          reconcile
         </div>,
         "name": "div",
         "props": {

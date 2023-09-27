@@ -30,7 +30,7 @@ export function reconcile(
       ) {
         reconcileTagProps(bnode.hnode, vnode.props, bnode.props);
         bnode.props = vnode.props;
-        bnode.child = reconcile(vnode.child, bnode, bnode.hnode);
+        bnode.child = reconcile(vnode.child, bnode.child, bnode.hnode);
       } else {
         unmount(bnode);
         // TODO: ref callback
@@ -220,8 +220,7 @@ type BFragment = Omit<VFragment, "children"> & {
 
 function emptyBnode(): BNode {
   return {
-    type: "fragment",
-    children: [],
+    type: "empty",
   };
 }
 
