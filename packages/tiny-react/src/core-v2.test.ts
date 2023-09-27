@@ -3,7 +3,6 @@ import { type VNode, render } from "./core-v2";
 
 describe(render, () => {
   it("basic", () => {
-    const parent = document.createElement("main");
     const vnode: VNode = {
       type: "tag",
       name: "div",
@@ -27,6 +26,7 @@ describe(render, () => {
         ],
       },
     };
+    const parent = document.createElement("main");
     const bnode = render(vnode, parent);
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -86,6 +86,73 @@ describe(render, () => {
           "class": "flex items-center gap-2",
         },
         "type": "tag",
+      }
+    `);
+  });
+
+  it("custom", () => {
+    const vnode: VNode = {
+      type: "custom",
+      props: { value: "hello" },
+      render: (props) => ({
+        type: "fragment",
+        children: [
+          {
+            type: "tag",
+            name: "span",
+            props: {},
+            child: {
+              type: "text",
+              data: (props as any).value,
+            },
+          },
+          {
+            type: "text",
+            data: "world",
+          },
+        ],
+      }),
+    };
+    const parent = document.createElement("main");
+    const bnode = render(vnode, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <span>
+          hello
+        </span>
+        world
+      </main>
+    `);
+    expect(bnode).toMatchInlineSnapshot(`
+      {
+        "child": {
+          "children": [
+            {
+              "child": {
+                "data": "hello",
+                "hnode": hello,
+                "type": "text",
+              },
+              "hnode": <span>
+                hello
+              </span>,
+              "name": "span",
+              "props": {},
+              "type": "tag",
+            },
+            {
+              "data": "world",
+              "hnode": world,
+              "type": "text",
+            },
+          ],
+          "type": "fragment",
+        },
+        "props": {
+          "value": "hello",
+        },
+        "render": [Function],
+        "type": "custom",
       }
     `);
   });

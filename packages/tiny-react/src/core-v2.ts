@@ -67,7 +67,21 @@ export function reconcile(
       break;
     }
     case "custom": {
-      // TODO
+      // TODO: hook context
+      if (
+        bnode.type === "custom" &&
+        bnode.key === vnode.key &&
+        bnode.render === vnode.render
+      ) {
+        const vchild = vnode.render(vnode.props);
+        bnode.props = vnode.props;
+        bnode.child = reconcile(vchild, bnode.child, parent);
+      } else {
+        unmount(bnode);
+        const vchild = vnode.render(vnode.props);
+        const child = reconcile(vchild, emptyBnode(), parent);
+        bnode = { ...vnode, child } satisfies BCustom;
+      }
       break;
     }
   }
@@ -158,6 +172,7 @@ type VText = {
 type VCustom = {
   type: "custom";
   key?: NodeKey;
+  props: Props;
   render: (props: Props) => VNode;
 };
 
