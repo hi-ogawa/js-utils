@@ -17,7 +17,9 @@ export function render(vnode: VNode, parent: HNode) {
 export function reconcile(
   vnode: VNode,
   bnode: BNode, // mutated
-  parent: HNode // TODO: + where to append
+  // insert via `parent.insertBefore(..., slot?.nextSibling ?? null)`
+  parent: HNode,
+  slot?: HNode
 ): BNode {
   switch (vnode.type) {
     case "empty": {
@@ -26,6 +28,7 @@ export function reconcile(
         unmount(bnode);
         bnode = { ...vnode };
       }
+      bnode.slot = slot;
       break;
     }
     case "tag": {
@@ -43,7 +46,7 @@ export function reconcile(
         const hnode = document.createElement(vnode.name);
         const child = reconcile(vnode.child, emptyNode(), hnode);
         reconcileTagProps(hnode, vnode.props, {});
-        parent.appendChild(hnode);
+        parent.insertBefore(hnode, slot?.nextSibling ?? null);
         bnode = { ...vnode, child, hnode } satisfies BTag;
       }
       break;
@@ -57,7 +60,7 @@ export function reconcile(
       } else {
         unmount(bnode);
         const hnode = document.createTextNode(vnode.data);
-        parent.appendChild(hnode);
+        parent.insertBefore(hnode, slot?.nextSibling ?? null);
         bnode = { ...vnode, hnode } satisfies BText;
       }
       break;
@@ -73,15 +76,22 @@ export function reconcile(
         unmount(bnode);
         bnode = { ...vnode, children: [] } satisfies BFragment;
       }
-      // unmount exess bnode.children
+      // unmount excess bnode.children
       const bchildren = bnode.children;
       for (const bchild of bchildren.slice(vnode.children.length)) {
         unmount(bchild);
       }
       // reconcile vnode.children
-      bnode.children = vnode.children.map((vchild, i) =>
-        reconcile(vchild, bchildren[i] ?? emptyNode(), parent)
-      );
+      bnode.children = vnode.children.map((vchild, i) => {
+        const bchild = reconcile(
+          vchild,
+          bchildren[i] ?? emptyNode(),
+          parent,
+          slot
+        );
+        slot = getSlot(bchild);
+        return bchild;
+      });
       // TODO
       // this would not be so easy since each bchild doesn't necessary contribute to single host node (e.g. empty, fragment, custom)
       // probably, each bchild needs to track the range of affecting host nodes under parent.
@@ -102,6 +112,7 @@ export function reconcile(
           parent.appendChild(child);
         }
       }
+      bnode.slot = slot;
       break;
     }
     case "custom": {
@@ -113,13 +124,14 @@ export function reconcile(
       ) {
         const vchild = vnode.render(vnode.props);
         bnode.props = vnode.props;
-        bnode.child = reconcile(vchild, bnode.child, parent);
+        bnode.child = reconcile(vchild, bnode.child, parent, slot);
       } else {
         unmount(bnode);
         const vchild = vnode.render(vnode.props);
-        const child = reconcile(vchild, emptyNode(), parent);
+        const child = reconcile(vchild, emptyNode(), parent, slot);
         bnode = { ...vnode, child } satisfies BCustom;
       }
+      bnode.slot = getSlot(bnode.child);
       break;
     }
   }
@@ -279,7 +291,9 @@ type VFragment = {
 // TODO: need pointer to parent for sub tree reconcilation?
 type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
-type BEmpty = VEmpty;
+type BEmpty = VEmpty & {
+  slot?: HNode;
+};
 
 type BTag = Omit<VTag, "child"> & {
   child: BNode;
@@ -292,10 +306,12 @@ type BText = VText & {
 
 type BCustom = VCustom & {
   child: BNode;
+  slot?: HNode;
 };
 
 type BFragment = Omit<VFragment, "children"> & {
   children: BNode[];
+  slot?: HNode;
 };
 
 function emptyNode(): VNode & BNode {
@@ -313,6 +329,13 @@ function getNodeKey(node: VNode | BNode): NodeKey | undefined {
     return node.key;
   }
   return;
+}
+
+function getSlot(node: BNode): HNode | undefined {
+  if (node.type === "tag" || node.type === "text") {
+    return node.hnode;
+  }
+  return node.slot;
 }
 
 //

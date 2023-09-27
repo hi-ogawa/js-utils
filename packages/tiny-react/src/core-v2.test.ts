@@ -70,6 +70,11 @@ describe(reconcile, () => {
               "type": "tag",
             },
           ],
+          "slot": <span
+            class="text-red"
+          >
+            world
+          </span>,
           "type": "fragment",
         },
         "hnode": <div
@@ -183,12 +188,14 @@ describe(reconcile, () => {
               "type": "text",
             },
           ],
+          "slot": world,
           "type": "fragment",
         },
         "props": {
           "value": "hello",
         },
         "render": [Function],
+        "slot": world,
         "type": "custom",
       }
     `);
@@ -325,14 +332,13 @@ describe(reconcile, () => {
     vnode = h(Fragment, {}, "a", h("span", {}, "b"), "c");
     bnode = reconcile(vnode, bnode, parent);
 
-    // TODO: broken sub-tree reconcilation
     expect(parent).toMatchInlineSnapshot(`
       <main>
         a
-        c
         <span>
           b
         </span>
+        c
       </main>
     `);
   });
