@@ -1,10 +1,10 @@
 // architecture inspired by yew
 // https://github.com/yewstack/yew
 
-import { zipMax } from "@hiogawa/utils";
+import { range } from "@hiogawa/utils";
 
 export function render(vnode: VNode, parent: HNode) {
-  const bnode = reconcile(vnode, emptyBnode(), parent);
+  const bnode = reconcile(vnode, emptyNode(), parent);
   return bnode;
 }
 
@@ -33,9 +33,9 @@ export function reconcile(
         bnode.child = reconcile(vnode.child, bnode.child, bnode.hnode);
       } else {
         unmount(bnode);
-        // TODO: ref callback
+        // TODO: ref effect
         const hnode = document.createElement(vnode.name);
-        const child = reconcile(vnode.child, emptyBnode(), hnode);
+        const child = reconcile(vnode.child, emptyNode(), hnode);
         reconcileTagProps(hnode, vnode.props, {});
         parent.appendChild(hnode);
         bnode = { ...vnode, child, hnode } satisfies BTag;
@@ -58,22 +58,21 @@ export function reconcile(
     }
     case "fragment": {
       if (bnode.type === "fragment" && bnode.key === vnode.key) {
-        // TODO: match bnode.children order by key
-        vnode.children;
-        bnode.children;
+        // TODO: need to move `bnode.children` within `parent`
+        moveBnodesByKey(vnode.children, bnode.children);
       } else {
         unmount(bnode);
         bnode = { ...vnode, children: [] } satisfies BFragment;
       }
-      const newChildren: BFragment["children"] = [];
-      for (const [vchild, bchild] of zipMax(vnode.children, bnode.children)) {
-        if (vchild) {
-          newChildren.push(reconcile(vchild, bchild ?? emptyBnode(), parent));
-        } else if (bchild) {
-          unmount(bchild);
-        }
+      // unmount exess bnode.children
+      const bchildren = bnode.children;
+      for (const bchild of bchildren.slice(vnode.children.length)) {
+        unmount(bchild);
       }
-      bnode.children = newChildren;
+      // reconcile vnode.children
+      bnode.children = vnode.children.map((vchild, i) =>
+        reconcile(vchild, bchildren[i] ?? emptyNode(), parent)
+      );
       break;
     }
     case "custom": {
@@ -89,13 +88,51 @@ export function reconcile(
       } else {
         unmount(bnode);
         const vchild = vnode.render(vnode.props);
-        const child = reconcile(vchild, emptyBnode(), parent);
+        const child = reconcile(vchild, emptyNode(), parent);
         bnode = { ...vnode, child } satisfies BCustom;
       }
       break;
     }
   }
   return bnode;
+}
+
+function moveBnodesByKey(vchildren: VNode[], bchildren: BNode[]) {
+  const bKeyMap = new Map<NodeKey, [number, BNode]>();
+  bchildren.forEach((bchild, i) => {
+    const bkey = getNodeKey(bchild);
+    if (typeof bkey !== "undefined") {
+      bKeyMap.set(bkey, [i, bchild]);
+    }
+  });
+
+  // for simplicity, align length (TODO: optimize by dealing with array with holes)
+  if (bchildren.length < vchildren.length) {
+    bchildren.push(
+      ...range(vchildren.length - bchildren.length).map(() => emptyNode())
+    );
+  }
+
+  vchildren.forEach((vchild, i) => {
+    const vkey = getNodeKey(vchild);
+    if (typeof vkey !== "undefined") {
+      const found = bKeyMap.get(vkey);
+      if (found) {
+        const [j, jchild] = found;
+        if (i !== j) {
+          const ichild = bchildren[i];
+          bchildren[i] = jchild;
+          if (ichild) {
+            bchildren[j] = ichild;
+            const ikey = getNodeKey(ichild);
+            if (typeof ikey !== "undefined") {
+              bKeyMap.set(ikey, [j, ichild]);
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 function reconcileTagProps(hnode: HNode, props: Props, oldProps: Props) {
@@ -113,7 +150,7 @@ function reconcileTagProps(hnode: HNode, props: Props, oldProps: Props) {
 }
 
 function unmount(bnode: BNode) {
-  // TODO: unmount/ref callback
+  // TODO: unmount/ref effect
   switch (bnode.type) {
     case "empty": {
       break;
@@ -196,6 +233,7 @@ type VFragment = {
 // bundle node (mutated through reconcilation and works both as input and output)
 //
 
+// TODO: need pointer to parent for sub tree reconcilation?
 type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
 type BEmpty = VEmpty;
@@ -217,10 +255,21 @@ type BFragment = Omit<VFragment, "children"> & {
   children: BNode[];
 };
 
-function emptyBnode(): BNode {
+function emptyNode(): VNode & BNode {
   return {
     type: "empty",
   };
+}
+
+function getNodeKey(node: VNode | BNode): NodeKey | undefined {
+  if (
+    node.type === "tag" ||
+    node.type === "custom" ||
+    node.type === "fragment"
+  ) {
+    return node.key;
+  }
+  return;
 }
 
 //
@@ -238,24 +287,26 @@ export function h(
   inProps: Props,
   ...children: ComponentChild[]
 ): VNode {
+  const child: VNode =
+    children.length === 0
+      ? emptyNode()
+      : {
+          type: "fragment",
+          children: children.map((c) => hComponentChild(c)),
+        };
+
   const { key, ...props } = inProps as { key?: NodeKey };
+
   if (typeof t === "string") {
     return {
       type: "tag",
       name: t,
       key,
       props,
-      child: {
-        type: "fragment",
-        children: children.map((c) => hComponentChild(c)),
-      },
+      child,
     };
   } else if (t === Fragment) {
-    return {
-      type: "fragment",
-      key,
-      children: children.map((c) => hComponentChild(c)),
-    };
+    return child;
   } else if (typeof t === "function") {
     return {
       type: "custom",

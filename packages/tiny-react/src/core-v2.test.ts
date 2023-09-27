@@ -1,5 +1,6 @@
+import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
-import { type VNode, h, reconcile, render } from "./core-v2";
+import { Fragment, type VNode, h, reconcile, render } from "./core-v2";
 
 describe(reconcile, () => {
   it("basic", () => {
@@ -194,9 +195,105 @@ describe(reconcile, () => {
   });
 });
 
+describe("children-key", () => {
+  it("basic", () => {
+    const keys = [..."abcde"];
+    const vnode = h(
+      Fragment,
+      {},
+      ...keys.map((key) => h("span", { key, "data-prop": key }))
+    );
+    const parent = document.createElement("main");
+
+    // initial render
+    const bnode = render(vnode, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <span
+          data-prop="a"
+        />
+        <span
+          data-prop="b"
+        />
+        <span
+          data-prop="c"
+        />
+        <span
+          data-prop="d"
+        />
+        <span
+          data-prop="e"
+        />
+      </main>
+    `);
+
+    // mutate dom
+    parent.childNodes.forEach((node) => {
+      tinyassert(node instanceof HTMLElement);
+      node.dataset["mutate"] = node.dataset["prop"];
+    });
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <span
+          data-mutate="a"
+          data-prop="a"
+        />
+        <span
+          data-mutate="b"
+          data-prop="b"
+        />
+        <span
+          data-mutate="c"
+          data-prop="c"
+        />
+        <span
+          data-mutate="d"
+          data-prop="d"
+        />
+        <span
+          data-mutate="e"
+          data-prop="e"
+        />
+      </main>
+    `);
+
+    // reverse input order of vnode
+    tinyassert(vnode.type === "fragment");
+    vnode.children.reverse();
+
+    // re-render should keep mutated dom
+    reconcile(vnode, bnode, parent);
+
+    // TODO: reconcilation still needs to mutate parent to re-order
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <span
+          data-mutate="a"
+          data-prop="a"
+        />
+        <span
+          data-mutate="b"
+          data-prop="b"
+        />
+        <span
+          data-mutate="c"
+          data-prop="c"
+        />
+        <span
+          data-mutate="d"
+          data-prop="d"
+        />
+        <span
+          data-mutate="e"
+          data-prop="e"
+        />
+      </main>
+    `);
+  });
+});
+
 describe(h, () => {
   it("basic", () => {
-    h("div", {});
     const parent = document.createElement("main");
     function Custom(props: any) {
       return h("input", { placeholder: props.value });
