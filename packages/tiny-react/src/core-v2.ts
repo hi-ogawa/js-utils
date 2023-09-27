@@ -128,15 +128,7 @@ function moveBnodesByKey(
     }
   });
 
-  // align length for simplicity (we could optimize by dealing with array with holes?)
-  if (bchildren.length < vchildren.length) {
-    bchildren.push(
-      ...range(vchildren.length - bchildren.length).map(() => emptyNode())
-    );
-  }
-
   let moves: [number, number][] = [];
-
   vchildren.forEach((vchild, i) => {
     const vkey = getNodeKey(vchild);
     if (typeof vkey !== "undefined") {
@@ -149,6 +141,7 @@ function moveBnodesByKey(
 
   const oldChildren = [...bchildren];
   for (const [j, i] of moves) {
+    // this swap migth create "empty holes" in `bchildren` when `bchildren.length < vchildren.length`
     bchildren[i] = oldChildren[j];
   }
 
