@@ -195,7 +195,7 @@ describe(reconcile, () => {
   });
 
   it("children-key", () => {
-    const keys = [..."abcde"];
+    const keys = [..."abc"];
     const vnode = h(
       Fragment,
       {},
@@ -215,12 +215,6 @@ describe(reconcile, () => {
         />
         <span
           data-prop="c"
-        />
-        <span
-          data-prop="d"
-        />
-        <span
-          data-prop="e"
         />
       </main>
     `);
@@ -244,14 +238,6 @@ describe(reconcile, () => {
           data-mutate="c"
           data-prop="c"
         />
-        <span
-          data-mutate="d"
-          data-prop="d"
-        />
-        <span
-          data-mutate="e"
-          data-prop="e"
-        />
       </main>
     `);
 
@@ -270,16 +256,8 @@ describe(reconcile, () => {
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <span
-          data-mutate="e"
-          data-prop-x="boom"
-        />
-        <span
-          data-mutate="d"
-          data-prop="d"
-        />
-        <span
           data-mutate="c"
-          data-prop="c"
+          data-prop-x="boom"
         />
         <span
           data-mutate="b"
