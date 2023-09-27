@@ -121,30 +121,30 @@ export function reconcile(
 }
 
 function moveBnodesByKey(
-  vchildren: VNode[],
-  bchildren: BNode[] // mutated
+  vnodes: VNode[],
+  bnodes: BNode[] // mutated
 ) {
-  const keyToIndex = new Map<NodeKey, number>();
-  bchildren.forEach((bchild, i) => {
-    const bkey = getNodeKey(bchild);
+  const bKeyToIndex = new Map<NodeKey, number>();
+  bnodes.forEach((bnode, i) => {
+    const bkey = getNodeKey(bnode);
     if (typeof bkey !== "undefined") {
-      keyToIndex.set(bkey, i);
+      bKeyToIndex.set(bkey, i);
     }
   });
 
-  // fill bnodes to ensure bchildren.length >= vchildren.length
-  vchildren.forEach((_v, i) => {
-    bchildren[i] ??= emptyNode();
+  // fill bnodes to ensure bnodes.length >= vnodes.length
+  vnodes.forEach((_v, i) => {
+    bnodes[i] ??= emptyNode();
   });
 
-  const oldChildren = [...bchildren];
+  const oldBnodes = [...bnodes];
 
-  vchildren.forEach((vchild, i) => {
-    const vkey = getNodeKey(vchild);
+  vnodes.forEach((vnode, i) => {
+    const vkey = getNodeKey(vnode);
     if (typeof vkey !== "undefined") {
-      const j = keyToIndex.get(vkey);
+      const j = bKeyToIndex.get(vkey);
       if (typeof j !== "undefined" && i !== j) {
-        bchildren[i] = oldChildren[j];
+        bnodes[i] = oldBnodes[j];
       }
     }
   });
