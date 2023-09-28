@@ -4,7 +4,8 @@ import { tinyassert } from "@hiogawa/utils";
 // https://github.com/yewstack/yew
 
 // TODO:
-// - re-render scheduling
+// - custom component re-rendering
+// - rework slot?
 // - hook
 
 export function render(vnode: VNode, parent: HNode) {
@@ -16,6 +17,7 @@ export function reconcile(
   vnode: VNode,
   bnode: BNode, // mutated
   // insert via `parent.insertBefore(..., slot?.nextSibling ?? null)`
+  // undefined slot means it should be
   parent: HNode,
   slot?: HNode
 ): BNode {
@@ -120,6 +122,14 @@ export function reconcile(
     }
   }
   return bnode;
+}
+
+triggerReconcileCustom;
+function triggerReconcileCustom(vnode: VCustom, bnode: BCustom, parent: HNode) {
+  // TODO: need to propagete new bnode.slot back to ancestor bnodes
+  vnode;
+  bnode.slot;
+  parent;
 }
 
 function moveBnodesByKey(
@@ -236,7 +246,7 @@ type HTag = Element;
 type HText = Text;
 
 //
-// virtual node
+// virtual node (immutable)
 //
 
 // TODO: optimize object shape?
