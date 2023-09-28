@@ -13,6 +13,7 @@ export function render(vnode: VNode, parent: HNode) {
   return bnode;
 }
 
+// returns bnode object with same identity when vnode is reconciled over the same bnode
 export function reconcile(
   vnode: VNode,
   bnode: BNode, // mutated
@@ -143,17 +144,12 @@ function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
   // traverse ancestors to find "slot"
   const preSlot = findPreviousSlot(bnode);
   const newBnode = reconcile(vnode, bnode, bnode.hparent, preSlot);
+  tinyassert(newBnode === bnode); // reconciled over itself without unmount
 
-  // TODO
-  // traverse ancestors again to fix up new `bnode.slot`?
-  const newSlot = getSlot(newBnode);
-  if (newSlot !== oldSlot) {
-    if (newSlot && oldSlot) {
-    }
-    if (newSlot && !oldSlot) {
-    }
-    if (!newSlot && oldSlot) {
-    }
+  // fix up ancestors slot
+  const newSlot = getSlot(bnode);
+  if (oldSlot !== newSlot) {
+    updateParentSlot(bnode);
   }
 }
 
@@ -161,8 +157,11 @@ function findPreviousSlot(child: BNode): HNode | undefined {
   let parent = child.parent;
   while (parent) {
     if (parent.type === "tag") {
-      // child is first within parent tag
+      // no slot since child is first within parent tag
       return;
+    }
+    if (parent.type === "custom") {
+      // simply go up for custom
     }
     if (parent.type === "fragment") {
       // TODO: faster look up within BFragment.children?
@@ -176,6 +175,25 @@ function findPreviousSlot(child: BNode): HNode | undefined {
     parent = child.parent;
   }
   return;
+}
+
+function updateParentSlot(child: BNode) {
+  let parent = child.parent;
+  while (parent) {
+    if (parent.type === "tag") {
+      return;
+    }
+    if (parent.type === "custom") {
+      parent.slot = getSlot(child);
+    }
+    if (parent.type === "fragment") {
+      // TODO: need to traverse all?
+      const i = parent.children.indexOf(child);
+      tinyassert(i >= 0);
+    }
+    child = parent;
+    parent = child.parent;
+  }
 }
 
 function moveBnodesByKey(
@@ -342,7 +360,9 @@ type BNodeParent = BTag | BCustom | BFragment;
 
 type BEmpty = VEmpty & {
   parent?: BNodeParent;
-  slot?: HNode; // probably not needed but it simplifies fragment children reconcilation
+  // probably not needed but it simplifies fragment children reconcilation
+  // TODO: this probably gets stale during self-reconcilation so better to avoid it
+  slot?: HNode;
 };
 
 type BTag = Omit<VTag, "child"> & {
@@ -389,6 +409,7 @@ function getNodeKey(node: VNode | BNode): NodeKey | undefined {
 
 // BNode slot holds last HNode up to itself within the same parent
 // i.e. next BNode should follow the slot
+// TOOD: make it defined only when BNode includes HNode within it?
 function getSlot(node: BNode): HNode | undefined {
   if (node.type === "tag" || node.type === "text") {
     return node.hnode;
