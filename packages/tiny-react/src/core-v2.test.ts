@@ -217,6 +217,7 @@ describe(reconcile, () => {
           "hooks": [],
           "initial": false,
           "notify": [Function],
+          "useReducer": [Function],
           "useState": [Function],
         },
         "hparent": <main>

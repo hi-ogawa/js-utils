@@ -117,8 +117,8 @@ export function reconcile(
       bnode.child.parent = bnode;
       bnode.slot = getSlot(bnode.child);
 
-      // expose "forceUpdate" via props
-      // (don't have to support setState while render)
+      // expose re-rendering trigger via hooks
+      // (this doesn't support setState while render)
       const vcustom = vnode;
       const bcustom = bnode;
       function forceUpdate() {

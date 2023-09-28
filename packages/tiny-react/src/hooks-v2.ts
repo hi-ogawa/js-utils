@@ -7,6 +7,7 @@ type ReducerHookState = {
   state: unknown;
 };
 
+// TODO
 type EffectHookState = {
   type: "effect";
 };
@@ -37,6 +38,14 @@ export class HookContext {
   //
 
   useState = <T>(initialState: T) => {
+    return this.useReducer<T, T>((_prev, next) => next, initialState);
+  };
+
+  useReducer = <S, A>(
+    reducer: (prevState: S, action: A) => S,
+    initialState: S
+  ) => {
+    // get or create hook state
     if (this.initial) {
       this.hooks.push({
         type: "reducer",
@@ -47,21 +56,27 @@ export class HookContext {
     tinyassert(hookToCheck.type === "reducer");
     const hook = hookToCheck;
 
-    const state = hook.state as T;
-    const setState = (next: T) => {
-      hook.state = next;
+    // reducer
+    const state = hook.state as S;
+    const dispatch = (next: A) => {
+      hook.state = reducer(state, next);
       this.notify();
     };
-    return [state, setState] as const;
+    return [state, dispatch] as const;
   };
 }
 
-export const useState = expose(() => {
+export const useState = lazyExpose(() => {
   tinyassert(HookContext.current);
   return HookContext.current.useState;
 });
 
-function expose<F extends (...args: any[]) => any>(getF: () => F): F {
+export const useReducer = lazyExpose(() => {
+  tinyassert(HookContext.current);
+  return HookContext.current.useReducer;
+});
+
+function lazyExpose<F extends (...args: any[]) => any>(getF: () => F): F {
   return new Proxy(() => {}, {
     apply(_target, thisArg, argArray) {
       return getF().apply(thisArg, argArray);
