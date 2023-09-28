@@ -27,7 +27,6 @@ export function reconcile(
         unmount(bnode);
         bnode = { ...vnode };
       }
-      bnode.slot = slot;
       break;
     }
     case "tag": {
@@ -90,7 +89,7 @@ export function reconcile(
           parent,
           slot
         );
-        slot = getSlot(bchild);
+        slot = getSlotForNext(bchild, slot);
         bchild.parent = bnode;
         bnode.children[i] = bchild;
       }
@@ -157,20 +156,27 @@ function findPreviousSlot(child: BNode): HNode | undefined {
   let parent = child.parent;
   while (parent) {
     if (parent.type === "tag") {
-      // no slot since child is first within parent tag
+      // no slot i.e. child is first within parent tag
       return;
     }
-    if (parent.type === "custom") {
-      // simply go up for custom
-    }
     if (parent.type === "fragment") {
-      // TODO: faster look up within BFragment.children?
-      const i = parent.children.indexOf(child);
-      tinyassert(i >= 0);
-      if (i > 0) {
-        return getSlot(parent.children[i - 1]);
+      // TODO
+      // need faster look up within BFragment.children?
+      // though this wouldn't be so bad practically since we traverse up to only first BTag ancestor
+      let slot: HNode | undefined;
+      for (const c of parent.children) {
+        if (c === child) {
+          // otherwise it didn't find previous slot within the fragment
+          // so give up and go up to next parent
+          if (slot) {
+            return slot;
+          }
+          break;
+        }
+        slot = getSlotForNext(c, slot);
       }
     }
+    // go up to parent also when parent.type === "custom"
     child = parent;
     parent = child.parent;
   }
@@ -187,9 +193,12 @@ function updateParentSlot(child: BNode) {
       parent.slot = getSlot(child);
     }
     if (parent.type === "fragment") {
-      // TODO: need to traverse all?
-      const i = parent.children.indexOf(child);
-      tinyassert(i >= 0);
+      // TODO: could optimize something?
+      let slot: HNode | undefined;
+      for (const c of parent.children) {
+        slot = getSlotForNext(c, slot);
+      }
+      parent.slot = slot;
     }
     child = parent;
     parent = child.parent;
@@ -360,9 +369,6 @@ type BNodeParent = BTag | BCustom | BFragment;
 
 type BEmpty = VEmpty & {
   parent?: BNodeParent;
-  // probably not needed but it simplifies fragment children reconcilation
-  // TODO: this probably gets stale during self-reconcilation so better to avoid it
-  slot?: HNode;
 };
 
 type BTag = Omit<VTag, "child"> & {
@@ -387,7 +393,7 @@ type BCustom = VCustom & {
 type BFragment = Omit<VFragment, "children"> & {
   parent?: BNodeParent;
   children: BNode[];
-  slot?: HNode;
+  slot?: HNode; // last HNode included inside the subtree
 };
 
 function emptyNode(): VNode & BNode {
@@ -407,14 +413,24 @@ function getNodeKey(node: VNode | BNode): NodeKey | undefined {
   return;
 }
 
-// BNode slot holds last HNode up to itself within the same parent
-// i.e. next BNode should follow the slot
-// TOOD: make it defined only when BNode includes HNode within it?
+// slot is last HNode inside BNode subtree if any
 function getSlot(node: BNode): HNode | undefined {
+  if (node.type === "empty") {
+    return;
+  }
   if (node.type === "tag" || node.type === "text") {
     return node.hnode;
   }
-  return node.slot; // TODO: rename to "node.last" or "node.nextSlot"?
+  return node.slot;
+}
+
+// convenient wrapper to progress slot while looping children
+function getSlotForNext(
+  node: BNode,
+  preSlot: HNode | undefined
+): HNode | undefined {
+  const slot = getSlot(node);
+  return slot ? slot : preSlot;
 }
 
 //
