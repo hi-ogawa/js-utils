@@ -10,7 +10,12 @@ type ReducerHookState = {
 // TODO
 type EffectHookState = {
   type: "effect";
+  effect: EffectFn;
+  deps?: unknown[];
+  cleanup?: () => void;
 };
+
+type EffectFn = () => (() => void) | void;
 
 export class HookContext {
   // expose global
@@ -63,6 +68,39 @@ export class HookContext {
       this.notify();
     };
     return [state, dispatch] as const;
+  };
+
+  useEffect = (effect: EffectFn, deps?: unknown[]) => {
+    // get or create hook state
+    if (this.initial) {
+      this.hooks.push({
+        type: "effect",
+        effect,
+        deps,
+      });
+    }
+    const hookToCheck = this.hooks[this.hookCount++];
+    tinyassert(hookToCheck.type === "effect");
+    const hook = hookToCheck;
+
+    // enqueue effect
+    tinyassert(hook.deps?.length === deps?.length);
+    if (!this.initial) {
+      // enqueue
+    }
+
+    function runEffect() {
+      const cleanup = hook.effect();
+      if (cleanup) {
+        hook.cleanup = cleanup;
+      }
+    }
+
+    // enqueueEffectCleanup
+    hook.deps;
+    deps;
+    effect;
+    deps;
   };
 }
 

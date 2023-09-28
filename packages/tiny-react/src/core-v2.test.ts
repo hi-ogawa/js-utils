@@ -217,6 +217,7 @@ describe(reconcile, () => {
           "hooks": [],
           "initial": false,
           "notify": [Function],
+          "useEffect": [Function],
           "useReducer": [Function],
           "useState": [Function],
         },
