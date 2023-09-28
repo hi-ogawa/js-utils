@@ -16,8 +16,8 @@ export function render(vnode: VNode, parent: HNode) {
 export function reconcile(
   vnode: VNode,
   bnode: BNode, // mutated
-  parent: HNode,
-  slot?: HNode
+  parent: HNode, // rename to hparent?
+  slot?: HNode // rename to preSlot?
 ): BNode {
   switch (vnode.type) {
     case "empty": {
@@ -48,6 +48,7 @@ export function reconcile(
         reconcileTagProps(bnode, vnode.props, {});
         placeChild(bnode.hnode, parent, slot, true);
       }
+      bnode.child.parent = bnode;
       break;
     }
     case "text": {
@@ -81,16 +82,17 @@ export function reconcile(
         unmount(bchild);
       }
       // reconcile vnode.children
-      bnode.children = vnode.children.map((vchild, i) => {
+      for (let i = 0; i < vnode.children.length; i++) {
         const bchild = reconcile(
-          vchild,
+          vnode.children[i],
           bchildren[i] ?? emptyNode(),
           parent,
           slot
         );
         slot = getSlot(bchild);
-        return bchild;
-      });
+        bchild.parent = bnode;
+        bnode.children[i] = bchild;
+      }
       bnode.slot = slot;
       break;
     }
@@ -104,13 +106,14 @@ export function reconcile(
         const vchild = vnode.render(vnode.props);
         bnode.child = reconcile(vchild, bnode.child, parent, slot);
         bnode.props = vnode.props;
-        bnode.parent = parent;
+        bnode.hparent = parent;
       } else {
         unmount(bnode);
         const vchild = vnode.render(vnode.props);
         const child = reconcile(vchild, emptyNode(), parent, slot);
-        bnode = { ...vnode, child, parent } satisfies BCustom;
+        bnode = { ...vnode, child, hparent: parent } satisfies BCustom;
       }
+      bnode.child.parent = bnode;
       bnode.slot = getSlot(bnode.child);
       break;
     }
@@ -135,12 +138,44 @@ function placeChild(
 // aka. re-rendering custom component
 selfReconcileCustom;
 function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
-  // TODO: need to propagete new `bnode.slot` back to ancestor bnodes
-  vnode;
-  bnode.slot;
-  bnode.parent;
-  const bnodeNext = reconcile(vnode, bnode, bnode.parent, bnode.slot);
-  bnodeNext.type;
+  const oldSlot = getSlot(bnode);
+
+  // traverse ancestors to find "slot"
+  const preSlot = findPreviousSlot(bnode);
+  const newBnode = reconcile(vnode, bnode, bnode.hparent, preSlot);
+
+  // TODO
+  // traverse ancestors again to fix up new `bnode.slot`?
+  const newSlot = getSlot(newBnode);
+  if (newSlot !== oldSlot) {
+    if (newSlot && oldSlot) {
+    }
+    if (newSlot && !oldSlot) {
+    }
+    if (!newSlot && oldSlot) {
+    }
+  }
+}
+
+function findPreviousSlot(child: BNode): HNode | undefined {
+  let parent = child.parent;
+  while (parent) {
+    if (parent.type === "tag") {
+      // child is first within parent tag
+      return;
+    }
+    if (parent.type === "fragment") {
+      // TODO: faster look up within BFragment.children?
+      const i = parent.children.indexOf(child);
+      tinyassert(i >= 0);
+      if (i > 0) {
+        return getSlot(parent.children[i - 1]);
+      }
+    }
+    child = parent;
+    parent = child.parent;
+  }
+  return;
 }
 
 function moveBnodesByKey(
@@ -303,27 +338,34 @@ type VFragment = {
 
 type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
+type BNodeParent = BTag | BCustom | BFragment;
+
 type BEmpty = VEmpty & {
+  parent?: BNodeParent;
   slot?: HNode; // probably not needed but it simplifies fragment children reconcilation
 };
 
 type BTag = Omit<VTag, "child"> & {
+  parent?: BNodeParent;
   child: BNode;
   hnode: HTag;
   listeners: Map<string, () => void>;
 };
 
 type BText = VText & {
+  parent?: BNodeParent;
   hnode: HText;
 };
 
 type BCustom = VCustom & {
+  parent?: BNodeParent;
   child: BNode;
   slot?: HNode;
-  parent: HNode; // need back pointer for self re-rendering?
+  hparent: HNode; // need back pointer for self re-rendering?
 };
 
 type BFragment = Omit<VFragment, "children"> & {
+  parent?: BNodeParent;
   children: BNode[];
   slot?: HNode;
 };
@@ -351,7 +393,7 @@ function getSlot(node: BNode): HNode | undefined {
   if (node.type === "tag" || node.type === "text") {
     return node.hnode;
   }
-  return node.slot;
+  return node.slot; // TODO: rename to "node.last" or "node.nextSlot"?
 }
 
 //

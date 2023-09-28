@@ -50,12 +50,14 @@ describe(reconcile, () => {
             {
               "data": "hello",
               "hnode": hello,
+              "parent": [Circular],
               "type": "text",
             },
             {
               "child": {
                 "data": "world",
                 "hnode": world,
+                "parent": [Circular],
                 "type": "text",
               },
               "hnode": <span
@@ -65,12 +67,14 @@ describe(reconcile, () => {
               </span>,
               "listeners": Map {},
               "name": "span",
+              "parent": [Circular],
               "props": {
                 "class": "text-red",
               },
               "type": "tag",
             },
           ],
+          "parent": [Circular],
           "slot": <span
             class="text-red"
           >
@@ -118,6 +122,7 @@ describe(reconcile, () => {
         "child": {
           "data": "reconcile",
           "hnode": reconcile,
+          "parent": [Circular],
           "type": "text",
         },
         "hnode": <div
@@ -176,6 +181,7 @@ describe(reconcile, () => {
               "child": {
                 "data": "hello",
                 "hnode": hello,
+                "parent": [Circular],
                 "type": "text",
               },
               "hnode": <span>
@@ -183,19 +189,22 @@ describe(reconcile, () => {
               </span>,
               "listeners": Map {},
               "name": "span",
+              "parent": [Circular],
               "props": {},
               "type": "tag",
             },
             {
               "data": "world",
               "hnode": world,
+              "parent": [Circular],
               "type": "text",
             },
           ],
+          "parent": [Circular],
           "slot": world,
           "type": "fragment",
         },
-        "parent": <main>
+        "hparent": <main>
           <span>
             hello
           </span>
