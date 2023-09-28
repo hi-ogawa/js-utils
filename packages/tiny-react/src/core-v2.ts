@@ -16,8 +16,6 @@ export function render(vnode: VNode, parent: HNode) {
 export function reconcile(
   vnode: VNode,
   bnode: BNode, // mutated
-  // insert via `parent.insertBefore(..., slot?.nextSibling ?? null)`
-  // undefined slot means it should be
   parent: HNode,
   slot?: HNode
 ): BNode {
@@ -40,9 +38,7 @@ export function reconcile(
         reconcileTagProps(bnode, vnode.props, bnode.props);
         bnode.props = vnode.props;
         bnode.child = reconcile(vnode.child, bnode.child, bnode.hnode);
-        if (slot !== bnode.hnode.previousSibling) {
-          parent.insertBefore(bnode.hnode, slot?.nextSibling ?? null);
-        }
+        placeChild(bnode.hnode, parent, slot, false);
       } else {
         unmount(bnode);
         // TODO: ref effect
@@ -50,7 +46,7 @@ export function reconcile(
         const child = reconcile(vnode.child, emptyNode(), hnode);
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
         reconcileTagProps(bnode, vnode.props, {});
-        parent.insertBefore(hnode, slot?.nextSibling ?? null);
+        placeChild(bnode.hnode, parent, slot, true);
       }
       break;
     }
@@ -60,14 +56,12 @@ export function reconcile(
           bnode.hnode.data = vnode.data;
           bnode.data = vnode.data;
         }
-        if (slot !== bnode.hnode.previousSibling) {
-          parent.insertBefore(bnode.hnode, slot?.nextSibling ?? null);
-        }
+        placeChild(bnode.hnode, parent, slot, false);
       } else {
         unmount(bnode);
         const hnode = document.createTextNode(vnode.data);
-        parent.insertBefore(hnode, slot?.nextSibling ?? null);
         bnode = { ...vnode, hnode } satisfies BText;
+        placeChild(bnode.hnode, parent, slot, true);
       }
       break;
     }
@@ -124,9 +118,23 @@ export function reconcile(
   return bnode;
 }
 
+// `node` is positioned after `slot` within `parent`
+function placeChild(
+  node: HNode,
+  parent: HNode,
+  slot: HNode | undefined,
+  init: boolean
+) {
+  // TODO: too much dom property access?
+  const slotNext = slot ? slot.nextSibling : parent.firstChild;
+  if (init || !(node === slotNext || node.nextSibling === slotNext)) {
+    parent.insertBefore(node, slotNext);
+  }
+}
+
 triggerReconcileCustom;
 function triggerReconcileCustom(vnode: VCustom, bnode: BCustom, parent: HNode) {
-  // TODO: need to propagete new bnode.slot back to ancestor bnodes
+  // TODO: need to propagete new `bnode.slot` back to ancestor bnodes
   vnode;
   bnode.slot;
   parent;
