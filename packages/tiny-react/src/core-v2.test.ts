@@ -8,7 +8,7 @@ import {
   render,
   selfReconcileCustom,
 } from "./core-v2";
-import { hooks } from "./hooks-v2";
+import { useState } from "./hooks-v2";
 
 describe(reconcile, () => {
   it("basic", () => {
@@ -504,7 +504,7 @@ describe(selfReconcileCustom, () => {
 describe("hooks", () => {
   it("basic", () => {
     function Custom() {
-      const [state, setState] = hooks.useState(0);
+      const [state, setState] = useState(0);
       return h(
         "div",
         {},

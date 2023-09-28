@@ -12,6 +12,9 @@ type EffectHookState = {
 };
 
 export class HookContext {
+  // expose global
+  static current: HookContext | undefined;
+
   private initial = true;
   private hookCount = 0;
   private hooks: HookState[] = [];
@@ -19,13 +22,13 @@ export class HookContext {
   constructor(private notify: () => void) {}
 
   wrap<T>(f: () => T): T {
-    current = this;
+    HookContext.current = this;
     this.hookCount = 0;
     try {
       return f();
     } finally {
       this.initial = false;
-      current = undefined!;
+      HookContext.current = undefined!;
     }
   }
 
@@ -53,12 +56,15 @@ export class HookContext {
   };
 }
 
-// expose global state
-let current: HookContext | undefined;
+export const useState = expose(() => {
+  tinyassert(HookContext.current);
+  return HookContext.current.useState;
+});
 
-export const hooks = {
-  get useState() {
-    tinyassert(current);
-    return current.useState;
-  },
-};
+function expose<F extends (...args: any[]) => any>(getF: () => F): F {
+  return new Proxy(() => {}, {
+    apply(_target, thisArg, argArray) {
+      return getF().apply(thisArg, argArray);
+    },
+  }) as F;
+}
