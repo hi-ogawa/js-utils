@@ -50,7 +50,7 @@ export class HookContext {
     reducer: (prevState: S, action: A) => S,
     initialState: S
   ) => {
-    // get or create hook state
+    // init hook state
     if (this.initial) {
       this.hooks.push({
         type: "reducer",
@@ -71,7 +71,7 @@ export class HookContext {
   };
 
   useEffect = (effect: EffectFn, deps?: unknown[]) => {
-    // get or create hook state
+    // init hook state
     if (this.initial) {
       this.hooks.push({
         type: "effect",
@@ -83,10 +83,10 @@ export class HookContext {
     tinyassert(hookToCheck.type === "effect");
     const hook = hookToCheck;
 
-    // enqueue effect
+    // TODO: handle deps
     tinyassert(hook.deps?.length === deps?.length);
-    if (!this.initial) {
-      // enqueue
+    if (!this.initial && !(hook.deps && deps && isEqualShallow(hook.deps, deps))) {
+      // cleanup old effect
     }
 
     function runEffect() {
@@ -95,12 +95,6 @@ export class HookContext {
         hook.cleanup = cleanup;
       }
     }
-
-    // enqueueEffectCleanup
-    hook.deps;
-    deps;
-    effect;
-    deps;
   };
 }
 
@@ -120,4 +114,8 @@ function lazyExpose<F extends (...args: any[]) => any>(getF: () => F): F {
       return getF().apply(thisArg, argArray);
     },
   }) as F;
+}
+
+function isEqualShallow(xs: unknown[], ys: unknown[]) {
+  return xs.length === ys.length && xs.every((x, i) => x === ys[i])
 }
