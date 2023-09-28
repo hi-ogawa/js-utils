@@ -1,6 +1,13 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
-import { Fragment, type VNode, h, reconcile, render } from "./core-v2";
+import {
+  Fragment,
+  type VNode,
+  h,
+  reconcile,
+  render,
+  selfReconcileCustom,
+} from "./core-v2";
 
 describe(reconcile, () => {
   it("basic", () => {
@@ -388,6 +395,101 @@ describe(reconcile, () => {
     bnode = reconcile(vnode, bnode, parent);
     (parent.firstChild as HTMLElement).click();
     expect(mockFn.mock.calls).toMatchInlineSnapshot("[]");
+  });
+});
+
+describe(selfReconcileCustom, () => {
+  it("basic", () => {
+    let vnode = {
+      type: "fragment",
+      children: [
+        {
+          type: "custom",
+          props: {
+            tag: "div",
+          },
+          render: (props: any) => h(props.tag, {}, "x"),
+        },
+        {
+          type: "custom",
+          props: {
+            tag: "span",
+          },
+          render: (props: any) => h(props.tag, {}, "y"),
+        },
+      ],
+    } satisfies VNode;
+    const parent = document.createElement("main");
+
+    let bnode = reconcile(vnode, { type: "empty" }, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          x
+        </div>
+        <span>
+          y
+        </span>
+      </main>
+    `);
+    tinyassert(bnode.type === "fragment");
+    expect(bnode.slot).toMatchInlineSnapshot(`
+      <span>
+        y
+      </span>
+    `);
+
+    tinyassert(bnode.children[0].type === "custom");
+    selfReconcileCustom(
+      {
+        ...vnode.children[0],
+        props: {
+          tag: "p",
+        },
+      },
+      bnode.children[0]
+    );
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <p>
+          x
+        </p>
+        <span>
+          y
+        </span>
+      </main>
+    `);
+    expect(bnode.slot).toMatchInlineSnapshot(`
+      <span>
+        y
+      </span>
+    `);
+
+    tinyassert(bnode.children[1].type === "custom");
+    selfReconcileCustom(
+      {
+        ...vnode.children[1],
+        props: {
+          tag: "b",
+        },
+      },
+      bnode.children[1]
+    );
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <p>
+          x
+        </p>
+        <b>
+          y
+        </b>
+      </main>
+    `);
+    expect(bnode.slot).toMatchInlineSnapshot(`
+      <b>
+        y
+      </b>
+    `);
   });
 });
 

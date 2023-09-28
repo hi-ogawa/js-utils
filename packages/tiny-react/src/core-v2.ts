@@ -9,8 +9,7 @@ import { tinyassert } from "@hiogawa/utils";
 // - hook
 
 export function render(vnode: VNode, parent: HNode) {
-  const bnode = reconcile(vnode, emptyNode(), parent);
-  return bnode;
+  return reconcile(vnode, emptyNode(), parent);
 }
 
 // returns bnode object with same identity when vnode is reconciled over the same bnode
@@ -136,12 +135,13 @@ function placeChild(
 }
 
 // aka. re-rendering custom component
-selfReconcileCustom;
-function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
+export function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
   const oldSlot = getSlot(bnode);
 
   // traverse ancestors to find "slot"
   const preSlot = findPreviousSlot(bnode);
+
+  // reconcile
   const newBnode = reconcile(vnode, bnode, bnode.hparent, preSlot);
   tinyassert(newBnode === bnode); // reconciled over itself without unmount
 
