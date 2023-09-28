@@ -4,7 +4,7 @@ import { tinyassert } from "@hiogawa/utils";
 // https://github.com/yewstack/yew
 
 // TODO:
-// - trigger update dispatch (self-reconcilation)
+// - schedule re-render
 // - state hook
 // - effect hook (ref, mount, unmount)
 
@@ -103,18 +103,25 @@ export function reconcile(
         bnode.key === vnode.key &&
         bnode.render === vnode.render
       ) {
-        const vchild = vnode.render(vnode.props);
+        const vchild = vnode.render({ ...vnode.props, forceUpdate });
         bnode.child = reconcile(vchild, bnode.child, hparent, preSlot);
         bnode.props = vnode.props;
         bnode.hparent = hparent;
       } else {
         unmount(bnode);
-        const vchild = vnode.render(vnode.props);
+        const vchild = vnode.render({ ...vnode.props, forceUpdate });
         const child = reconcile(vchild, emptyNode(), hparent, preSlot);
         bnode = { ...vnode, child, hparent } satisfies BCustom;
       }
       bnode.child.parent = bnode;
       bnode.slot = getSlot(bnode.child);
+
+      // expose "forceUpdate" via props
+      const vcustom = vnode;
+      const bcustom = bnode;
+      function forceUpdate() {
+        selfReconcileCustom(vcustom, bcustom);
+      }
       break;
     }
   }

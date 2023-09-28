@@ -493,6 +493,63 @@ describe(selfReconcileCustom, () => {
   });
 });
 
+describe("forceUpdate", () => {
+  it("basic", () => {
+    let i = 0;
+
+    function Custom(props: any) {
+      return h(
+        "div",
+        {},
+        h(i % 2 === 0 ? "span" : "div", {}, i),
+        h("button", {
+          onClick: () => {
+            i++;
+            props.forceUpdate();
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    render(h(Custom, {}), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            0
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            1
+          </div>
+          <button />
+        </div>
+      </main>
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            2
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+  });
+});
+
 describe(h, () => {
   it("basic", () => {
     const parent = document.createElement("main");
