@@ -132,12 +132,15 @@ function placeChild(
   }
 }
 
-triggerReconcileCustom;
-function triggerReconcileCustom(vnode: VCustom, bnode: BCustom, parent: HNode) {
+// aka. re-rendering custom component
+selfReconcileCustom;
+function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
   // TODO: need to propagete new `bnode.slot` back to ancestor bnodes
   vnode;
   bnode.slot;
-  parent;
+  bnode.parent;
+  const bnodeNext = reconcile(vnode, bnode, bnode.parent, bnode.slot);
+  bnodeNext.type;
 }
 
 function moveBnodesByKey(
@@ -301,7 +304,7 @@ type VFragment = {
 type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
 type BEmpty = VEmpty & {
-  slot?: HNode;
+  slot?: HNode; // probably not needed but it simplifies fragment children reconcilation
 };
 
 type BTag = Omit<VTag, "child"> & {
@@ -342,6 +345,8 @@ function getNodeKey(node: VNode | BNode): NodeKey | undefined {
   return;
 }
 
+// BNode slot holds last HNode up to itself within the same parent
+// i.e. next BNode should follow the slot
 function getSlot(node: BNode): HNode | undefined {
   if (node.type === "tag" || node.type === "text") {
     return node.hnode;
