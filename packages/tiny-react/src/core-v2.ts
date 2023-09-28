@@ -4,20 +4,21 @@ import { tinyassert } from "@hiogawa/utils";
 // https://github.com/yewstack/yew
 
 // TODO:
-// - custom component re-rendering
-// - rework slot?
-// - hook
+// - trigger update dispatch (self-reconcilation)
+// - state hook
+// - effect hook (ref, mount, unmount)
 
 export function render(vnode: VNode, parent: HNode) {
   return reconcile(vnode, emptyNode(), parent);
 }
 
-// returns bnode object with same identity when vnode is reconciled over the same bnode
+// returns bnode with same object identity when vnode is reconciled over the same bnode
+// in which case bnode input is mutated.
 export function reconcile(
   vnode: VNode,
   bnode: BNode, // mutated
-  parent: HNode, // rename to hparent?
-  slot?: HNode // rename to preSlot?
+  hparent: HNode,
+  preSlot?: HNode
 ): BNode {
   switch (vnode.type) {
     case "empty": {
@@ -37,7 +38,7 @@ export function reconcile(
         reconcileTagProps(bnode, vnode.props, bnode.props);
         bnode.props = vnode.props;
         bnode.child = reconcile(vnode.child, bnode.child, bnode.hnode);
-        placeChild(bnode.hnode, parent, slot, false);
+        placeChild(bnode.hnode, hparent, preSlot, false);
       } else {
         unmount(bnode);
         // TODO: ref effect
@@ -45,7 +46,7 @@ export function reconcile(
         const child = reconcile(vnode.child, emptyNode(), hnode);
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
         reconcileTagProps(bnode, vnode.props, {});
-        placeChild(bnode.hnode, parent, slot, true);
+        placeChild(bnode.hnode, hparent, preSlot, true);
       }
       bnode.child.parent = bnode;
       break;
@@ -56,12 +57,12 @@ export function reconcile(
           bnode.hnode.data = vnode.data;
           bnode.data = vnode.data;
         }
-        placeChild(bnode.hnode, parent, slot, false);
+        placeChild(bnode.hnode, hparent, preSlot, false);
       } else {
         unmount(bnode);
         const hnode = document.createTextNode(vnode.data);
         bnode = { ...vnode, hnode } satisfies BText;
-        placeChild(bnode.hnode, parent, slot, true);
+        placeChild(bnode.hnode, hparent, preSlot, true);
       }
       break;
     }
@@ -85,14 +86,14 @@ export function reconcile(
         const bchild = reconcile(
           vnode.children[i],
           bchildren[i] ?? emptyNode(),
-          parent,
-          slot
+          hparent,
+          preSlot
         );
-        slot = getSlotForNext(bchild, slot);
+        preSlot = getSlotForNext(bchild, preSlot);
         bchild.parent = bnode;
         bnode.children[i] = bchild;
       }
-      bnode.slot = slot;
+      bnode.slot = preSlot;
       break;
     }
     case "custom": {
@@ -103,14 +104,14 @@ export function reconcile(
         bnode.render === vnode.render
       ) {
         const vchild = vnode.render(vnode.props);
-        bnode.child = reconcile(vchild, bnode.child, parent, slot);
+        bnode.child = reconcile(vchild, bnode.child, hparent, preSlot);
         bnode.props = vnode.props;
-        bnode.hparent = parent;
+        bnode.hparent = hparent;
       } else {
         unmount(bnode);
         const vchild = vnode.render(vnode.props);
-        const child = reconcile(vchild, emptyNode(), parent, slot);
-        bnode = { ...vnode, child, hparent: parent } satisfies BCustom;
+        const child = reconcile(vchild, emptyNode(), hparent, preSlot);
+        bnode = { ...vnode, child, hparent } satisfies BCustom;
       }
       bnode.child.parent = bnode;
       bnode.slot = getSlot(bnode.child);
@@ -120,17 +121,17 @@ export function reconcile(
   return bnode;
 }
 
-// `node` is positioned after `slot` within `parent`
+// `hnode` is positioned after `preSlot` within `hparent`
 function placeChild(
-  node: HNode,
-  parent: HNode,
-  slot: HNode | undefined,
+  hnode: HNode,
+  hparent: HNode,
+  preSlot: HNode | undefined,
   init: boolean
 ) {
   // TODO: too much dom property access?
-  const slotNext = slot ? slot.nextSibling : parent.firstChild;
-  if (init || !(node === slotNext || node.nextSibling === slotNext)) {
-    parent.insertBefore(node, slotNext);
+  const slotNext = preSlot ? preSlot.nextSibling : hparent.firstChild;
+  if (init || !(hnode === slotNext || hnode.nextSibling === slotNext)) {
+    hparent.insertBefore(hnode, slotNext);
   }
 }
 
@@ -413,7 +414,7 @@ function getNodeKey(node: VNode | BNode): NodeKey | undefined {
   return;
 }
 
-// slot is last HNode inside BNode subtree if any
+// "slot" is the last HNode inside the BNode subtree
 function getSlot(node: BNode): HNode | undefined {
   if (node.type === "empty") {
     return;
