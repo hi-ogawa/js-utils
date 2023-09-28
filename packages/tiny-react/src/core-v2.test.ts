@@ -8,6 +8,7 @@ import {
   render,
   selfReconcileCustom,
 } from "./core-v2";
+import { HookContext, hooks } from "./hooks-v2";
 
 describe(reconcile, () => {
   it("basic", () => {
@@ -210,6 +211,13 @@ describe(reconcile, () => {
           "parent": [Circular],
           "slot": world,
           "type": "fragment",
+        },
+        "hookContext": HookContext {
+          "hookCount": 0,
+          "hooks": [],
+          "initial": false,
+          "notify": [Function],
+          "useState": [Function],
         },
         "hparent": <main>
           <span>
@@ -506,6 +514,61 @@ describe("forceUpdate", () => {
           onClick: () => {
             i++;
             props.forceUpdate();
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    render(h(Custom, {}), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            0
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            1
+          </div>
+          <button />
+        </div>
+      </main>
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            2
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+  });
+});
+
+describe("hooks", () => {
+  it("basic", () => {
+    function Custom() {
+      const [state, setState] = hooks.useState(0);
+      return h(
+        "div",
+        {},
+        h(state % 2 === 0 ? "span" : "div", {}, state),
+        h("button", {
+          onClick: () => {
+            setState(state + 1);
           },
         })
       );

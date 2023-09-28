@@ -1,4 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
+import { HookContext } from "./hooks-v2";
 
 // architecture inspired by yew
 // https://github.com/yewstack/yew
@@ -97,26 +98,31 @@ export function reconcile(
       break;
     }
     case "custom": {
-      // TODO: hook context
       if (
         bnode.type === "custom" &&
         bnode.key === vnode.key &&
         bnode.render === vnode.render
       ) {
-        const vchild = vnode.render({ ...vnode.props, forceUpdate });
+        const vchild = bnode.hookContext.wrap(() =>
+          vnode.render({ ...vnode.props, forceUpdate })
+        );
         bnode.child = reconcile(vchild, bnode.child, hparent, preSlot);
         bnode.props = vnode.props;
         bnode.hparent = hparent;
       } else {
         unmount(bnode);
-        const vchild = vnode.render({ ...vnode.props, forceUpdate });
+        const hookContext = new HookContext(forceUpdate);
+        const vchild = hookContext.wrap(() =>
+          vnode.render({ ...vnode.props, forceUpdate })
+        );
         const child = reconcile(vchild, emptyNode(), hparent, preSlot);
-        bnode = { ...vnode, child, hparent } satisfies BCustom;
+        bnode = { ...vnode, child, hparent, hookContext } satisfies BCustom;
       }
       bnode.child.parent = bnode;
       bnode.slot = getSlot(bnode.child);
 
       // expose "forceUpdate" via props
+      // (don't have to support setState while render)
       const vcustom = vnode;
       const bcustom = bnode;
       function forceUpdate() {
@@ -395,7 +401,8 @@ type BCustom = VCustom & {
   parent?: BNodeParent;
   child: BNode;
   slot?: HNode;
-  hparent: HNode; // need back pointer for self re-rendering?
+  hparent: HNode;
+  hookContext: HookContext;
 };
 
 type BFragment = Omit<VFragment, "children"> & {
