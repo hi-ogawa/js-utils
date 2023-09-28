@@ -103,18 +103,14 @@ export function reconcile(
         bnode.key === vnode.key &&
         bnode.render === vnode.render
       ) {
-        const vchild = bnode.hookContext.wrap(() =>
-          vnode.render({ ...vnode.props, forceUpdate })
-        );
+        const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
         bnode.child = reconcile(vchild, bnode.child, hparent, preSlot);
         bnode.props = vnode.props;
         bnode.hparent = hparent;
       } else {
         unmount(bnode);
         const hookContext = new HookContext(forceUpdate);
-        const vchild = hookContext.wrap(() =>
-          vnode.render({ ...vnode.props, forceUpdate })
-        );
+        const vchild = hookContext.wrap(() => vnode.render(vnode.props));
         const child = reconcile(vchild, emptyNode(), hparent, preSlot);
         bnode = { ...vnode, child, hparent, hookContext } satisfies BCustom;
       }
