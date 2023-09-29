@@ -122,6 +122,24 @@ export class HookContext {
     return hook.ref as { current: T };
   };
 
+  useMemo = <T>(callback: () => T, deps: unknown[]) => {
+    const ref = this.useRef({
+      deps,
+      value: undefined as T,
+    });
+    if (this.initial || !isEqualShallow(ref.current.deps, deps)) {
+      ref.current.value = callback();
+    }
+    return ref.current.value;
+  };
+
+  useCallback = <F extends (...args: any[]) => any>(
+    callback: F,
+    deps: unknown[]
+  ) => {
+    return this.useMemo(() => callback, deps);
+  };
+
   useEffect = (effect: EffectFn, deps?: unknown[]) => {
     // init hook state
     if (this.initial) {
@@ -151,6 +169,8 @@ export const useState = /* @__PURE__ */ defineHook((ctx) => ctx.useState);
 export const useReducer = /* @__PURE__ */ defineHook((ctx) => ctx.useReducer);
 export const useRef = /* @__PURE__ */ defineHook((ctx) => ctx.useRef);
 export const useEffect = /* @__PURE__ */ defineHook((ctx) => ctx.useEffect);
+export const useMemo = /* @__PURE__ */ defineHook((ctx) => ctx.useMemo);
+export const useCallback = /* @__PURE__ */ defineHook((ctx) => ctx.useCallback);
 
 function defineHook<T>(implement: (ctx: HookContext) => T): T {
   return new Proxy(() => {}, {

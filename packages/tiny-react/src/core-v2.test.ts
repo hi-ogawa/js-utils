@@ -1,7 +1,7 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { Fragment, type VNode, h, render, rerenderCustomNode } from "./core-v2";
-import { useEffect, useRef, useState } from "./hooks-v2";
+import { useEffect, useMemo, useRef, useState } from "./hooks-v2";
 
 describe(render, () => {
   it("basic", () => {
@@ -210,7 +210,9 @@ describe(render, () => {
           "hooks": [],
           "initial": false,
           "notify": [Function],
+          "useCallback": [Function],
           "useEffect": [Function],
+          "useMemo": [Function],
           "useReducer": [Function],
           "useRef": [Function],
           "useState": [Function],
@@ -585,6 +587,89 @@ describe("hooks", () => {
           </span>
         </div>
       </main>
+    `);
+  });
+
+  it("useMemo", () => {
+    const mockFn = vi.fn();
+
+    function Custom({ prop }: any) {
+      const [state, setState] = useState(1);
+
+      const state2 = useMemo(() => {
+        mockFn("memo", state);
+        return state * 2;
+      }, [state]);
+
+      return h(
+        "div",
+        {},
+        JSON.stringify({ state, state2, prop }),
+        h("button", {
+          onClick: () => {
+            setState(state + 1);
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    let bnode = render(h(Custom, { prop: "x" }), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          {"state":1,"state2":2,"prop":"x"}
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "memo",
+          1,
+        ],
+      ]
+    `);
+
+    bnode = render(h(Custom, { prop: "y" }), parent, bnode);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          {"state":1,"state2":2,"prop":"y"}
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "memo",
+          1,
+        ],
+      ]
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          {"state":2,"state2":4,"prop":"x"}
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "memo",
+          1,
+        ],
+        [
+          "memo",
+          2,
+        ],
+      ]
     `);
   });
 
