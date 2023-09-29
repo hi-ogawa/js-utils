@@ -8,7 +8,7 @@ import {
   render,
   selfReconcileCustom,
 } from "./core-v2";
-import { useState } from "./hooks-v2";
+import { useRef, useState } from "./hooks-v2";
 
 describe(reconcile, () => {
   it("basic", () => {
@@ -219,6 +219,7 @@ describe(reconcile, () => {
           "notify": [Function],
           "useEffect": [Function],
           "useReducer": [Function],
+          "useRef": [Function],
           "useState": [Function],
         },
         "hparent": <main>
@@ -504,7 +505,7 @@ describe(selfReconcileCustom, () => {
 });
 
 describe("hooks", () => {
-  it("basic", () => {
+  it("useState", () => {
     function Custom() {
       const [state, setState] = useState(0);
       return h(
@@ -552,6 +553,43 @@ describe("hooks", () => {
             2
           </span>
           <button />
+        </div>
+      </main>
+    `);
+  });
+
+  it("useRef", () => {
+    function Custom() {
+      const ref = useRef(0);
+      ref.current++;
+
+      return h(
+        "div",
+        {},
+        h(ref.current % 2 === 0 ? "span" : "div", {}, ref.current)
+      );
+    }
+
+    let vnode = h(Custom, {});
+    const parent = document.createElement("main");
+    let bnode = render(vnode, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            1
+          </div>
+        </div>
+      </main>
+    `);
+
+    reconcile(vnode, bnode, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            2
+          </span>
         </div>
       </main>
     `);

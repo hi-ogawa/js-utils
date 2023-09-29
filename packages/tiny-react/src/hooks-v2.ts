@@ -1,10 +1,15 @@
 import { tinyassert } from "@hiogawa/utils";
 
-type HookState = ReducerHookState | EffectHookState;
+type HookState = ReducerHookState | EffectHookState | RefHookState;
 
 type ReducerHookState = {
   type: "reducer";
   state: unknown;
+};
+
+type RefHookState = {
+  type: "ref";
+  ref: { current: unknown };
 };
 
 // TODO
@@ -70,6 +75,19 @@ export class HookContext {
     return [state, dispatch] as const;
   };
 
+  useRef = <T>(initialState: T) => {
+    // init hook state
+    if (this.initial) {
+      this.hooks.push({
+        type: "ref",
+        ref: { current: initialState },
+      });
+    }
+    const hook = this.hooks[this.hookCount++];
+    tinyassert(hook.type === "ref");
+    return hook.ref as { current: T };
+  };
+
   useEffect = (effect: EffectFn, deps?: unknown[]) => {
     // init hook state
     if (this.initial) {
@@ -110,6 +128,11 @@ export const useState = /* @__PURE__ */ lazyProxy(() => {
 export const useReducer = /* @__PURE__ */ lazyProxy(() => {
   tinyassert(HookContext.current);
   return HookContext.current.useReducer;
+});
+
+export const useRef = /* @__PURE__ */ lazyProxy(() => {
+  tinyassert(HookContext.current);
+  return HookContext.current.useRef;
 });
 
 function lazyProxy<T>(actual: () => T): T {
