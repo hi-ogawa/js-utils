@@ -85,7 +85,10 @@ export class HookContext {
 
     // TODO: handle deps
     tinyassert(hook.deps?.length === deps?.length);
-    if (!this.initial && !(hook.deps && deps && isEqualShallow(hook.deps, deps))) {
+    if (
+      !this.initial &&
+      !(hook.deps && deps && isEqualShallow(hook.deps, deps))
+    ) {
       // cleanup old effect
     }
 
@@ -98,24 +101,30 @@ export class HookContext {
   };
 }
 
-export const useState = lazyExpose(() => {
+export const useState = /* @__PURE__ */ lazyProxy(() => {
   tinyassert(HookContext.current);
   return HookContext.current.useState;
 });
 
-export const useReducer = lazyExpose(() => {
+export const useReducer = /* @__PURE__ */ lazyProxy(() => {
   tinyassert(HookContext.current);
   return HookContext.current.useReducer;
 });
 
-function lazyExpose<F extends (...args: any[]) => any>(getF: () => F): F {
+function lazyProxy<T>(actual: () => T): T {
   return new Proxy(() => {}, {
-    apply(_target, thisArg, argArray) {
-      return getF().apply(thisArg, argArray);
+    get(_target, ...args) {
+      return Reflect.get(actual() as any, ...args);
     },
-  }) as F;
+    set(_target, ...args) {
+      return Reflect.set(actual() as any, ...args);
+    },
+    apply(_target, ...args) {
+      return Reflect.apply(actual() as any, ...args);
+    },
+  }) as T;
 }
 
 function isEqualShallow(xs: unknown[], ys: unknown[]) {
-  return xs.length === ys.length && xs.every((x, i) => x === ys[i])
+  return xs.length === ys.length && xs.every((x, i) => x === ys[i]);
 }
