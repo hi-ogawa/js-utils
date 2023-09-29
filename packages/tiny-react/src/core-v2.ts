@@ -17,7 +17,7 @@ export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
     undefined,
     effectManager
   );
-  effectManager.run();
+  effectManager.runEffect();
   return newBnode;
 }
 
@@ -149,6 +149,7 @@ function reconcileNode(
       }
       bnode.child.parent = bnode;
       bnode.slot = getSlot(bnode.child);
+      effectManager.nodes.push(bnode);
 
       // expose re-rendering trigger via hooks
       // (this doesn't support setState while render)
@@ -161,11 +162,6 @@ function reconcileNode(
     }
   }
   return bnode;
-}
-
-// TODO
-class EffectManager {
-  run() {}
 }
 
 // `hnode` is positioned after `preSlot` within `hparent`
@@ -182,6 +178,7 @@ function placeChild(
   }
 }
 
+// export for unit test
 // aka. re-rendering custom component
 export function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
   const oldSlot = getSlot(bnode);
@@ -191,7 +188,13 @@ export function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
 
   // reconcile
   const effectManager = new EffectManager();
-  const newBnode = reconcileNode(vnode, bnode, bnode.hparent, preSlot, effectManager);
+  const newBnode = reconcileNode(
+    vnode,
+    bnode,
+    bnode.hparent,
+    preSlot,
+    effectManager
+  );
   tinyassert(newBnode === bnode); // reconciled over itself without unmount (i.e. should be same `key` and `render`)
 
   // fix up ancestors slot
@@ -200,7 +203,7 @@ export function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
     updateParentSlot(bnode);
   }
 
-  effectManager.run();
+  effectManager.runEffect();
 }
 
 function findPreviousSlot(child: BNode): HNode | undefined {
@@ -330,14 +333,21 @@ function removeTagProp(bnode: BTag, key: string) {
 }
 
 function unmount(bnode: BNode) {
-  // TODO: unmount/ref effect
+  return unmountNode(bnode, false);
+}
+
+function unmountNode(bnode: BNode, skipRemove: boolean) {
   switch (bnode.type) {
     case "empty": {
       break;
     }
     case "tag": {
-      unmount(bnode.child); // TODO: can skip actual remove since parent removes all anyways
-      bnode.hnode.remove();
+      // TODO: ref
+      // skipRemove children since parent will detach subtree
+      unmountNode(bnode.child, /* skipRemove */ true);
+      if (!skipRemove) {
+        bnode.hnode.remove();
+      }
       break;
     }
     case "text": {
@@ -346,13 +356,25 @@ function unmount(bnode: BNode) {
     }
     case "fragment": {
       for (const child of bnode.children) {
-        unmount(child);
+        unmountNode(child, skipRemove);
       }
       break;
     }
     case "custom": {
-      unmount(bnode.child);
+      bnode.hookContext.cleanupEffect();
+      unmountNode(bnode.child, skipRemove);
       break;
+    }
+  }
+}
+
+// TODO: this traverses all hooks of all custom nodes. probably can optimize.
+class EffectManager {
+  nodes: BCustom[] = [];
+
+  runEffect() {
+    for (const node of this.nodes) {
+      node.hookContext.runEffect();
     }
   }
 }

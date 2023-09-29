@@ -7,7 +7,7 @@ import {
   render,
   selfReconcileCustom,
 } from "./core-v2";
-import { useRef, useState } from "./hooks-v2";
+import { useEffect, useRef, useState } from "./hooks-v2";
 
 describe(render, () => {
   it("basic", () => {
@@ -591,6 +591,128 @@ describe("hooks", () => {
           </span>
         </div>
       </main>
+    `);
+  });
+
+  it("useEffect", () => {
+    const mockFn = vi.fn();
+
+    function Custom(props: any) {
+      const [state, setState] = useState(0);
+
+      useEffect(() => {
+        mockFn("effect", props.value);
+        return () => {
+          mockFn("cleanup", props.value);
+        };
+      }, [props.value]);
+
+      return h(
+        "div",
+        {},
+        h("div", {}, state),
+        h("button", {
+          onClick: () => {
+            setState(state + 1);
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    let bnode = render(h(Custom, { value: 0 }), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            0
+          </div>
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect",
+          0,
+        ],
+      ]
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            1
+          </div>
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect",
+          0,
+        ],
+      ]
+    `);
+
+    render(h(Custom, { value: 1 }), parent, bnode);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            1
+          </div>
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect",
+          0,
+        ],
+        [
+          "cleanup",
+          0,
+        ],
+        [
+          "effect",
+          1,
+        ],
+      ]
+    `);
+
+    render(h("div", {}), parent, bnode);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div />
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect",
+          0,
+        ],
+        [
+          "cleanup",
+          0,
+        ],
+        [
+          "effect",
+          1,
+        ],
+        [
+          "cleanup",
+          1,
+        ],
+      ]
     `);
   });
 });

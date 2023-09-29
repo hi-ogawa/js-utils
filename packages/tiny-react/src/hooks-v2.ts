@@ -12,15 +12,33 @@ type RefHookState = {
   ref: { current: unknown };
 };
 
-// TODO
 type EffectHookState = {
   type: "effect";
-  effect: EffectFn;
+  effect?: EffectFn;
   deps?: unknown[];
   cleanup?: () => void;
 };
 
 type EffectFn = () => (() => void) | void;
+
+function runEffect(hook: EffectHookState) {
+  if (hook.effect) {
+    // cleanup last effect only when there is a new effect
+    if (hook.cleanup) {
+      hook.cleanup();
+      hook.cleanup = undefined;
+    }
+    hook.cleanup = hook.effect() ?? undefined;
+    hook.effect = undefined;
+  }
+}
+
+function cleanupEffect(hook: EffectHookState) {
+  if (hook.cleanup) {
+    hook.cleanup();
+    hook.cleanup = undefined;
+  }
+}
 
 export class HookContext {
   // expose global
@@ -40,6 +58,22 @@ export class HookContext {
     } finally {
       this.initial = false;
       HookContext.current = undefined!;
+    }
+  }
+
+  runEffect() {
+    for (const hook of this.hooks) {
+      if (hook.type === "effect") {
+        runEffect(hook);
+      }
+    }
+  }
+
+  cleanupEffect() {
+    for (const hook of this.hooks) {
+      if (hook.type === "effect") {
+        cleanupEffect(hook);
+      }
     }
   }
 
@@ -101,21 +135,14 @@ export class HookContext {
     tinyassert(hookToCheck.type === "effect");
     const hook = hookToCheck;
 
-    // TODO: handle deps
     tinyassert(hook.deps?.length === deps?.length);
     if (
       !this.initial &&
       !(hook.deps && deps && isEqualShallow(hook.deps, deps))
     ) {
-      // cleanup old effect
-    }
-
-    runEffect;
-    function runEffect() {
-      const cleanup = hook.effect();
-      if (cleanup) {
-        hook.cleanup = cleanup;
-      }
+      // last effect should've been already done
+      tinyassert(!hook.effect);
+      hook.effect = effect;
     }
   };
 }
@@ -133,6 +160,11 @@ export const useReducer = /* @__PURE__ */ lazyProxy(() => {
 export const useRef = /* @__PURE__ */ lazyProxy(() => {
   tinyassert(HookContext.current);
   return HookContext.current.useRef;
+});
+
+export const useEffect = /* @__PURE__ */ lazyProxy(() => {
+  tinyassert(HookContext.current);
+  return HookContext.current.useEffect;
 });
 
 function lazyProxy<T>(actual: () => T): T {
