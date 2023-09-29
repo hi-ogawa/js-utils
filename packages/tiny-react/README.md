@@ -1,6 +1,8 @@
 # tiny-react
 
-toy experiment to study react-like rendering implementation
+Experiment to study react-like virtual-dom rendering implementation.
+
+Internal architecture is inspired by yew and preact.
 
 ## links
 

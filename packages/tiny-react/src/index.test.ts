@@ -1,7 +1,9 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
-import { Fragment, type VNode, h, render, rerenderCustomNode } from "./core";
 import { useCallback, useEffect, useMemo, useRef, useState } from "./hooks";
+import { Fragment, h } from "./hyperscript";
+import { render, rerenderCustomNode } from "./reconciler";
+import type { VNode } from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {

@@ -1,8 +1,20 @@
 import { tinyassert } from "@hiogawa/utils";
 import { HookContext } from "./hooks";
-
-// architecture inspired by yew
-// https://github.com/yewstack/yew
+import {
+  type BCustom,
+  type BFragment,
+  type BNode,
+  type BTag,
+  type BText,
+  type HNode,
+  type NodeKey,
+  type Props,
+  type VCustom,
+  type VNode,
+  emptyNode,
+  getNodeKey,
+  getSlot,
+} from "./virtual-dom";
 
 export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
   const effectManager = new EffectManager();
@@ -386,198 +398,4 @@ class EffectManager {
     this.effects.forEach((f) => f());
     this.effects = [];
   }
-}
-
-//
-// types
-//
-
-type NodeKey = string;
-type Props = Record<string, unknown>;
-
-// host node
-type HNode = Node;
-type HTag = Element;
-type HText = Text;
-
-//
-// virtual node (immutable)
-//
-
-// TODO: optimize object shape?
-export type VNode = VEmpty | VTag | VText | VCustom | VFragment;
-
-type VEmpty = {
-  type: "empty";
-};
-
-// dom element
-type VTag = {
-  type: "tag";
-  key?: NodeKey;
-  name: string; // tagName
-  props: Props;
-  child: VNode;
-  ref?: (el: HTag | null) => VNode;
-};
-
-// text node
-type VText = {
-  type: "text";
-  data: string;
-};
-
-// user-defined functional component
-type VCustom = {
-  type: "custom";
-  key?: NodeKey;
-  props: Props;
-  render: (props: Props) => VNode;
-};
-
-type VFragment = {
-  type: "fragment";
-  key?: NodeKey;
-  children: VNode[];
-};
-
-//
-// bundle node (mutated through reconcilation and works both as input and output)
-//
-
-type BNode = BEmpty | BTag | BText | BCustom | BFragment;
-
-type BNodeParent = BTag | BCustom | BFragment;
-
-type BEmpty = VEmpty & {
-  parent?: BNodeParent;
-};
-
-type BTag = Omit<VTag, "child"> & {
-  parent?: BNodeParent;
-  child: BNode;
-  hnode: HTag;
-  listeners: Map<string, () => void>;
-};
-
-type BText = VText & {
-  parent?: BNodeParent;
-  hnode: HText;
-};
-
-type BCustom = VCustom & {
-  parent?: BNodeParent;
-  child: BNode;
-  slot?: HNode;
-  hparent: HNode;
-  hookContext: HookContext;
-};
-
-type BFragment = Omit<VFragment, "children"> & {
-  parent?: BNodeParent;
-  children: BNode[];
-  slot?: HNode; // last HNode included inside the subtree
-};
-
-function emptyNode(): VNode & BNode {
-  return {
-    type: "empty",
-  };
-}
-
-function getNodeKey(node: VNode | BNode): NodeKey | undefined {
-  if (
-    node.type === "tag" ||
-    node.type === "custom" ||
-    node.type === "fragment"
-  ) {
-    return node.key;
-  }
-  return;
-}
-
-// "slot" is the last HNode inside the BNode subtree
-function getSlot(node: BNode): HNode | undefined {
-  if (node.type === "empty") {
-    return;
-  }
-  if (node.type === "tag" || node.type === "text") {
-    return node.hnode;
-  }
-  return node.slot;
-}
-
-//
-// hyperscript helper
-//
-
-export const Fragment = Symbol.for("Fragment");
-
-type ComponentType = VTag["name"] | VCustom["render"] | typeof Fragment;
-
-type ComponentChild = VNode | string | number | null | undefined | boolean;
-
-export function h(
-  t: ComponentType,
-  inProps: Props,
-  ...children: ComponentChild[]
-): VNode {
-  const vchildren = children.map((c) => normalizeComponentChild(c));
-  const vchild: VNode =
-    children.length === 0
-      ? emptyNode()
-      : {
-          type: "fragment",
-          children: vchildren,
-        };
-
-  const { key, ...props } = inProps as { key?: NodeKey };
-
-  if (typeof t === "string") {
-    const { ref, ...tagProps } = props as { ref?: any };
-    return {
-      type: "tag",
-      name: t,
-      key,
-      ref,
-      props: tagProps,
-      child: vchild,
-    };
-  } else if (t === Fragment) {
-    return {
-      type: "fragment",
-      key,
-      children: vchildren,
-    };
-  } else if (typeof t === "function") {
-    return {
-      type: "custom",
-      key,
-      props: {
-        ...props,
-        children: vchild,
-      },
-      render: t,
-    };
-  }
-  return t satisfies never;
-}
-
-function normalizeComponentChild(child: ComponentChild): VNode {
-  if (
-    child === null ||
-    typeof child === "undefined" ||
-    typeof child === "boolean"
-  ) {
-    return {
-      type: "empty",
-    };
-  }
-  if (typeof child === "string" || typeof child === "number") {
-    return {
-      type: "text",
-      data: String(child),
-    };
-  }
-  return child;
 }
