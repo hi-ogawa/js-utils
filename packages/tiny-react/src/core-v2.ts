@@ -6,20 +6,21 @@ import { HookContext } from "./hooks-v2";
 
 // TODO:
 // - schedule re-render
-// - state hook
 // - effect hook (ref, mount, unmount)
 
 export function render(vnode: VNode, parent: HNode) {
   return reconcile(vnode, emptyNode(), parent);
 }
 
-// returns bnode with same object identity when vnode is reconciled over the same bnode
-// in which case bnode input is mutated.
-export function reconcile(
+export function reconcile(vnode: VNode, bnode: BNode, hparent: HNode): BNode {
+  return reconcileNode(vnode, bnode, hparent, undefined);
+}
+
+function reconcileNode(
   vnode: VNode,
-  bnode: BNode, // mutated
+  bnode: BNode, // mutated when reconciled over same bnode
   hparent: HNode,
-  preSlot?: HNode
+  preSlot: HNode | undefined
 ): BNode {
   switch (vnode.type) {
     case "empty": {
@@ -38,13 +39,18 @@ export function reconcile(
       ) {
         reconcileTagProps(bnode, vnode.props, bnode.props);
         bnode.props = vnode.props;
-        bnode.child = reconcile(vnode.child, bnode.child, bnode.hnode);
+        bnode.child = reconcileNode(
+          vnode.child,
+          bnode.child,
+          bnode.hnode,
+          undefined
+        );
         placeChild(bnode.hnode, hparent, preSlot, false);
       } else {
         unmount(bnode);
         // TODO: ref effect
         const hnode = document.createElement(vnode.name);
-        const child = reconcile(vnode.child, emptyNode(), hnode);
+        const child = reconcileNode(vnode.child, emptyNode(), hnode, undefined);
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
         reconcileTagProps(bnode, vnode.props, {});
         placeChild(bnode.hnode, hparent, preSlot, true);
@@ -85,7 +91,7 @@ export function reconcile(
       // reconcile vnode.children
       bnode.slot = undefined;
       for (let i = 0; i < vnode.children.length; i++) {
-        const bchild = reconcile(
+        const bchild = reconcileNode(
           vnode.children[i],
           bchildren[i] ?? emptyNode(),
           hparent,
@@ -105,14 +111,14 @@ export function reconcile(
         bnode.render === vnode.render
       ) {
         const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
-        bnode.child = reconcile(vchild, bnode.child, hparent, preSlot);
+        bnode.child = reconcileNode(vchild, bnode.child, hparent, preSlot);
         bnode.props = vnode.props;
         bnode.hparent = hparent;
       } else {
         unmount(bnode);
         const hookContext = new HookContext(forceUpdate);
         const vchild = hookContext.wrap(() => vnode.render(vnode.props));
-        const child = reconcile(vchild, emptyNode(), hparent, preSlot);
+        const child = reconcileNode(vchild, emptyNode(), hparent, preSlot);
         bnode = { ...vnode, child, hparent, hookContext } satisfies BCustom;
       }
       bnode.child.parent = bnode;
@@ -153,8 +159,8 @@ export function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
   const preSlot = findPreviousSlot(bnode);
 
   // reconcile
-  const newBnode = reconcile(vnode, bnode, bnode.hparent, preSlot);
-  tinyassert(newBnode === bnode); // reconciled over itself without unmount
+  const newBnode = reconcileNode(vnode, bnode, bnode.hparent, preSlot);
+  tinyassert(newBnode === bnode); // reconciled over itself without unmount (i.e. should be same `key` and `render`)
 
   // fix up ancestors slot
   const newSlot = getSlot(bnode);
