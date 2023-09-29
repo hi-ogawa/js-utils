@@ -20,7 +20,10 @@ export function _typeCheck() {
 
   <Custom1 value=""></Custom1>;
 
-  // @ts-expect-error
+  // @ts-expect-error unexpected children props
+  <Custom1 value="">xyz</Custom1>;
+
+  // @ts-expect-error missing children props
   <Custom2 />;
 
   <Custom2>
