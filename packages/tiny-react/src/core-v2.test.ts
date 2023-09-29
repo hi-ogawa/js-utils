@@ -4,13 +4,12 @@ import {
   Fragment,
   type VNode,
   h,
-  reconcile,
   render,
   selfReconcileCustom,
 } from "./core-v2";
 import { useRef, useState } from "./hooks-v2";
 
-describe(reconcile, () => {
+describe(render, () => {
   it("basic", () => {
     let vnode: VNode = {
       type: "tag",
@@ -115,7 +114,7 @@ describe(reconcile, () => {
         data: "reconcile",
       },
     };
-    bnode = reconcile(vnode, bnode, parent);
+    bnode = render(vnode, parent, bnode);
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div
@@ -294,7 +293,7 @@ describe(reconcile, () => {
     };
 
     // re-render should keep mutated dom
-    reconcile(vnode, bnode, parent);
+    render(vnode, parent, bnode);
 
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -323,7 +322,7 @@ describe(reconcile, () => {
     );
     const parent = document.createElement("main");
 
-    let bnode = reconcile(vnode, { type: "empty" }, parent);
+    let bnode = render(vnode, parent);
     expect(parent).toMatchInlineSnapshot(`
       <main>
         1
@@ -339,7 +338,7 @@ describe(reconcile, () => {
       h(Fragment, { key: "y" }, "3", "4"),
       h(Fragment, { key: "x" }, "1", "2")
     );
-    bnode = reconcile(vnode, bnode, parent);
+    bnode = render(vnode, parent, bnode);
 
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -355,7 +354,7 @@ describe(reconcile, () => {
     let vnode = h(Fragment, {}, "a", "b", "c");
     const parent = document.createElement("main");
 
-    let bnode = reconcile(vnode, { type: "empty" }, parent);
+    let bnode = render(vnode, parent);
     expect(parent).toMatchInlineSnapshot(`
       <main>
         a
@@ -365,7 +364,7 @@ describe(reconcile, () => {
     `);
 
     vnode = h(Fragment, {}, "a", h("span", {}, "b"), "c");
-    bnode = reconcile(vnode, bnode, parent);
+    bnode = render(vnode, parent, bnode);
 
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -403,7 +402,7 @@ describe(reconcile, () => {
     mockFn.mockReset();
 
     vnode = h("button", {});
-    bnode = reconcile(vnode, bnode, parent);
+    bnode = render(vnode, parent, bnode);
     (parent.firstChild as HTMLElement).click();
     expect(mockFn.mock.calls).toMatchInlineSnapshot("[]");
   });
@@ -432,7 +431,7 @@ describe(selfReconcileCustom, () => {
     } satisfies VNode;
     const parent = document.createElement("main");
 
-    let bnode = reconcile(vnode, { type: "empty" }, parent);
+    let bnode = render(vnode, parent);
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -583,7 +582,7 @@ describe("hooks", () => {
       </main>
     `);
 
-    reconcile(vnode, bnode, parent);
+    render(vnode, parent, bnode);
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>

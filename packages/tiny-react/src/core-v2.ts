@@ -8,12 +8,8 @@ import { HookContext } from "./hooks-v2";
 // - schedule re-render
 // - effect hook (ref, mount, unmount)
 
-export function render(vnode: VNode, parent: HNode) {
-  return reconcile(vnode, emptyNode(), parent);
-}
-
-export function reconcile(vnode: VNode, bnode: BNode, hparent: HNode): BNode {
-  return reconcileNode(vnode, bnode, hparent, undefined);
+export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
+  return reconcileNode(vnode, bnode ?? emptyNode(), parent, undefined);
 }
 
 function reconcileNode(
