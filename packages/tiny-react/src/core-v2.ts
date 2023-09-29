@@ -4,10 +4,6 @@ import { HookContext } from "./hooks-v2";
 // architecture inspired by yew
 // https://github.com/yewstack/yew
 
-// TODO:
-// - schedule re-render
-// - effect hook (ref, mount, unmount)
-
 export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
   const effectManager = new EffectManager();
   const newBnode = reconcileNode(
@@ -156,7 +152,7 @@ function reconcileNode(
       const vcustom = vnode;
       const bcustom = bnode;
       function forceUpdate() {
-        selfReconcileCustom(vcustom, bcustom);
+        rerenderCustomNode(vcustom, bcustom);
       }
       break;
     }
@@ -171,7 +167,6 @@ function placeChild(
   preSlot: HNode | undefined,
   init: boolean
 ) {
-  // TODO: too much dom property access?
   const slotNext = preSlot ? preSlot.nextSibling : hparent.firstChild;
   if (init || !(hnode === slotNext || hnode.nextSibling === slotNext)) {
     hparent.insertBefore(hnode, slotNext);
@@ -179,8 +174,7 @@ function placeChild(
 }
 
 // export for unit test
-// aka. re-rendering custom component
-export function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
+export function rerenderCustomNode(vnode: VCustom, bnode: BCustom) {
   const oldSlot = getSlot(bnode);
 
   // traverse ancestors to find "slot"

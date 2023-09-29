@@ -1,12 +1,6 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
-import {
-  Fragment,
-  type VNode,
-  h,
-  render,
-  selfReconcileCustom,
-} from "./core-v2";
+import { Fragment, type VNode, h, render, rerenderCustomNode } from "./core-v2";
 import { useEffect, useRef, useState } from "./hooks-v2";
 
 describe(render, () => {
@@ -408,7 +402,7 @@ describe(render, () => {
   });
 });
 
-describe(selfReconcileCustom, () => {
+describe(rerenderCustomNode, () => {
   it("basic", () => {
     let vnode = {
       type: "fragment",
@@ -450,7 +444,7 @@ describe(selfReconcileCustom, () => {
     `);
 
     tinyassert(bnode.children[0].type === "custom");
-    selfReconcileCustom(
+    rerenderCustomNode(
       {
         ...vnode.children[0],
         props: {
@@ -476,7 +470,7 @@ describe(selfReconcileCustom, () => {
     `);
 
     tinyassert(bnode.children[1].type === "custom");
-    selfReconcileCustom(
+    rerenderCustomNode(
       {
         ...vnode.children[1],
         props: {
