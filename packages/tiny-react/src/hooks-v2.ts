@@ -147,36 +147,16 @@ export class HookContext {
   };
 }
 
-export const useState = /* @__PURE__ */ lazyProxy(() => {
-  tinyassert(HookContext.current);
-  return HookContext.current.useState;
-});
+export const useState = /* @__PURE__ */ defineHook((ctx) => ctx.useState);
+export const useReducer = /* @__PURE__ */ defineHook((ctx) => ctx.useReducer);
+export const useRef = /* @__PURE__ */ defineHook((ctx) => ctx.useRef);
+export const useEffect = /* @__PURE__ */ defineHook((ctx) => ctx.useEffect);
 
-export const useReducer = /* @__PURE__ */ lazyProxy(() => {
-  tinyassert(HookContext.current);
-  return HookContext.current.useReducer;
-});
-
-export const useRef = /* @__PURE__ */ lazyProxy(() => {
-  tinyassert(HookContext.current);
-  return HookContext.current.useRef;
-});
-
-export const useEffect = /* @__PURE__ */ lazyProxy(() => {
-  tinyassert(HookContext.current);
-  return HookContext.current.useEffect;
-});
-
-function lazyProxy<T>(actual: () => T): T {
+function defineHook<T>(implement: (ctx: HookContext) => T): T {
   return new Proxy(() => {}, {
-    get(_target, ...args) {
-      return Reflect.get(actual() as any, ...args);
-    },
-    set(_target, ...args) {
-      return Reflect.set(actual() as any, ...args);
-    },
     apply(_target, ...args) {
-      return Reflect.apply(actual() as any, ...args);
+      tinyassert(HookContext.current);
+      return Reflect.apply(implement(HookContext.current) as any, ...args);
     },
   }) as T;
 }
