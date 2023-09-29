@@ -1,11 +1,4 @@
-import {
-  type NodeKey,
-  type Props,
-  type VCustom,
-  type VNode,
-  type VTag,
-  emptyNode,
-} from "./virtual-dom";
+import { type NodeKey, type Props, type VNode, emptyNode } from "./virtual-dom";
 
 //
 // helper to construct VNode
@@ -15,9 +8,7 @@ import {
 // https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
 // https://www.typescriptlang.org/tsconfig#jsxImportSource
 
-export const Fragment = Symbol.for("Fragment");
-
-type ComponentType = VTag["name"] | VCustom["render"] | typeof Fragment;
+type ComponentType = string | ((props: any) => VNode);
 
 type ComponentChild = VNode | string | number | null | undefined | boolean;
 
@@ -26,13 +17,12 @@ export function h(
   inProps: Props,
   ...children: ComponentChild[]
 ): VNode {
-  const vchildren = children.map((c) => normalizeComponentChild(c));
-  const vchild: VNode =
+  const child: VNode =
     children.length === 0
       ? emptyNode()
       : {
           type: "fragment",
-          children: vchildren,
+          children: children.map((c) => normalizeComponentChild(c)),
         };
 
   const { key, ...props } = inProps as { key?: NodeKey };
@@ -45,13 +35,7 @@ export function h(
       key,
       ref,
       props: tagProps,
-      child: vchild,
-    };
-  } else if (t === Fragment) {
-    return {
-      type: "fragment",
-      key,
-      children: vchildren,
+      child,
     };
   } else if (typeof t === "function") {
     return {
@@ -59,12 +43,16 @@ export function h(
       key,
       props: {
         ...props,
-        children: vchild,
+        children: child,
       },
       render: t,
     };
   }
   return t satisfies never;
+}
+
+export function Fragment(props: { children: VNode }): VNode {
+  return props.children;
 }
 
 function normalizeComponentChild(child: ComponentChild): VNode {

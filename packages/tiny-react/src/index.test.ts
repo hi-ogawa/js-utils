@@ -236,12 +236,10 @@ describe(render, () => {
   });
 
   it("fragment children key", () => {
-    const keys = [..."abc"];
-    const vnode = h(
-      Fragment,
-      {},
-      ...keys.map((key) => h("span", { key, "data-prop": key }))
-    );
+    const vnode: VNode = {
+      type: "fragment",
+      children: [..."abc"].map((key) => h("span", { key, "data-prop": key })),
+    };
     const parent = document.createElement("main");
 
     // initial render
