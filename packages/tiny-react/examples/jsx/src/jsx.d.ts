@@ -1,34 +1,56 @@
 // TODO: for starter, experiment it here directly instead of `packages/tiny-react/src/jsx.ts`
 
-namespace JSX {
-  // can constraint custom component return type
-  type Element = {};
+// import "@hiogawa/tiny-react/jsx";
 
-  // interface ElementClass {}
-  // interface ElementAttributesProperty {}
+// type Tmp = import("@hiogawa/tiny-react/dist/jsx");
 
-  interface ElementChildrenAttribute {
-    children: {};
-  }
+// interface Tmp2 {
+//   Element: import("@hiogawa/tiny-react/dist/jsx").Element,
+//   ElementChildrenAttribute: import("@hiogawa/tiny-react/dist/jsx").ElementChildrenAttribute,
+// }
 
-  interface IntrinsicAttributes {
-    key?: NodeKey;
-    ref?: unknown;
-  }
+// type Tmp = import("@hiogawa/tiny-react/dist/jsx").Element;
 
-  // TODO: generate from something
-  interface IntrinsicElements {
-    div: HTMLAttributes;
-    span: HTMLAttributes;
-  }
+// namespace JSX {
+//   // can constraint custom component return type
+//   // type Element = Tmp.Element;
 
-  //
-  // internal
-  //
-  interface HTMLAttributes extends IntrinsicAttributes {
-    [key: string]: unknown;
-  }
-}
+//   type Element = {};
+//   // interface ElementClass {}
+//   // interface ElementAttributesProperty {}
+
+//   // export import X = import("@hiogawa/tiny-react/dist/jsx");
+//   // type x = import("@hiogawa/tiny-react/dist/jsx").Tmp.ElementChildrenAttribute
+
+//   // type ElementChildrenAttribute = {
+//   //   children: {};
+//   // }
+//   // import ElementAttributesProperty = import("@hiogawa/tiny-react/dist/jsx").ElementAttributesProperty
+//   interface ElementChildrenAttribute {
+//     children: {};
+//   }
+//   // interface ElementChildrenAttribute extends import("@hiogawa/tiny-react/dist/jsx").ElementChildrenAttribute {
+//   //   // children: {};
+//   // }
+
+//   interface IntrinsicAttributes {
+//     key?: NodeKey;
+//     ref?: unknown;
+//   }
+
+//   // TODO: generate from something
+//   interface IntrinsicElements {
+//     div: HTMLAttributes;
+//     span: HTMLAttributes;
+//   }
+
+//   //
+//   // internal
+//   //
+//   interface HTMLAttributes extends IntrinsicAttributes {
+//     [key: string]: unknown;
+//   }
+// }
 
 // prettier-ignore
 // declare namespace JSX {

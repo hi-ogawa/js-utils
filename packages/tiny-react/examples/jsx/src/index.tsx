@@ -1,4 +1,22 @@
-import { h } from "@hiogawa/tiny-react";
+// import { h } from "@hiogawa/tiny-react";
+// import { JSX } from "@hiogawa/tiny-react/jsx";
+// import "@hiogawa/tiny-react/jsx";
+import "@hiogawa/tiny-react/jsx";
+
+// type x = JSX.Element;
+// declare global {
+//   namespace JSX {
+//     interface IntrinsicAttributes {
+//       key?: string | number;
+//       ref?: unknown;
+//     }
+
+//     interface IntrinsicElements {
+//       div: IntrinsicAttributes;
+//       span: IntrinsicAttributes;
+//   }
+//   }
+// }
 
 export function App() {
   <div key={0} />;
@@ -26,10 +44,12 @@ export function App() {
 
 function Custom1(props: { value: string; opt?: number }) {
   props;
-  return h("div", {});
+  return {};
+  // return h("div", {});
 }
 
 function Custom2(props: { children: number[] }) {
   props;
-  return h("div", {});
+  return {};
+  // return h("div", {});
 }
