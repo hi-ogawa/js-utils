@@ -22,7 +22,7 @@ export interface IntrinsicClassAttributes {}
 export interface LibraryManagedAttributes {}
 
 export interface ElementChildrenAttribute {
-  children: {};
+  children?: {};
 }
 
 export interface IntrinsicAttributes {
@@ -36,6 +36,4 @@ export interface IntrinsicElements {
   span: HTMLAttributes;
 }
 
-interface HTMLAttributes extends IntrinsicAttributes {
-  [key: string]: unknown;
-}
+type HTMLAttributes = IntrinsicAttributes & ElementChildrenAttribute;
