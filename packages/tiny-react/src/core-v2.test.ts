@@ -1,7 +1,7 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { Fragment, type VNode, h, render, rerenderCustomNode } from "./core-v2";
-import { useEffect, useMemo, useRef, useState } from "./hooks-v2";
+import { useCallback, useEffect, useMemo, useRef, useState } from "./hooks-v2";
 
 describe(render, () => {
   it("basic", () => {
@@ -796,6 +796,99 @@ describe("hooks", () => {
   });
 });
 
+describe("ref", () => {
+  it("basic", () => {
+    const mockFn = vi.fn();
+
+    function Custom() {
+      const [state, setState] = useState(0);
+
+      return h(
+        "div",
+        {},
+        h(
+          state < 2 ? "div" : "span",
+          {
+            ref: useCallback((el: Element | null) => {
+              mockFn(el?.tagName ?? null);
+            }, []),
+          },
+          state
+        ),
+        h("button", {
+          onClick: () => {
+            setState(state + 1);
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    render(h(Custom, {}), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            0
+          </div>
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "DIV",
+        ],
+      ]
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            1
+          </div>
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "DIV",
+        ],
+      ]
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            2
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "DIV",
+        ],
+        [
+          null,
+        ],
+        [
+          "SPAN",
+        ],
+      ]
+    `);
+  });
+});
+
 describe(h, () => {
   it("basic", () => {
     const parent = document.createElement("main");
@@ -842,6 +935,7 @@ describe(h, () => {
               "props": {
                 "class": "text-red",
               },
+              "ref": undefined,
               "type": "tag",
             },
           ],
@@ -852,6 +946,7 @@ describe(h, () => {
         "props": {
           "class": "flex",
         },
+        "ref": undefined,
         "type": "tag",
       }
     `);

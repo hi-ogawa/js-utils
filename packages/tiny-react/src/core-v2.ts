@@ -37,6 +37,7 @@ function reconcileNode(
       if (
         bnode.type === "tag" &&
         bnode.key === vnode.key &&
+        bnode.ref === vnode.ref &&
         bnode.name === vnode.name
       ) {
         reconcileTagProps(bnode, vnode.props, bnode.props);
@@ -51,7 +52,6 @@ function reconcileNode(
         placeChild(bnode.hnode, hparent, preSlot, false);
       } else {
         unmount(bnode);
-        // TODO: ref effect
         const hnode = document.createElement(vnode.name);
         const child = reconcileNode(
           vnode.child,
@@ -63,6 +63,7 @@ function reconcileNode(
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
         reconcileTagProps(bnode, vnode.props, {});
         placeChild(bnode.hnode, hparent, preSlot, true);
+        vnode.ref?.(bnode.hnode); // TODO: should be delayed by EffectManager?
       }
       bnode.child.parent = bnode;
       break;
@@ -336,11 +337,11 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
       break;
     }
     case "tag": {
-      // TODO: ref
       // skipRemove children since parent will detach subtree
       unmountNode(bnode.child, /* skipRemove */ true);
       if (!skipRemove) {
         bnode.hnode.remove();
+        bnode.ref?.(null);
       }
       break;
     }
@@ -396,14 +397,14 @@ type VEmpty = {
   type: "empty";
 };
 
-// dom element with tag name
-// TODO: ref?
+// dom element
 type VTag = {
   type: "tag";
   key?: NodeKey;
-  name: string;
+  name: string; // tagName
   props: Props;
   child: VNode;
+  ref?: (el: HTag | null) => VNode;
 };
 
 // text node
@@ -519,11 +520,13 @@ export function h(
   const { key, ...props } = inProps as { key?: NodeKey };
 
   if (typeof t === "string") {
+    const { ref, ...tagProps } = props as { ref?: any };
     return {
       type: "tag",
       name: t,
       key,
-      props,
+      ref,
+      props: tagProps,
       child: vchild,
     };
   } else if (t === Fragment) {
