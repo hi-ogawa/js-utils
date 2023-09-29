@@ -13,7 +13,7 @@ export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
     undefined,
     effectManager
   );
-  effectManager.runEffect();
+  effectManager.run();
   return newBnode;
 }
 
@@ -63,7 +63,7 @@ function reconcileNode(
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
         reconcileTagProps(bnode, vnode.props, {});
         placeChild(bnode.hnode, hparent, preSlot, true);
-        vnode.ref?.(bnode.hnode); // TODO: should be delayed by EffectManager?
+        effectManager.queueRef(bnode);
       }
       bnode.child.parent = bnode;
       break;
@@ -146,7 +146,7 @@ function reconcileNode(
       }
       bnode.child.parent = bnode;
       bnode.slot = getSlot(bnode.child);
-      effectManager.nodes.push(bnode);
+      effectManager.queueEffect(bnode);
 
       // expose re-rendering trigger via hooks
       // (this doesn't support setState while render)
@@ -198,7 +198,7 @@ export function rerenderCustomNode(vnode: VCustom, bnode: BCustom) {
     updateParentSlot(bnode);
   }
 
-  effectManager.runEffect();
+  effectManager.run();
 }
 
 function findPreviousSlot(child: BNode): HNode | undefined {
@@ -363,14 +363,28 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
   }
 }
 
-// TODO: this traverses all hooks of all custom nodes. probably can optimize.
 class EffectManager {
-  nodes: BCustom[] = [];
+  private refs: (() => void)[] = [];
+  private effects: (() => void)[] = [];
 
-  runEffect() {
-    for (const node of this.nodes) {
-      node.hookContext.runEffect();
+  queueRef(bnode: BTag) {
+    const { ref, hnode } = bnode;
+    if (ref) {
+      this.refs.push(() => ref(hnode));
     }
+  }
+
+  queueEffect(node: BCustom) {
+    this.effects.push(() => node.hookContext.runEffect());
+  }
+
+  run() {
+    this.refs.forEach((f) => f());
+    this.refs = [];
+
+    // TODO: traverses all hooks of all custom nodes. probably can optimize.
+    this.effects.forEach((f) => f());
+    this.effects = [];
   }
 }
 
