@@ -11,6 +11,10 @@ import {
 // helper to construct VNode
 //
 
+// TODO: learn from
+// https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
+// https://www.typescriptlang.org/tsconfig#jsxImportSource
+
 export const Fragment = Symbol.for("Fragment");
 
 type ComponentType = VTag["name"] | VCustom["render"] | typeof Fragment;
