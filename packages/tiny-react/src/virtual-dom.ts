@@ -4,7 +4,7 @@ import type { HookContext } from "./hooks";
 // host/virtual/bundle node types and helper
 //
 
-export type NodeKey = string;
+export type NodeKey = string | number;
 export type Props = Record<string, unknown>;
 
 // host node
@@ -88,7 +88,7 @@ export type BCustom = VCustom & {
 export type BFragment = Omit<VFragment, "children"> & {
   parent?: BNodeParent;
   children: BNode[];
-  slot?: HNode; // last HNode included inside the subtree
+  slot?: HNode;
 };
 
 export function emptyNode(): VNode & BNode {
