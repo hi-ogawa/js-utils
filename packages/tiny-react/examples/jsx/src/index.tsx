@@ -1,22 +1,5 @@
-// import { h } from "@hiogawa/tiny-react";
-// import { JSX } from "@hiogawa/tiny-react/jsx";
-// import "@hiogawa/tiny-react/jsx";
 import "@hiogawa/tiny-react/jsx";
-
-// type x = JSX.Element;
-// declare global {
-//   namespace JSX {
-//     interface IntrinsicAttributes {
-//       key?: string | number;
-//       ref?: unknown;
-//     }
-
-//     interface IntrinsicElements {
-//       div: IntrinsicAttributes;
-//       span: IntrinsicAttributes;
-//   }
-//   }
-// }
+import { h } from "@hiogawa/tiny-react";
 
 export function App() {
   <div key={0} />;
@@ -40,16 +23,28 @@ export function App() {
     {0}
     {1}
   </Custom2>;
+
+  // @ts-expect-error JSX.Element enforces custom component return type
+  <Custom3 />;
+
+  // but `null` doesn't seem to be excluded, so runtime has to support it...
+  <Custom4 />;
 }
 
 function Custom1(props: { value: string; opt?: number }) {
   props;
-  return {};
-  // return h("div", {});
+  return h("div", {});
 }
 
 function Custom2(props: { children: number[] }) {
   props;
+  return h("div", {});
+}
+
+function Custom3() {
   return {};
-  // return h("div", {});
+}
+
+function Custom4() {
+  return null;
 }
