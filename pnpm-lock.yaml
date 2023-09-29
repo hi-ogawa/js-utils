@@ -205,6 +205,12 @@ importers:
         specifier: workspace:*
         version: link:../utils
 
+  packages/tiny-react/examples/jsx:
+    devDependencies:
+      '@hiogawa/tiny-react':
+        specifier: workspace:*
+        version: link:../..
+
   packages/tiny-rpc:
     devDependencies:
       '@brillout/json-serializer':

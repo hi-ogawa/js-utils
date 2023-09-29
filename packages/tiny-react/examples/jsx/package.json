@@ -1,0 +1,11 @@
+{
+  "name": "tiny-react-examples-jsx",
+  "private": true,
+  "scripts": {},
+  "devDependencies": {
+    "@hiogawa/tiny-react": "workspace:*"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}
