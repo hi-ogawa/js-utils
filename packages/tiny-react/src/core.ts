@@ -1,5 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
-import { HookContext } from "./hooks-v2";
+import { HookContext } from "./hooks";
 
 // architecture inspired by yew
 // https://github.com/yewstack/yew
