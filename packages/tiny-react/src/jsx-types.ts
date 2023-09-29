@@ -1,4 +1,5 @@
-import type { NodeKey, VNode } from "./virtual-dom";
+import type { ComponentType } from "./hyperscript";
+import type { NodeKey } from "./virtual-dom";
 
 // probably nothing is spec'ed so figure it out from checker.ts
 // see "namespace JsxNames" at
@@ -10,8 +11,15 @@ import type { NodeKey, VNode } from "./virtual-dom";
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/46cd17037ac5399364b0a59511d646c0dd56165a/types/react/index.d.ts#L3249
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/46cd17037ac5399364b0a59511d646c0dd56165a/types/react/index.d.ts#L3311
 
-// constraint functional component return type
-export type Element = VNode;
+// constraint allowed jsx element tag e.g. <Component ... />
+export type ElementType = ComponentType;
+
+// not sure what these for...
+export type Element = {};
+export interface ElementClass {}
+export interface ElementAttributesProperty {}
+export interface IntrinsicClassAttributes {}
+export interface LibraryManagedAttributes {}
 
 export interface ElementChildrenAttribute {
   children: {};

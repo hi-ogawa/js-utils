@@ -26,8 +26,7 @@ export function App() {
 
   // @ts-expect-error JSX.Element enforces custom component return type
   <Custom3 />;
-
-  // but `null` doesn't seem to be excluded, so runtime has to support it...
+  // @ts-expect-error
   <Custom4 />;
 }
 

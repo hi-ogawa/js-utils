@@ -9,7 +9,7 @@ import { type NodeKey, type Props, type VNode, emptyNode } from "./virtual-dom";
 // https://www.typescriptlang.org/tsconfig#jsxImportSource
 // https://github.com/preactjs/preact/blob/08b07ccea62bfdb44b983bfe69ae73eb5e4f43c7/jsx-runtime/src/index.js
 
-type ComponentType = string | ((props: any) => VNode);
+export type ComponentType = string | ((props: any) => VNode);
 
 type ComponentChild = VNode | string | number | null | undefined | boolean;
 
