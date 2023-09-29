@@ -91,8 +91,8 @@ export function reconcile(
           hparent,
           preSlot
         );
-        preSlot = getSlotForNext(bchild, preSlot);
-        bnode.slot = getSlotForNext(bchild, bnode.slot);
+        preSlot = getSlot(bchild) ?? preSlot;
+        bnode.slot = getSlot(bchild) ?? bnode.slot;
         bnode.children[i] = bchild;
         bchild.parent = bnode;
       }
@@ -184,7 +184,7 @@ function findPreviousSlot(child: BNode): HNode | undefined {
           }
           break;
         }
-        slot = getSlotForNext(c, slot);
+        slot = getSlot(c) ?? slot;
       }
     }
     // go up to parent also when parent.type === "custom"
@@ -207,7 +207,7 @@ function updateParentSlot(child: BNode) {
       // TODO: could optimize something?
       let slot: HNode | undefined;
       for (const c of parent.children) {
-        slot = getSlotForNext(c, slot);
+        slot = getSlot(c) ?? slot;
       }
       parent.slot = slot;
     }
@@ -434,15 +434,6 @@ function getSlot(node: BNode): HNode | undefined {
     return node.hnode;
   }
   return node.slot;
-}
-
-// convenient wrapper to progress slot while looping children
-function getSlotForNext(
-  node: BNode,
-  preSlot: HNode | undefined
-): HNode | undefined {
-  const slot = getSlot(node);
-  return slot ? slot : preSlot;
 }
 
 //

@@ -92,6 +92,7 @@ export class HookContext {
       // cleanup old effect
     }
 
+    runEffect;
     function runEffect() {
       const cleanup = hook.effect();
       if (cleanup) {
