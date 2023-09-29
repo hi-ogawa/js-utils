@@ -2,7 +2,11 @@
   "extends": "../../../../tsconfig.base.json",
   "include": ["src"],
   "compilerOptions": {
+    "outDir": "dist/tsc",
+    "noEmit": false,
     "types": ["@hiogawa/tiny-react/jsx"],
-    "jsx": "preserve"
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment"
   }
 }

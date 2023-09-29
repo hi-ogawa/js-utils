@@ -1,7 +1,11 @@
 {
   "name": "tiny-react-examples-jsx",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "build:tsc": "tsc",
+    "build:vite": "false",
+    "build:esbuild": "false"
+  },
   "devDependencies": {
     "@hiogawa/tiny-react": "workspace:*"
   },

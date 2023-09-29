@@ -11,6 +11,12 @@ import type { NodeKey } from "./virtual-dom";
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/46cd17037ac5399364b0a59511d646c0dd56165a/types/react/index.d.ts#L3249
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/46cd17037ac5399364b0a59511d646c0dd56165a/types/react/index.d.ts#L3311
 
+// also note
+// https://www.typescriptlang.org/tsconfig#jsxFactory
+// > If the factory is defined as React.createElement (the default),
+// > the compiler will check for React.JSX before checking for a global JSX.
+// > If the factory is defined as h, it will check for h.JSX before a global JSX.
+
 // constraint allowed jsx element tag e.g. <Component ... />
 export type ElementType = ComponentType;
 
