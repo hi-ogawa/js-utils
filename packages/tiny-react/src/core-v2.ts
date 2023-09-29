@@ -83,6 +83,7 @@ export function reconcile(
         unmount(bchild);
       }
       // reconcile vnode.children
+      bnode.slot = undefined;
       for (let i = 0; i < vnode.children.length; i++) {
         const bchild = reconcile(
           vnode.children[i],
@@ -91,10 +92,10 @@ export function reconcile(
           preSlot
         );
         preSlot = getSlotForNext(bchild, preSlot);
-        bchild.parent = bnode;
+        bnode.slot = getSlotForNext(bchild, bnode.slot);
         bnode.children[i] = bchild;
+        bchild.parent = bnode;
       }
-      bnode.slot = preSlot;
       break;
     }
     case "custom": {
