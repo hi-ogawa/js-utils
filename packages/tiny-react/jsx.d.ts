@@ -6,5 +6,10 @@ declare global {
     export import ElementChildrenAttribute = types.ElementChildrenAttribute;
     export import IntrinsicAttributes = types.IntrinsicAttributes;
     export import IntrinsicElements = types.IntrinsicElements;
+    interface ElementClass {}
+    interface ElementAttributesProperty {}
+    interface ElementType {}
+    interface IntrinsicClassAttributes {}
+    interface LibraryManagedAttributes {}
   }
 }
