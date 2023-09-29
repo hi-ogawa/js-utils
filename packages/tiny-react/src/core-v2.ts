@@ -9,14 +9,24 @@ import { HookContext } from "./hooks-v2";
 // - effect hook (ref, mount, unmount)
 
 export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
-  return reconcileNode(vnode, bnode ?? emptyNode(), parent, undefined);
+  const effectManager = new EffectManager();
+  const newBnode = reconcileNode(
+    vnode,
+    bnode ?? emptyNode(),
+    parent,
+    undefined,
+    effectManager
+  );
+  effectManager.run();
+  return newBnode;
 }
 
 function reconcileNode(
   vnode: VNode,
   bnode: BNode, // mutated when reconciled over same bnode
   hparent: HNode,
-  preSlot: HNode | undefined
+  preSlot: HNode | undefined,
+  effectManager: EffectManager
 ): BNode {
   switch (vnode.type) {
     case "empty": {
@@ -39,14 +49,21 @@ function reconcileNode(
           vnode.child,
           bnode.child,
           bnode.hnode,
-          undefined
+          undefined,
+          effectManager
         );
         placeChild(bnode.hnode, hparent, preSlot, false);
       } else {
         unmount(bnode);
         // TODO: ref effect
         const hnode = document.createElement(vnode.name);
-        const child = reconcileNode(vnode.child, emptyNode(), hnode, undefined);
+        const child = reconcileNode(
+          vnode.child,
+          emptyNode(),
+          hnode,
+          undefined,
+          effectManager
+        );
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
         reconcileTagProps(bnode, vnode.props, {});
         placeChild(bnode.hnode, hparent, preSlot, true);
@@ -91,7 +108,8 @@ function reconcileNode(
           vnode.children[i],
           bchildren[i] ?? emptyNode(),
           hparent,
-          preSlot
+          preSlot,
+          effectManager
         );
         preSlot = getSlot(bchild) ?? preSlot;
         bnode.slot = getSlot(bchild) ?? bnode.slot;
@@ -107,14 +125,26 @@ function reconcileNode(
         bnode.render === vnode.render
       ) {
         const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
-        bnode.child = reconcileNode(vchild, bnode.child, hparent, preSlot);
+        bnode.child = reconcileNode(
+          vchild,
+          bnode.child,
+          hparent,
+          preSlot,
+          effectManager
+        );
         bnode.props = vnode.props;
         bnode.hparent = hparent;
       } else {
         unmount(bnode);
         const hookContext = new HookContext(forceUpdate);
         const vchild = hookContext.wrap(() => vnode.render(vnode.props));
-        const child = reconcileNode(vchild, emptyNode(), hparent, preSlot);
+        const child = reconcileNode(
+          vchild,
+          emptyNode(),
+          hparent,
+          preSlot,
+          effectManager
+        );
         bnode = { ...vnode, child, hparent, hookContext } satisfies BCustom;
       }
       bnode.child.parent = bnode;
@@ -131,6 +161,11 @@ function reconcileNode(
     }
   }
   return bnode;
+}
+
+// TODO
+class EffectManager {
+  run() {}
 }
 
 // `hnode` is positioned after `preSlot` within `hparent`
@@ -155,7 +190,8 @@ export function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
   const preSlot = findPreviousSlot(bnode);
 
   // reconcile
-  const newBnode = reconcileNode(vnode, bnode, bnode.hparent, preSlot);
+  const effectManager = new EffectManager();
+  const newBnode = reconcileNode(vnode, bnode, bnode.hparent, preSlot, effectManager);
   tinyassert(newBnode === bnode); // reconciled over itself without unmount (i.e. should be same `key` and `render`)
 
   // fix up ancestors slot
@@ -163,6 +199,8 @@ export function selfReconcileCustom(vnode: VCustom, bnode: BCustom) {
   if (oldSlot !== newSlot) {
     updateParentSlot(bnode);
   }
+
+  effectManager.run();
 }
 
 function findPreviousSlot(child: BNode): HNode | undefined {
