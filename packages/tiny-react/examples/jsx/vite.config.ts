@@ -6,7 +6,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     outDir: "./dist/vite",
-    minify: false,
+    minify: true, // set `false` to verify transpilated output easily
   },
   plugins: [
     // test babel transpilation used by this plugin.
