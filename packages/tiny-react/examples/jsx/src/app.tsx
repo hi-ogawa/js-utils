@@ -229,10 +229,10 @@ function TestTodoApp() {
             />
             <button
               className={
-                "antd-btn w-5 h-5 " +
+                "antd-btn antd-btn-ghost w-5 h-5 " +
                 (todo.checked
-                  ? "i-ri-checkbox-fill"
-                  : "i-ri-checkbox-blank-fill")
+                  ? "i-ri-checkbox-line"
+                  : "i-ri-checkbox-blank-line")
               }
               onclick={() => {
                 setTodos((prev) => {
