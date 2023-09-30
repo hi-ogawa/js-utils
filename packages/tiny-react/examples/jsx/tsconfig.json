@@ -4,9 +4,8 @@
   "compilerOptions": {
     "outDir": "dist/tsc",
     "noEmit": false,
-    "types": ["@hiogawa/tiny-react/jsx"],
-    "jsx": "react",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@hiogawa/tiny-react"
   }
 }

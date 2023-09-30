@@ -1,4 +1,4 @@
-import { Fragment, h } from "@hiogawa/tiny-react";
+import { Fragment } from "@hiogawa/tiny-react";
 
 export function _typeCheck() {
   <div />;
