@@ -297,10 +297,15 @@ function moveBnodesByKey(
   });
 }
 
+// cf.
+// https://github.com/preactjs/preact/blame/08b07ccea62bfdb44b983bfe69ae73eb5e4f43c7/src/diff/props.js#L17-L29
+// https://github.com/preactjs/preact/blob/08b07ccea62bfdb44b983bfe69ae73eb5e4f43c7/compat/src/render.js#L114
+// https://github.com/ryansolid/dom-expressions/blob/a2bd455055f5736bb591abe69a5f5b52568b9ea6/packages/babel-plugin-jsx-dom-expressions/src/dom/element.js#L219-L246
+// https://github.com/ryansolid/dom-expressions/blob/a2bd455055f5736bb591abe69a5f5b52568b9ea6/packages/dom-expressions/src/constants.js#L30-L39
 function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
   for (const k in oldProps) {
     if (!(k in props)) {
-      removeTagProp(bnode, k);
+      setTagProp(bnode, k, null);
     }
   }
   for (const k in props) {
@@ -311,34 +316,37 @@ function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
 }
 
 function setTagProp(bnode: BTag, key: string, value: unknown) {
-  // TODO: InputElement.value etc... is not an attribute
-  // TODO: support defalutValue?
-  if (key.startsWith("on")) {
-    const eventType = key.slice(2).toLowerCase();
-    const listener = bnode.listeners.get(eventType);
-    if (listener) {
-      bnode.hnode.removeEventListener(eventType, listener);
-    }
-    tinyassert(
-      typeof value === "function",
-      `Invalid event listener prop for '${eventType}'`
-    );
-    bnode.listeners.set(eventType, value as any);
-    bnode.hnode.addEventListener(eventType, value as any);
-  } else {
-    bnode.hnode.setAttribute(key, value as any);
-  }
-}
+  const { listeners, hnode } = bnode;
 
-function removeTagProp(bnode: BTag, key: string) {
   if (key.startsWith("on")) {
     const eventType = key.slice(2).toLowerCase();
-    const listener = bnode.listeners.get(eventType);
+    const listener = listeners.get(eventType);
     if (listener) {
-      bnode.hnode.removeEventListener(eventType, listener);
+      hnode.removeEventListener(eventType, listener);
     }
+    if (value != null) {
+      tinyassert(
+        typeof value === "function",
+        `Invalid event listener prop for '${eventType}'`
+      );
+      listeners.set(eventType, value as any);
+      hnode.addEventListener(eventType, value as any);
+    }
+    return;
+  }
+
+  // TODO: support defalutValue?
+  if (key in hnode) {
+    try {
+      (hnode as any)[key] = value != null ? value : "";
+      return;
+    } catch {}
+  }
+
+  if (value != null) {
+    hnode.setAttribute(key, value as any);
   } else {
-    bnode.hnode.removeAttribute(key);
+    hnode.removeAttribute(key);
   }
 }
 

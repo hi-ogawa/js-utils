@@ -1,5 +1,5 @@
 import { getTheme, setTheme } from "@hiogawa/theme-script";
-import { useCallback } from "@hiogawa/tiny-react";
+import { useState } from "@hiogawa/tiny-react";
 
 export function App() {
   return (
@@ -17,20 +17,18 @@ export function App() {
 }
 
 function ThemeSelect() {
+  const [value, setValue] = useState(getTheme());
+
   return (
     <label class="flex gap-2">
       Theme
       <select
         class="antd-input px-1"
-        // TODO: defaultValue?
-        ref={useCallback((el) => {
-          if (el) {
-            el.value = getTheme();
-          }
-        }, [])}
-        value={getTheme()}
+        value={value}
         onChange={(e: any) => {
-          setTheme(e.currentTarget.value);
+          const newValue = e.currentTarget.value;
+          setTheme(newValue);
+          setValue(newValue);
         }}
       >
         <option value="system">System</option>
