@@ -31,7 +31,7 @@ export type VTag = {
   name: string; // tagName
   props: Props;
   child: VNode;
-  ref?: (el: HTag | null) => VNode;
+  ref?: (el: HTag | null) => VNode; // core only supports callback. maybe { current: T } can be implemented in compat layer.
 };
 
 // text node

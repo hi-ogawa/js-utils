@@ -57,7 +57,6 @@ export namespace JSX {
 
   export interface IntrinsicAttributes {
     key?: NodeKey;
-    ref?: unknown; // TODO: type it in ToIntrinsicElementProps
   }
 
   export interface IntrinsicElements extends HTMLElementTagNameToProps {}
@@ -82,12 +81,13 @@ export namespace JSX {
 
   type ToIntrinsicElementProps<T> = Omit<
     Partial<T>,
-    | keyof (IntrinsicAttributes & ElementChildrenAttribute)
-    | keyof GlobalEventHandlers
+    keyof GlobalEventHandlers | keyof ElementChildrenAttribute
   > &
+    Partial<PatchedEventHandlers<T>> &
     IntrinsicAttributes &
-    ElementChildrenAttribute &
-    Partial<PatchedEventHandlers<T>>;
+    ElementChildrenAttribute & {
+      ref?: (el: T | null) => void;
+    };
 
   type HTMLElementTagNameToProps = {
     [T in keyof HTMLElementTagNameMap]: ToIntrinsicElementProps<

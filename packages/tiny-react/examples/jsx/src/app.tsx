@@ -1,5 +1,5 @@
 import { getTheme, setTheme } from "@hiogawa/theme-script";
-import { useState } from "@hiogawa/tiny-react";
+import { useCallback, useState } from "@hiogawa/tiny-react";
 
 export function App() {
   return (
@@ -11,6 +11,7 @@ export function App() {
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto">
         <TestFragment />
         <TestForm />
+        <TestRef />
       </div>
     </div>
   );
@@ -65,7 +66,7 @@ function TestForm() {
         <label className="flex flex-col gap-1">
           <span className="text-colorTextSecondary">input</span>
           <input
-            className="antd-input p-1"
+            className="antd-input px-1"
             value={inputValue}
             oninput={(e) => {
               setInputValue(e.currentTarget.value);
@@ -76,6 +77,29 @@ function TestForm() {
       <details>
         <pre>{JSON.stringify({ inputValue })}</pre>
       </details>
+    </div>
+  );
+}
+
+function TestRef() {
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <h1>{TestRef.name}</h1>
+      <div className="flex flex-col gap-2">
+        <label className="flex flex-col gap-1">
+          <span className="text-colorTextSecondary">
+            set default value via ref callback
+          </span>
+          <input
+            className="antd-input px-1"
+            ref={useCallback((el: HTMLInputElement | null) => {
+              if (el) {
+                el.value = "hello";
+              }
+            }, [])}
+          />
+        </label>
+      </div>
     </div>
   );
 }
