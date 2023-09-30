@@ -65,10 +65,15 @@ export namespace JSX {
     div: HTMLAttributes;
     span: HTMLAttributes;
     h1: HTMLAttributes;
+    label: HTMLAttributes;
+    select: HTMLAttributes;
+    option: HTMLAttributes;
   }
 
   type HTMLAttributes = IntrinsicAttributes &
     ElementChildrenAttribute & {
       class?: string;
+      onChange?: unknown;
+      value?: unknown;
     };
 }

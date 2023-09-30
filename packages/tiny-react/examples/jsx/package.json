@@ -10,6 +10,7 @@
     "build:tsc": "tsc"
   },
   "devDependencies": {
+    "@hiogawa/theme-script": "workspace:*",
     "@hiogawa/tiny-react": "workspace:*",
     "@hiogawa/unocss-preset-antd": "2.2.1-pre.3",
     "@hiogawa/utils": "workspace:*",

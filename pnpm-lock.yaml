@@ -207,6 +207,9 @@ importers:
 
   packages/tiny-react/examples/jsx:
     devDependencies:
+      '@hiogawa/theme-script':
+        specifier: workspace:*
+        version: link:../../../theme-script
       '@hiogawa/tiny-react':
         specifier: workspace:*
         version: link:../..
@@ -1454,7 +1457,7 @@ packages:
       '@unocss/preset-uno': 0.54.0
       '@unocss/reset': 0.48.5
       local-pkg: 0.4.3
-      unocss: 0.53.6(postcss@8.4.27)(vite@4.4.7)
+      unocss: 0.53.6(postcss@8.4.27)(vite@4.4.6)
     dev: true
 
   /@iconify-json/ri@1.1.10:

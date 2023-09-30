@@ -311,6 +311,8 @@ function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
 }
 
 function setTagProp(bnode: BTag, key: string, value: unknown) {
+  // TODO: InputElement.value etc... is not an attribute
+  // TODO: support defalutValue?
   if (key.startsWith("on")) {
     const eventType = key.slice(2).toLowerCase();
     const listener = bnode.listeners.get(eventType);

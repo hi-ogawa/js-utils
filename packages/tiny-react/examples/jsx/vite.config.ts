@@ -1,3 +1,4 @@
+import { themeScriptPlugin } from "@hiogawa/theme-script/dist/vite";
 import react from "@vitejs/plugin-react";
 import unocss from "unocss/vite";
 import { defineConfig } from "vite";
@@ -14,7 +15,8 @@ export default defineConfig({
       react({
         jsxImportSource: "@hiogawa/tiny-react",
       }),
-    // TODO: fix peer-dep?
+    // TODO: bad peer-dep?
     unocss() as any,
+    themeScriptPlugin(),
   ],
 });
