@@ -67,7 +67,8 @@ export namespace JSX {
     h1: HTMLAttributes;
   }
 
-  type HTMLAttributes = IntrinsicAttributes & ElementChildrenAttribute & {
-    class?: string;
-  };
+  type HTMLAttributes = IntrinsicAttributes &
+    ElementChildrenAttribute & {
+      class?: string;
+    };
 }
