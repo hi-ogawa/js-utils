@@ -1,4 +1,4 @@
-import { type NodeKey, type Props, type VNode, emptyNode } from "./virtual-dom";
+import { type NodeKey, type Props, type VNode } from "./virtual-dom";
 
 //
 // helper to construct VNode
@@ -28,7 +28,15 @@ export function h(
 ): VNode {
   const { key, ...props } = inProps as { key?: NodeKey };
 
-  const child = normalizeComponentChildren(children);
+  // safe to unwrap single child to avoid trivial fragment by the assumption that
+  // example such as:
+  //   h("div", {}, ...["some-varing", "id-list"].map(key => h("input", { key })))
+  // should be written without spreading
+  //   h("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
+  // note that this is guaranteed when `h` is used via jsx-runtime-based transpilation.
+  const child = normalizeComponentChildren(
+    children.length <= 1 ? children[0] : children
+  );
 
   if (typeof tag === "string") {
     const { ref, ...tagProps } = props as { ref?: any };
@@ -62,9 +70,6 @@ export function Fragment(props: { children?: ComponentChildren }): VNode {
 
 function normalizeComponentChildren(children?: ComponentChildren): VNode {
   if (Array.isArray(children)) {
-    if (children.length === 0) {
-      return emptyNode();
-    }
     return {
       type: "fragment",
       children: children.map((c) => normalizeComponentChildren(c)),
