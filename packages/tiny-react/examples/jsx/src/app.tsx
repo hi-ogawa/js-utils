@@ -1,5 +1,6 @@
 import { getTheme, setTheme } from "@hiogawa/theme-script";
 import { useCallback, useState } from "@hiogawa/tiny-react";
+import { range } from "@hiogawa/utils";
 
 export function App() {
   return (
@@ -57,26 +58,31 @@ function TestFragment() {
 }
 
 function TestForm() {
-  const [inputValue, setInputValue] = useState("");
+  const [values, setValues] = useState(() => range(3).map((i) => String(i)));
 
   return (
     <div className="border p-2 flex flex-col gap-2">
       <h1 className="text-lg">{TestForm.name}</h1>
       <div className="flex flex-col gap-2">
-        <label className="flex flex-col gap-1">
-          <span className="text-colorTextSecondary">input</span>
-          <input
-            className="antd-input px-1"
-            value={inputValue}
-            oninput={(e) => {
-              setInputValue(e.currentTarget.value);
-            }}
-          />
-        </label>
+        {values.map((value, i) => (
+          <label key={i} className="flex flex-col gap-1">
+            <span className="text-colorTextSecondary">input ({i})</span>
+            <input
+              className="antd-input px-1"
+              value={value}
+              oninput={(e) => {
+                setValues((prev) => {
+                  prev = [...prev];
+                  prev[i] = e.currentTarget.value;
+                  return prev;
+                });
+              }}
+            />
+          </label>
+        ))}
       </div>
-      <details>
-        <pre>{JSON.stringify({ inputValue })}</pre>
-      </details>
+      <div className="border-t my-1"></div>
+      <pre className="text-sm">debug: {JSON.stringify({ values })}</pre>
     </div>
   );
 }
