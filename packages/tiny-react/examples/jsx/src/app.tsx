@@ -17,7 +17,7 @@ export function App() {
 }
 
 function ThemeSelect() {
-  const [value, setValue] = useState(getTheme());
+  const [value, setValue] = useState(() => getTheme());
 
   return (
     <label class="flex gap-2">

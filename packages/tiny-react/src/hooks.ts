@@ -40,6 +40,15 @@ function cleanupEffect(hook: EffectHookState) {
   }
 }
 
+type InitialState<T> = T | (() => T);
+
+type NextState<T> = T | ((prev: T) => T);
+
+function resolveNextState<T>(prev: T, next: NextState<T>): T {
+  // cannot narrow since `T` could be a function
+  return typeof next === "function" ? (next as any)(prev) : next;
+}
+
 export class HookContext {
   // expose global
   static current: HookContext | undefined;
@@ -81,19 +90,22 @@ export class HookContext {
   // hook api
   //
 
-  useState = <T>(initialState: T) => {
-    return this.useReducer<T, T>((_prev, next) => next, initialState);
+  useState = <T>(initialState: InitialState<T>) => {
+    return this.useReducer<T, NextState<T>>(
+      (prev, next) => resolveNextState(prev, next),
+      initialState
+    );
   };
 
   useReducer = <S, A>(
     reducer: (prevState: S, action: A) => S,
-    initialState: S
+    initialState: InitialState<S>
   ) => {
     // init hook state
     if (this.initial) {
       this.hooks.push({
         type: "reducer",
-        state: initialState,
+        state: resolveNextState(undefined!, initialState),
       });
     }
     const hookToCheck = this.hooks[this.hookCount++];

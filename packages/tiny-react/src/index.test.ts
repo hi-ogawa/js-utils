@@ -509,7 +509,7 @@ describe("hooks", () => {
         h(state % 2 === 0 ? "span" : "div", {}, state),
         h("button", {
           onClick: () => {
-            setState(state + 1);
+            setState((prev) => prev + 1);
           },
         })
       );
