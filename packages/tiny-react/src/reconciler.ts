@@ -101,15 +101,14 @@ function reconcileNode(
       // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
       // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
       if (bnode.type === "fragment" && bnode.key === vnode.key) {
-        console.log("== before: children", {
-          v: vnode.children,
-          b: bnode.children,
-        });
-        moveBnodesByKey(vnode.children, bnode.children);
-        console.log("== after: children", {
-          v: vnode.children,
-          b: bnode.children,
-        });
+        const [newChildren, oldChildren] = alignChildrenByKey(
+          vnode.children,
+          bnode.children
+        );
+        bnode.children = newChildren;
+        for (const bnode of oldChildren) {
+          unmount(bnode);
+        }
       } else {
         unmount(bnode);
         bnode = { ...vnode, children: [] } satisfies BFragment;
@@ -226,7 +225,7 @@ function findPreviousSlot(child: BNode): HNode | undefined {
   let parent = child.parent;
   while (parent) {
     if (parent.type === "tag") {
-      // no slot i.e. child is first within parent tag
+      // no slot i.e. new node will be the first child within parent tag
       return;
     }
     if (parent.type === "fragment") {
@@ -275,34 +274,40 @@ function updateParentSlot(child: BNode) {
   }
 }
 
-function moveBnodesByKey(
+function alignChildrenByKey(
   vnodes: VNode[],
-  bnodes: BNode[] // mutated
-) {
-  const bKeyToIndex = new Map<NodeKey, number>();
-  bnodes.forEach((bnode, i) => {
-    const bkey = getNodeKey(bnode);
-    if (typeof bkey !== "undefined") {
-      bKeyToIndex.set(bkey, i);
-    }
-  });
-
-  // fill bnodes to ensure bnodes.length >= vnodes.length
-  vnodes.forEach((_v, i) => {
-    bnodes[i] ??= emptyNode();
-  });
-
-  const oldBnodes = [...bnodes];
+  bnodes: BNode[]
+): [BNode[], BNode[]] {
+  const keyMap = new Map<NodeKey, number>();
 
   vnodes.forEach((vnode, i) => {
-    const vkey = getNodeKey(vnode);
-    if (typeof vkey !== "undefined") {
-      const j = bKeyToIndex.get(vkey);
-      if (typeof j !== "undefined" && i !== j) {
-        bnodes[i] = oldBnodes[j];
-      }
+    const key = getNodeKey(vnode);
+    if (typeof key !== "undefined") {
+      keyMap.set(key, i);
     }
   });
+
+  // for now, handle only when all nodes have keys
+  if (keyMap.size !== vnodes.length) {
+    return [bnodes, []];
+  }
+
+  const newBnodes = vnodes.map(() => emptyNode());
+  const oldBnodes: BNode[] = [];
+
+  for (const bnode of bnodes) {
+    const key = getNodeKey(bnode);
+    if (typeof key !== "undefined") {
+      const i = keyMap.get(key);
+      if (typeof i !== "undefined") {
+        newBnodes[i] = bnode;
+        continue;
+      }
+    }
+    oldBnodes.push(bnode);
+  }
+
+  return [newBnodes, oldBnodes];
 }
 
 // cf.

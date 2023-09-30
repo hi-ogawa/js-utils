@@ -156,17 +156,28 @@ function TestEffect() {
 // cf. https://github.com/adamhaile/surplus#example
 function TestTodoApp() {
   interface TodoItem {
+    id: string;
     value: string;
     checked: number;
   }
 
   const [input, setInput] = useState("");
-  const [todos, setTodos] = useState<TodoItem[]>([
+  const [todos, setTodos] = useState<TodoItem[]>(() => [
     {
+      id: generateId(),
+      value: "do something",
+      checked: 1,
+    },
+    {
+      id: generateId(),
       value: "do something",
       checked: 0,
     },
   ]);
+
+  function generateId() {
+    return Math.random().toString(36).slice(2);
+  }
 
   return (
     <div className="border p-2 flex flex-col gap-2">
@@ -182,6 +193,7 @@ function TestTodoApp() {
             setInput("");
             setTodos((prev) => [
               {
+                id: generateId(),
                 value: input,
                 checked: 0,
               },
@@ -200,10 +212,8 @@ function TestTodoApp() {
         {todos.length === 0 && (
           <div className="text-colorTextSecondary">No todo...</div>
         )}
-        {/* TODO: bug when key-ed element count changes inside the same fragment */}
-        {/* TODO: bug when deleting non-key-ed element? */}
         {todos.map((todo, i) => (
-          <div className="flex items-center gap-2">
+          <div key={todo.id} className="flex items-center gap-2">
             <input
               className="flex-1 antd-input px-2"
               value={todo.value}

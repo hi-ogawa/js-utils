@@ -355,11 +355,9 @@ describe(render, () => {
     const parent = document.createElement("main");
     const hc = (key: string) => h("div", { key }, key);
 
-    console.log("== render 1 ==");
     let bnode = render(h(Fragment, {}, []), parent);
     expect(parent).toMatchInlineSnapshot("<main />");
 
-    console.log("== render 2 ==");
     bnode = render(h(Fragment, {}, [hc("a")]), parent, bnode);
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -370,28 +368,33 @@ describe(render, () => {
     `);
 
     // prepend new child
-    console.log("== render 2 ==");
     bnode = render(h(Fragment, {}, [hc("b"), hc("a")]), parent, bnode);
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
           b
         </div>
+        <div>
+          a
+        </div>
       </main>
     `);
 
-    // TODO: more mixing
-    // console.log("== render 3 ==");
-    // bnode = render(h(Fragment, {}, [hc("c"), hc("a"), hc("b")]), parent, bnode);
+    bnode = render(h(Fragment, {}, [hc("c"), hc("a"), hc("b")]), parent, bnode);
 
-    // // TODO: <div>a</div> shouldn't disappear...
-    // expect(parent).toMatchInlineSnapshot(`
-    //   <main>
-    //     <div>
-    //       c
-    //     </div>
-    //   </main>
-    // `);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          c
+        </div>
+        <div>
+          a
+        </div>
+        <div>
+          b
+        </div>
+      </main>
+    `);
   });
 
   it("nested fragment", () => {
