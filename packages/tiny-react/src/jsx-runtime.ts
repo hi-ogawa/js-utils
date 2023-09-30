@@ -1,4 +1,4 @@
-import { type ComponentChildren, type ComponentType } from "./hyperscript";
+import { type ComponentChildren, type ComponentType, h } from "./hyperscript";
 import type { NodeKey, VNode } from "./virtual-dom";
 
 // jsx-runtime convention for type-checker and transpilers
@@ -7,14 +7,13 @@ import type { NodeKey, VNode } from "./virtual-dom";
 // https://github.com/preactjs/preact/blob/08b07ccea62bfdb44b983bfe69ae73eb5e4f43c7/jsx-runtime/src/index.js
 
 export function jsx(
-  type: ComponentType,
+  tag: ComponentType,
   props: { children?: ComponentChildren },
   key?: NodeKey
 ) {
-  // TODO
-  type;
-  props;
-  key;
+  // for now, just delegate to hyperscript without specific optimization
+  const { children, ...otherProps } = props;
+  return h(tag, { key, ...otherProps }, props.children);
 }
 
 export { jsx as jsxs, jsx as jsxDEV };

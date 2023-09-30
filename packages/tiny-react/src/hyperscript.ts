@@ -22,7 +22,7 @@ export type ComponentChild =
 export type ComponentChildren = ComponentChild | ComponentChildren[];
 
 export function h(
-  t: ComponentType,
+  tag: ComponentType,
   inProps: Props,
   ...children: ComponentChildren[]
 ): VNode {
@@ -30,17 +30,17 @@ export function h(
 
   const child = normalizeComponentChildren(children);
 
-  if (typeof t === "string") {
+  if (typeof tag === "string") {
     const { ref, ...tagProps } = props as { ref?: any };
     return {
       type: "tag",
-      name: t,
+      name: tag,
       key,
       ref,
       props: tagProps,
       child,
     };
-  } else if (typeof t === "function") {
+  } else if (typeof tag === "function") {
     return {
       type: "custom",
       key,
@@ -48,14 +48,14 @@ export function h(
         ...props,
         children: child,
       },
-      render: t,
+      render: tag,
     };
   }
-  return t satisfies never;
+  return tag satisfies never;
 }
 
 // we can probably optimize Fragment creation directly as { type: "fragment" }
-// but for now we wrap as { type: "custom" }
+// but for now we wrap as { type: "custom" }, which also helps testing the robustness of architecture
 export function Fragment(props: { children?: ComponentChildren }): VNode {
   return normalizeComponentChildren(props.children);
 }
