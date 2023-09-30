@@ -380,8 +380,8 @@ describe(render, () => {
       </main>
     `);
 
+    // mix
     bnode = render(h(Fragment, {}, [hc("c"), hc("a"), hc("b")]), parent, bnode);
-
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -389,6 +389,19 @@ describe(render, () => {
         </div>
         <div>
           a
+        </div>
+        <div>
+          b
+        </div>
+      </main>
+    `);
+
+    // delete
+    bnode = render(h(Fragment, {}, [hc("c"), hc("b")]), parent, bnode);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          c
         </div>
         <div>
           b

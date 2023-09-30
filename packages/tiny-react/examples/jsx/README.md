@@ -1,1 +1,3 @@
-check if jsx works in typescript
+# tiny-react example
+
+playground for integration test
