@@ -101,7 +101,15 @@ function reconcileNode(
       // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
       // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
       if (bnode.type === "fragment" && bnode.key === vnode.key) {
+        console.log("== before: children", {
+          v: vnode.children,
+          b: bnode.children,
+        });
         moveBnodesByKey(vnode.children, bnode.children);
+        console.log("== after: children", {
+          v: vnode.children,
+          b: bnode.children,
+        });
       } else {
         unmount(bnode);
         bnode = { ...vnode, children: [] } satisfies BFragment;

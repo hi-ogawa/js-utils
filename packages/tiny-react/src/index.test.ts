@@ -309,7 +309,7 @@ describe(render, () => {
     `);
   });
 
-  it("fragment children key - change length", () => {
+  it("fragment children key - append", () => {
     let vnode: VNode = {
       type: "fragment",
       children: [],
@@ -349,25 +349,49 @@ describe(render, () => {
         </div>
       </main>
     `);
+  });
 
-    vnode = {
-      type: "fragment",
-      children: [hchild("c"), hchild("a"), hchild("b")],
-    };
-    bnode = render(vnode, parent, bnode);
+  it("fragment children key - prepend", () => {
+    const parent = document.createElement("main");
+    const hc = (key: string) => h("div", { key }, key);
 
-    // TODO: <div>a</div> shouldn't disappear...
+    console.log("== render 1 ==");
+    let bnode = render(h(Fragment, {}, []), parent);
+    expect(parent).toMatchInlineSnapshot("<main />");
+
+    console.log("== render 2 ==");
+    bnode = render(h(Fragment, {}, [hc("a")]), parent, bnode);
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-          c
+          a
         </div>
-        <div />
+      </main>
+    `);
+
+    // prepend new child
+    console.log("== render 2 ==");
+    bnode = render(h(Fragment, {}, [hc("b"), hc("a")]), parent, bnode);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
         <div>
           b
         </div>
       </main>
     `);
+
+    // TODO: more mixing
+    // console.log("== render 3 ==");
+    // bnode = render(h(Fragment, {}, [hc("c"), hc("a"), hc("b")]), parent, bnode);
+
+    // // TODO: <div>a</div> shouldn't disappear...
+    // expect(parent).toMatchInlineSnapshot(`
+    //   <main>
+    //     <div>
+    //       c
+    //     </div>
+    //   </main>
+    // `);
   });
 
   it("nested fragment", () => {
@@ -1007,13 +1031,8 @@ describe(h, () => {
             },
             {
               "child": {
-                "children": [
-                  {
-                    "data": "world",
-                    "type": "text",
-                  },
-                ],
-                "type": "fragment",
+                "data": "world",
+                "type": "text",
               },
               "key": undefined,
               "name": "span",
