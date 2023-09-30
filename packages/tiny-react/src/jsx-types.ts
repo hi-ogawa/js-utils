@@ -1,4 +1,4 @@
-import type { ComponentType } from "./hyperscript";
+import type { ComponentChildren, ComponentType } from "./hyperscript";
 import type { NodeKey, VNode } from "./virtual-dom";
 
 // define types via ".ts" so that tsc/tsup catches type-error
@@ -19,7 +19,8 @@ import type { NodeKey, VNode } from "./virtual-dom";
 // > the compiler will check for React.JSX before checking for a global JSX.
 // > If the factory is defined as h, it will check for h.JSX before a global JSX.
 
-// constraint allowed jsx element tag e.g. <Component ... />
+// constraint what's usable as jsx element tag e.g. <div /> <Component ... />
+// `keyof IntrinsicElements` further constraints intrinsic tags
 export type ElementType = ComponentType;
 
 // type of JSX element e.g. <div /> <Component />
@@ -32,7 +33,7 @@ export interface IntrinsicClassAttributes {}
 export interface LibraryManagedAttributes {}
 
 export interface ElementChildrenAttribute {
-  children?: {};
+  children?: ComponentChildren;
 }
 
 export interface IntrinsicAttributes {

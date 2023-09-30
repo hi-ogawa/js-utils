@@ -10,10 +10,10 @@ export function _typeCheck() {
     {""}
   </div>;
 
-  // @ts-expect-error
+  // @ts-expect-error constraint by JSX.IntrinsicElements["span"]
   <span badAttr={0} />;
 
-  // @ts-expect-error error TS2339: Property 'xxx' does not exist on type 'JSX.IntrinsicElements'.
+  // @ts-expect-error constraint by keyof JSX.IntrinsicElements
   <xxx />;
 
   <Custom1 value="" opt={0} />;
@@ -22,7 +22,7 @@ export function _typeCheck() {
 
   <div>
     <span />
-    {/* TODO: should catch type-error? */}
+    {/* @ts-expect-error constraint by JSX.ElementChildrenAttribute */}
     {{ x: 0 }}
   </div>;
 
@@ -35,9 +35,10 @@ export function _typeCheck() {
   <Custom2>
     {0}
     {1}
+    {{ x: 0 }}
   </Custom2>;
 
-  // @ts-expect-error JSX.Element enforces custom component return type
+  // @ts-expect-error constraint by JSX.ElementType
   <Custom3 />;
   // @ts-expect-error
   <Custom4 />;
@@ -56,8 +57,8 @@ function Custom1(_props: { value: string; opt?: number }) {
   return <div />;
 }
 
-function Custom2(props: { children: number[] }) {
-  return <div>{props.children}</div>;
+function Custom2(_props: { children: (number | { x: number })[] }) {
+  return <div />;
 }
 
 function Custom3() {
