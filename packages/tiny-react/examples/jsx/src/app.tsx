@@ -165,12 +165,12 @@ function TestTodoApp() {
   const [todos, setTodos] = useState<TodoItem[]>(() => [
     {
       id: generateId(),
-      value: "do something",
+      value: "hello",
       checked: 1,
     },
     {
       id: generateId(),
-      value: "do something",
+      value: "world",
       checked: 0,
     },
   ]);
