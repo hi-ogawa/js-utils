@@ -25,10 +25,9 @@ function ThemeSelect() {
       <select
         className="antd-input px-1"
         value={value}
-        onchange={(e: any) => {
-          const newValue = e.currentTarget.value;
-          setTheme(newValue);
-          setValue(newValue);
+        onchange={(e) => {
+          setTheme(e.currentTarget.value);
+          setValue(e.currentTarget.value);
         }}
       >
         <option value="system">System</option>
@@ -68,9 +67,7 @@ function TestForm() {
           <input
             className="antd-input p-1"
             value={inputValue}
-            // no support for react-like special onChange semantics...
-            oninput={(e: any) => {
-              console.log(e.currentTarget.value);
+            oninput={(e) => {
               setInputValue(e.currentTarget.value);
             }}
           />
