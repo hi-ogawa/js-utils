@@ -2,12 +2,20 @@
   "name": "tiny-react-examples-jsx",
   "private": true,
   "scripts": {
-    "build:tsc": "tsc",
-    "build:vite": "false",
-    "build:esbuild": "false"
+    "dev": "pnpm run /^dev:/",
+    "dev:vite": "vite --no-clearScreen",
+    "dev:tsc": "tsc --watch --preserveWatchOutput",
+    "build": "pnpm run --seq /^build:/",
+    "build:vite": "vite build",
+    "build:tsc": "tsc"
   },
   "devDependencies": {
-    "@hiogawa/tiny-react": "workspace:*"
+    "@hiogawa/tiny-react": "workspace:*",
+    "@hiogawa/unocss-preset-antd": "2.2.1-pre.3",
+    "@hiogawa/utils": "workspace:*",
+    "@vitejs/plugin-react": "^4.0.1",
+    "unocss": "^0.53.6",
+    "vite": "^4.4.6"
   },
   "volta": {
     "extends": "../../package.json"

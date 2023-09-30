@@ -3,6 +3,7 @@ import type { NodeKey, VNode } from "./virtual-dom";
 
 // jsx-runtime convention for type-checker and transpilers
 // https://www.typescriptlang.org/tsconfig#jsxImportSource
+// https://esbuild.github.io/api/#jsx-import-source
 // https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md#detailed-design
 // https://github.com/preactjs/preact/blob/08b07ccea62bfdb44b983bfe69ae73eb5e4f43c7/jsx-runtime/src/index.js
 
@@ -63,7 +64,10 @@ export namespace JSX {
   export interface IntrinsicElements {
     div: HTMLAttributes;
     span: HTMLAttributes;
+    h1: HTMLAttributes;
   }
 
-  type HTMLAttributes = IntrinsicAttributes & ElementChildrenAttribute;
+  type HTMLAttributes = IntrinsicAttributes & ElementChildrenAttribute & {
+    class?: string;
+  };
 }
