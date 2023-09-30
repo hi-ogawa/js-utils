@@ -235,7 +235,7 @@ describe(render, () => {
     `);
   });
 
-  it("fragment children key", () => {
+  it("fragment children key basic", () => {
     const vnode: VNode = {
       type: "fragment",
       children: [..."abc"].map((key) => h("span", { key, "data-prop": key })),
@@ -305,6 +305,67 @@ describe(render, () => {
           data-mutate="a"
           data-prop="a"
         />
+      </main>
+    `);
+  });
+
+  it("fragment children key - change length", () => {
+    let vnode: VNode = {
+      type: "fragment",
+      children: [],
+    };
+    const parent = document.createElement("main");
+
+    const hchild = (key: string) => h("div", { key }, key);
+
+    let bnode = render(vnode, parent);
+    expect(parent).toMatchInlineSnapshot("<main />");
+
+    vnode = {
+      type: "fragment",
+      children: [hchild("a")],
+    };
+    bnode = render(vnode, parent, bnode);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          a
+        </div>
+      </main>
+    `);
+
+    vnode = {
+      type: "fragment",
+      children: [hchild("a"), hchild("b")],
+    };
+    bnode = render(vnode, parent, bnode);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          a
+        </div>
+        <div>
+          b
+        </div>
+      </main>
+    `);
+
+    vnode = {
+      type: "fragment",
+      children: [hchild("c"), hchild("a"), hchild("b")],
+    };
+    bnode = render(vnode, parent, bnode);
+
+    // TODO: <div>a</div> shouldn't disappear...
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          c
+        </div>
+        <div />
+        <div>
+          b
+        </div>
       </main>
     `);
   });
