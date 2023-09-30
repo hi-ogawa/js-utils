@@ -11,22 +11,24 @@ import { type NodeKey, type Props, type VNode, emptyNode } from "./virtual-dom";
 
 export type ComponentType = string | ((props: any) => VNode);
 
-type ComponentChild = VNode | string | number | null | undefined | boolean;
+export type ComponentChild =
+  | VNode
+  | string
+  | number
+  | null
+  | undefined
+  | boolean;
+
+export type ComponentChildren = ComponentChild | ComponentChildren[];
 
 export function h(
   t: ComponentType,
   inProps: Props,
-  ...children: ComponentChild[]
+  ...children: ComponentChildren[]
 ): VNode {
-  const child: VNode =
-    children.length === 0
-      ? emptyNode()
-      : {
-          type: "fragment",
-          children: children.map((c) => normalizeComponentChild(c)),
-        };
-
   const { key, ...props } = inProps as { key?: NodeKey };
+
+  const child = normalizeComponentChildren(children);
 
   if (typeof t === "string") {
     const { ref, ...tagProps } = props as { ref?: any };
@@ -52,8 +54,23 @@ export function h(
   return t satisfies never;
 }
 
-export function Fragment(props: { children: VNode }): VNode {
-  return props.children;
+// we can probably optimize Fragment creation directly as { type: "fragment" }
+// but for now we wrap as { type: "custom" }
+export function Fragment(props: { children?: ComponentChildren }): VNode {
+  return normalizeComponentChildren(props.children);
+}
+
+function normalizeComponentChildren(children?: ComponentChildren): VNode {
+  if (Array.isArray(children)) {
+    if (children.length === 0) {
+      return emptyNode();
+    }
+    return {
+      type: "fragment",
+      children: children.map((c) => normalizeComponentChildren(c)),
+    };
+  }
+  return normalizeComponentChild(children);
 }
 
 function normalizeComponentChild(child: ComponentChild): VNode {

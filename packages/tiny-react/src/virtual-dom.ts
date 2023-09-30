@@ -19,6 +19,7 @@ export type HText = Text;
 // TODO: optimize object shape?
 export type VNode = VEmpty | VTag | VText | VCustom | VFragment;
 
+// TODO: safe to optmize into singleton constant?
 export type VEmpty = {
   type: "empty";
 };
@@ -62,6 +63,8 @@ export type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 export type BNodeParent = BTag | BCustom | BFragment;
 
 export type BEmpty = VEmpty & {
+  // not needed since only we need to traverse up only from BCustom?
+  // but for now, make it easier by having `Bnode.parent` type
   parent?: BNodeParent;
 };
 

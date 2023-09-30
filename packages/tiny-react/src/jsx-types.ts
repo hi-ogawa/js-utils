@@ -1,5 +1,7 @@
 import type { ComponentType } from "./hyperscript";
-import type { NodeKey } from "./virtual-dom";
+import type { NodeKey, VNode } from "./virtual-dom";
+
+// define types via ".ts" so that tsc/tsup catches type-error
 
 // probably nothing is spec'ed so figure it out from checker.ts
 // see "namespace JsxNames" at
@@ -20,8 +22,10 @@ import type { NodeKey } from "./virtual-dom";
 // constraint allowed jsx element tag e.g. <Component ... />
 export type ElementType = ComponentType;
 
-// not sure what these for...
-export type Element = {};
+// type of JSX element e.g. <div /> <Component />
+export type Element = VNode;
+
+// not sure what these are for...
 export interface ElementClass {}
 export interface ElementAttributesProperty {}
 export interface IntrinsicClassAttributes {}

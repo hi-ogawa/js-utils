@@ -20,6 +20,12 @@ export function _typeCheck() {
 
   <Custom1 value=""></Custom1>;
 
+  <div>
+    <span />
+    {/* TODO: should catch type-error? */}
+    {{ x: 0 }}
+  </div>;
+
   // @ts-expect-error unexpected children props
   <Custom1 value="">xyz</Custom1>;
 
@@ -39,18 +45,19 @@ export function _typeCheck() {
   // fragment
   <>x</>;
 
-  // @ts-expect-error TODO: children types are not "jsx compatible"...
   <Fragment>x</Fragment>;
+
+  <Fragment>
+    x {0} {[0, 1]}
+  </Fragment>;
 }
 
-function Custom1(props: { value: string; opt?: number }) {
-  props;
-  return h("div", {});
+function Custom1(_props: { value: string; opt?: number }) {
+  return <div />;
 }
 
 function Custom2(props: { children: number[] }) {
-  props;
-  return h("div", {});
+  return <div>{props.children}</div>;
 }
 
 function Custom3() {
