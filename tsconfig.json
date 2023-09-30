@@ -17,6 +17,9 @@
       "path": "packages/query-proxy"
     },
     {
+      "path": "packages/sort-package-json"
+    },
+    {
       "path": "packages/theme-script"
     },
     {
@@ -27,6 +30,12 @@
     },
     {
       "path": "packages/tiny-jwt"
+    },
+    {
+      "path": "packages/tiny-react"
+    },
+    {
+      "path": "packages/tiny-react/examples/jsx"
     },
     {
       "path": "packages/tiny-rpc"
