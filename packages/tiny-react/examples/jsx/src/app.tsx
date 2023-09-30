@@ -1,5 +1,5 @@
 import { getTheme, setTheme } from "@hiogawa/theme-script";
-import { useCallback, useState } from "@hiogawa/tiny-react";
+import { useCallback, useEffect, useRef, useState } from "@hiogawa/tiny-react";
 import { range } from "@hiogawa/utils";
 
 export function App() {
@@ -10,9 +10,11 @@ export function App() {
         <ThemeSelect />
       </div>
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto">
-        <TestFragment />
-        <TestForm />
+        <TestTodoApp />
+        <TestState />
+        <TestEffect />
         <TestRef />
+        <TestFragment />
       </div>
     </div>
   );
@@ -57,12 +59,12 @@ function TestFragment() {
   );
 }
 
-function TestForm() {
+function TestState() {
   const [values, setValues] = useState(() => range(3).map((i) => String(i)));
 
   return (
     <div className="border p-2 flex flex-col gap-2">
-      <h1 className="text-lg">{TestForm.name}</h1>
+      <h1 className="text-lg">{TestState.name}</h1>
       <div className="flex flex-col gap-2">
         {values.map((value, i) => (
           <label key={i} className="flex flex-col gap-1">
@@ -106,6 +108,56 @@ function TestRef() {
           />
         </label>
       </div>
+    </div>
+  );
+}
+
+function TestEffect() {
+  const [state, setState] = useState(0);
+
+  const ref1 = useRef(0);
+  const ref2 = useRef(0);
+
+  useEffect(() => {
+    ref1.current += 1;
+  }, []);
+
+  useEffect(() => {
+    ref2.current += 1;
+  });
+
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <h1>{TestEffect.name}</h1>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span>Counter</span>
+          <span className="min-w-[1rem] text-center">{state}</span>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev - 1)}
+          >
+            -1
+          </button>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev + 1)}
+          >
+            +1
+          </button>
+        </div>
+        <div>Effect1 {ref1.current}</div>
+        <div>Effect2 {ref2.current}</div>
+      </div>
+    </div>
+  );
+}
+
+function TestTodoApp() {
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <h1>{TestTodoApp.name}</h1>
+      <div className="flex flex-col gap-2">TODO</div>
     </div>
   );
 }
