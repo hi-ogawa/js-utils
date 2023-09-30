@@ -219,6 +219,9 @@ importers:
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../../../utils
+      '@iconify-json/ri':
+        specifier: ^1.1.10
+        version: 1.1.10
       '@vitejs/plugin-react':
         specifier: ^4.0.1
         version: 4.0.1(vite@4.4.7)
@@ -1457,7 +1460,7 @@ packages:
       '@unocss/preset-uno': 0.54.0
       '@unocss/reset': 0.48.5
       local-pkg: 0.4.3
-      unocss: 0.53.6(postcss@8.4.27)(vite@4.4.6)
+      unocss: 0.53.6(postcss@8.4.27)(vite@4.4.7)
     dev: true
 
   /@iconify-json/ri@1.1.10:

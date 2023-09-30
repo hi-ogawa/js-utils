@@ -153,11 +153,103 @@ function TestEffect() {
   );
 }
 
+// cf. https://github.com/adamhaile/surplus#example
 function TestTodoApp() {
+  interface TodoItem {
+    value: string;
+    checked: number;
+  }
+
+  const [input, setInput] = useState("");
+  const [todos, setTodos] = useState<TodoItem[]>([
+    {
+      value: "do something",
+      checked: 0,
+    },
+  ]);
+
   return (
     <div className="border p-2 flex flex-col gap-2">
       <h1>{TestTodoApp.name}</h1>
-      <div className="flex flex-col gap-2">TODO</div>
+      <div className="flex flex-col gap-2">
+        <form
+          className="flex flex-col w-full"
+          onsubmit={(e) => {
+            e.preventDefault();
+            if (!input.trim()) {
+              return;
+            }
+            setInput("");
+            setTodos((prev) => [
+              {
+                value: input,
+                checked: 0,
+              },
+              ...prev,
+            ]);
+          }}
+        >
+          <input
+            placeholder="new todo..."
+            className="antd-input px-2"
+            value={input}
+            oninput={(e) => setInput(e.currentTarget.value)}
+          />
+        </form>
+        <div className="border-t my-1"></div>
+        {todos.length === 0 && (
+          <div className="text-colorTextSecondary">No todo...</div>
+        )}
+        {/* TODO: bug when key-ed element count changes inside the same fragment */}
+        {/* TODO: bug when deleting non-key-ed element? */}
+        {todos.map((todo, i) => (
+          <div className="flex items-center gap-2">
+            <input
+              className="flex-1 antd-input px-2"
+              value={todo.value}
+              oninput={(e) => {
+                const value = e.currentTarget.value;
+                setTodos((prev) => {
+                  prev = prev.slice();
+                  prev[i] = { ...prev[i] };
+                  prev[i].value = value;
+                  return prev;
+                });
+              }}
+            />
+            <button
+              className={
+                "antd-btn w-5 h-5 " +
+                (todo.checked
+                  ? "i-ri-checkbox-fill"
+                  : "i-ri-checkbox-blank-fill")
+              }
+              onclick={() => {
+                setTodos((prev) => {
+                  prev = prev.slice();
+                  prev[i] = { ...prev[i] };
+                  prev[i].checked ^= 1;
+                  return prev;
+                });
+              }}
+            />
+            <button
+              className="antd-btn antd-btn-ghost i-ri-close-line w-5 h-5"
+              onclick={() => {
+                setTodos((prev) => {
+                  prev = prev.slice();
+                  prev.splice(i, 1);
+                  return prev;
+                });
+              }}
+            />
+          </div>
+        ))}
+      </div>
+      <details className="text-sm">
+        <summary>debug</summary>
+        <pre>{JSON.stringify({ input, todos }, null, 2)}</pre>
+      </details>
     </div>
   );
 }

@@ -14,6 +14,7 @@
     "@hiogawa/tiny-react": "workspace:*",
     "@hiogawa/unocss-preset-antd": "2.2.1-pre.3",
     "@hiogawa/utils": "workspace:*",
+    "@iconify-json/ri": "^1.1.10",
     "@vitejs/plugin-react": "^4.0.1",
     "unocss": "^0.53.6",
     "vite": "^4.4.6"
