@@ -553,6 +553,30 @@ describe("hooks", () => {
     `);
   });
 
+  it("no support for dispatch during render", () => {
+    function Custom() {
+      const [state, setState] = useState(0);
+      setState(1);
+      return h(
+        "div",
+        {},
+        h(state % 2 === 0 ? "span" : "div", {}, state),
+        h("button", {
+          onClick: () => {
+            setState((prev) => prev + 1);
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    expect(() =>
+      render(h(Custom, {}), parent)
+    ).toThrowErrorMatchingInlineSnapshot(
+      "\"Cannot access 'vcustom' before initialization\""
+    );
+  });
+
   it("useRef", () => {
     function Custom() {
       const ref = useRef(0);
