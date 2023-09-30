@@ -57,27 +57,27 @@ export namespace JSX {
 
   export interface IntrinsicAttributes {
     key?: NodeKey;
-    ref?: unknown;
+    ref?: unknown; // TODO: type it in ToIntrinsicElementProps
   }
 
-  // TODO: auto generate
-  export interface IntrinsicElements {
-    div: HTMLAttributes;
-    span: HTMLAttributes;
-    h1: HTMLAttributes;
-    label: HTMLAttributes;
-    input: HTMLAttributes;
-    select: HTMLAttributes;
-    option: HTMLAttributes;
-    details: HTMLAttributes;
-    pre: HTMLAttributes;
-  }
+  export interface IntrinsicElements extends HTMLElementTagNameToProps {}
 
-  type HTMLAttributes = IntrinsicAttributes &
-    ElementChildrenAttribute & {
-      class?: string;
-      onChange?: unknown;
-      onInput?: unknown;
-      value?: unknown;
-    };
+  //
+  // derive IntrinsicElements based on lib.dom typing
+  //
+
+  // TODO: improve event handler typing?
+
+  type ToIntrinsicElementProps<T> = Omit<
+    Partial<T>,
+    keyof (IntrinsicAttributes & ElementChildrenAttribute)
+  > &
+    IntrinsicAttributes &
+    ElementChildrenAttribute;
+
+  type HTMLElementTagNameToProps = {
+    [T in keyof HTMLElementTagNameMap]: ToIntrinsicElementProps<
+      HTMLElementTagNameMap[T]
+    >;
+  };
 }
