@@ -4,11 +4,18 @@ import { range } from "@hiogawa/utils";
 
 export function App() {
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-2 p-2 px-4">
-        <h1 className="flex-1 text-lg">tiny-react test</h1>
+    <div className="flex flex-col gap-4">
+      <header className="flex items-center gap-3 p-2 px-4 shadow shadow-black/[0.05] dark:shadow-black/[0.4]">
+        <h1 className="flex-1 text-lg">tiny-react example</h1>
         <ThemeSelect />
-      </div>
+        <a
+          className="flex items-center antd-btn antd-btn-ghost"
+          href="https://github.com/hi-ogawa/js-utils/pull/144"
+          target="_blank"
+        >
+          <span className="i-ri-github-line w-6 h-6"></span>
+        </a>
+      </header>
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto">
         <TestTodoApp />
         <TestState />
@@ -24,7 +31,7 @@ function ThemeSelect() {
   const [value, setValue] = useState(() => getTheme());
 
   return (
-    <label className="flex gap-2">
+    <label className="flex items-center gap-2">
       Theme
       <select
         className="antd-input px-1"
