@@ -45,7 +45,7 @@ function ThemeSelect() {
 function TestFragment() {
   return (
     <div className="border p-2 flex flex-col gap-2">
-      <h1>{TestFragment.name}</h1>
+      <h1>Test Fragment</h1>
       <div>
         <>
           <>string</>
@@ -64,7 +64,7 @@ function TestState() {
 
   return (
     <div className="border p-2 flex flex-col gap-2">
-      <h1 className="text-lg">{TestState.name}</h1>
+      <h1 className="text-lg">Test State</h1>
       <div className="flex flex-col gap-2">
         {values.map((value, i) => (
           <label key={i} className="flex flex-col gap-1">
@@ -92,7 +92,7 @@ function TestState() {
 function TestRef() {
   return (
     <div className="border p-2 flex flex-col gap-2">
-      <h1>{TestRef.name}</h1>
+      <h1>Test Ref</h1>
       <div className="flex flex-col gap-2">
         <label className="flex flex-col gap-1">
           <span className="text-colorTextSecondary">
@@ -128,7 +128,7 @@ function TestEffect() {
 
   return (
     <div className="border p-2 flex flex-col gap-2">
-      <h1>{TestEffect.name}</h1>
+      <h1>Test Effect</h1>
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <span>Counter</span>
@@ -181,7 +181,7 @@ function TestTodoApp() {
 
   return (
     <div className="border p-2 flex flex-col gap-2">
-      <h1>{TestTodoApp.name}</h1>
+      <h1>Todo App</h1>
       <div className="flex flex-col gap-2">
         <form
           className="flex flex-col w-full"
