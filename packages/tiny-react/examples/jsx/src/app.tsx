@@ -8,7 +8,7 @@ export function App() {
         <h1 class="flex-1 text-lg">tiny-react test</h1>
         <ThemeSelect />
       </div>
-      <div class="flex flex-col gap-4 w-full max-w-2xl mx-auto">
+      <div class="flex flex-col gap-4 w-full max-w-xl mx-auto">
         <TestFragment />
         <TestForm />
       </div>
@@ -45,9 +45,10 @@ function TestFragment() {
       <h1>{TestFragment.name}</h1>
       <div>
         <>
-          <>hello</>
+          <>string</>
           <>
-            {0} {1}
+            {"number"} {0} {1}
+            {["arr", "ay"]}
           </>
         </>
       </div>
@@ -56,13 +57,28 @@ function TestFragment() {
 }
 
 function TestForm() {
-  // input
-  // textarea
-  // select
+  const [inputValue, setInputValue] = useState("");
+
   return (
     <div class="border p-2 flex flex-col gap-2">
-      <h1>{TestForm.name}</h1>
-      <div>TODO</div>
+      <h1 class="text-lg">{TestForm.name}</h1>
+      <div class="flex flex-col gap-2">
+        <label class="flex flex-col gap-1">
+          <span class="text-colorTextSecondary">input</span>
+          <input
+            class="antd-input p-1"
+            value={inputValue}
+            // no support for react-like special onChange semantics...
+            onInput={(e: any) => {
+              console.log(e.currentTarget.value);
+              setInputValue(e.currentTarget.value);
+            }}
+          />
+        </label>
+      </div>
+      <details>
+        <pre>{JSON.stringify({ inputValue })}</pre>
+      </details>
     </div>
   );
 }
