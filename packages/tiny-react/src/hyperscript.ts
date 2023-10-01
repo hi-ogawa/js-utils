@@ -1,4 +1,6 @@
-import { type NodeKey, type Props, type VNode } from "./virtual-dom";
+// TODO: fix cyclic import
+import { type JSX } from "./jsx-namespace";
+import { type NodeKey, type VNode } from "./virtual-dom";
 
 //
 // helper to construct VNode without JSX
@@ -16,19 +18,34 @@ export type ComponentChild =
 
 export type ComponentChildren = ComponentChild | ComponentChildren[];
 
+// TODO: export noisy/too-strict type-safe one separately?
+// TODO: separate helper for intrinsic and custom?
+export function h<P>(
+  tag: (props: P) => VNode,
+  props: P & JSX.IntrinsicAttributes,
+  ...children: ComponentChildren[]
+): VNode;
+
+export function h<K extends keyof JSX.IntrinsicElements>(
+  tag: K,
+  props: JSX.IntrinsicElements[K],
+  ...children: ComponentChildren[]
+): VNode;
+
 export function h(
   tag: ComponentType,
-  inProps: Props,
+  inProps: unknown,
   ...children: ComponentChildren[]
 ): VNode {
   const { key, ...props } = inProps as { key?: NodeKey };
 
-  // safe to unwrap single child to avoid trivial fragment by the assumption that
+  // unwrap single child to skip trivial fragment.
+  // this should be "safe" by the assumption that
   // example such as:
   //   h("div", {}, ...["some-varing", "id-list"].map(key => h("input", { key })))
   // should be written without spreading
   //   h("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
-  // note that this is guaranteed when `h` is used via jsx-runtime-based transpilation.
+  // this should be guaranteed when `h` is used via jsx-runtime-based transpilation.
   const child = normalizeComponentChildren(
     children.length <= 1 ? children[0] : children
   );

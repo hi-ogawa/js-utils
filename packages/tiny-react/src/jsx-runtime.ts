@@ -14,7 +14,7 @@ export function jsx(
 ) {
   // for now, just delegate to hyperscript without specific optimization
   const { children, ...otherProps } = props;
-  return h(tag, { key, ...otherProps }, props.children);
+  return h(tag as any, { key, ...otherProps }, props.children);
 }
 
 export { jsx as jsxs, jsx as jsxDEV };

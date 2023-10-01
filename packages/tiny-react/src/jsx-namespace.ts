@@ -51,6 +51,9 @@ export namespace JSX {
   // - HTMLElementTagNameMap
   // - GlobalEventHandlersEventMap
   //
+  // TODO: probably these typescript wizardly are too expensive for tsc,
+  //       so it's better to auto-generate into flat interface...
+  //
 
   // refine currentTarget
   type PatchedEventHandlers<T> = {

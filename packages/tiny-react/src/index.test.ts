@@ -238,7 +238,7 @@ describe(render, () => {
   it("fragment children key basic", () => {
     const vnode: VNode = {
       type: "fragment",
-      children: [..."abc"].map((key) => h("span", { key, "data-prop": key })),
+      children: [..."abc"].map((key) => h("span", { key }, key)),
     };
     const parent = document.createElement("main");
 
@@ -246,37 +246,40 @@ describe(render, () => {
     const bnode = render(vnode, parent);
     expect(parent).toMatchInlineSnapshot(`
       <main>
-        <span
-          data-prop="a"
-        />
-        <span
-          data-prop="b"
-        />
-        <span
-          data-prop="c"
-        />
+        <span>
+          a
+        </span>
+        <span>
+          b
+        </span>
+        <span>
+          c
+        </span>
       </main>
     `);
 
     // mutate dom
     parent.childNodes.forEach((node) => {
       tinyassert(node instanceof HTMLElement);
-      node.dataset["mutate"] = node.dataset["prop"];
+      node.setAttribute("data-mutate", node.textContent ?? "");
     });
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <span
           data-mutate="a"
-          data-prop="a"
-        />
+        >
+          a
+        </span>
         <span
           data-mutate="b"
-          data-prop="b"
-        />
+        >
+          b
+        </span>
         <span
           data-mutate="c"
-          data-prop="c"
-        />
+        >
+          c
+        </span>
       </main>
     `);
 
@@ -285,7 +288,7 @@ describe(render, () => {
     vnode.children.reverse();
     tinyassert(vnode.children[0].type === "tag");
     vnode.children[0].props = {
-      "data-prop-x": "boom",
+      "data-new-prop": "boom",
     };
 
     // re-render should keep mutated dom
@@ -295,16 +298,20 @@ describe(render, () => {
       <main>
         <span
           data-mutate="c"
-          data-prop-x="boom"
-        />
+          data-new-prop="boom"
+        >
+          c
+        </span>
         <span
           data-mutate="b"
-          data-prop="b"
-        />
+        >
+          b
+        </span>
         <span
           data-mutate="a"
-          data-prop="a"
-        />
+        >
+          a
+        </span>
       </main>
     `);
   });
@@ -609,7 +616,7 @@ describe("hooks", () => {
         {},
         h(state % 2 === 0 ? "span" : "div", {}, state),
         h("button", {
-          onClick: () => {
+          onclick: () => {
             setState((prev) => prev + 1);
           },
         })
@@ -663,7 +670,7 @@ describe("hooks", () => {
         {},
         h(state % 2 === 0 ? "span" : "div", {}, state),
         h("button", {
-          onClick: () => {
+          onclick: () => {
             setState((prev) => prev + 1);
           },
         })
@@ -731,7 +738,7 @@ describe("hooks", () => {
         {},
         JSON.stringify({ state, state2, prop }),
         h("button", {
-          onClick: () => {
+          onclick: () => {
             setState(state + 1);
           },
         })
@@ -801,7 +808,7 @@ describe("hooks", () => {
   it("useEffect", () => {
     const mockFn = vi.fn();
 
-    function Custom(props: any) {
+    function Custom(props: { value: number }) {
       const [state, setState] = useState(0);
 
       useEffect(() => {
@@ -816,7 +823,7 @@ describe("hooks", () => {
         {},
         h("div", {}, state),
         h("button", {
-          onClick: () => {
+          onclick: () => {
             setState(state + 1);
           },
         })
@@ -941,7 +948,7 @@ describe("ref", () => {
           state
         ),
         h("button", {
-          onClick: () => {
+          onclick: () => {
             setState(state + 1);
           },
         })
@@ -1017,15 +1024,15 @@ describe("ref", () => {
 describe(h, () => {
   it("basic", () => {
     const parent = document.createElement("main");
-    function Custom(props: any) {
+    function Custom(props: { value: string }) {
       return h("input", { placeholder: props.value });
     }
     const vnode = h(
       "div",
-      { class: "flex" },
+      { className: "flex" },
       h(Custom, { value: "hello" }),
       null,
-      h("span", { class: "text-red" }, "world")
+      h("span", { className: "text-red" }, "world")
     );
     expect(vnode).toMatchInlineSnapshot(`
       {
@@ -1053,7 +1060,7 @@ describe(h, () => {
               "key": undefined,
               "name": "span",
               "props": {
-                "class": "text-red",
+                "className": "text-red",
               },
               "ref": undefined,
               "type": "tag",
@@ -1064,7 +1071,7 @@ describe(h, () => {
         "key": undefined,
         "name": "div",
         "props": {
-          "class": "flex",
+          "className": "flex",
         },
         "ref": undefined,
         "type": "tag",
