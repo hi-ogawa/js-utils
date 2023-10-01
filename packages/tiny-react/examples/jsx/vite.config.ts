@@ -15,8 +15,7 @@ export default defineConfig({
       react({
         jsxImportSource: "@hiogawa/tiny-react",
       }),
-    // TODO: bad peer-dep?
-    unocss() as any,
+    unocss(),
     themeScriptPlugin(),
   ],
 });

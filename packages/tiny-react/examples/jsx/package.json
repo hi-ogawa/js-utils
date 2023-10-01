@@ -19,8 +19,8 @@
     "@hiogawa/utils": "workspace:*",
     "@iconify-json/ri": "^1.1.10",
     "@vitejs/plugin-react": "^4.0.1",
-    "unocss": "^0.53.6",
-    "vite": "^4.4.6"
+    "unocss": "^0.56.4",
+    "vite": "^4.4.9"
   },
   "volta": {
     "extends": "../../package.json"
