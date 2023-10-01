@@ -30,3 +30,13 @@ Examples:
 ```
 
 <!-- %template-output-end:help% -->
+
+## development
+
+```sh
+pnpm i
+pnpm scrape
+pnpm build
+pnpm doc
+pnpm release
+```
