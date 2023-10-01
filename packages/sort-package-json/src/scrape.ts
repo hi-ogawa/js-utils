@@ -2,7 +2,7 @@ import { tinyassert } from "@hiogawa/utils";
 
 async function main() {
   const res = await fetch(
-    "https://github.com/keithamus/sort-package-json/raw/main/defaultRules.md"
+    "https://github.com/keithamus/sort-package-json/raw/v2.6.0/defaultRules.md"
   );
   tinyassert(res.ok);
   const text = await res.text();
