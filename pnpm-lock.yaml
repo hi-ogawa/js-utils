@@ -11,6 +11,9 @@ importers:
       '@changesets/cli':
         specifier: ^2.26.2
         version: 2.26.2
+      '@hiogawa/icheck-ts':
+        specifier: workspace:*
+        version: link:packages/icheck-ts
       '@hiogawa/inline-template':
         specifier: workspace:*
         version: link:packages/inline-template

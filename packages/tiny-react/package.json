@@ -35,6 +35,7 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest",
+    "lint": "icheck-ts $(find src -name '*.ts')",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
