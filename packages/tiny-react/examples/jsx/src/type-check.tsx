@@ -10,6 +10,16 @@ export function _typeCheck() {
     {""}
   </div>;
 
+  // event handler type is infered with `currentTarget`
+  <button
+    onclick={(e) => {
+      e satisfies MouseEvent;
+      e.currentTarget satisfies HTMLButtonElement;
+    }}
+  >
+    hey
+  </button>;
+
   // @ts-expect-error constraint by JSX.IntrinsicElements["span"]
   <span badAttr={0} />;
 

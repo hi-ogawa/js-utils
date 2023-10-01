@@ -62,21 +62,18 @@ export namespace JSX {
   export interface IntrinsicElements extends HTMLElementTagNameToProps {}
 
   //
-  // derive IntrinsicElements based on lib.dom typing
+  // derive IntrinsicElements from lib.dom typing
+  // - HTMLElementTagNameMap
+  // - GlobalEventHandlersEventMap
   //
 
-  // refine Event type (e.g. MouseEvent)
   // refine currentTarget
   type PatchedEventHandlers<T> = {
-    [K in keyof GlobalEventHandlers]: K extends `on${infer K}`
-      ? K extends keyof GlobalEventHandlersEventMap
-        ? (
-            event: Omit<GlobalEventHandlersEventMap[K], "currentTarget"> & {
-              readonly currentTarget: T;
-            }
-          ) => void
-        : never
-      : never;
+    [K in keyof GlobalEventHandlersEventMap as `on${K}`]: (
+      event: Omit<GlobalEventHandlersEventMap[K], "currentTarget"> & {
+        readonly currentTarget: T;
+      }
+    ) => void;
   };
 
   type ToIntrinsicElementProps<T> = Omit<
