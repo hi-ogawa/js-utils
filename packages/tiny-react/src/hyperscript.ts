@@ -1,10 +1,6 @@
-// TODO: fix cyclic import
-import { type JSX } from "./jsx-namespace";
 import { type NodeKey, type VNode } from "./virtual-dom";
 
-//
 // helper to construct VNode without JSX
-//
 
 export type ComponentType = string | ((props: any) => VNode);
 
@@ -18,26 +14,12 @@ export type ComponentChild =
 
 export type ComponentChildren = ComponentChild | ComponentChildren[];
 
-// TODO: export noisy/too-strict type-safe one separately?
-// TODO: separate helper for intrinsic and custom?
-export function h<P>(
-  tag: (props: P) => VNode,
-  props: P & JSX.IntrinsicAttributes,
-  ...children: ComponentChildren[]
-): VNode;
-
-export function h<K extends keyof JSX.IntrinsicElements>(
-  tag: K,
-  props: JSX.IntrinsicElements[K],
-  ...children: ComponentChildren[]
-): VNode;
-
-export function h(
+export function h1(
   tag: ComponentType,
-  inProps: unknown,
+  props: {},
   ...children: ComponentChildren[]
 ): VNode {
-  const { key, ...props } = inProps as { key?: NodeKey };
+  const { key, ...propsNoKey } = props as { key?: NodeKey };
 
   // unwrap single child to skip trivial fragment.
   // this should be "safe" by the assumption that
@@ -51,13 +33,13 @@ export function h(
   );
 
   if (typeof tag === "string") {
-    const { ref, ...tagProps } = props as { ref?: any };
+    const { ref, ...propsNoKeyNoRef } = propsNoKey as { ref?: any };
     return {
       type: "tag",
       name: tag,
       key,
       ref,
-      props: tagProps,
+      props: propsNoKeyNoRef,
       child,
     };
   } else if (typeof tag === "function") {
@@ -65,7 +47,7 @@ export function h(
       type: "custom",
       key,
       props: {
-        ...props,
+        ...propsNoKey,
         children: child,
       },
       render: tag,

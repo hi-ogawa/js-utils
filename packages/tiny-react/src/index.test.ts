@@ -1,7 +1,8 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { useCallback, useEffect, useMemo, useRef, useState } from "./hooks";
-import { Fragment, h } from "./hyperscript";
+import { Fragment } from "./hyperscript";
+import { h } from "./hyperscript-typed";
 import { render, rerenderCustomNode } from "./reconciler";
 import type { VNode } from "./virtual-dom";
 
@@ -238,7 +239,7 @@ describe(render, () => {
   it("fragment children key basic", () => {
     const vnode: VNode = {
       type: "fragment",
-      children: [..."abc"].map((key) => h("span", { key }, key)),
+      children: [..."abc"].map((key) => h.span({ key }, key)),
     };
     const parent = document.createElement("main");
 
@@ -323,7 +324,7 @@ describe(render, () => {
     };
     const parent = document.createElement("main");
 
-    const hchild = (key: string) => h("div", { key }, key);
+    const hchild = (key: string) => h.div({ key }, key);
 
     let bnode = render(vnode, parent);
     expect(parent).toMatchInlineSnapshot("<main />");
@@ -360,7 +361,7 @@ describe(render, () => {
 
   it("fragment children key - prepend", () => {
     const parent = document.createElement("main");
-    const hc = (key: string) => h("div", { key }, key);
+    const hc = (key: string) => h.div({ key }, key);
 
     let bnode = render(h(Fragment, {}, []), parent);
     expect(parent).toMatchInlineSnapshot("<main />");
@@ -467,7 +468,7 @@ describe(render, () => {
       </main>
     `);
 
-    vnode = h(Fragment, {}, "a", h("span", {}, "b"), "c");
+    vnode = h(Fragment, {}, "a", h.span({}, "b"), "c");
     bnode = render(vnode, parent, bnode);
 
     expect(parent).toMatchInlineSnapshot(`
@@ -483,7 +484,7 @@ describe(render, () => {
 
   it("event-listener", () => {
     const mockFn = vi.fn();
-    let vnode = h("button", {
+    let vnode = h.button({
       onclick: () => {
         mockFn("click");
       },
@@ -505,7 +506,7 @@ describe(render, () => {
     `);
     mockFn.mockReset();
 
-    vnode = h("button", {});
+    vnode = h.button({});
     bnode = render(vnode, parent, bnode);
     (parent.firstChild as HTMLElement).click();
     expect(mockFn.mock.calls).toMatchInlineSnapshot("[]");
@@ -611,11 +612,10 @@ describe("hooks", () => {
   it("useState", () => {
     function Custom() {
       const [state, setState] = useState(0);
-      return h(
-        "div",
+      return h.div(
         {},
-        h(state % 2 === 0 ? "span" : "div", {}, state),
-        h("button", {
+        h[state % 2 === 0 ? "span" : "div"]({}, state),
+        h.button({
           onclick: () => {
             setState((prev) => prev + 1);
           },
@@ -665,11 +665,10 @@ describe("hooks", () => {
     function Custom() {
       const [state, setState] = useState(0);
       setState(1);
-      return h(
-        "div",
+      return h.div(
         {},
-        h(state % 2 === 0 ? "span" : "div", {}, state),
-        h("button", {
+        h[state % 2 === 0 ? "span" : "div"]({}, state),
+        h.button({
           onclick: () => {
             setState((prev) => prev + 1);
           },
@@ -690,10 +689,9 @@ describe("hooks", () => {
       const ref = useRef(0);
       ref.current++;
 
-      return h(
-        "div",
+      return h.div(
         {},
-        h(ref.current % 2 === 0 ? "span" : "div", {}, ref.current)
+        h[ref.current % 2 === 0 ? "span" : "div"]({}, ref.current)
       );
     }
 
@@ -733,11 +731,10 @@ describe("hooks", () => {
         return state * 2;
       }, [state]);
 
-      return h(
-        "div",
+      return h.div(
         {},
         JSON.stringify({ state, state2, prop }),
-        h("button", {
+        h.button({
           onclick: () => {
             setState(state + 1);
           },
@@ -818,11 +815,10 @@ describe("hooks", () => {
         };
       }, [props.value]);
 
-      return h(
-        "div",
+      return h.div(
         {},
-        h("div", {}, state),
-        h("button", {
+        h.div({}, state),
+        h.button({
           onclick: () => {
             setState(state + 1);
           },
@@ -899,7 +895,7 @@ describe("hooks", () => {
       ]
     `);
 
-    render(h("div", {}), parent, bnode);
+    render(h.div({}), parent, bnode);
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div />
@@ -935,11 +931,9 @@ describe("ref", () => {
     function Custom() {
       const [state, setState] = useState(0);
 
-      return h(
-        "div",
+      return h.div(
         {},
-        h(
-          state < 2 ? "div" : "span",
+        h[state < 2 ? "div" : "span"](
           {
             ref: useCallback((el: Element | null) => {
               mockFn(el?.tagName ?? null);
@@ -947,7 +941,7 @@ describe("ref", () => {
           },
           state
         ),
-        h("button", {
+        h.button({
           onclick: () => {
             setState(state + 1);
           },
@@ -1021,18 +1015,17 @@ describe("ref", () => {
   });
 });
 
-describe(h, () => {
+describe("hyperscript", () => {
   it("basic", () => {
     const parent = document.createElement("main");
     function Custom(props: { value: string }) {
-      return h("input", { placeholder: props.value });
+      return h.input({ placeholder: props.value });
     }
-    const vnode = h(
-      "div",
+    const vnode = h.div(
       { className: "flex" },
       h(Custom, { value: "hello" }),
       null,
-      h("span", { className: "text-red" }, "world")
+      h.span({ className: "text-red" }, "world")
     );
     expect(vnode).toMatchInlineSnapshot(`
       {

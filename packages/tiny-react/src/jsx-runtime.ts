@@ -1,4 +1,4 @@
-import { type ComponentChildren, type ComponentType, h } from "./hyperscript";
+import { type ComponentChildren, type ComponentType, h1 } from "./hyperscript";
 import type { NodeKey } from "./virtual-dom";
 
 // jsx-runtime convention for transpilers
@@ -14,7 +14,7 @@ export function jsx(
 ) {
   // for now, just delegate to hyperscript without specific optimization
   const { children, ...otherProps } = props;
-  return h(tag as any, { key, ...otherProps }, props.children);
+  return h1(tag as any, { key, ...otherProps }, props.children);
 }
 
 export { jsx as jsxs, jsx as jsxDEV };
