@@ -151,8 +151,8 @@ importers:
         specifier: workspace:*
         version: link:../..
       '@hiogawa/unocss-preset-antd':
-        specifier: 2.2.1-pre.3
-        version: 2.2.1-pre.3(@unocss/preset-uno@0.54.0)(unocss@0.53.6)
+        specifier: 2.2.1-pre.7
+        version: 2.2.1-pre.7(unocss@0.53.6)
       '@iconify-json/ri':
         specifier: ^1.1.10
         version: 1.1.10
@@ -214,8 +214,8 @@ importers:
         specifier: workspace:*
         version: link:../..
       '@hiogawa/unocss-preset-antd':
-        specifier: 2.2.1-pre.3
-        version: 2.2.1-pre.3(@unocss/preset-uno@0.54.0)(unocss@0.53.6)
+        specifier: 2.2.1-pre.7
+        version: 2.2.1-pre.7(unocss@0.53.6)
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../../../utils
@@ -1451,16 +1451,12 @@ packages:
       typescript: 5.1.6
     dev: true
 
-  /@hiogawa/unocss-preset-antd@2.2.1-pre.3(@unocss/preset-uno@0.54.0)(unocss@0.53.6):
-    resolution: {integrity: sha512-NjJ0uKIA6tqmDTXQkO52Hb83tBJjwjOCUx9cgodxiROjTCuEP+yfkmJyzMlDzfxRUl8DnHd8IijnZl2cAX7s9Q==}
+  /@hiogawa/unocss-preset-antd@2.2.1-pre.7(unocss@0.53.6):
+    resolution: {integrity: sha512-gwY0T8FpFzvHE3I2bShDFKRFAlf1dxgAeaLkfGy7VpNkVr7NkrS3hIUb3An95zAjQWSvgP90t+p1e8AaFW8oXw==}
     peerDependencies:
-      '@unocss/preset-uno': '*'
       unocss: '*'
     dependencies:
-      '@unocss/preset-uno': 0.54.0
-      '@unocss/reset': 0.48.5
-      local-pkg: 0.4.3
-      unocss: 0.53.6(postcss@8.4.27)(vite@4.4.7)
+      unocss: 0.53.6(postcss@8.4.27)(vite@4.4.6)
     dev: true
 
   /@iconify-json/ri@1.1.10:
@@ -1787,20 +1783,10 @@ packages:
     resolution: {integrity: sha512-wuaLjWCzKUisHUxo4pjIdzcimdSmVa2hMHA3V7wVFBiSFX96/s7l0bvhHGFF/gMjbOnvJ+y+lBl3VKqcj9kwbA==}
     dev: true
 
-  /@unocss/core@0.54.0:
-    resolution: {integrity: sha512-iHfJJ8U+pVhMrbVpzMb0GImZUJu3Xmp165Q5Qr44hGOEzcMdvdBxbMSSl2VBKjRsEuNudNVhh7XJAyUcKxnSWg==}
-    dev: true
-
   /@unocss/extractor-arbitrary-variants@0.53.6:
     resolution: {integrity: sha512-5MQD/9pIflZT5LXFx6qFUgPuVszFj+Pyq97UPI1YH4Lf4prDpfUtR4vKrXeMQv0XFvXqKluIWovgG9c6nrpg9w==}
     dependencies:
       '@unocss/core': 0.53.6
-    dev: true
-
-  /@unocss/extractor-arbitrary-variants@0.54.0:
-    resolution: {integrity: sha512-luJTF3TnXFbMZ2Gau56p0uRsR+yIUbvHbT6ag6mvv0TvUsnhEFsMUdkXVJ1arp0duIl/dg0r1drL/Ax75RszNw==}
-    dependencies:
-      '@unocss/core': 0.54.0
     dev: true
 
   /@unocss/inspector@0.53.6:
@@ -1847,13 +1833,6 @@ packages:
       '@unocss/extractor-arbitrary-variants': 0.53.6
     dev: true
 
-  /@unocss/preset-mini@0.54.0:
-    resolution: {integrity: sha512-y+BnGpQAGC3ZWWZfXnsvUuTTO2rNnakHx4jIyf1cv7rw5oo7jL+ONb8stKqlmLGCzlQUKjG1xp+DGuKSVnRXBw==}
-    dependencies:
-      '@unocss/core': 0.54.0
-      '@unocss/extractor-arbitrary-variants': 0.54.0
-    dev: true
-
   /@unocss/preset-tagify@0.53.6:
     resolution: {integrity: sha512-RZUvXIaxJviu7CCbGIaizT08exMSaoCcmhLEotrY1vLcmgne6q6IMK9m4hCFlFuaidrFxPqLd1FjsDTSaNWQvw==}
     dependencies:
@@ -1875,14 +1854,6 @@ packages:
       '@unocss/preset-wind': 0.53.6
     dev: true
 
-  /@unocss/preset-uno@0.54.0:
-    resolution: {integrity: sha512-09/sthjGLDNMr/Cayu0Gy9jTMSxUuTfetWnM3jkByNidhfuzMW26eaMhxTrbUd28H8Titt6M+WgbJ7Gi0lQtZA==}
-    dependencies:
-      '@unocss/core': 0.54.0
-      '@unocss/preset-mini': 0.54.0
-      '@unocss/preset-wind': 0.54.0
-    dev: true
-
   /@unocss/preset-web-fonts@0.53.6:
     resolution: {integrity: sha512-IWswKHaqD6A7baTQxdt01lkFKe7qDpt6OzRMRgrCF9fDV4gsD7mJdpQOGFE9HolDbEHJbxS2NObzXXZChI/u2w==}
     dependencies:
@@ -1895,17 +1866,6 @@ packages:
     dependencies:
       '@unocss/core': 0.53.6
       '@unocss/preset-mini': 0.53.6
-    dev: true
-
-  /@unocss/preset-wind@0.54.0:
-    resolution: {integrity: sha512-SO971KQOYzM5IKwGDBve+EWBKevU1T0mK20g17BHxPI++ubHPWRRQIh/xxHyew592taBFWK6Q75fcbOgIodx4w==}
-    dependencies:
-      '@unocss/core': 0.54.0
-      '@unocss/preset-mini': 0.54.0
-    dev: true
-
-  /@unocss/reset@0.48.5:
-    resolution: {integrity: sha512-+JJT3Btj1oNX4XwKBDPRUYre3NYBNmi0PsC3tqkHN2VphJG0iZl91XNfsveLz8pVpDJPUDdLH4xsqh52WmxU1g==}
     dev: true
 
   /@unocss/reset@0.53.6:
