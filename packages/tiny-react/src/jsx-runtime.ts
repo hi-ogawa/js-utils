@@ -13,8 +13,8 @@ export function jsx(
   key?: NodeKey
 ) {
   // for now, just delegate to hyperscript without specific optimization
-  const { children, ...otherProps } = props;
-  return h1(tag as any, { key, ...otherProps }, props.children);
+  const { children, ...propsNoChildren } = props;
+  return h1(tag as any, { key, ...propsNoChildren }, props.children);
 }
 
 export { jsx as jsxs, jsx as jsxDEV };
