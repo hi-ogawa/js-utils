@@ -1,6 +1,8 @@
 import type { ComponentChildren, ComponentType } from "./hyperscript";
 import type { NodeKey, VNode } from "./virtual-dom";
 
+// JSX namespace convention for type-checker
+
 // probably nothing is spec'ed so figure it out from checker.ts and other library usages
 // see "namespace JsxNames" at
 // https://github.com/microsoft/TypeScript/blob/b0db525798fda109c1c05ef530cb8949ab544677/src/compiler/checker.ts#L50096-L50108

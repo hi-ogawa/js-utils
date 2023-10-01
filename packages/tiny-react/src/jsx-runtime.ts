@@ -1,7 +1,7 @@
 import { type ComponentChildren, type ComponentType, h } from "./hyperscript";
 import type { NodeKey } from "./virtual-dom";
 
-// jsx-runtime convention for type-checker and transpilers
+// jsx-runtime convention for transpilers
 // https://www.typescriptlang.org/tsconfig#jsxImportSource
 // https://esbuild.github.io/api/#jsx-import-source
 // https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md#detailed-design
@@ -21,4 +21,5 @@ export { jsx as jsxs, jsx as jsxDEV };
 
 export { Fragment } from "./hyperscript";
 
+// re-export for type-checker convention
 export { type JSX } from "./jsx-namespace";
