@@ -4,8 +4,8 @@ import { range } from "@hiogawa/utils";
 
 export function App() {
   return (
-    <div className="flex flex-col gap-4">
-      <header className="flex items-center gap-3 p-2 px-4 shadow shadow-black/[0.05] dark:shadow-black/[0.4]">
+    <div className="flex flex-col">
+      <header className="flex items-center gap-3 p-2 px-4 shadow-md shadow-black/[0.05] dark:shadow-black/[0.4]">
         <h1 className="flex-1 text-lg">tiny-react example</h1>
         <ThemeSelect />
         <a
@@ -16,7 +16,7 @@ export function App() {
           <span className="i-ri-github-line w-6 h-6"></span>
         </a>
       </header>
-      <div className="flex flex-col gap-4 w-full max-w-xl mx-auto">
+      <div className="flex flex-col gap-4 w-full max-w-xl mx-auto p-4">
         <TestTodoApp />
         <TestState />
         <TestEffect />
