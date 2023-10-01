@@ -1,13 +1,8 @@
 import { type NodeKey, type Props, type VNode } from "./virtual-dom";
 
 //
-// helper to construct VNode
+// helper to construct VNode without JSX
 //
-
-// TODO: learn from
-// https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md
-// https://www.typescriptlang.org/tsconfig#jsxImportSource
-// https://github.com/preactjs/preact/blob/08b07ccea62bfdb44b983bfe69ae73eb5e4f43c7/jsx-runtime/src/index.js
 
 export type ComponentType = string | ((props: any) => VNode);
 
