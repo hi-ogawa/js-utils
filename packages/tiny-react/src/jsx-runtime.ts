@@ -38,6 +38,9 @@ export namespace JSX {
   // > the compiler will check for React.JSX before checking for a global JSX.
   // > If the factory is defined as h, it will check for h.JSX before a global JSX.
 
+  // see below example for how each type/interface affects jsx typing
+  // packages/tiny-react/examples/jsx/src/type-check.tsx
+
   // constraint what's usable as jsx element tag e.g. <div /> <Component ... />
   // `keyof IntrinsicElements` further constraints intrinsic tags
   export type ElementType = ComponentType;
