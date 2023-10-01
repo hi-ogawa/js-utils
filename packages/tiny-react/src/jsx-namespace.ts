@@ -57,18 +57,27 @@ export namespace JSX {
 
   // refine currentTarget
   type PatchedEventHandlers<T> = {
-    [K in keyof GlobalEventHandlersEventMap as `on${K}`]: (
+    [K in keyof GlobalEventHandlersEventMap as `on${K}`]+?: (
       event: Omit<GlobalEventHandlersEventMap[K], "currentTarget"> & {
         readonly currentTarget: T;
       }
     ) => void;
   };
 
+  // fix up a few more things
+  interface PatchProps {
+    // for starter, support only simple string instead of CSSStyleDeclaration object
+    style?: string;
+  }
+
   type ToIntrinsicElementProps<T> = Omit<
     Partial<T>,
-    keyof GlobalEventHandlers | keyof ElementChildrenAttribute
+    | keyof GlobalEventHandlers
+    | keyof PatchProps
+    | keyof ElementChildrenAttribute
   > &
-    Partial<PatchedEventHandlers<T>> &
+    PatchedEventHandlers<T> &
+    PatchProps &
     IntrinsicAttributes &
     ElementChildrenAttribute & {
       ref?: (el: T | null) => void;
