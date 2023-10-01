@@ -7,16 +7,24 @@ const RULE_MAP = Object.fromEntries(
   Object.entries(RULE).map(([k, v]) => [v, Number(k)])
 );
 
-const HELP = `
+const HELP = `\
 ${name}@${version}
 
 Usage:
-  $ sort-package-json [package.json files...]
-`.trim();
+  sort-package-json [package.json files...]
+
+Example:
+  # sort package.json files in pnpm workspace
+  sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path' | xargs -i echo {}/package.json)
+`;
 
 function main() {
   const infiles = process.argv.slice(2);
-  if (infiles.includes("-h") || infiles.includes("--help")) {
+  if (
+    infiles.includes("-h") ||
+    infiles.includes("--help") ||
+    infiles.length === 0
+  ) {
     console.log(HELP);
     return;
   }
