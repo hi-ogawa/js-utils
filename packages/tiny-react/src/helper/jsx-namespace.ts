@@ -1,5 +1,5 @@
-import type { ComponentChildren, ComponentType } from "./hyperscript";
-import type { NodeKey, VNode } from "./virtual-dom";
+import type { NodeKey, VNode } from "../virtual-dom";
+import type { ComponentChildren, ComponentType } from "./common";
 
 // JSX namespace convention for type-checker
 

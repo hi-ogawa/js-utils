@@ -1,22 +1,14 @@
-import { type NodeKey, type VNode } from "./virtual-dom";
+import { type NodeKey, type Props, type VNode } from "../virtual-dom";
+import type {
+  ComponentChild,
+  ComponentChildren,
+  ComponentType,
+} from "./common";
+import { type JSX } from "./jsx-namespace";
 
-// helper to construct VNode without JSX
-
-export type ComponentType = string | ((props: any) => VNode);
-
-export type ComponentChild =
-  | VNode
-  | string
-  | number
-  | null
-  | undefined
-  | boolean;
-
-export type ComponentChildren = ComponentChild | ComponentChildren[];
-
-export function h1(
+export function createElement(
   tag: ComponentType,
-  props: {},
+  props: Props,
   ...children: ComponentChildren[]
 ): VNode {
   const { key, ...propsNoKey } = props as { key?: NodeKey };
@@ -24,9 +16,9 @@ export function h1(
   // unwrap single child to skip trivial fragment.
   // this should be "safe" by the assumption that
   // example such as:
-  //   h("div", {}, ...["some-varing", "id-list"].map(key => h("input", { key })))
+  //   createElement("div", {}, ...["some-varing", "id-list"].map(key => h("input", { key })))
   // should be written without spreading
-  //   h("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
+  //   createElement("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
   // this should be guaranteed when `h` is used via jsx-runtime-based transpilation.
   const child = normalizeComponentChildren(
     children.length <= 1 ? children[0] : children
@@ -90,3 +82,35 @@ function normalizeComponentChild(child: ComponentChild): VNode {
   }
   return child;
 }
+
+//
+// type-safe createElement wrapper
+//
+
+// provide intrinsic tag helper via property access (e.g. h.div(...) instead of h("div", ...))
+// since function overloading to support both h("div", ...) and h(Custom, ...)
+// seems very clumsy for IDE to deal with.
+
+export const h: Hyperscript = /* @__PURE__ */ new Proxy(() => {}, {
+  get(_target, tag, _receiver) {
+    return (...args: any[]) => (createElement as any)(tag, ...args);
+  },
+  apply(_target, _thisArg, args) {
+    return (createElement as any)(...args);
+  },
+}) as any as Hyperscript;
+
+interface Hyperscript extends HyperscriptIntrinsic, HyperscriptCustom {}
+
+type HyperscriptIntrinsic = {
+  [K in keyof JSX.IntrinsicElements]: (
+    props: JSX.IntrinsicElements[K],
+    ...children: ComponentChildren[]
+  ) => VNode;
+};
+
+type HyperscriptCustom = <P>(
+  tag: (props: P) => VNode,
+  props: P & JSX.IntrinsicAttributes,
+  ...children: ComponentChildren[]
+) => VNode;

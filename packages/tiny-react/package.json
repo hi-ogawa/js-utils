@@ -16,14 +16,14 @@
       "types": "./dist/index.d.ts"
     },
     "./jsx-runtime": {
-      "import": "./dist/jsx-runtime.js",
-      "require": "./dist/jsx-runtime.cjs",
-      "types": "./dist/jsx-runtime.d.ts"
+      "import": "./dist/helper/jsx-runtime.js",
+      "require": "./dist/helper/jsx-runtime.cjs",
+      "types": "./dist/helper/jsx-runtime.d.ts"
     },
     "./jsx-dev-runtime": {
-      "import": "./dist/jsx-runtime.js",
-      "require": "./dist/jsx-runtime.cjs",
-      "types": "./dist/jsx-runtime.d.ts"
+      "import": "./dist/helper/jsx-runtime.js",
+      "require": "./dist/helper/jsx-runtime.cjs",
+      "types": "./dist/helper/jsx-runtime.d.ts"
     }
   },
   "main": "./dist/index.js",
