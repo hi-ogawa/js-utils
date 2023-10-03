@@ -150,7 +150,6 @@ function reconcileNode(
           effectManager
         );
         bnode.props = vnode.props;
-        bnode.hparent = hparent;
       } else {
         unmount(bnode);
         const hookContext = new HookContext(forceUpdate);
@@ -162,8 +161,9 @@ function reconcileNode(
           preSlot,
           effectManager
         );
-        bnode = { ...vnode, child, hparent, hookContext } satisfies BCustom;
+        bnode = { ...vnode, child, hookContext } satisfies BCustom;
       }
+      bnode.hparent = hparent;
       bnode.child.parent = bnode;
       bnode.slot = getSlot(bnode.child);
       effectManager.queueEffect(bnode);
@@ -196,6 +196,11 @@ function placeChild(
 
 // export for unit test
 export function rerenderCustomNode(vnode: VCustom, bnode: BCustom) {
+  // multiple forceUpdate can make bnode unmounted
+  if (!bnode.hparent) {
+    return;
+  }
+
   const oldSlot = getSlot(bnode);
 
   // traverse ancestors to find "slot"
@@ -393,6 +398,7 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
     }
     case "custom": {
       bnode.hookContext.cleanupEffect();
+      bnode.hparent = undefined;
       unmountNode(bnode.child, skipRemove);
       break;
     }

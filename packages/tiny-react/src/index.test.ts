@@ -940,15 +940,10 @@ describe("hooks", () => {
       </main>
     `);
 
-    // TODO: unmounted Custom2's setState is breaking parent
     parent.querySelector("button")!.click();
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-          <div>
-            <span />
-            <button />
-          </div>
           <span>
             xx
           </span>

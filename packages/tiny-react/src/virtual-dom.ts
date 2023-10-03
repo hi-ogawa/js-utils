@@ -64,7 +64,7 @@ export type BNodeParent = BTag | BCustom | BFragment;
 
 export type BEmpty = VEmpty & {
   // not needed since only we need to traverse up only from BCustom?
-  // but for now, make it easier by having `Bnode.parent` type
+  // but for now, make it easier by having uniform `BNode.parent` type
   parent?: BNodeParent;
 };
 
@@ -84,7 +84,7 @@ export type BCustom = VCustom & {
   parent?: BNodeParent;
   child: BNode;
   slot?: HNode;
-  hparent: HNode;
+  hparent?: HNode;
   hookContext: HookContext;
 };
 
