@@ -683,6 +683,271 @@ describe("hooks", () => {
     );
   });
 
+  it("multiple update - same hook", () => {
+    function Custom() {
+      const [state, setState] = useState(0);
+      return h.div(
+        {},
+        h.span({}, state),
+        h.button({
+          onclick: () => {
+            setState((prev) => prev + 1);
+            setState((prev) => prev + 1);
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    render(h(Custom, {}), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            0
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+
+    // TODO: should be 2
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            1
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+  });
+
+  it("multiple update - differnt hook", () => {
+    function Custom() {
+      const [state, setState] = useState("x");
+      const [state2, setState2] = useState("y");
+      return h.div(
+        {},
+        h.span({}, state),
+        h.span({}, state2),
+        h.button({
+          onclick: () => {
+            setState((prev) => prev.repeat(2));
+            setState2((prev) => prev.repeat(2));
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    render(h(Custom, {}), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            x
+          </span>
+          <span>
+            y
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            xx
+          </span>
+          <span>
+            yy
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+  });
+
+  it("multiple update - nested component - simple", () => {
+    function Custom() {
+      const [state, setState] = useState("x");
+      return h.div(
+        {},
+        h.span({}, state),
+        h(Custom2, {
+          onClick: () => {
+            setState((prev) => prev.repeat(2));
+          },
+        })
+      );
+    }
+
+    function Custom2(props: { onClick: () => void }) {
+      const [state2, setState2] = useState("y");
+      return h(
+        Fragment,
+        {},
+        h.span({}, state2),
+        h.button({
+          onclick: () => {
+            setState2((prev) => prev.repeat(2));
+            props.onClick();
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    render(h(Custom, {}), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            x
+          </span>
+          <span>
+            y
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            xx
+          </span>
+          <span>
+            yy
+          </span>
+          <button />
+        </div>
+      </main>
+    `);
+  });
+
+  it("multiple update - nested component - unmount - 1", () => {
+    function Custom() {
+      const [state, setState] = useState("x");
+      return h(
+        Fragment,
+        {},
+        h.span({}, state),
+        state.length === 1 &&
+          h(Custom2, {
+            onClick: () => {
+              setState((prev) => prev.repeat(2));
+            },
+          })
+      );
+    }
+
+    function Custom2(props: { onClick: () => void }) {
+      const [state2, setState2] = useState("y");
+      return h(
+        Fragment,
+        {},
+        h.span({}, state2),
+        h.button({
+          onclick: () => {
+            setState2((prev) => prev.repeat(2));
+            props.onClick();
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    render(h(Custom, {}), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <span>
+          x
+        </span>
+        <span>
+          y
+        </span>
+        <button />
+      </main>
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <span>
+          xx
+        </span>
+      </main>
+    `);
+  });
+
+  it("multiple update - nested component - unmount - 2", () => {
+    function Custom() {
+      const [state, setState] = useState("x");
+      return h(
+        Fragment,
+        {},
+        h.span({}, state),
+        state.length === 1 &&
+          h(Custom2, {
+            onClick: () => {
+              setState((prev) => prev.repeat(2));
+            },
+          })
+      );
+    }
+
+    function Custom2(props: { onClick: () => void }) {
+      const [state2, setState2] = useState("y");
+      return h(
+        Fragment,
+        {},
+        h.span({}, state2),
+        h.button({
+          onclick: () => {
+            props.onClick();
+            setState2((prev) => prev.repeat(2));
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    render(h(Custom, {}), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <span>
+          x
+        </span>
+        <span>
+          y
+        </span>
+        <button />
+      </main>
+    `);
+
+    // TODO: unmounted Custom2's setState is breaking parent
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <span />
+        <button />
+        <span>
+          xx
+        </span>
+      </main>
+    `);
+  });
+
   it("useRef", () => {
     function Custom() {
       const ref = useRef(0);
