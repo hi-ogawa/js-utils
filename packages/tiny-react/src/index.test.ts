@@ -837,8 +837,7 @@ describe("hooks", () => {
   it("multiple update - nested component - unmount - 1", () => {
     function Custom() {
       const [state, setState] = useState("x");
-      return h(
-        Fragment,
+      return h.div(
         {},
         h.span({}, state),
         state.length === 1 &&
@@ -852,8 +851,7 @@ describe("hooks", () => {
 
     function Custom2(props: { onClick: () => void }) {
       const [state2, setState2] = useState("y");
-      return h(
-        Fragment,
+      return h.div(
         {},
         h.span({}, state2),
         h.button({
@@ -869,22 +867,28 @@ describe("hooks", () => {
     render(h(Custom, {}), parent);
     expect(parent).toMatchInlineSnapshot(`
       <main>
-        <span>
-          x
-        </span>
-        <span>
-          y
-        </span>
-        <button />
+        <div>
+          <span>
+            x
+          </span>
+          <div>
+            <span>
+              y
+            </span>
+            <button />
+          </div>
+        </div>
       </main>
     `);
 
     parent.querySelector("button")!.click();
     expect(parent).toMatchInlineSnapshot(`
       <main>
-        <span>
-          xx
-        </span>
+        <div>
+          <span>
+            xx
+          </span>
+        </div>
       </main>
     `);
   });
@@ -892,8 +896,7 @@ describe("hooks", () => {
   it("multiple update - nested component - unmount - 2", () => {
     function Custom() {
       const [state, setState] = useState("x");
-      return h(
-        Fragment,
+      return h.div(
         {},
         h.span({}, state),
         state.length === 1 &&
@@ -907,8 +910,7 @@ describe("hooks", () => {
 
     function Custom2(props: { onClick: () => void }) {
       const [state2, setState2] = useState("y");
-      return h(
-        Fragment,
+      return h.div(
         {},
         h.span({}, state2),
         h.button({
@@ -924,13 +926,17 @@ describe("hooks", () => {
     render(h(Custom, {}), parent);
     expect(parent).toMatchInlineSnapshot(`
       <main>
-        <span>
-          x
-        </span>
-        <span>
-          y
-        </span>
-        <button />
+        <div>
+          <span>
+            x
+          </span>
+          <div>
+            <span>
+              y
+            </span>
+            <button />
+          </div>
+        </div>
       </main>
     `);
 
@@ -938,11 +944,15 @@ describe("hooks", () => {
     parent.querySelector("button")!.click();
     expect(parent).toMatchInlineSnapshot(`
       <main>
-        <span />
-        <button />
-        <span>
-          xx
-        </span>
+        <div>
+          <div>
+            <span />
+            <button />
+          </div>
+          <span>
+            xx
+          </span>
+        </div>
       </main>
     `);
   });
