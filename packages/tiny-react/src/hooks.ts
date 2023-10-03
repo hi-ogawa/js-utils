@@ -115,7 +115,7 @@ export class HookContext {
     // reducer
     const state = hook.state as S;
     const dispatch = (next: A) => {
-      hook.state = reducer(state, next);
+      hook.state = reducer(hook.state as S, next);
       this.notify();
     };
     return [state, dispatch] as const;

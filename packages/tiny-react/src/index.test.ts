@@ -711,13 +711,12 @@ describe("hooks", () => {
       </main>
     `);
 
-    // TODO: should be 2
     parent.querySelector("button")!.click();
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
           <span>
-            1
+            2
           </span>
           <button />
         </div>
