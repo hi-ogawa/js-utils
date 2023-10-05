@@ -1,4 +1,4 @@
-import type { ComponentType, FC } from "../helper/common";
+import type { FC } from "../helper/common";
 import type { h } from "../helper/hyperscript";
 import type { useEffect, useState } from "../hooks";
 
@@ -39,14 +39,14 @@ export function createHmrRegistry(
   };
 }
 
-export function createHmrComponent(registry: HmrRegistry, Fc: FC) {
+export function createHmrComponent<P>(registry: HmrRegistry, Fc: FC<P>) {
   const hmrData: HmrComponentData = {
     component: Fc,
     listeners: new Set(),
   };
   registry.components.set(Fc.name, hmrData);
 
-  const WrapperComponent: ComponentType = (props) => {
+  const WrapperComponent: FC<P> = (props) => {
     // take latest component from registry.
     const [LatestFc, setFc] = registry.runtime.useState<FC>(() => Fc);
 
