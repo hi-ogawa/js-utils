@@ -150,6 +150,7 @@ function reconcileNode(
           effectManager
         );
         bnode.props = vnode.props;
+        bnode.hookContext.notify = forceUpdate;
       } else {
         unmount(bnode);
         const hookContext = new HookContext(forceUpdate); // TODO: this forceUpdate references old bnode after rerender

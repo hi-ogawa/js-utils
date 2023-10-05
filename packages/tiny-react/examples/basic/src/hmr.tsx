@@ -13,14 +13,11 @@ const registry = createHmrRegistry({
   useEffect,
 });
 
-// TODO: changing HmrChild implementation here shouldn't reset state in HmrTest
+// changing HmrChild implementation here shouldn't reset state in HmrTest
 export const HmrChild = createHmrComponent(
   registry,
   function HmrChild(props: { value: number }) {
-    // TODO: somehow `props.value` resets to `0`
-    //       it might be a bug in reconciler...
-    console.log("== HmrChild", props);
-    return h.div({}, props.value + 123);
+    return h.div({}, props.value);
   }
 );
 

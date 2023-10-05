@@ -1051,7 +1051,7 @@ describe("hooks", () => {
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-          {"state":2,"state2":4,"prop":"x"}
+          {"state":2,"state2":4,"prop":"y"}
           <button />
         </div>
       </main>
