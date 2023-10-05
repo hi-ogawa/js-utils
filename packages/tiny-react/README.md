@@ -4,7 +4,7 @@ Experiment to study react-like virtual-dom rendering implementation.
 
 Internal architecture is inspired by yew and preact.
 
-See example app in `./examples/jsx`
+See example app in `./examples/basic`
 
 - https://tiny-react-hiro18181.vercel.app
 

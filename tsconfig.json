@@ -35,7 +35,7 @@
       "path": "packages/tiny-react"
     },
     {
-      "path": "packages/tiny-react/examples/jsx"
+      "path": "packages/tiny-react/examples/basic"
     },
     {
       "path": "packages/tiny-rpc"

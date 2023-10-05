@@ -211,7 +211,7 @@ importers:
         specifier: ^4.4.9
         version: 4.4.9(@types/node@18.16.20)
 
-  packages/tiny-react/examples/jsx:
+  packages/tiny-react/examples/basic:
     devDependencies:
       '@hiogawa/theme-script':
         specifier: workspace:*
