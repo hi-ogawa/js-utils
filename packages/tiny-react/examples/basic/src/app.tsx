@@ -18,6 +18,7 @@ export function App() {
         </a>
       </header>
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto p-4">
+        <TestProps />
         <TestHmr />
         <TestTodoApp />
         <TestState />
@@ -298,6 +299,67 @@ function TestHmr() {
         </div>
         <div>
           HmrChild <HmrChild value={state} />{" "}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TestProps() {
+  const [state, setState] = useState(0);
+
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <h1>Test Props</h1>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span>Outer State</span>
+          <span className="min-w-[1rem] text-center">{state}</span>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev - 1)}
+          >
+            -1
+          </button>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev + 1)}
+          >
+            +1
+          </button>
+        </div>
+        <TestPropsInner value={state} />
+      </div>
+    </div>
+  );
+}
+
+function TestPropsInner(props: { value: number }) {
+  const [state, setState] = useState(0);
+
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span>Inner State</span>
+          <span className="min-w-[1rem] text-center">{state}</span>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev - 1)}
+          >
+            -1
+          </button>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev + 1)}
+          >
+            +1
+          </button>
+        </div>
+        {/* TODO: props resets on inner state change */}
+        <div className="flex items-center gap-2">
+          <span>Props</span>
+          <span>{JSON.stringify(props, null, 2)}</span>
         </div>
       </div>
     </div>
