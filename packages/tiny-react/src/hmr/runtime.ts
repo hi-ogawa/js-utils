@@ -66,7 +66,7 @@ export function createHmrComponent<P>(registry: HmrRegistry, Fc: FC<P>) {
     //   This renders component as a child, which makes it always re-mount on hot update since two functions are not identical.
     //   Hook states are not preserved, but new component can add/remove hook usage since hook states reset anyways.
     //
-    // approach 2.
+    // approach 2. (TODO)
     //
     //   return LatestFc(props)
     //
@@ -106,15 +106,8 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
 }
 
 export function setupHmr(hot: HotContext, registry: HmrRegistry) {
-  console.log("== setupHmr", { registry });
   hot.data[LATEST_DATA] = registry;
   hot.accept((newModule) => {
-    console.log("== accept", {
-      newModule,
-      registry,
-      latestReg: hot.data[LATEST_DATA],
-    });
-
     // `registry` refereneced here is the one from the last module which is "accept"-ing new modules.
     // `hot.data[LATEST_DATA]` is always updated by new module before new module is "accept"-ed.
     const patchSuccess =
