@@ -23,5 +23,7 @@ export const HmrChild = createHmrComponent(
 
 if (import.meta.hot) {
   setupHmr(import.meta.hot, registry);
-  import.meta.hot.accept(); // need exact string for vite to recognize
+
+  // source code needs to include exact import.meta expression for vite's static analysis
+  () => import.meta.hot?.accept();
 }
