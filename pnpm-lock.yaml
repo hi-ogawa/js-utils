@@ -208,7 +208,7 @@ importers:
         specifier: workspace:*
         version: link:../utils
 
-  packages/tiny-react/examples/jsx:
+  packages/tiny-react/examples/basic:
     devDependencies:
       '@hiogawa/theme-script':
         specifier: workspace:*

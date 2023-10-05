@@ -20,7 +20,7 @@ import type { ComponentChildren, ComponentType } from "./common";
 // > If the factory is defined as h, it will check for h.JSX before a global JSX.
 
 // see following example for how each type/interface affects jsx typing
-// packages/tiny-react/examples/jsx/src/type-check.tsx
+// packages/tiny-react/examples/basic/src/type-check.tsx
 
 export namespace JSX {
   // constraint what's usable as jsx element tag e.g. <div /> <Component ... />
