@@ -39,7 +39,8 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
-    "@hiogawa/utils": "workspace:*"
+    "@hiogawa/utils": "workspace:*",
+    "vite": "^4.4.9"
   },
   "volta": {
     "extends": "../../package.json"
