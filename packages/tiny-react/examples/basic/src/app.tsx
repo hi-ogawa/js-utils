@@ -1,6 +1,7 @@
 import { getTheme, setTheme } from "@hiogawa/theme-script";
 import { useCallback, useEffect, useRef, useState } from "@hiogawa/tiny-react";
 import { range } from "@hiogawa/utils";
+import { HmrChild } from "./hmr";
 
 export function App() {
   return (
@@ -17,6 +18,7 @@ export function App() {
         </a>
       </header>
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto p-4">
+        <TestHmr />
         <TestTodoApp />
         <TestState />
         <TestEffect />
@@ -267,6 +269,37 @@ function TestTodoApp() {
         <summary>debug</summary>
         <pre>{JSON.stringify({ input, todos }, null, 2)}</pre>
       </details>
+    </div>
+  );
+}
+
+function TestHmr() {
+  const [state, setState] = useState(0);
+
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <h1>Test Hmr</h1>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span>Counter</span>
+          <span className="min-w-[1rem] text-center">{state}</span>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev - 1)}
+          >
+            -1
+          </button>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev + 1)}
+          >
+            +1
+          </button>
+        </div>
+        <div>
+          HmrChild <HmrChild value={state} />{" "}
+        </div>
+      </div>
     </div>
   );
 }
