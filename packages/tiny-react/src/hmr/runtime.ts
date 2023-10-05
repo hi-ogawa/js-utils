@@ -72,7 +72,7 @@ export function createHmrComponent<P>(registry: HmrRegistry, Fc: FC<P>) {
     //
     //   This directly calls into functional component and use it as implementation of `WrapperComponent`.
     //   This won't cause re-mount but it must ensure hook usage didn't change, otherwise it'll crash client.
-    //   To empty this approach, we need to detect the usage of hook and conditionally `hot.invalidate`
+    //   To employ this approach, we need to detect the usage of hook and conditionally `hot.invalidate`
     //   only when hook usage is changed.
     //
 
