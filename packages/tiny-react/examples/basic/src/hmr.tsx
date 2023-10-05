@@ -17,10 +17,14 @@ const registry = createHmrRegistry({
 export const HmrChild = createHmrComponent(
   registry,
   function HmrChild(props: { value: number }) {
-    return h.div({}, props.value);
+    // TODO: somehow `props.value` resets to `0`
+    //       it might be a bug in reconciler...
+    console.log("== HmrChild", props);
+    return h.div({}, props.value + 123);
   }
 );
 
 if (import.meta.hot) {
   setupHmr(import.meta.hot, registry);
+  import.meta.hot.accept(); // need exact string for vite to recognize
 }

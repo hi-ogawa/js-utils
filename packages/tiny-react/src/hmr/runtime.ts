@@ -93,6 +93,9 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (!current || !latest) {
       return false;
     }
+    if (current === latest) {
+      continue;
+    }
     currentReg.components.set(key, latest);
     latest.listeners = current.listeners;
     if (latest.listeners) {
@@ -103,8 +106,15 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
 }
 
 export function setupHmr(hot: HotContext, registry: HmrRegistry) {
+  console.log("== setupHmr", { registry });
   hot.data[LATEST_DATA] = registry;
   hot.accept((newModule) => {
+    console.log("== accept", {
+      newModule,
+      registry,
+      latestReg: hot.data[LATEST_DATA],
+    });
+
     // `registry` refereneced here is the one from the last module which is "accept"-ing new modules.
     // `hot.data[LATEST_DATA]` is always updated by new module before new module is "accept"-ed.
     const patchSuccess =
