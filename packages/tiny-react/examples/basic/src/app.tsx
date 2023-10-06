@@ -282,8 +282,7 @@ function TestHmr() {
       <h1 className="text-lg">TestHmr</h1>
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <span>Counter</span>
-          <span className="min-w-[1rem] text-center">{state}</span>
+          <span>Counter = {state}</span>
           <button
             className="antd-btn antd-btn-default px-1"
             onclick={() => setState((prev) => prev - 1)}
