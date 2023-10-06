@@ -10,7 +10,7 @@ import {
   setupHmr,
 } from "./runtime";
 
-describe("hmr", () => {
+describe(setupHmr, () => {
   it("basic", () => {
     let firstOnNewModule!: (newModule: {} | undefined) => void;
 
