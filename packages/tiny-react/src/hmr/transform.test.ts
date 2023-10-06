@@ -4,7 +4,7 @@ import { hmrTransform } from "./transform";
 describe(hmrTransform, () => {
   it("basic", () => {
     const input = `\
-/* @tiny-react.hmr SomeComponent */
+/* @hmr SomeComponent */
 
 function SomeComponent() {
   return <div>hello</div>;
@@ -13,16 +13,16 @@ function SomeComponent() {
     expect(hmrTransform(input)).toMatchInlineSnapshot(`
       "
 
-      import * as _$tinyReact from \\"@hiogawa/tiny-react\\";
-      import * as _$tinyReactHmr from \\"@hiogawa/tiny-react/dist/hmr\\";
+      import * as _$lib from \\"@hiogawa/tiny-react\\";
+      import * as _$hmr from \\"@hiogawa/tiny-react/dist/hmr\\";
 
-      const _$registry = _$tinyReactHmr.createHmrRegistry({
-        h: _$tinyReact.h,
-        useState: _$tinyReact.useState,
-        useEffect: _$tinyReact.useEffect,
+      const _$registry = _$hmr.createHmrRegistry({
+        h: _$lib.h,
+        useState: _$lib.useState,
+        useEffect: _$lib.useEffect,
       });
 
-      /* @tiny-react.hmr SomeComponent */
+      /* @hmr SomeComponent */
 
       function SomeComponent() {
         return <div>hello</div>;
@@ -30,12 +30,12 @@ function SomeComponent() {
 
 
       var _$tmp_SomeComponent  = SomeComponent ;
-      SomeComponent  = _$tinyReactHmr.createHmrComponent(_$registry, _$tmp_SomeComponent );
+      SomeComponent  = _$hmr.createHmrComponent(_$registry, _$tmp_SomeComponent );
 
 
 
       if (import.meta.hot) {
-        _$tinyReactHmr.setupHmr(import.meta.hot, _$registry);
+        _$hmr.setupHmr(import.meta.hot, _$registry);
         () => import.meta.hot.accept();
       }
 

@@ -1,6 +1,6 @@
 import { useState } from "@hiogawa/tiny-react";
 
-/* @tiny-react.hmr HmrTransform */
+/* @hmr HmrTransform */
 
 export function HmrTransform(props: { counter: number }) {
   const [state, setState] = useState(0);
