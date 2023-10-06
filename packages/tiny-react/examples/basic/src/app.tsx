@@ -18,9 +18,9 @@ export function App() {
         </a>
       </header>
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto p-4">
-        <TestProps />
         <TestHmr />
         <TestTodoApp />
+        <TestProps />
         <TestState />
         <TestEffect />
         <TestRef />
@@ -279,7 +279,7 @@ function TestHmr() {
 
   return (
     <div className="border p-2 flex flex-col gap-2">
-      <h1>Test Hmr</h1>
+      <h1 className="text-lg">TestHmr</h1>
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <span>Counter</span>
@@ -297,9 +297,8 @@ function TestHmr() {
             +1
           </button>
         </div>
-        <div>
-          HmrChild <HmrChild value={state} />{" "}
-        </div>
+        <div className="border-t my-1"></div>
+        <HmrChild counter={state} />
       </div>
     </div>
   );

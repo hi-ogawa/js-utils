@@ -96,6 +96,7 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current === latest) {
       continue;
     }
+    // TODO: don't reset if source code is exactly same
     currentReg.components.set(key, latest);
     latest.listeners = current.listeners;
     if (latest.listeners) {
