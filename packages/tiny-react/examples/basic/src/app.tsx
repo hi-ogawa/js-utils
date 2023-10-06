@@ -357,7 +357,6 @@ function TestPropsInner(props: { value: number }) {
             +1
           </button>
         </div>
-        {/* TODO: props resets on inner state change */}
         <div className="flex items-center gap-2">
           <span>Props</span>
           <span>{JSON.stringify(props, null, 2)}</span>

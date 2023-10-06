@@ -1,6 +1,8 @@
 // this simple semi-auto-injection requires
 // - explicit magic pragma to list component /* @tiny-react.hmr SomeComponent */
-// - component must be defined either `function SomeComponent() { ... }` or `let SomeComponent = ...` (not `const SomeComponent = ...`)
+// - component cannot be declared via `const` and it must be either of
+//   - function SomeComponent() { ... }
+//   - let SomeComponent = ...`
 
 export interface HmrTransformOptions {
   ignore: string[];
