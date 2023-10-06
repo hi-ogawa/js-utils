@@ -5,7 +5,7 @@ import {
   setupHmr,
 } from "@hiogawa/tiny-react/dist/hmr";
 
-// manually use tiny-react/hmr api for easier debugging
+// manually use tiny-react hmr api for easier debugging
 
 const registry = createHmrRegistry({
   h,
