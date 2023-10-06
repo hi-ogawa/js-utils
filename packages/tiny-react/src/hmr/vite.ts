@@ -1,5 +1,5 @@
 import { type FilterPattern, type Plugin, createFilter } from "vite";
-import { hmrTransform } from "./transform";
+import { hmrTransform2 } from "./transform";
 
 interface TinyReactHmrPluginOptions {
   include?: FilterPattern;
@@ -24,7 +24,7 @@ export function tinyReactHmrPlugin(
       if (id.includes("/node_modules/") || !filter(id)) {
         return;
       }
-      return hmrTransform(code);
+      return hmrTransform2(code);
     },
   };
 }
