@@ -3,12 +3,9 @@ import {
   createHmrComponent,
   createHmrRegistry,
   setupHmr,
-} from "@hiogawa/tiny-react/hmr";
+} from "@hiogawa/tiny-react/dist/hmr";
 
-// TODO: ast transform to inject hmr
-
-// TODO: start with semi-automatic injection based on manual flag via speical comment?
-/* @tiny-react.hmr HmrChild */
+// manually use tiny-react/hmr api for easier debugging
 
 const registry = createHmrRegistry({
   h,
@@ -16,7 +13,6 @@ const registry = createHmrRegistry({
   useEffect,
 });
 
-// changing HmrChild implementation here shouldn't reset state in HmrTest
 export const HmrChild = createHmrComponent(
   registry,
   function HmrChild(props: { counter: number }) {

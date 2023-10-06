@@ -6,14 +6,17 @@ export interface HmrTransformOptions {
   ignore: string[];
 }
 
-const PRAGMA_RE = /\/\*\s*@tiny-react.hmr\s+(\w+)\s*\*\//;
+const PRAGMA_RE = /\/\*\s*@tiny-react.hmr\s+(.*)\s*\*\//g;
 
-export function hmrTransform(code: string, _options?: HmrTransformOptions) {
-  const pragma = code.match(PRAGMA_RE);
-  if (!pragma) {
-    return code;
+export function hmrTransform(
+  code: string,
+  _options?: HmrTransformOptions
+): string | undefined {
+  let names = [...code.matchAll(PRAGMA_RE)].map((match) => match[1]);
+  names = [...new Set(names)];
+  if (names.length === 0) {
+    return;
   }
-  const names = pragma[1].split(",");
   const extraCode = names.map((name) => wrapCreateHmrComponent(name));
   return HEADER_CODE + code + extraCode + FOOTER_CODE;
 }
@@ -30,8 +33,8 @@ ${name} = _$tinyReactHmr.createHmrComponent(_$registry, _$tmp_${name});
 // /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates
 const HEADER_CODE = /* js */ `
 
-import _$tinyReact from "@hiogawa/tiny-react";
-import _$tinyReactHmr from "@hiogawa/tiny-react/hmr";
+import * as _$tinyReact from "@hiogawa/tiny-react";
+import * as _$tinyReactHmr from "@hiogawa/tiny-react/dist/hmr";
 
 const _$registry = _$tinyReactHmr.createHmrRegistry({
   h: _$tinyReact.h,

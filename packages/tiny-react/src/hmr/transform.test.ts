@@ -13,8 +13,8 @@ function SomeComponent() {
     expect(hmrTransform(input)).toMatchInlineSnapshot(`
       "
 
-      import _$tinyReact from \\"@hiogawa/tiny-react\\";
-      import _$tinyReactHmr from \\"@hiogawa/tiny-react/hmr\\";
+      import * as _$tinyReact from \\"@hiogawa/tiny-react\\";
+      import * as _$tinyReactHmr from \\"@hiogawa/tiny-react/dist/hmr\\";
 
       const _$registry = _$tinyReactHmr.createHmrRegistry({
         h: _$tinyReact.h,
@@ -29,8 +29,8 @@ function SomeComponent() {
       }
 
 
-      var _$tmp_SomeComponent = SomeComponent;
-      SomeComponent = _$tinyReactHmr.createHmrComponent(_$registry, _$tmp_SomeComponent);
+      var _$tmp_SomeComponent  = SomeComponent ;
+      SomeComponent  = _$tinyReactHmr.createHmrComponent(_$registry, _$tmp_SomeComponent );
 
 
 

@@ -2,6 +2,7 @@ import { getTheme, setTheme } from "@hiogawa/theme-script";
 import { useCallback, useEffect, useRef, useState } from "@hiogawa/tiny-react";
 import { range } from "@hiogawa/utils";
 import { HmrChild } from "./hmr";
+import { HmrTransform } from "./hmr-transform";
 
 export function App() {
   return (
@@ -298,6 +299,8 @@ function TestHmr() {
         </div>
         <div className="border-t my-1"></div>
         <HmrChild counter={state} />
+        <div className="border-t my-1"></div>
+        <HmrTransform counter={state} />
       </div>
     </div>
   );
