@@ -15,11 +15,12 @@ const PRAGMA_RE = /\/\*\s*@hmr\s+(.*)\s*\*\//g;
 
 export function hmrTransform(code: string): string | undefined {
   let names = [...code.matchAll(PRAGMA_RE)].map((match) => match[1]);
-  names = [...new Set(names)];
   if (names.length === 0) {
     return;
   }
-  const extraCode = names.map((name) => wrapCreateHmrComponent(name));
+  const extraCode = [...new Set(names)].map((name) =>
+    wrapCreateHmrComponent(name)
+  );
   return HEADER_CODE + code + extraCode + FOOTER_CODE;
 }
 
