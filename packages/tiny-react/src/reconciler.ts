@@ -153,7 +153,7 @@ function reconcileNode(
         bnode.hookContext.notify = forceUpdate;
       } else {
         unmount(bnode);
-        const hookContext = new HookContext(forceUpdate); // TODO: this forceUpdate references old bnode after rerender
+        const hookContext = new HookContext(forceUpdate);
         const vchild = hookContext.wrap(() => vnode.render(vnode.props));
         const child = reconcileNode(
           vchild,
