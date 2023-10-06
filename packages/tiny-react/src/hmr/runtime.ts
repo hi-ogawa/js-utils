@@ -28,6 +28,7 @@ interface HmrRegistry {
 interface HmrComponentData {
   component: FC;
   listeners: Set<(fc: () => FC) => void>;
+  options: HmrComponentOptions;
 }
 
 export function createHmrRegistry(
@@ -39,15 +40,23 @@ export function createHmrRegistry(
   };
 }
 
-export function createHmrComponent<P>(registry: HmrRegistry, Fc: FC<P>) {
+interface HmrComponentOptions {
+  remount: boolean;
+}
+
+export function createHmrComponent<P>(
+  registry: HmrRegistry,
+  Fc: FC<P>,
+  options: HmrComponentOptions
+) {
   const hmrData: HmrComponentData = {
     component: Fc,
     listeners: new Set(),
+    options,
   };
   registry.components.set(Fc.name, hmrData);
 
   const WrapperComponent: FC<P> = (props) => {
-    // take latest component from registry.
     const [LatestFc, setFc] = registry.runtime.useState<FC>(() => Fc);
 
     registry.runtime.useEffect(() => {
@@ -59,24 +68,27 @@ export function createHmrComponent<P>(registry: HmrRegistry, Fc: FC<P>) {
     }, []);
 
     //
-    // approach 1. (current)
+    // approach 1.
     //
-    //   return h(LatestFc, props)
+    //   h(LatestFc, props)
     //
     //   This renders component as a child, which makes it always re-mount on hot update since two functions are not identical.
     //   Hook states are not preserved, but new component can add/remove hook usage since hook states reset anyways.
     //
-    // approach 2. (TODO)
+    // approach 2.
     //
-    //   return LatestFc(props)
+    //   LatestFc(props)
     //
     //   This directly calls into functional component and use it as implementation of `WrapperComponent`.
     //   This won't cause re-mount but it must ensure hook usage didn't change, otherwise it'll crash client.
     //   To employ this approach, we need to detect the usage of hook and conditionally `hot.invalidate`
     //   only when hook usage is changed.
+    //   however we allow this mode via explicit "// @safe-unsafe" comment.
     //
 
-    return registry.runtime.h(LatestFc, props);
+    return options.remount
+      ? registry.runtime.h(LatestFc, props)
+      : LatestFc(props);
   };
 
   return WrapperComponent;
@@ -96,7 +108,10 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current === latest) {
       continue;
     }
-    // TODO: don't reset if source code is exactly same
+    if (current.options.remount !== latest.options.remount) {
+      return false;
+    }
+    // TODO: don't need to reset if source code is exactly same? current.component.toString()
     currentReg.components.set(key, latest);
     latest.listeners = current.listeners;
     if (latest.listeners) {

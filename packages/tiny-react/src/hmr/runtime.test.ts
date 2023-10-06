@@ -34,9 +34,13 @@ describe(setupHmr, () => {
         useEffect,
       });
 
-      const Child = createHmrComponent(registry, function Child() {
-        return h.div({}, "1");
-      });
+      const Child = createHmrComponent(
+        registry,
+        function Child() {
+          return h.div({}, "1");
+        },
+        { remount: true }
+      );
       ChildExport = Child;
 
       setupHmr(hot, registry);
@@ -66,9 +70,13 @@ describe(setupHmr, () => {
         useEffect,
       });
 
-      const Child = createHmrComponent(registry, function Child() {
-        return h.div({}, "2");
-      });
+      const Child = createHmrComponent(
+        registry,
+        function Child() {
+          return h.div({}, "2");
+        },
+        { remount: true }
+      );
       // this export itself doesn't affect original version of export
       Child;
 
@@ -94,9 +102,13 @@ describe(setupHmr, () => {
         useEffect,
       });
 
-      const Child = createHmrComponent(registry, function Child() {
-        return h.div({}, "3");
-      });
+      const Child = createHmrComponent(
+        registry,
+        function Child() {
+          return h.div({}, "3");
+        },
+        { remount: true }
+      );
       Child;
 
       setupHmr(hot, registry);

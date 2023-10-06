@@ -2,7 +2,7 @@ import { tinyassert } from "@hiogawa/utils";
 
 //
 // limitations of this primitive transform
-// - it requires explicit magic pragma '// @hmr' before component declaration
+// - it requires explicit magic comment "@hmr" or "@hmr-unsafe" before component declaration
 // - change in other code in the same file won't cause refresh
 //
 
@@ -11,25 +11,24 @@ const PRAGMA_RE = /^\s*\/\/\s*@hmr/g;
 export function hmrTransform(code: string): string | undefined {
   const lines = code.split("\n");
   const newLines = [...lines];
-  const componentNames: string[] = [];
+  const extraCodes: string[] = [];
+
   for (let i = 0; i < lines.length - 1; i++) {
     const line = lines[i];
     if (line.match(PRAGMA_RE)) {
       const found = transformComponentDecl(lines[i + 1]);
       if (found) {
         newLines[i + 1] = found[0];
-        componentNames.push(found[1]);
+        extraCodes.push(
+          wrapCreateHmrComponent(found[1], !line.includes("@hmr-unsafe"))
+        );
       }
     }
   }
-  if (componentNames.length === 0) {
+  if (extraCodes.length === 0) {
     return;
   }
-  const newCode = newLines.join("\n");
-  const extraCode = [...new Set(componentNames)]
-    .map((name) => wrapCreateHmrComponent(name))
-    .join("\n");
-  return HEADER_CODE + newCode + extraCode + FOOTER_CODE;
+  return [HEADER_CODE, ...newLines, ...extraCodes, FOOTER_CODE].join("\n");
 }
 
 const COMPONENT_DECL_RE = /(function|let|const)\s*(\w+)/;
@@ -66,9 +65,9 @@ function spliceString(
 
 // re-assigning over function declaration is sketchy but seems to be okay
 // cf. https://eslint.org/docs/latest/rules/no-func-assign
-const wrapCreateHmrComponent = (name: string) => /* js */ `
+const wrapCreateHmrComponent = (name: string, remount: boolean) => /* js */ `
 var _$tmp_${name} = ${name};
-${name} = _$hmr.createHmrComponent(_$registry, _$tmp_${name});
+${name} = _$hmr.createHmrComponent(_$registry, _$tmp_${name}, { remount: ${remount} });
 `;
 
 // /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates

@@ -32,6 +32,7 @@ function CompNa() {
         useState: _$lib.useState,
         useEffect: _$lib.useEffect,
       });
+
       // @hmr
       function CompFn() {
         return <div>hello</div>;
@@ -51,16 +52,18 @@ function CompNa() {
         return <div>hello</div>;
       }
 
+
       var _$tmp_CompFn = CompFn;
-      CompFn = _$hmr.createHmrComponent(_$registry, _$tmp_CompFn);
+      CompFn = _$hmr.createHmrComponent(_$registry, _$tmp_CompFn, { remount: true });
 
 
       var _$tmp_CompLet = CompLet;
-      CompLet = _$hmr.createHmrComponent(_$registry, _$tmp_CompLet);
+      CompLet = _$hmr.createHmrComponent(_$registry, _$tmp_CompLet, { remount: true });
 
 
       var _$tmp_CompConst = CompConst;
-      CompConst = _$hmr.createHmrComponent(_$registry, _$tmp_CompConst);
+      CompConst = _$hmr.createHmrComponent(_$registry, _$tmp_CompConst, { remount: true });
+
 
       if (import.meta.hot) {
         _$hmr.setupHmr(import.meta.hot, _$registry);

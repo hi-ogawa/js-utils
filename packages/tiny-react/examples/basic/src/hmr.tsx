@@ -47,7 +47,8 @@ export const HmrChild = createHmrComponent(
         </span>
       </div>
     );
-  }
+  },
+  { remount: true }
 );
 
 if (import.meta.hot) {
