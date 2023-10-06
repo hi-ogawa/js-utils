@@ -1,40 +1,20 @@
+import { tinyassert } from "@hiogawa/utils";
+
 //
 // limitations of this primitive transform
-//
-// - it requires explicit magic pragma to list component by
-//   - /* @hmr SomeComponent */
-//
-// - component cannot be declared via `const` and it must be either
-//   - function SomeComponent() { ... } or
-//   - let SomeComponent = ...`
-//
+// - it requires explicit magic pragma '// @hmr' before component declaration
 // - change in other code in the same file won't cause refresh
 //
 
-import { tinyassert } from "@hiogawa/utils";
-
-const PRAGMA_RE = /\/\*\s*@hmr\s+(.*)\s*\*\//g;
+const PRAGMA_RE = /^\s*\/\/\s*@hmr/g;
 
 export function hmrTransform(code: string): string | undefined {
-  let names = [...code.matchAll(PRAGMA_RE)].map((match) => match[1]);
-  if (names.length === 0) {
-    return;
-  }
-  const extraCode = [...new Set(names)].map((name) =>
-    wrapCreateHmrComponent(name)
-  );
-  return HEADER_CODE + code + extraCode + FOOTER_CODE;
-}
-
-const PRAGMA_RE2 = /^\s*\/\/\s*@hmr/g;
-
-export function hmrTransform2(code: string): string | undefined {
   const lines = code.split("\n");
   const newLines = [...lines];
   const componentNames: string[] = [];
   for (let i = 0; i < lines.length - 1; i++) {
     const line = lines[i];
-    if (line.match(PRAGMA_RE2)) {
+    if (line.match(PRAGMA_RE)) {
       const found = transformComponentDecl(lines[i + 1]);
       if (found) {
         newLines[i + 1] = found[0];
@@ -84,7 +64,7 @@ function spliceString(
   );
 }
 
-// re-assigning over function declaration is sketchy but seems to "work"
+// re-assigning over function declaration is sketchy but seems to be okay
 // cf. https://eslint.org/docs/latest/rules/no-func-assign
 const wrapCreateHmrComponent = (name: string) => /* js */ `
 var _$tmp_${name} = ${name};
