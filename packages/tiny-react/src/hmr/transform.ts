@@ -1,9 +1,15 @@
-// this simple semi-auto-injection requires
-// - explicit magic pragma to list component by
+//
+// limitations
+//
+// - it requires explicit magic pragma to list component by
 //   - /* @hmr SomeComponent */
+//
 // - component cannot be declared via `const` and it must be either
 //   - function SomeComponent() { ... } or
 //   - let SomeComponent = ...`
+//
+// - change in other code in the same file won't cause refresh
+//
 
 const PRAGMA_RE = /\/\*\s*@hmr\s+(.*)\s*\*\//g;
 
