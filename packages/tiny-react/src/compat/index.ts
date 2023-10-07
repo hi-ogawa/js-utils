@@ -1,47 +1,39 @@
-// not really compat but maybe good enough for simple cases...
-// cf. https://github.com/preactjs/preact/blame/9c5a82efcc3dcbd0035c694817a3022d81264687/compat/src/index.js
+import { useEffect, useRef, useState } from "../hooks";
+import { render } from "../reconciler";
+import { type BNode, type VNode, emptyNode } from "../virtual-dom";
 
-// probably critical missing features
-// - defaultValue prop
-// - dangerouslySetInnerHTML prop
-// - mutable ref prop
-// - forwardRef
-// - useLayoutEffect
+// non comprehensive compatibility features
 
-import {
-  Fragment,
-  render,
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "../index";
-import { createRoot, useSyncExternalStore } from "./misc";
+// https://react.dev/reference/react/useSyncExternalStore
+// https://github.com/preactjs/preact/blob/9c5a82efcc3dcbd0035c694817a3022d81264687/compat/src/index.js#L154
+export function useSyncExternalStore<T>(
+  subscribe: (onStoreChange: () => void) => () => void,
+  getSnapshot: () => T,
+  _getServerSnapshot?: () => T
+): T {
+  const [value, setValue] = useState(() => getSnapshot());
 
-export {
-  render,
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  createRoot,
-};
+  const latestRef = useRef({ getSnapshot });
+  latestRef.current.getSnapshot = getSnapshot;
 
-export default {
-  render,
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  createRoot,
-};
+  useEffect(() => {
+    return subscribe(() => {
+      setValue(latestRef.current.getSnapshot());
+    });
+  }, [subscribe]);
+
+  return value;
+}
+
+// https://react.dev/reference/react-dom/client/createRoot
+export function createRoot(container: Element) {
+  let bnode: BNode | undefined;
+  return {
+    render: (vnode: VNode) => {
+      bnode = render(vnode, container, bnode);
+    },
+    unmount() {
+      render(emptyNode(), container, bnode);
+    },
+  };
+}

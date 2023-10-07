@@ -1,5 +1,8 @@
 import { tinyassert } from "@hiogawa/utils";
 
+// not particularly intentional but this hook module doesn't depend on any of reconciler/virtual-dom logic,
+// which tells that the hook idea itself is general concept of functional api..
+
 type HookState = ReducerHookState | EffectHookState | RefHookState;
 
 type ReducerHookState = {
@@ -55,6 +58,7 @@ function resolveNextState<T>(prev: T, next: NextState<T>): T {
 
 export class HookContext {
   // expose global
+  // (technically we can keep stack HookContext[] so that HookContext.wrap can be reentrant)
   static current: HookContext | undefined;
 
   private initial = true;
@@ -198,27 +202,6 @@ export function useCallback<F extends (...args: any[]) => any>(
   deps: unknown[]
 ) {
   return useMemo(() => callback, deps);
-}
-
-// quicker-and-dirtier useSyncExternalStore
-// cf. https://github.com/preactjs/preact/blob/9c5a82efcc3dcbd0035c694817a3022d81264687/compat/src/index.js#L154
-export function useSyncExternalStore<T>(
-  subscribe: (onStoreChange: () => void) => () => void,
-  getSnapshot: () => T,
-  _getServerSnapshot?: () => T
-): T {
-  const [value, setValue] = useState(() => getSnapshot());
-
-  const latestRef = useRef({ getSnapshot });
-  latestRef.current.getSnapshot = getSnapshot;
-
-  useEffect(() => {
-    return subscribe(() => {
-      setValue(latestRef.current.getSnapshot());
-    });
-  }, [subscribe]);
-
-  return value;
 }
 
 //

@@ -12,6 +12,14 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - jsx-runtime
 - hmr
 
+## unsupported
+
+- defaultValue prop
+- dangerouslySetInnerHTML prop
+- mutable ref prop
+- forwardRef
+- useLayoutEffect
+
 ## example
 
 See example app in `./examples/basic`
