@@ -41,7 +41,7 @@ export function hashString(
 }
 
 // https://en.wikipedia.org/wiki/MurmurHash#Algorithm
-// fuzz test in packages/murmur3-wasm-bindgen/src-js/fuzz.test.ts
+// fuzz test in https://github.com/hi-ogawa/murmur3-wasm-bindgen/blob/main/src-js/fuzz.test.ts
 export function murmur3_32(key: Uint8Array, seed: number): number {
   const len = key.length;
   let h = seed;
