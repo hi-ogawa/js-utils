@@ -66,9 +66,11 @@ function reconcileNode(
         isMount = true;
         const hnode = getSlotTargetNode(hparent, preSlot);
         tinyassert(
-          hnode instanceof Element && hnode.tagName === vnode.name,
-          "hydration mismatch?"
+          hnode instanceof Element &&
+            hnode.tagName.toLowerCase() === vnode.name,
+          `hydration mismatch? (actual: '${hnode?.nodeName}', expected: '${vnode.name}')`
         );
+        preSlot = hnode;
         bnode = {
           ...vnode,
           child: emptyNode(),
@@ -118,11 +120,16 @@ function reconcileNode(
     case "text": {
       if (hydration) {
         const hnode = getSlotTargetNode(hparent, preSlot);
-        tinyassert(hnode instanceof Text, "hydration mismatch?");
-        bnode = {
-          ...vnode,
-          hnode: document.createTextNode(vnode.data),
-        } satisfies BText;
+        tinyassert(
+          hnode instanceof Text,
+          `VText hydration mismatch? (actual: '${hnode?.nodeName}', expected: '#text')`
+        );
+        tinyassert(
+          hnode.data === vnode.data,
+          `VText hydration mismatch? (actual: '${hnode.data}', expected: '${vnode.data}')`
+        );
+        preSlot = hnode;
+        bnode = { ...vnode, hnode } satisfies BText;
       }
       if (bnode.type === "text") {
         if (bnode.data !== vnode.data) {
