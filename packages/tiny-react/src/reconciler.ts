@@ -16,17 +16,27 @@ import {
   getSlot,
 } from "./virtual-dom";
 
-export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
+export function render(
+  vnode: VNode,
+  parent: HNode,
+  bnode: BNode = emptyNode(),
+  hydration: boolean = false
+) {
   const effectManager = new EffectManager();
   const newBnode = reconcileNode(
     vnode,
-    bnode ?? emptyNode(),
+    bnode,
     parent,
     undefined,
-    effectManager
+    effectManager,
+    hydration
   );
   effectManager.run();
   return newBnode;
+}
+
+export function hydrate(vnode: VNode, parent: HNode) {
+  return render(vnode, parent, undefined, true);
 }
 
 function reconcileNode(
@@ -34,10 +44,15 @@ function reconcileNode(
   bnode: BNode, // mutated when reconciled over same bnode
   hparent: HNode,
   preSlot: HNode | undefined,
-  effectManager: EffectManager
+  effectManager: EffectManager,
+  // for hydration, idea is that to setup expected bnode before going into standard reconcilation mutation.
+  hydration: boolean
 ): BNode {
   switch (vnode.type) {
     case "empty": {
+      if (hydration) {
+        bnode = emptyNode();
+      }
       if (bnode.type === "empty") {
       } else {
         unmount(bnode);
@@ -46,6 +61,21 @@ function reconcileNode(
       break;
     }
     case "tag": {
+      let isMount = false; // invoke ref callback on mount
+      if (hydration) {
+        isMount = true;
+        const hnode = getSlotTargetNode(hparent, preSlot);
+        tinyassert(
+          hnode instanceof Element && hnode.tagName === vnode.name,
+          "hydration mismatch?"
+        );
+        bnode = {
+          ...vnode,
+          child: emptyNode(),
+          hnode,
+          listeners: new Map(),
+        } satisfies BTag;
+      }
       if (
         bnode.type === "tag" &&
         bnode.key === vnode.key &&
@@ -59,28 +89,41 @@ function reconcileNode(
           bnode.child,
           bnode.hnode,
           undefined,
-          effectManager
+          effectManager,
+          hydration
         );
         placeChild(bnode.hnode, hparent, preSlot, false);
       } else {
         unmount(bnode);
+        isMount = true;
         const hnode = document.createElement(vnode.name);
         const child = reconcileNode(
           vnode.child,
           emptyNode(),
           hnode,
           undefined,
-          effectManager
+          effectManager,
+          hydration
         );
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
         reconcileTagProps(bnode, vnode.props, {});
         placeChild(bnode.hnode, hparent, preSlot, true);
+      }
+      if (isMount) {
         effectManager.queueRef(bnode);
       }
       bnode.child.parent = bnode;
       break;
     }
     case "text": {
+      if (hydration) {
+        const hnode = getSlotTargetNode(hparent, preSlot);
+        tinyassert(hnode instanceof Text, "hydration mismatch?");
+        bnode = {
+          ...vnode,
+          hnode: document.createTextNode(vnode.data),
+        } satisfies BText;
+      }
       if (bnode.type === "text") {
         if (bnode.data !== vnode.data) {
           bnode.hnode.data = vnode.data;
@@ -100,6 +143,9 @@ function reconcileNode(
       // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
       // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
       // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
+      if (hydration) {
+        bnode = { ...vnode, children: [] } satisfies BFragment;
+      }
       if (bnode.type === "fragment" && bnode.key === vnode.key) {
         const [newChildren, oldChildren] = alignChildrenByKey(
           vnode.children,
@@ -126,7 +172,8 @@ function reconcileNode(
           bchildren[i] ?? emptyNode(),
           hparent,
           preSlot,
-          effectManager
+          effectManager,
+          hydration
         );
         preSlot = getSlot(bchild) ?? preSlot;
         bnode.slot = getSlot(bchild) ?? bnode.slot;
@@ -136,6 +183,10 @@ function reconcileNode(
       break;
     }
     case "custom": {
+      if (hydration) {
+        const hookContext = new HookContext(forceUpdate);
+        bnode = { ...vnode, child: emptyNode(), hookContext } satisfies BCustom;
+      }
       if (
         bnode.type === "custom" &&
         bnode.key === vnode.key &&
@@ -147,7 +198,8 @@ function reconcileNode(
           bnode.child,
           hparent,
           preSlot,
-          effectManager
+          effectManager,
+          hydration
         );
         bnode.props = vnode.props;
         bnode.hookContext.notify = forceUpdate;
@@ -160,7 +212,8 @@ function reconcileNode(
           emptyNode(),
           hparent,
           preSlot,
-          effectManager
+          effectManager,
+          hydration
         );
         bnode = { ...vnode, child, hookContext } satisfies BCustom;
       }
@@ -189,13 +242,21 @@ function placeChild(
   preSlot: HNode | undefined,
   init: boolean
 ) {
-  const slotNext = preSlot ? preSlot.nextSibling : hparent.firstChild;
+  const slotNext = getSlotTargetNode(hparent, preSlot);
   if (init || !(hnode === slotNext || hnode.nextSibling === slotNext)) {
     hparent.insertBefore(hnode, slotNext);
   }
 }
 
+function getSlotTargetNode(
+  hparent: HNode,
+  preSlot: HNode | undefined
+): HNode | null {
+  return preSlot ? preSlot.nextSibling : hparent.firstChild;
+}
+
 // export for unit test
+// TODO: rename to `updateCustomNode`
 export function rerenderCustomNode(vnode: VCustom, bnode: BCustom) {
   // multiple forceUpdate can make bnode unmounted
   if (!bnode.hparent) {
@@ -214,7 +275,8 @@ export function rerenderCustomNode(vnode: VCustom, bnode: BCustom) {
     bnode,
     bnode.hparent,
     preSlot,
-    effectManager
+    effectManager,
+    false
   );
   tinyassert(newBnode === bnode); // reconciled over itself without unmount (i.e. should be same `key` and `render`)
 
