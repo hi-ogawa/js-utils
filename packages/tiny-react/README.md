@@ -9,7 +9,7 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - client side rendering
 - functional component
 - hooks
-- jsx-runtime
+- jsx-runtime (similar typescript DX as react)
 - hmr (with vite plugin)
 
 ## unsupported
@@ -19,7 +19,7 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - mutable ref prop
 - forwardRef
 - useLayoutEffect
-- and a lot more...
+- ...
 
 ## example
 
