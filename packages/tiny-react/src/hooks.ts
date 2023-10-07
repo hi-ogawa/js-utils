@@ -113,8 +113,11 @@ export class HookContext {
     // reducer
     const state = hook.state as S;
     const dispatch = (next: A) => {
-      hook.state = reducer(hook.state as S, next);
-      this.notify();
+      const nextState = reducer(hook.state as S, next);
+      if (hook.state !== nextState) {
+        hook.state = nextState;
+        this.notify();
+      }
     };
     return [state, dispatch] as const;
   };
@@ -195,6 +198,27 @@ export function useCallback<F extends (...args: any[]) => any>(
   deps: unknown[]
 ) {
   return useMemo(() => callback, deps);
+}
+
+// quicker-and-dirtier useSyncExternalStore
+// cf. https://github.com/preactjs/preact/blob/9c5a82efcc3dcbd0035c694817a3022d81264687/compat/src/index.js#L154
+export function useSyncExternalStore<T>(
+  subscribe: (onStoreChange: () => void) => () => void,
+  getSnapshot: () => T,
+  _getServerSnapshot?: () => T
+): T {
+  const [value, setValue] = useState(() => getSnapshot());
+
+  const latestRef = useRef({ getSnapshot });
+  latestRef.current.getSnapshot = getSnapshot;
+
+  useEffect(() => {
+    return subscribe(() => {
+      setValue(latestRef.current.getSnapshot());
+    });
+  }, [subscribe]);
+
+  return value;
 }
 
 //
