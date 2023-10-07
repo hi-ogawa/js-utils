@@ -69,12 +69,14 @@ export class HookContext {
   constructor(public notify: () => void) {}
 
   wrap<T>(f: () => T): T {
+    tinyassert(!HookContext.current, "hook reentrance?");
     HookContext.current = this;
     this.hookCount = 0;
     try {
       return f();
     } finally {
       this.initial = false;
+      tinyassert(HookContext.current);
       HookContext.current = undefined!;
     }
   }

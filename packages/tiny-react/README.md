@@ -17,6 +17,7 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - defaultValue prop
 - dangerouslySetInnerHTML prop
 - mutable ref prop
+- onChange prop
 - forwardRef
 - useLayoutEffect
 - ...

@@ -128,6 +128,7 @@ function TestEffect() {
 
   const ref1 = useRef(0);
   const ref2 = useRef(0);
+  const ref3 = useRef(0);
 
   useEffect(() => {
     ref1.current += 1;
@@ -136,6 +137,10 @@ function TestEffect() {
   useEffect(() => {
     ref2.current += 1;
   });
+
+  useEffect(() => {
+    ref3.current += 1;
+  }, [state]);
 
   return (
     <div className="border p-2 flex flex-col gap-2">
@@ -159,6 +164,7 @@ function TestEffect() {
         </div>
         <div>Effect1 {ref1.current}</div>
         <div>Effect2 {ref2.current}</div>
+        <div>Effect3 {ref3.current}</div>
       </div>
     </div>
   );
