@@ -10,7 +10,7 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - functional component
 - hooks
 - jsx-runtime
-- hmr
+- hmr (with vite plugin)
 
 ## unsupported
 
