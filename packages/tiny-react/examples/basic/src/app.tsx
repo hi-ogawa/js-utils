@@ -201,7 +201,9 @@ function TestSetStateInEffect() {
             +1
           </button>
         </div>
-        <pre className="text-sm">{JSON.stringify({ state, state2, render: renderCountRef.current })}</pre>
+        <pre className="text-sm">
+          {JSON.stringify({ state, state2, render: renderCountRef.current })}
+        </pre>
       </div>
     </div>
   );

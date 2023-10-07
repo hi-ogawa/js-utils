@@ -113,9 +113,8 @@ export class HookContext {
         state: resolveNextState(undefined!, initialState),
       });
     }
-    const hookToCheck = this.hooks[this.hookCount++];
-    tinyassert(hookToCheck.type === "reducer");
-    const hook = hookToCheck;
+    const hook = this.hooks[this.hookCount++];
+    tinyassert(hook.type === "reducer");
 
     // reducer
     const state = hook.state as S;
@@ -139,6 +138,8 @@ export class HookContext {
     }
     const hook = this.hooks[this.hookCount++];
     tinyassert(hook.type === "ref");
+
+    // ref state
     return hook.ref as { current: T };
   };
 
@@ -151,10 +152,10 @@ export class HookContext {
         deps,
       });
     }
-    const hookToCheck = this.hooks[this.hookCount++];
-    tinyassert(hookToCheck.type === "effect");
-    const hook = hookToCheck;
+    const hook = this.hooks[this.hookCount++];
+    tinyassert(hook.type === "effect");
 
+    // queue effect
     tinyassert(hook.deps?.length === deps?.length);
     if (
       !this.initial &&
@@ -163,6 +164,7 @@ export class HookContext {
       // last effect should've been already done
       tinyassert(!hook.effect);
       hook.effect = effect;
+      hook.deps = deps;
     }
   };
 }
