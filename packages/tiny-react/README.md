@@ -20,6 +20,8 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - onChange prop
 - forwardRef
 - useLayoutEffect
+- context
+- ssr
 - ...
 
 ## example
