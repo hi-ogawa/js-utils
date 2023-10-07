@@ -19,6 +19,7 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - mutable ref prop
 - forwardRef
 - useLayoutEffect
+- and a lot more...
 
 ## example
 
