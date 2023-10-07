@@ -66,25 +66,24 @@ function spliceString(
 // re-assigning over function declaration is sketchy but seems to be okay
 // cf. https://eslint.org/docs/latest/rules/no-func-assign
 const wrapCreateHmrComponent = (name: string, remount: boolean) => /* js */ `
-var _$tmp_${name} = ${name};
-${name} = _$hmr.createHmrComponent(_$registry, _$tmp_${name}, { remount: ${remount} });
+var $$tmp_${name} = ${name};
+${name} = $$lib.createHmrComponent($$registry, $$tmp_${name}, { remount: ${remount} });
 `;
 
 // /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates
 const HEADER_CODE = /* js */ `
-import * as _$lib from "@hiogawa/tiny-react";
-import * as _$hmr from "@hiogawa/tiny-react/dist/hmr";
-const _$registry = _$hmr.createHmrRegistry({
-  h: _$lib.h,
-  useState: _$lib.useState,
-  useEffect: _$lib.useEffect,
+import * as $$lib from "@hiogawa/tiny-react";
+const $$registry = $$lib.createHmrRegistry({
+  h: $$lib.h,
+  useState: $$lib.useState,
+  useEffect: $$lib.useEffect,
 });
 `;
 
 // for vite to detect, source code needs to include the exact "import.meta.hot.accept" expression.
 const FOOTER_CODE = /* js */ `
 if (import.meta.hot) {
-  _$hmr.setupHmr(import.meta.hot, _$registry);
+  $$lib.setupHmr(import.meta.hot, $$registry);
   () => import.meta.hot.accept();
 }
 `;

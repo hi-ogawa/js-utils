@@ -4,3 +4,4 @@ export { Fragment, h } from "./helper/hyperscript";
 export type { ComponentChildren, ComponentChild, FC } from "./helper/common";
 export * from "./hooks";
 export * from "./compat";
+export * from "./hmr/runtime";

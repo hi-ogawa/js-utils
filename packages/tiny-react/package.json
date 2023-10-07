@@ -25,15 +25,10 @@
       "require": "./dist/helper/jsx-runtime.cjs",
       "types": "./dist/helper/jsx-runtime.d.ts"
     },
-    "./dist/hmr": {
-      "import": "./dist/hmr/index.js",
-      "require": "./dist/hmr/index.cjs",
-      "types": "./dist/hmr/index.d.ts"
-    },
-    "./dist/hmr/vite": {
-      "import": "./dist/hmr/vite.js",
-      "require": "./dist/hmr/vite.cjs",
-      "types": "./dist/hmr/vite.d.ts"
+    "./dist/plugins/vite": {
+      "import": "./dist/plugins/vite.js",
+      "require": "./dist/plugins/vite.cjs",
+      "types": "./dist/plugins/vite.d.ts"
     }
   },
   "main": "./dist/index.js",

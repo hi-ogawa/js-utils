@@ -1,11 +1,13 @@
-import { h, useEffect, useState } from "@hiogawa/tiny-react";
 import {
   createHmrComponent,
   createHmrRegistry,
+  h,
   setupHmr,
-} from "@hiogawa/tiny-react/dist/hmr";
+  useEffect,
+  useState,
+} from "@hiogawa/tiny-react";
 
-// manually use tiny-react hmr api for easier debugging
+// manually use tiny-react hmr runtime for easier testing/debugging
 
 const registry = createHmrRegistry({
   h,

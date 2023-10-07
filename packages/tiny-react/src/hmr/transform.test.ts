@@ -25,12 +25,11 @@ function CompNa() {
 `;
     expect(hmrTransform(input)).toMatchInlineSnapshot(`
       "
-      import * as _$lib from \\"@hiogawa/tiny-react\\";
-      import * as _$hmr from \\"@hiogawa/tiny-react/dist/hmr\\";
-      const _$registry = _$hmr.createHmrRegistry({
-        h: _$lib.h,
-        useState: _$lib.useState,
-        useEffect: _$lib.useEffect,
+      import * as $$lib from \\"@hiogawa/tiny-react\\";
+      const $$registry = $$lib.createHmrRegistry({
+        h: $$lib.h,
+        useState: $$lib.useState,
+        useEffect: $$lib.useEffect,
       });
 
       // @hmr
@@ -53,20 +52,20 @@ function CompNa() {
       }
 
 
-      var _$tmp_CompFn = CompFn;
-      CompFn = _$hmr.createHmrComponent(_$registry, _$tmp_CompFn, { remount: true });
+      var $$tmp_CompFn = CompFn;
+      CompFn = $$lib.createHmrComponent($$registry, $$tmp_CompFn, { remount: true });
 
 
-      var _$tmp_CompLet = CompLet;
-      CompLet = _$hmr.createHmrComponent(_$registry, _$tmp_CompLet, { remount: true });
+      var $$tmp_CompLet = CompLet;
+      CompLet = $$lib.createHmrComponent($$registry, $$tmp_CompLet, { remount: true });
 
 
-      var _$tmp_CompConst = CompConst;
-      CompConst = _$hmr.createHmrComponent(_$registry, _$tmp_CompConst, { remount: true });
+      var $$tmp_CompConst = CompConst;
+      CompConst = $$lib.createHmrComponent($$registry, $$tmp_CompConst, { remount: true });
 
 
       if (import.meta.hot) {
-        _$hmr.setupHmr(import.meta.hot, _$registry);
+        $$lib.setupHmr(import.meta.hot, $$registry);
         () => import.meta.hot.accept();
       }
       "
