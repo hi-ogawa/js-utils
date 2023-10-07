@@ -57,7 +57,8 @@ export class HookContext {
   private hookCount = 0;
   private hooks: HookState[] = [];
 
-  constructor(private notify: () => void) {}
+  // reconciler use `notify` for "force update"
+  constructor(public notify: () => void) {}
 
   wrap<T>(f: () => T): T {
     HookContext.current = this;

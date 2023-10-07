@@ -24,6 +24,16 @@
       "import": "./dist/helper/jsx-runtime.js",
       "require": "./dist/helper/jsx-runtime.cjs",
       "types": "./dist/helper/jsx-runtime.d.ts"
+    },
+    "./dist/hmr": {
+      "import": "./dist/hmr/index.js",
+      "require": "./dist/hmr/index.cjs",
+      "types": "./dist/hmr/index.d.ts"
+    },
+    "./dist/hmr/vite": {
+      "import": "./dist/hmr/vite.js",
+      "require": "./dist/hmr/vite.cjs",
+      "types": "./dist/hmr/vite.d.ts"
     }
   },
   "main": "./dist/index.js",
@@ -39,7 +49,16 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
-    "@hiogawa/utils": "workspace:*"
+    "@hiogawa/utils": "workspace:*",
+    "vite": "^4.4.9"
+  },
+  "peerDependencies": {
+    "vite": "*"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
   },
   "volta": {
     "extends": "../../package.json"

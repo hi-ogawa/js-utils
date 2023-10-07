@@ -4,6 +4,7 @@
   "compilerOptions": {
     "outDir": "dist/tsc",
     "noEmit": false,
+    "types": ["vite/client"],
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "jsxImportSource": "@hiogawa/tiny-react"

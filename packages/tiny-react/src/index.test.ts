@@ -510,6 +510,113 @@ describe(render, () => {
     (parent.firstChild as HTMLElement).click();
     expect(mockFn.mock.calls).toMatchInlineSnapshot("[]");
   });
+
+  it("forceUpdate keeps latest props", () => {
+    function Outer() {
+      const [state, setState] = useState(0);
+
+      return h(
+        Fragment,
+        {},
+        h.button({
+          id: "outer",
+          onclick: () => {
+            setState((prev) => prev + 1);
+          },
+        }),
+        JSON.stringify({ outer: state }),
+        h(Inner, { value: state })
+      );
+    }
+
+    function Inner(props: { value: number }) {
+      const [state, setState] = useState(0);
+
+      return h(
+        Fragment,
+        {},
+        h.button({
+          id: "inner",
+          onclick: () => {
+            setState((prev) => prev + 1);
+          },
+        }),
+        JSON.stringify({ inner: state, prop: props.value })
+      );
+    }
+
+    let vnode = h(Outer, {});
+    const parent = document.createElement("main");
+    render(vnode, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <button
+          id="outer"
+        />
+        {"outer":0}
+        <button
+          id="inner"
+        />
+        {"inner":0,"prop":0}
+      </main>
+    `);
+
+    (parent.querySelector("#outer") as HTMLElement).click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <button
+          id="outer"
+        />
+        {"outer":1}
+        <button
+          id="inner"
+        />
+        {"inner":0,"prop":1}
+      </main>
+    `);
+
+    (parent.querySelector("#inner") as HTMLElement).click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <button
+          id="outer"
+        />
+        {"outer":1}
+        <button
+          id="inner"
+        />
+        {"inner":1,"prop":1}
+      </main>
+    `);
+
+    (parent.querySelector("#outer") as HTMLElement).click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <button
+          id="outer"
+        />
+        {"outer":2}
+        <button
+          id="inner"
+        />
+        {"inner":1,"prop":2}
+      </main>
+    `);
+
+    (parent.querySelector("#inner") as HTMLElement).click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <button
+          id="outer"
+        />
+        {"outer":2}
+        <button
+          id="inner"
+        />
+        {"inner":2,"prop":2}
+      </main>
+    `);
+  });
 });
 
 describe(rerenderCustomNode, () => {
@@ -1051,7 +1158,7 @@ describe("hooks", () => {
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-          {"state":2,"state2":4,"prop":"x"}
+          {"state":2,"state2":4,"prop":"y"}
           <button />
         </div>
       </main>

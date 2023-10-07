@@ -1,6 +1,8 @@
 import { getTheme, setTheme } from "@hiogawa/theme-script";
 import { useCallback, useEffect, useRef, useState } from "@hiogawa/tiny-react";
 import { range } from "@hiogawa/utils";
+import { HmrChild } from "./hmr";
+import { HmrTransform } from "./hmr-transform";
 
 export function App() {
   return (
@@ -17,7 +19,9 @@ export function App() {
         </a>
       </header>
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto p-4">
+        <TestHmr />
         <TestTodoApp />
+        <TestProps />
         <TestState />
         <TestEffect />
         <TestRef />
@@ -267,6 +271,97 @@ function TestTodoApp() {
         <summary>debug</summary>
         <pre>{JSON.stringify({ input, todos }, null, 2)}</pre>
       </details>
+    </div>
+  );
+}
+
+function TestHmr() {
+  const [state, setState] = useState(0);
+
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <h1 className="text-lg">TestHmr</h1>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span>Counter = {state}</span>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev - 1)}
+          >
+            -1
+          </button>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev + 1)}
+          >
+            +1
+          </button>
+        </div>
+        <div className="border-t my-1"></div>
+        <HmrChild counter={state} />
+        <div className="border-t my-1"></div>
+        <HmrTransform counter={state} />
+      </div>
+    </div>
+  );
+}
+
+function TestProps() {
+  const [state, setState] = useState(0);
+
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <h1>Test Props</h1>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span>Outer State</span>
+          <span className="min-w-[1rem] text-center">{state}</span>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev - 1)}
+          >
+            -1
+          </button>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev + 1)}
+          >
+            +1
+          </button>
+        </div>
+        <TestPropsInner value={state} />
+      </div>
+    </div>
+  );
+}
+
+function TestPropsInner(props: { value: number }) {
+  const [state, setState] = useState(0);
+
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span>Inner State</span>
+          <span className="min-w-[1rem] text-center">{state}</span>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev - 1)}
+          >
+            -1
+          </button>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev + 1)}
+          >
+            +1
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <span>Props</span>
+          <span>{JSON.stringify(props, null, 2)}</span>
+        </div>
+      </div>
     </div>
   );
 }

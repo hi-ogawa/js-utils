@@ -2,7 +2,17 @@
 
 Experiment to study react-like virtual-dom rendering implementation.
 
-Internal architecture is inspired by yew and preact.
+Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and [preact](https://github.com/preactjs/preact).
+
+## features
+
+- client side rendering
+- functional component
+- hooks
+- jsx-runtime
+- hmr
+
+## example
 
 See example app in `./examples/basic`
 
