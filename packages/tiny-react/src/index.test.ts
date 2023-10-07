@@ -212,12 +212,9 @@ describe(render, () => {
           "hooks": [],
           "initial": false,
           "notify": [Function],
-          "useCallback": [Function],
           "useEffect": [Function],
-          "useMemo": [Function],
           "useReducer": [Function],
           "useRef": [Function],
-          "useState": [Function],
         },
         "hparent": <main>
           <span>

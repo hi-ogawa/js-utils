@@ -49,6 +49,10 @@ function resolveNextState<T>(prev: T, next: NextState<T>): T {
   return typeof next === "function" ? (next as any)(prev) : next;
 }
 
+//
+// hook context (instantiated for each BCustom.hookContext)
+//
+
 export class HookContext {
   // expose global
   static current: HookContext | undefined;
@@ -91,13 +95,6 @@ export class HookContext {
   // hook api
   //
 
-  useState = <T>(initialState: InitialState<T>) => {
-    return this.useReducer<T, NextState<T>>(
-      (prev, next) => resolveNextState(prev, next),
-      initialState
-    );
-  };
-
   useReducer = <S, A>(
     reducer: (prevState: S, action: A) => S,
     initialState: InitialState<S>
@@ -135,24 +132,6 @@ export class HookContext {
     return hook.ref as { current: T };
   };
 
-  useMemo = <T>(callback: () => T, deps: unknown[]) => {
-    const ref = this.useRef({
-      deps,
-      value: undefined as T,
-    });
-    if (this.initial || !isEqualShallow(ref.current.deps, deps)) {
-      ref.current.value = callback();
-    }
-    return ref.current.value;
-  };
-
-  useCallback = <F extends (...args: any[]) => any>(
-    callback: F,
-    deps: unknown[]
-  ) => {
-    return this.useMemo(() => callback, deps);
-  };
-
   useEffect = (effect: EffectFn, deps?: unknown[]) => {
     // init hook state
     if (this.initial) {
@@ -178,12 +157,49 @@ export class HookContext {
   };
 }
 
-export const useState = /* @__PURE__ */ defineHook((ctx) => ctx.useState);
+//
+// core hooks
+//
+
 export const useReducer = /* @__PURE__ */ defineHook((ctx) => ctx.useReducer);
 export const useRef = /* @__PURE__ */ defineHook((ctx) => ctx.useRef);
 export const useEffect = /* @__PURE__ */ defineHook((ctx) => ctx.useEffect);
-export const useMemo = /* @__PURE__ */ defineHook((ctx) => ctx.useMemo);
-export const useCallback = /* @__PURE__ */ defineHook((ctx) => ctx.useCallback);
+
+//
+// hooks implemented based on core hooks
+//
+
+export function useState<T>(initialState: InitialState<T>) {
+  return useReducer<T, NextState<T>>(
+    (prev, next) => resolveNextState(prev, next),
+    initialState
+  );
+}
+
+export function useMemo<T>(callback: () => T, deps: unknown[]) {
+  const ref = useRef({
+    initial: true,
+    value: undefined as T,
+    deps,
+  });
+  if (ref.current.initial || !isEqualShallow(ref.current.deps, deps)) {
+    ref.current.initial = false;
+    ref.current.value = callback();
+    ref.current.deps = deps;
+  }
+  return ref.current.value;
+}
+
+export function useCallback<F extends (...args: any[]) => any>(
+  callback: F,
+  deps: unknown[]
+) {
+  return useMemo(() => callback, deps);
+}
+
+//
+// utils
+//
 
 function defineHook<T>(implement: (ctx: HookContext) => T): T {
   return new Proxy(() => {}, {
