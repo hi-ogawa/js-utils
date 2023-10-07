@@ -32,8 +32,8 @@ function runEffect(hook: EffectHookState) {
       hook.cleanup = undefined;
     }
     const effect = hook.effect;
-    hook.effect = undefined; // reset before run since `effect` can cause re-render and another `useEffect` which asserts `!hook.effect`.
     hook.cleanup = effect() ?? undefined;
+    hook.effect = undefined;
   }
 }
 
@@ -161,8 +161,9 @@ export class HookContext {
       !this.initial &&
       !(hook.deps && deps && isEqualShallow(hook.deps, deps))
     ) {
-      // last effect should've been already done
-      tinyassert(!hook.effect);
+      // Last effect should've been already done.
+      // Otherwise, it's likely effect itself caused "force update", which is not currently supported.
+      tinyassert(!hook.effect, "repeated render caused by useEffect?");
       hook.effect = effect;
       hook.deps = deps;
     }
