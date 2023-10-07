@@ -1,7 +1,7 @@
 import { tinyassert } from "@hiogawa/utils";
 
 // not particularly intentional but this hook module doesn't depend on any of reconciler/virtual-dom logic,
-// which tells that the hook idea itself is general concept of functional api..
+// which tells that the hook idea itself is a general concept applicable to functional api...?
 
 type HookState = ReducerHookState | EffectHookState | RefHookState;
 
