@@ -11,9 +11,6 @@
       "path": "packages/json-extra"
     },
     {
-      "path": "packages/murmur3-wasm-bindgen"
-    },
-    {
       "path": "packages/query-proxy"
     },
     {
