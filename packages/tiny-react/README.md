@@ -10,7 +10,16 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - functional component
 - hooks
 - jsx-runtime
-- hmr
+- hmr (with vite plugin)
+
+## unsupported
+
+- defaultValue prop
+- dangerouslySetInnerHTML prop
+- mutable ref prop
+- forwardRef
+- useLayoutEffect
+- and a lot more...
 
 ## example
 

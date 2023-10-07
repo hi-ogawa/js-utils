@@ -1,5 +1,8 @@
 import { tinyassert } from "@hiogawa/utils";
 
+// not particularly intentional but this hook module doesn't depend on any of reconciler/virtual-dom logic,
+// which tells that the hook idea itself is a general concept applicable to functional api...?
+
 type HookState = ReducerHookState | EffectHookState | RefHookState;
 
 type ReducerHookState = {
@@ -55,6 +58,7 @@ function resolveNextState<T>(prev: T, next: NextState<T>): T {
 
 export class HookContext {
   // expose global
+  // (technically we can keep stack HookContext[] so that HookContext.wrap can be reentrant)
   static current: HookContext | undefined;
 
   private initial = true;
@@ -113,8 +117,11 @@ export class HookContext {
     // reducer
     const state = hook.state as S;
     const dispatch = (next: A) => {
-      hook.state = reducer(hook.state as S, next);
-      this.notify();
+      const nextState = reducer(hook.state as S, next);
+      if (hook.state !== nextState) {
+        hook.state = nextState;
+        this.notify();
+      }
     };
     return [state, dispatch] as const;
   };
