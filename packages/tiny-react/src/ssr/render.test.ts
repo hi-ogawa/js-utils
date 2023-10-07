@@ -16,21 +16,21 @@ describe(renderToString, () => {
       )
     );
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<div class=\\"flex\\" aria-current=\\"\\">hello <span title=\\"foo\\">world</span></div>"'
+      '"<div class=\\"flex\\" aria-current=\\"\\">hello<span title=\\"foo\\">world</span></div>"'
     );
   });
 
   it("void-element", () => {
     const vnode = h.div({}, h.input({}), h.span({}), h.br({}));
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<div><input/> <span></span> <br/></div>"'
+      '"<div><input/><span></span><br/></div>"'
     );
   });
 
   it("escape", () => {
     const vnode = h.div({ title: "a & b" }, "<hehe />", "'\"");
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<div title=\\"a &amp; b\\">&lt;hehe /&gt; &#x27;&quot;</div>"'
+      '"<div title=\\"a &amp; b\\">&lt;hehe /&gt;&#x27;&quot;</div>"'
     );
   });
 

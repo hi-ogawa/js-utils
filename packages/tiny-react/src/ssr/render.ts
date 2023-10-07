@@ -19,9 +19,14 @@ export function renderToString(vnode: VNode): string {
       return renderToString(vchild);
     }
     case "fragment": {
-      // TODO: how to whitespace?
-      // https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Whitespace
-      return vnode.children.map((vchild) => renderToString(vchild)).join(" ");
+      // assume children whitespace is handled by JSX transpilation e.g.
+      // https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&corejs=3.21&spec=false&loose=false&code_lz=DwEwlgbgfAhgBAIzgbwEQGNUF80my1AU22AHpxog&debug=false&forceAllTransforms=false&modules=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=env%2Creact%2Cstage-2&prettier=false&targets=&version=7.23.1&externalPlugins=&assumptions=%7B%7D
+      // <div>a b {"c"}{"d"} {"e"}</div> => { children: ["a b ", "c", "d", " ", "e"] }
+      let result = "";
+      for (const vchild of vnode.children) {
+        result += renderToString(vchild);
+      }
+      return result;
     }
   }
 }
