@@ -1,7 +1,7 @@
 import { tinyassert } from "@hiogawa/utils";
 
 //
-// limitations of this primitive transform
+// limitations of this super simple hmr
 // - it requires explicit magic comment "@hmr" or "@hmr-unsafe" before component declaration
 // - change in other code in the same file won't cause refresh
 //
