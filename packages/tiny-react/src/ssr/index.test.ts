@@ -23,6 +23,8 @@ describe(hydrate, () => {
         </div>
       </main>
     `);
+    const div = parent.querySelector("div");
+    const span = parent.querySelector("span");
 
     hydrate(vnode, parent);
     expect(parent).toMatchInlineSnapshot(`
@@ -35,5 +37,7 @@ describe(hydrate, () => {
         </div>
       </main>
     `);
+    expect(parent.querySelector("div")).toBe(div);
+    expect(parent.querySelector("span")).toBe(span);
   });
 });
