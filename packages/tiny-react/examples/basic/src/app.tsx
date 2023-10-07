@@ -22,6 +22,7 @@ export function App() {
         <TestHmr />
         <TestTodoApp />
         <TestProps />
+        <TestSetStateInEffect />
         <TestState />
         <TestEffect />
         <TestRef />
@@ -165,6 +166,42 @@ function TestEffect() {
         <div>Effect1 {ref1.current}</div>
         <div>Effect2 {ref2.current}</div>
         <div>Effect3 {ref3.current}</div>
+      </div>
+    </div>
+  );
+}
+
+// @hmr
+function TestSetStateInEffect() {
+  const [state, setState] = useState(0);
+  const [state2, setState2] = useState(0);
+
+  const renderCountRef = useRef(0);
+  renderCountRef.current++;
+
+  useEffect(() => {
+    setState2(2 * state);
+  }, [state]);
+
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <h1>Test SetState in useEffect</h1>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev - 1)}
+          >
+            -1
+          </button>
+          <button
+            className="antd-btn antd-btn-default px-1"
+            onclick={() => setState((prev) => prev + 1)}
+          >
+            +1
+          </button>
+        </div>
+        <pre className="text-sm">{JSON.stringify({ state, state2, render: renderCountRef.current })}</pre>
       </div>
     </div>
   );

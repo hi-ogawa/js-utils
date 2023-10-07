@@ -31,8 +31,9 @@ function runEffect(hook: EffectHookState) {
       hook.cleanup();
       hook.cleanup = undefined;
     }
-    hook.cleanup = hook.effect() ?? undefined;
-    hook.effect = undefined;
+    const effect = hook.effect;
+    hook.effect = undefined; // reset before run since `effect` can cause re-render and another `useEffect` which asserts `!hook.effect`.
+    hook.cleanup = effect() ?? undefined;
   }
 }
 
