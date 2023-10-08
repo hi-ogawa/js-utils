@@ -85,7 +85,7 @@ export type BCustom = VCustom & {
   parent?: BNodeParent;
   child: BNode;
   slot?: HNode;
-  hparent?: HNode; // undefined after unmounted
+  hparent?: HNode; // undefined after unmounted (this flag seems necessary to skip already scheduled re-rendering after unmount)
   hookContext: HookContext;
   contextMap: ContextMap;
 };
