@@ -2,7 +2,7 @@ import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { Fragment, h } from "./helper/hyperscript";
 import { useCallback, useEffect, useMemo, useRef, useState } from "./hooks";
-import { render, rerenderCustomNode } from "./reconciler";
+import { render, updateCustomNode } from "./reconciler";
 import type { VNode } from "./virtual-dom";
 
 describe(render, () => {
@@ -616,7 +616,7 @@ describe(render, () => {
   });
 });
 
-describe(rerenderCustomNode, () => {
+describe(updateCustomNode, () => {
   it("basic", () => {
     let vnode = {
       type: "fragment",
@@ -658,7 +658,7 @@ describe(rerenderCustomNode, () => {
     `);
 
     tinyassert(bnode.children[0].type === "custom");
-    rerenderCustomNode(
+    updateCustomNode(
       {
         ...vnode.children[0],
         props: {
@@ -684,7 +684,7 @@ describe(rerenderCustomNode, () => {
     `);
 
     tinyassert(bnode.children[1].type === "custom");
-    rerenderCustomNode(
+    updateCustomNode(
       {
         ...vnode.children[1],
         props: {
