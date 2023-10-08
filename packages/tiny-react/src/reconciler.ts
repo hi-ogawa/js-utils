@@ -203,7 +203,7 @@ function reconcileNode(
       const vcustom = vnode;
       const bcustom = bnode;
       function forceUpdate() {
-        rerenderCustomNode(vcustom, bcustom);
+        updateCustomNode(vcustom, bcustom);
       }
       break;
     }
@@ -280,9 +280,9 @@ function getSlotTargetNode(
   return preSlot ? preSlot.nextSibling : hparent.firstChild;
 }
 
-// export for unit test
-// TODO: rename to `updateCustomNode`
-export function rerenderCustomNode(vnode: VCustom, bnode: BCustom) {
+// update Custom node on its own (aka component re-rendering)
+// exported for unit test
+export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
   // multiple forceUpdate can make bnode unmounted
   if (!bnode.hparent) {
     return;
