@@ -1,3 +1,4 @@
+import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { h } from "../helper/hyperscript";
 import { hydrate } from "../reconciler";
@@ -93,6 +94,61 @@ describe(hydrate, () => {
           <span>
             world
           </span>,
+        ],
+      ]
+    `);
+  });
+
+  it("props", () => {
+    const clickFn = vi.fn();
+    const vnode = h.div(
+      { id: "x" },
+      "hello",
+      h.button({ onclick: () => clickFn("hi") }, "world")
+    );
+
+    const vnodeSsr = renderToString(vnode);
+    expect(vnodeSsr).toMatchInlineSnapshot(
+      '"<div id=\\"x\\">hello<button>world</button></div>"'
+    );
+
+    const parent = document.createElement("main");
+    parent.innerHTML = vnodeSsr;
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div
+          id="x"
+        >
+          hello
+          <button>
+            world
+          </button>
+        </div>
+      </main>
+    `);
+    const button = parent.querySelector("button");
+    tinyassert(button);
+    button.click();
+    expect(clickFn.mock.calls).toMatchInlineSnapshot("[]");
+
+    hydrate(vnode, parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div
+          id="x"
+        >
+          hello
+          <button>
+            world
+          </button>
+        </div>
+      </main>
+    `);
+    button.click();
+    expect(clickFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "hi",
         ],
       ]
     `);

@@ -230,6 +230,7 @@ function hydrateNode(
       );
       return {
         ...vnode,
+        props: {}, // for now, no prop mismatch check and let client repeat reconcilation against empty props
         child: emptyNode(),
         hnode,
         listeners: new Map(),
