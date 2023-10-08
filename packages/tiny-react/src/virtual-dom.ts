@@ -85,7 +85,7 @@ export type BCustom = VCustom & {
   parent?: BNodeParent;
   child: BNode;
   slot?: HNode;
-  hparent?: HNode;
+  hparent?: HNode; // undefined after unmounted
   hookContext: HookContext;
   contextMap: ContextMap;
 };
