@@ -207,6 +207,7 @@ describe(render, () => {
           "slot": world,
           "type": "fragment",
         },
+        "contextMap": Map {},
         "hookContext": HookContext {
           "hookCount": 0,
           "hooks": [],

@@ -1,4 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
+import { type ContextMap, RenderContextManager } from "./context";
 import { HookContext } from "./hooks";
 import {
   type BCustom,
@@ -12,17 +13,24 @@ import {
   type VCustom,
   type VNode,
   emptyNode,
+  getBNodeContextMap,
   getNodeKey,
   getSlot,
 } from "./virtual-dom";
 
-export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
+export function render(
+  vnode: VNode,
+  parent: HNode,
+  bnode: BNode = emptyNode()
+) {
   const effectManager = new EffectManager();
+  const contextMap = getBNodeContextMap(bnode) ?? new Map();
   const newBnode = reconcileNode(
     vnode,
-    bnode ?? emptyNode(),
+    bnode,
     parent,
     undefined,
+    contextMap,
     effectManager
   );
   effectManager.run();
@@ -34,6 +42,7 @@ function reconcileNode(
   bnode: BNode, // mutated when reconciled over same bnode
   hparent: HNode,
   preSlot: HNode | undefined,
+  contextMap: ContextMap,
   effectManager: EffectManager
 ): BNode {
   switch (vnode.type) {
@@ -59,6 +68,7 @@ function reconcileNode(
           bnode.child,
           bnode.hnode,
           undefined,
+          contextMap,
           effectManager
         );
         placeChild(bnode.hnode, hparent, preSlot, false);
@@ -70,6 +80,7 @@ function reconcileNode(
           emptyNode(),
           hnode,
           undefined,
+          contextMap,
           effectManager
         );
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
@@ -126,6 +137,7 @@ function reconcileNode(
           bchildren[i] ?? emptyNode(),
           hparent,
           preSlot,
+          contextMap,
           effectManager
         );
         preSlot = getSlot(bchild) ?? preSlot;
@@ -142,27 +154,34 @@ function reconcileNode(
         bnode.render === vnode.render
       ) {
         bnode.hookContext.notify = updateCustomNodeUnsupported;
-        const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
+        const [vchild, childContextMap] = bnode.hookContext.wrap(() =>
+          RenderContextManager.wrap(contextMap, () => vnode.render(vnode.props))
+        );
         bnode.child = reconcileNode(
           vchild,
           bnode.child,
           hparent,
           preSlot,
+          childContextMap,
           effectManager
         );
         bnode.props = vnode.props;
+        bnode.contextMap = contextMap;
       } else {
         unmount(bnode);
         const hookContext = new HookContext(updateCustomNodeUnsupported);
-        const vchild = hookContext.wrap(() => vnode.render(vnode.props));
+        const [vchild, childContextMap] = hookContext.wrap(() =>
+          RenderContextManager.wrap(contextMap, () => vnode.render(vnode.props))
+        );
         const child = reconcileNode(
           vchild,
           emptyNode(),
           hparent,
           preSlot,
+          childContextMap,
           effectManager
         );
-        bnode = { ...vnode, child, hookContext } satisfies BCustom;
+        bnode = { ...vnode, child, hookContext, contextMap } satisfies BCustom;
       }
       bnode.hparent = hparent;
       bnode.child.parent = bnode;
@@ -217,6 +236,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     bnode,
     bnode.hparent,
     preSlot,
+    bnode.contextMap,
     effectManager
   );
   tinyassert(newBnode === bnode); // reconciled over itself without unmount (i.e. should be same `key` and `render`)

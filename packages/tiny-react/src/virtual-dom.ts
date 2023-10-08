@@ -6,6 +6,7 @@ import type { HookContext } from "./hooks";
 
 export type NodeKey = string | number;
 export type Props = Record<string, unknown>;
+export type FC<P = any> = (props: P) => VNode;
 
 // host node
 export type HNode = Node;
@@ -86,6 +87,8 @@ export type BCustom = VCustom & {
   slot?: HNode;
   hparent?: HNode;
   hookContext: HookContext;
+  // TODO: fix cyclic import
+  contextMap: ContextMap;
 };
 
 export type BFragment = Omit<VFragment, "children"> & {
@@ -120,4 +123,25 @@ export function getSlot(node: BNode): HNode | undefined {
     return node.hnode;
   }
   return node.slot;
+}
+
+//
+// context
+//
+
+export type ContextKey = {}; // key for ContextMap
+
+export interface Context<T> {
+  key: ContextKey;
+  Provider: FC<{ value: T; children?: VNode }>;
+  defaultValue: T;
+}
+
+export type ContextMap = Map<ContextKey, unknown>;
+
+export function getBNodeContextMap(node: BNode): ContextMap | undefined {
+  if (node.type === "custom") {
+    return node.contextMap;
+  }
+  return;
 }
