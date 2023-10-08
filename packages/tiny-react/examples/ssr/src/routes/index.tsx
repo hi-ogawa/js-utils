@@ -17,7 +17,7 @@ export function Root() {
         </a>
       </header>
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto p-4">
-        <Demo />
+        <TestEventHandler />
       </div>
     </div>
   );
@@ -32,17 +32,19 @@ function ThemeSelect() {
   );
 }
 
-function Demo() {
+function TestEventHandler() {
   const [state, setState] = useState(1);
   return (
-    <button
-      className="antd-btn antd-btn-primary px-2"
-      onclick={() => {
-        // TODO: event handler not working...
-        setState((prev) => prev ^ 1);
-      }}
-    >
-      {state ? "Hello!" : "World!"}
-    </button>
+    <div className="border p-2 flex flex-col gap-2">
+      <h1>Test event handler</h1>
+      <button
+        className="antd-btn antd-btn-primary px-2"
+        onclick={() => {
+          setState((prev) => prev ^ 1);
+        }}
+      >
+        {state ? "Hello!" : "World!"}
+      </button>
+    </div>
   );
 }
