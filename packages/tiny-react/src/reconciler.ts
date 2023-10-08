@@ -450,6 +450,7 @@ class EffectManager {
     this.refs = [];
 
     // TODO: traverses all hooks of all custom nodes. probably can optimize.
+    // TODO: this is too early? (preact seems to queue on requestAnimationFrame https://github.com/preactjs/preact/blob/9c5a82efcc3dcbd0035c694817a3022d81264687/hooks/src/index.js#L67)
     this.effects.forEach((f) => f());
     this.effects = [];
   }
