@@ -180,6 +180,7 @@ export const useEffect = /* @__PURE__ */ defineHook((ctx) => ctx.useEffect);
 
 //
 // hooks implemented based on core hooks
+// (TODO: move to compat/hooks?)
 //
 
 export function useState<T>(initialState: InitialState<T>) {
