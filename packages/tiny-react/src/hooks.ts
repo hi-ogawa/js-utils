@@ -67,7 +67,7 @@ export class HookContext {
   private hooks: HookState[] = [];
 
   // reconciler use `notify` for "force update"
-  constructor(public notify: () => void) {}
+  constructor(public notify?: () => void) {}
 
   wrap<T>(f: () => T): T {
     tinyassert(!HookContext.current, "hook reentrance?");
@@ -122,7 +122,7 @@ export class HookContext {
       const nextState = reducer(hook.state as S, next);
       if (hook.state !== nextState) {
         hook.state = nextState;
-        this.notify();
+        this.notify?.();
       }
     };
     return [state, dispatch] as const;

@@ -39,20 +39,25 @@ export function hydrate(vnode: VNode, parent: HNode) {
   return render(vnode, parent, undefined, true);
 }
 
+// Recursively traverse VNode with simple switch by VNode.type.
+// Each case has either "mutating" or "mounting" reconcilation path.
+// For "mutating" path, input BNode is mutated.
+// For "mounting" path, new BNode is created and returned.
+// Hydration will mimic "mutating" path by (partially) creating expected BNode.
 function reconcileNode(
   vnode: VNode,
-  bnode: BNode, // mutated when reconciled over same bnode
+  bnode: BNode,
   hparent: HNode,
   preSlot: HNode | undefined,
   effectManager: EffectManager,
-  // for hydration, idea is that to setup expected bnode before going into standard reconcilation mutation.
-  hydration: boolean
+  isHydrate: boolean
 ): BNode {
+  if (isHydrate) {
+    bnode = hydrateNode(vnode, hparent, preSlot);
+    preSlot = getSlot(bnode) ?? preSlot;
+  }
   switch (vnode.type) {
     case "empty": {
-      if (hydration) {
-        bnode = emptyNode();
-      }
       if (bnode.type === "empty") {
       } else {
         unmount(bnode);
@@ -61,23 +66,7 @@ function reconcileNode(
       break;
     }
     case "tag": {
-      let isMount = false; // invoke ref callback on mount
-      if (hydration) {
-        isMount = true;
-        const hnode = getSlotTargetNode(hparent, preSlot);
-        tinyassert(
-          hnode instanceof Element &&
-            hnode.tagName.toLowerCase() === vnode.name,
-          `hydration mismatch? (actual: '${hnode?.nodeName}', expected: '${vnode.name}')`
-        );
-        preSlot = hnode;
-        bnode = {
-          ...vnode,
-          child: emptyNode(),
-          hnode,
-          listeners: new Map(),
-        } satisfies BTag;
-      }
+      let queueRef = isHydrate; // ref callback on mount or hydrate
       if (
         bnode.type === "tag" &&
         bnode.key === vnode.key &&
@@ -92,12 +81,12 @@ function reconcileNode(
           bnode.hnode,
           undefined,
           effectManager,
-          hydration
+          isHydrate
         );
         placeChild(bnode.hnode, hparent, preSlot, false);
       } else {
         unmount(bnode);
-        isMount = true;
+        queueRef = true;
         const hnode = document.createElement(vnode.name);
         const child = reconcileNode(
           vnode.child,
@@ -105,32 +94,19 @@ function reconcileNode(
           hnode,
           undefined,
           effectManager,
-          hydration
+          isHydrate
         );
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
         reconcileTagProps(bnode, vnode.props, {});
         placeChild(bnode.hnode, hparent, preSlot, true);
       }
-      if (isMount) {
+      if (queueRef) {
         effectManager.queueRef(bnode);
       }
       bnode.child.parent = bnode;
       break;
     }
     case "text": {
-      if (hydration) {
-        const hnode = getSlotTargetNode(hparent, preSlot);
-        tinyassert(
-          hnode instanceof Text,
-          `VText hydration mismatch? (actual: '${hnode?.nodeName}', expected: '#text')`
-        );
-        tinyassert(
-          hnode.data === vnode.data,
-          `VText hydration mismatch? (actual: '${hnode.data}', expected: '${vnode.data}')`
-        );
-        preSlot = hnode;
-        bnode = { ...vnode, hnode } satisfies BText;
-      }
       if (bnode.type === "text") {
         if (bnode.data !== vnode.data) {
           bnode.hnode.data = vnode.data;
@@ -150,9 +126,6 @@ function reconcileNode(
       // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
       // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
       // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
-      if (hydration) {
-        bnode = { ...vnode, children: [] } satisfies BFragment;
-      }
       if (bnode.type === "fragment" && bnode.key === vnode.key) {
         const [newChildren, oldChildren] = alignChildrenByKey(
           vnode.children,
@@ -180,7 +153,7 @@ function reconcileNode(
           hparent,
           preSlot,
           effectManager,
-          hydration
+          isHydrate
         );
         preSlot = getSlot(bchild) ?? preSlot;
         bnode.slot = getSlot(bchild) ?? bnode.slot;
@@ -190,10 +163,6 @@ function reconcileNode(
       break;
     }
     case "custom": {
-      if (hydration) {
-        const hookContext = new HookContext(forceUpdate);
-        bnode = { ...vnode, child: emptyNode(), hookContext } satisfies BCustom;
-      }
       if (
         bnode.type === "custom" &&
         bnode.key === vnode.key &&
@@ -206,7 +175,7 @@ function reconcileNode(
           hparent,
           preSlot,
           effectManager,
-          hydration
+          isHydrate
         );
         bnode.props = vnode.props;
         bnode.hookContext.notify = forceUpdate;
@@ -220,7 +189,7 @@ function reconcileNode(
           hparent,
           preSlot,
           effectManager,
-          hydration
+          isHydrate
         );
         bnode = { ...vnode, child, hookContext } satisfies BCustom;
       }
@@ -240,6 +209,55 @@ function reconcileNode(
     }
   }
   return bnode;
+}
+
+function hydrateNode(
+  vnode: VNode,
+  hparent: HNode,
+  preSlot: HNode | undefined
+): BNode {
+  switch (vnode.type) {
+    case "empty": {
+      return emptyNode();
+    }
+    case "tag": {
+      const hnode = getSlotTargetNode(hparent, preSlot);
+      // TODO: warning instead of hard error?
+      // TODO: check props mismatch?
+      tinyassert(
+        hnode instanceof Element && hnode.tagName.toLowerCase() === vnode.name,
+        `tag hydration mismatch (actual: '${hnode?.nodeName}', expected: '${vnode.name}')`
+      );
+      return {
+        ...vnode,
+        child: emptyNode(),
+        hnode,
+        listeners: new Map(),
+      } satisfies BTag;
+    }
+    case "text": {
+      const hnode = getSlotTargetNode(hparent, preSlot);
+      tinyassert(
+        hnode instanceof Text,
+        `text hydration mismatch (actual: '${hnode?.nodeName}', expected: '#text')`
+      );
+      tinyassert(
+        hnode.data === vnode.data,
+        `text hydration mismatch (actual: '${hnode.data}', expected: '${vnode.data}')`
+      );
+      return { ...vnode, hnode } satisfies BText;
+    }
+    case "fragment": {
+      return { ...vnode, children: [] } satisfies BFragment;
+    }
+    case "custom": {
+      return {
+        ...vnode,
+        child: emptyNode(),
+        hookContext: new HookContext(),
+      } satisfies BCustom;
+    }
+  }
 }
 
 // `hnode` is positioned after `preSlot` within `hparent`

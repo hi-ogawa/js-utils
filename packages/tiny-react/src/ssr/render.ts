@@ -14,7 +14,7 @@ export function renderToString(vnode: VNode): string {
     }
     case "custom": {
       const { render, props } = vnode;
-      const hookContext = new HookContext(() => {});
+      const hookContext = new HookContext();
       const vchild = hookContext.wrap(() => render(props));
       return renderToString(vchild);
     }
