@@ -1,5 +1,6 @@
 import { getTheme, setTheme } from "@hiogawa/theme-script";
 import { useState } from "@hiogawa/tiny-react";
+import { useUrl } from "../urils/use-url";
 
 // @hmr
 export function Root() {
@@ -17,6 +18,7 @@ export function Root() {
         </a>
       </header>
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto p-4">
+        <TestServerUrl />
         <TestEventHandler />
       </div>
     </div>
@@ -36,7 +38,7 @@ function TestEventHandler() {
   const [state, setState] = useState(1);
   return (
     <div className="border p-2 flex flex-col gap-2">
-      <h1>Test event handler</h1>
+      <h1>Test Event Handler</h1>
       <button
         className="antd-btn antd-btn-primary px-2"
         onclick={() => {
@@ -45,6 +47,28 @@ function TestEventHandler() {
       >
         {state ? "Hello!" : "World!"}
       </button>
+    </div>
+  );
+}
+
+function TestServerUrl() {
+  const [url, setUrl] = useUrl();
+  return (
+    <div className="border p-2 flex flex-col gap-2">
+      <h1>Test Server URL</h1>
+      <span className="text-colorTextSecondary text-sm">
+        See "View source" to verify input value is rendered during SSR
+      </span>
+      <input
+        className="antd-input px-1"
+        placeholder="?q=..."
+        value={url.searchParams.get("q") ?? ""}
+        oninput={(e) => {
+          const newUrl = new URL(url);
+          newUrl.searchParams.set("q", e.currentTarget.value);
+          setUrl(newUrl);
+        }}
+      />
     </div>
   );
 }

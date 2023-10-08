@@ -3,6 +3,7 @@ import { renderToString } from "@hiogawa/tiny-react";
 import { tinyassert } from "@hiogawa/utils";
 import { viteDevServer } from "@hiogawa/vite-import-dev-server/runtime";
 import { Root } from "../routes";
+import { requestContextStorage } from "./request-context";
 
 export function ssrHandler(): RequestHandler {
   return async (ctx) => {
@@ -10,7 +11,9 @@ export function ssrHandler(): RequestHandler {
       return new Response("Not found", { status: 404 });
     }
 
-    const ssrHtml = renderToString(<Root />);
+    const ssrHtml = requestContextStorage.run(ctx, () =>
+      renderToString(<Root />)
+    );
     let html = await importIndexHtml();
     html = html.replace("<!--@INJECT_SSR@-->", ssrHtml);
     return new Response(html, {
