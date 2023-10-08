@@ -31,7 +31,10 @@ export function renderToString(vnode: VNode): string {
   }
 }
 
-// learn more from https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/index.js#L322
+// TODO: learn more from https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/index.js#L322
+// - textarea value
+// - select value
+// - dangerouslySetInnerHTML
 function renderTag(vnode: VTag) {
   const { name, props, child } = vnode;
   let result = `<${name}`;
