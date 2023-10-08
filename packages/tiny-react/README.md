@@ -11,6 +11,7 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - hooks
 - jsx-runtime (similar typescript DX as react)
 - hmr (with vite plugin)
+- ssr
 
 ## unsupported
 
@@ -21,7 +22,6 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - forwardRef
 - useLayoutEffect
 - context
-- ssr
 - ...
 
 ## example
