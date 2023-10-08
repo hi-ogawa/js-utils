@@ -141,8 +141,8 @@ function reconcileNode(
         bnode.key === vnode.key &&
         bnode.render === vnode.render
       ) {
-        const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
         bnode.hookContext.notify = updateCustomNodeUnsupported;
+        const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
         bnode.child = reconcileNode(
           vchild,
           bnode.child,
