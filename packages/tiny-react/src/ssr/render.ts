@@ -1,4 +1,5 @@
 import { HookContext } from "../hooks";
+import { updateCustomNodeUnsupported } from "../reconciler";
 import type { VNode, VTag } from "../virtual-dom";
 
 export function renderToString(vnode: VNode): string {
@@ -14,7 +15,7 @@ export function renderToString(vnode: VNode): string {
     }
     case "custom": {
       const { render, props } = vnode;
-      const hookContext = new HookContext();
+      const hookContext = new HookContext(updateCustomNodeUnsupported);
       const vchild = hookContext.wrap(() => render(props));
       return renderToString(vchild);
     }

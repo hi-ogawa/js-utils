@@ -783,7 +783,7 @@ describe("hooks", () => {
     expect(() =>
       render(h(Custom, {}), parent)
     ).toThrowErrorMatchingInlineSnapshot(
-      "\"Cannot access 'vcustom' before initialization\""
+      '"Unsupported force-update during render"'
     );
   });
 

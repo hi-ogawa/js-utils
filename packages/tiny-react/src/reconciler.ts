@@ -169,6 +169,7 @@ function reconcileNode(
         bnode.render === vnode.render
       ) {
         const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
+        bnode.hookContext.notify = updateCustomNodeUnsupported;
         bnode.child = reconcileNode(
           vchild,
           bnode.child,
@@ -178,10 +179,9 @@ function reconcileNode(
           isHydrate
         );
         bnode.props = vnode.props;
-        bnode.hookContext.notify = forceUpdate;
       } else {
         unmount(bnode);
-        const hookContext = new HookContext(forceUpdate);
+        const hookContext = new HookContext(updateCustomNodeUnsupported);
         const vchild = hookContext.wrap(() => vnode.render(vnode.props));
         const child = reconcileNode(
           vchild,
@@ -198,13 +198,11 @@ function reconcileNode(
       bnode.slot = getSlot(bnode.child);
       effectManager.queueEffect(bnode);
 
-      // expose re-rendering trigger via hooks
-      // (this doesn't support setState while render)
-      const vcustom = vnode;
-      const bcustom = bnode;
-      function forceUpdate() {
-        updateCustomNode(vcustom, bcustom);
-      }
+      // expose re-rendering via hooks
+      const bcustom = bnode; // type-guard
+      bnode.hookContext.notify = () => {
+        updateCustomNode(vnode, bcustom);
+      };
       break;
     }
   }
@@ -255,7 +253,7 @@ function hydrateNode(
       return {
         ...vnode,
         child: emptyNode(),
-        hookContext: new HookContext(),
+        hookContext: new HookContext(updateCustomNodeUnsupported),
       } satisfies BCustom;
     }
   }
@@ -279,6 +277,10 @@ function getSlotTargetNode(
   preSlot: HNode | undefined
 ): HNode | null {
   return preSlot ? preSlot.nextSibling : hparent.firstChild;
+}
+
+export function updateCustomNodeUnsupported() {
+  throw new Error("Unsupported force-update during render");
 }
 
 // update Custom node on its own (aka component re-rendering)
