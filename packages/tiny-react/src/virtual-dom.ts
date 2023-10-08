@@ -87,7 +87,6 @@ export type BCustom = VCustom & {
   slot?: HNode;
   hparent?: HNode;
   hookContext: HookContext;
-  // TODO: fix cyclic import
   contextMap: ContextMap;
 };
 
