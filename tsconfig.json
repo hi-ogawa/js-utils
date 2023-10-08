@@ -35,6 +35,9 @@
       "path": "packages/tiny-react/examples/basic"
     },
     {
+      "path": "packages/tiny-react/examples/ssr"
+    },
+    {
       "path": "packages/tiny-rpc"
     },
     {

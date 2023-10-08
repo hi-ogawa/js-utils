@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>tiny-react basic demo</title>
+    <title>tiny-react ssr demo</title>
     <meta
       name="viewport"
       content="width=device-width, height=device-height, initial-scale=1.0"
@@ -21,7 +21,7 @@
     </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="./src/index.tsx"></script>
+    <div id="root"><!--@INJECT_SSR@--></div>
+    <script type="module" src="./src/client/index.tsx"></script>
   </body>
 </html>
