@@ -1,13 +1,12 @@
 import { tinyassert } from "@hiogawa/utils";
-import { type FC, type VNode, emptyNode } from "./virtual-dom";
-
-type ContextKey = {}; // key for ContextMap
-
-export interface Context<T> {
-  key: ContextKey;
-  Provider: FC<{ value: T; children?: VNode }>;
-  defaultValue: T;
-}
+import {
+  type Context,
+  type ContextKey,
+  type ContextMap,
+  type FC,
+  type VNode,
+  emptyNode,
+} from "./virtual-dom";
 
 export function createContext<T>(defaultValue: T): Context<T> {
   const key: ContextKey = {};
@@ -23,8 +22,6 @@ export function createContext<T>(defaultValue: T): Context<T> {
 export function useContext<T>(context: Context<T>): T {
   return RenderContextManager.get(context);
 }
-
-export type ContextMap = Map<ContextKey, unknown>;
 
 export class RenderContextManager {
   static current: ContextMap | undefined;
