@@ -1,5 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
-import { type ContextMap, RenderContextManager } from "./context";
+import { RenderContextManager } from "./context";
 import { HookContext } from "./hooks";
 import {
   type BCustom,
@@ -7,6 +7,7 @@ import {
   type BNode,
   type BTag,
   type BText,
+  type ContextMap,
   type HNode,
   type NodeKey,
   type Props,
