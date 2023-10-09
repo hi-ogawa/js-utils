@@ -12,7 +12,7 @@ interface ViteHot {
 }
 
 interface WebpackHot {
-  data: HotData;
+  data?: HotData;
   accept: (cb?: () => void) => void;
   dispose: (cb: (data: HotData) => void) => void;
   invalidate: () => void;
@@ -117,7 +117,7 @@ export function setupHmrVite(hot: ViteHot, registry: HmrRegistry) {
 
 export function setupHmrWebpack(hot: WebpackHot, registry: HmrRegistry) {
   // "perspective" flips for webpack as `hot.data` is passed by old module.
-  const lastRegistry = hot.data[REGISTRY_KEY];
+  const lastRegistry = hot.data && hot.data[REGISTRY_KEY];
   if (lastRegistry) {
     const patchSuccess = lastRegistry && patchRegistry(lastRegistry, registry);
     if (!patchSuccess) {
