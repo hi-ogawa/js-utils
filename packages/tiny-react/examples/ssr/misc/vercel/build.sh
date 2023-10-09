@@ -33,4 +33,5 @@ cp "$this_dir/.vc-config.json" .vercel/output/functions/index.func/.vc-config.js
 npx esbuild dist/server/index.js \
   --outfile=.vercel/output/functions/index.func/index.js \
   --metafile=dist/server/esbuild-metafile.json \
-  --bundle --minify --format=esm --platform=browser
+  --bundle --minify --format=esm --platform=browser \
+  --external:node:async_hooks

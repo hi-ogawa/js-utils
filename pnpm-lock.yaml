@@ -255,6 +255,9 @@ importers:
       '@hiogawa/vite-import-dev-server':
         specifier: ^0.0.1
         version: 0.0.1(vite@4.4.9)
+      '@hiogawa/vite-null-export':
+        specifier: ^0.0.0
+        version: 0.0.0(vite@4.4.9)
       '@iconify-json/ri':
         specifier: ^1.1.10
         version: 1.1.10
@@ -1522,6 +1525,15 @@ packages:
     peerDependencies:
       vite: '*'
     dependencies:
+      vite: 4.4.9(@types/node@20.8.3)
+    dev: true
+
+  /@hiogawa/vite-null-export@0.0.0(vite@4.4.9):
+    resolution: {integrity: sha512-VGEITf38JmnY0p7B+sgdteeJrHp9KHOjSLGGfx4dacu54Oq6VtAtVOM51/4M9/sPilPVFZunA13blxNi2jGvFg==}
+    peerDependencies:
+      vite: '*'
+    dependencies:
+      es-module-lexer: 1.3.1
       vite: 4.4.9(@types/node@20.8.3)
     dev: true
 
@@ -2924,6 +2936,10 @@ packages:
       is-string: 1.0.7
       isarray: 2.0.5
       stop-iteration-iterator: 1.0.0
+    dev: true
+
+  /es-module-lexer@1.3.1:
+    resolution: {integrity: sha512-JUFAyicQV9mXc3YRxPnDlrfBKpqt6hUYzz9/boprUJHs4e4KVr3XwOF70doO6gwXUor6EWZJAyWAfKki84t20Q==}
     dev: true
 
   /es-set-tostringtag@2.0.1:
