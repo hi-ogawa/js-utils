@@ -171,7 +171,6 @@ function TestEffect() {
   );
 }
 
-// @hmr
 function TestSetStateInEffect() {
   const [state, setState] = useState(0);
   const [state2, setState2] = useState(0);
@@ -345,6 +344,8 @@ function TestHmr() {
         <div className="border-t my-1"></div>
         <HmrChild counter={state} />
         <div className="border-t my-1"></div>
+        <span>Test multiple instances</span>
+        <HmrTransform counter={state} />
         <HmrTransform counter={state} />
       </div>
     </div>
