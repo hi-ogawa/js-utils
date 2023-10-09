@@ -1,27 +1,40 @@
 import { useSyncExternalStore } from "@hiogawa/tiny-react";
+import { tinyassert } from "@hiogawa/utils";
 import { getRequestContext } from "../server/request-context";
 
-class WindowHistoryStore {
+// simple global window url manager
+class WindowUrlStore {
   private listeners = new Set<() => void>();
-  private url = new URL(window.location.href);
 
-  get = () => this.url;
+  // support fallback e.g. to hook into request async context for SSR scenario
+  constructor(private options?: { fallback?: () => string }) {}
 
-  set = (url: URL) => {
-    window.history.pushState(null, "", url);
-    this.url = new URL(window.location.href);
+  get = (): string => {
+    return this.options?.fallback?.() ?? window.location.href;
+  };
+
+  set = (url: string, options?: { replace?: true }) => {
+    tinyassert(!this.options?.fallback, "cannot set url with fallback");
+    if (options?.replace) {
+      window.history.replaceState(null, "", url);
+    } else {
+      window.history.pushState(null, "", url);
+    }
     this.notify();
   };
 
   subscribe = (listener: () => void) => {
+    if (this.options?.fallback) {
+      return () => {};
+    }
     if (this.listeners.size === 0) {
-      window.addEventListener("popstate", this.onPopstate);
+      window.addEventListener("popstate", this.notify);
     }
     this.listeners.add(listener);
     return () => {
       this.listeners.delete(listener);
       if (this.listeners.size === 0) {
-        window.removeEventListener("popstate", this.onPopstate);
+        window.removeEventListener("popstate", this.notify);
       }
     };
   };
@@ -31,27 +44,19 @@ class WindowHistoryStore {
       listener();
     }
   };
-
-  private onPopstate = () => {
-    this.url = new URL(window.location.href);
-    this.notify();
-  };
 }
 
-// initialize only on client
-export const historyStore = !import.meta.env.SSR
-  ? new WindowHistoryStore()
-  : undefined!;
+const windowUrlStore = new WindowUrlStore({
+  fallback: import.meta.env.SSR
+    ? () => getRequestContext().url.href
+    : undefined,
+});
 
 export function useUrl() {
-  if (import.meta.env.SSR) {
-    const url = getRequestContext().url;
-    return [url, (_url: URL) => {}] as const;
-  }
   const url = useSyncExternalStore(
-    historyStore.subscribe,
-    historyStore.get,
-    historyStore.get
+    windowUrlStore.subscribe,
+    windowUrlStore.get,
+    windowUrlStore.get
   );
-  return [url, historyStore.set] as const;
+  return [url, windowUrlStore.set] as const;
 }

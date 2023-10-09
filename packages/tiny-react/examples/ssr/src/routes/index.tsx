@@ -62,11 +62,16 @@ function TestServerUrl() {
       <input
         className="antd-input px-1"
         placeholder="?q=..."
-        value={url.searchParams.get("q") ?? ""}
+        value={new URL(url).searchParams.get("q") ?? ""}
         oninput={(e) => {
           const newUrl = new URL(url);
-          newUrl.searchParams.set("q", e.currentTarget.value);
-          setUrl(newUrl);
+          const q = e.currentTarget.value;
+          if (q) {
+            newUrl.searchParams.set("q", q);
+          } else {
+            newUrl.searchParams.delete("q");
+          }
+          setUrl(newUrl.href);
         }}
       />
     </div>
