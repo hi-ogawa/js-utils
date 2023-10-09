@@ -246,6 +246,9 @@ importers:
       react:
         specifier: ^18.2.0
         version: 18.2.0
+      vite:
+        specifier: ^4.4.9
+        version: 4.4.9(@types/node@18.16.20)
 
   packages/tiny-rpc:
     devDependencies:

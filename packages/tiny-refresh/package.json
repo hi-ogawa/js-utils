@@ -15,10 +15,20 @@
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
     },
-    "./dist/react": {
-      "import": "./dist/react.js",
-      "require": "./dist/react.cjs",
-      "types": "./dist/react.d.ts"
+    "./dist/react/runtime": {
+      "import": "./dist/react/runtime.js",
+      "require": "./dist/react/runtime.cjs",
+      "types": "./dist/react/runtime.d.ts"
+    },
+    "./dist/react/vite": {
+      "import": "./dist/react/vite.js",
+      "require": "./dist/react/vite.cjs",
+      "types": "./dist/react/vite.d.ts"
+    },
+    "./dist/react/webpack": {
+      "import": "./dist/react/webpack.js",
+      "require": "./dist/react/webpack.cjs",
+      "types": "./dist/react/webpack.d.ts"
     }
   },
   "main": "./dist/index.js",
@@ -38,13 +48,18 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^18.2.14",
     "@vitejs/plugin-react": "^4.0.1",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "vite": "^4.4.9"
   },
   "peerDependencies": {
-    "react": "*"
+    "react": "*",
+    "vite": "*"
   },
   "peerDependenciesMeta": {
     "react": {
+      "optional": true
+    },
+    "vite": {
       "optional": true
     }
   },

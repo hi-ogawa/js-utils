@@ -1,6 +1,6 @@
 import React from "react";
 
-// cf. packages/tiny-react/src/hmr/runtime.ts
+// based on packages/tiny-react/src/hmr/runtime.ts
 
 const REGISTRY_KEY = Symbol.for("tiny-refresh.react");
 
@@ -54,6 +54,7 @@ export function createHmrComponent(
   };
   registry.components.set(Fc.name, hmrData);
 
+  // TODO: forward ref?
   const WrapperComponent: React.FC = (props) => {
     const [LatestFc, setFc] = React.useState<React.FC>(() => Fc);
 
