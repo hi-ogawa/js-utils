@@ -1,6 +1,6 @@
 import { getTheme, setTheme } from "@hiogawa/theme-script";
 import { useState } from "@hiogawa/tiny-react";
-import { useUrl } from "../urils/use-url";
+import { useUrl } from "../utils/use-url";
 
 // @hmr
 export function Root() {
