@@ -6,6 +6,7 @@ const PRAGMA_RE = /^\s*\/\/\s*@hmr/g;
 
 interface HmrTransformOptions {
   runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
+  refreshRuntime?: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself for simpler dev ergonomics
   bundler: "vite" | "webpack4";
 }
 
@@ -33,7 +34,10 @@ export function hmrTransform(
     return;
   }
   return [
-    headerCode(options.runtime),
+    headerCode(
+      options.runtime,
+      options.refreshRuntime ?? "@hiogawa/tiny-refresh"
+    ),
     ...newLines,
     ...extraCodes,
     options.bundler === "vite" ? FOOTER_CODE_VITE : FOOTER_CODE_WEBPACK4,
@@ -80,9 +84,9 @@ ${name} = $$refresh.createHmrComponent($$registry, $$tmp_${name}, { remount: ${r
 `;
 
 // /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates
-const headerCode = (runtime: string) => /* js */ `
+const headerCode = (runtime: string, refresh: string) => /* js */ `
 import * as $$runtime from "${runtime}";
-import * as $$refresh from "@hiogawa/tiny-refresh";
+import * as $$refresh from "${refresh}";
 const $$registry = $$refresh.createHmrRegistry({
   createElement: $$runtime.createElement,
   useState: $$runtime.useState,

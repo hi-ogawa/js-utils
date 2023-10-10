@@ -27,6 +27,7 @@ export function tinyReactVitePlugin(
         include: options?.hmr?.include,
         exclude: options?.hmr?.exclude,
         runtime: "@hiogawa/tiny-react",
+        refreshRuntime: "@hiogawa/tiny-react/hmr",
       }),
     !options?.alias?.disable && aliasPlugin(),
   ].filter(typedBoolean);

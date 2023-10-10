@@ -3,7 +3,7 @@ import {
   createHmrComponent,
   createHmrRegistry,
   setupHmrVite,
-} from "@hiogawa/tiny-refresh";
+} from "@hiogawa/tiny-react/hmr";
 
 // manually use tiny-refresh for easier testing/debugging
 
