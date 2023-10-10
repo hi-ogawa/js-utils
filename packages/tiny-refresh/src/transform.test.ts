@@ -26,7 +26,7 @@ function CompNooo() {
     expect(hmrTransform(input, { runtime: "react", bundler: "vite" }))
       .toMatchInlineSnapshot(`
         "
-        import * as $$runtime from \\"react\\",
+        import * as $$runtime from \\"react\\";
         import * as $$refresh from \\"@hiogawa/tiny-refresh\\";
         const $$registry = $$refresh.createHmrRegistry({
           createElement: $$runtime.createElement,
