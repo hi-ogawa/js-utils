@@ -82,7 +82,7 @@ ${name} = $$refresh.createHmrComponent($$registry, $$tmp_${name}, { remount: ${r
 // /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates
 const headerCode = (runtime: string) => /* js */ `
 import * as $$runtime from "${runtime}",
-import * as $$refresh from "@hiogawa/tiny-refresh/dist/react/runtime";
+import * as $$refresh from "@hiogawa/tiny-refresh";
 const $$registry = $$refresh.createHmrRegistry({
   createElement: $$runtime.createElement,
   useState: $$runtime.useState,

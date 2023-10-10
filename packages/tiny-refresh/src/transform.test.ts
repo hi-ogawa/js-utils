@@ -27,7 +27,7 @@ function CompNooo() {
       .toMatchInlineSnapshot(`
         "
         import * as $$runtime from \\"react\\",
-        import * as $$refresh from \\"@hiogawa/tiny-refresh/dist/react/runtime\\";
+        import * as $$refresh from \\"@hiogawa/tiny-refresh\\";
         const $$registry = $$refresh.createHmrRegistry({
           createElement: $$runtime.createElement,
           useState: $$runtime.useState,
