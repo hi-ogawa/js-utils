@@ -1,16 +1,14 @@
+import { createElement, useEffect, useState } from "@hiogawa/tiny-react";
 import {
   createHmrComponent,
   createHmrRegistry,
-  h,
-  setupHmr,
-  useEffect,
-  useState,
-} from "@hiogawa/tiny-react";
+  setupHmrVite,
+} from "@hiogawa/tiny-refresh";
 
-// manually use tiny-react hmr runtime for easier testing/debugging
+// manually use tiny-refresh for easier testing/debugging
 
 const registry = createHmrRegistry({
-  h,
+  createElement,
   useState,
   useEffect,
 });
@@ -54,7 +52,7 @@ export const HmrChild = createHmrComponent(
 );
 
 if (import.meta.hot) {
-  setupHmr(import.meta.hot, registry);
+  setupHmrVite(import.meta.hot, registry);
 
   // source code needs to include exact import.meta expression for vite's static analysis
   () => import.meta.hot?.accept();

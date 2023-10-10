@@ -210,6 +210,9 @@ importers:
       '@hiogawa/tiny-react':
         specifier: workspace:*
         version: link:../..
+      '@hiogawa/tiny-refresh':
+        specifier: workspace:*
+        version: link:../../../tiny-refresh
       '@hiogawa/unocss-preset-antd':
         specifier: 2.2.1-pre.7
         version: 2.2.1-pre.7(unocss@0.56.4)

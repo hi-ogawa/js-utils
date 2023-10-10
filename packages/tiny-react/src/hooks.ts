@@ -100,7 +100,7 @@ export class HookContext {
   useReducer = <S, A>(
     reducer: (prevState: S, action: A) => S,
     initialState: InitialState<S>
-  ) => {
+  ): [S, (action: A) => void] => {
     // init hook state
     if (this.initial) {
       this.hooks.push({
@@ -113,14 +113,14 @@ export class HookContext {
 
     // reducer
     const state = hook.state as S;
-    const dispatch = (next: A) => {
-      const nextState = reducer(hook.state as S, next);
+    const dispatch = (action: A) => {
+      const nextState = reducer(hook.state as S, action);
       if (hook.state !== nextState) {
         hook.state = nextState;
         this.notify();
       }
     };
-    return [state, dispatch] as const;
+    return [state, dispatch];
   };
 
   useEffect = (effect: EffectFn, deps?: unknown[]) => {
