@@ -205,6 +205,45 @@ importers:
         specifier: ^4.4.9
         version: 4.4.9(@types/node@18.17.1)
 
+  packages/tiny-refresh/examples/react:
+    devDependencies:
+      '@hiogawa/theme-script':
+        specifier: workspace:*
+        version: link:../../../theme-script
+      '@hiogawa/tiny-refresh':
+        specifier: workspace:*
+        version: link:../..
+      '@hiogawa/unocss-preset-antd':
+        specifier: 2.2.1-pre.3
+        version: 2.2.1-pre.3(@unocss/preset-uno@0.54.0)(unocss@0.53.6)
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../../../utils
+      '@iconify-json/ri':
+        specifier: ^1.1.10
+        version: 1.1.10
+      '@types/react':
+        specifier: ^18.2.14
+        version: 18.2.14
+      '@types/react-dom':
+        specifier: ^18.2.7
+        version: 18.2.7
+      '@vitejs/plugin-react':
+        specifier: ^4.0.1
+        version: 4.0.1(vite@4.4.9)
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
+      unocss:
+        specifier: ^0.53.6
+        version: 0.53.6(postcss@8.4.27)(vite@4.4.9)
+      vite:
+        specifier: ^4.4.6
+        version: 4.4.9(@types/node@18.17.1)
+
   packages/tiny-rpc:
     devDependencies:
       '@brillout/json-serializer':
@@ -1715,6 +1754,17 @@ packages:
       - vite
     dev: true
 
+  /@unocss/astro@0.53.6(vite@4.4.9):
+    resolution: {integrity: sha512-RA0H8iujvMhH7ga6RWOzzdtNRP8qB++1eu7ffajJTktih6xYXh1I5lRR9uYajW2riShhtMQ7FXLRnlEIa1Vwog==}
+    dependencies:
+      '@unocss/core': 0.53.6
+      '@unocss/reset': 0.53.6
+      '@unocss/vite': 0.53.6(vite@4.4.9)
+    transitivePeerDependencies:
+      - rollup
+      - vite
+    dev: true
+
   /@unocss/cli@0.53.6:
     resolution: {integrity: sha512-igUdBRT2cNreuT/8LKJp+0D6Sj+NQADs2fj1auPrh9Z6lOk0Ot8mY2hnKzdszHUosoOgdGyy8pLiAtQ09TFtRA==}
     engines: {node: '>=14'}
@@ -1925,6 +1975,26 @@ packages:
       fast-glob: 3.3.1
       magic-string: 0.30.1
       vite: 4.4.6(@types/node@18.16.20)
+    transitivePeerDependencies:
+      - rollup
+    dev: true
+
+  /@unocss/vite@0.53.6(vite@4.4.9):
+    resolution: {integrity: sha512-EfbtSqozWC8NVG0P+x02k6L77cEr0H/bfVtEtvwLIrzSyLoVU/Z+li248cB7v8ZSDQXYKJe9uiItx/GTc04A4g==}
+    peerDependencies:
+      vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0
+    dependencies:
+      '@ampproject/remapping': 2.2.1
+      '@rollup/pluginutils': 5.0.2
+      '@unocss/config': 0.53.6
+      '@unocss/core': 0.53.6
+      '@unocss/inspector': 0.53.6
+      '@unocss/scope': 0.53.6
+      '@unocss/transformer-directives': 0.53.6
+      chokidar: 3.5.3
+      fast-glob: 3.3.1
+      magic-string: 0.30.1
+      vite: 4.4.9(@types/node@18.17.1)
     transitivePeerDependencies:
       - rollup
     dev: true
@@ -5008,6 +5078,42 @@ packages:
       '@unocss/transformer-directives': 0.53.6
       '@unocss/transformer-variant-group': 0.53.6
       '@unocss/vite': 0.53.6(vite@4.4.6)
+    transitivePeerDependencies:
+      - postcss
+      - rollup
+      - supports-color
+      - vite
+    dev: true
+
+  /unocss@0.53.6(postcss@8.4.27)(vite@4.4.9):
+    resolution: {integrity: sha512-yZeSaa3ulfDyU7WaOeN5AZN/ciopY+f9GPuME4hgzxZmUnCSJmuwBW+5UHud2BSRKdem+mLIpBzNXTOsDP8gFA==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@unocss/webpack': 0.53.6
+    peerDependenciesMeta:
+      '@unocss/webpack':
+        optional: true
+    dependencies:
+      '@unocss/astro': 0.53.6(vite@4.4.9)
+      '@unocss/cli': 0.53.6
+      '@unocss/core': 0.53.6
+      '@unocss/extractor-arbitrary-variants': 0.53.6
+      '@unocss/postcss': 0.53.6(postcss@8.4.27)
+      '@unocss/preset-attributify': 0.53.6
+      '@unocss/preset-icons': 0.53.6
+      '@unocss/preset-mini': 0.53.6
+      '@unocss/preset-tagify': 0.53.6
+      '@unocss/preset-typography': 0.53.6
+      '@unocss/preset-uno': 0.53.6
+      '@unocss/preset-web-fonts': 0.53.6
+      '@unocss/preset-wind': 0.53.6
+      '@unocss/reset': 0.53.6
+      '@unocss/transformer-attributify-jsx': 0.53.6
+      '@unocss/transformer-attributify-jsx-babel': 0.53.6
+      '@unocss/transformer-compile-class': 0.53.6
+      '@unocss/transformer-directives': 0.53.6
+      '@unocss/transformer-variant-group': 0.53.6
+      '@unocss/vite': 0.53.6(vite@4.4.9)
     transitivePeerDependencies:
       - postcss
       - rollup
