@@ -6,7 +6,7 @@ import type React from "react";
 const REGISTRY_KEY = Symbol.for("tiny-refresh.react");
 
 // cf. https://github.com/solidjs/solid-refresh/blob/22d6a92c91013b6e5d71e520a3d1dcb47d491bba/src/runtime/index.ts
-interface ViteHot {
+export interface ViteHot {
   data: HotData;
   accept: (onNewModule: (newModule?: unknown) => void) => void;
   invalidate: () => void;
