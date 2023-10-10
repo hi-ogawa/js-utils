@@ -1,8 +1,6 @@
 import { type FilterPattern, type Plugin, createFilter } from "vite";
 import { hmrTransform } from "./transform";
 
-// based on packages/tiny-react/src/plugins/vite.ts
-
 export function vitePluginTinyRefresh(options?: {
   include?: FilterPattern;
   exclude?: FilterPattern;

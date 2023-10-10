@@ -1,7 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
 
-// based on packages/tiny-react/src/hmr/transform.ts
-
 const PRAGMA_RE = /^\s*\/\/\s*@hmr/g;
 
 interface HmrTransformOptions {
