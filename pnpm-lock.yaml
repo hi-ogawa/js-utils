@@ -187,6 +187,24 @@ importers:
         specifier: ^18.17.1
         version: 18.17.1
 
+  packages/tiny-refresh:
+    devDependencies:
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@testing-library/react':
+        specifier: ^14.0.0
+        version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
+      '@types/react':
+        specifier: ^18.2.14
+        version: 18.2.14
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      vite:
+        specifier: ^4.4.9
+        version: 4.4.9(@types/node@18.17.1)
+
   packages/tiny-rpc:
     devDependencies:
       '@brillout/json-serializer':
@@ -266,7 +284,7 @@ importers:
         version: 18.2.14
       '@vitejs/plugin-react':
         specifier: ^4.0.1
-        version: 4.0.1(vite@4.4.7)
+        version: 4.0.1(vite@4.4.9)
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -303,7 +321,7 @@ importers:
         version: 18.0.0
       '@vitejs/plugin-react':
         specifier: ^4.0.1
-        version: 4.0.1(vite@4.4.7)
+        version: 4.0.1(vite@4.4.9)
       jsdom:
         specifier: ^22.1.0
         version: 22.1.0
@@ -1906,7 +1924,7 @@ packages:
       chokidar: 3.5.3
       fast-glob: 3.3.1
       magic-string: 0.30.1
-      vite: 4.4.6
+      vite: 4.4.6(@types/node@18.16.20)
     transitivePeerDependencies:
       - rollup
     dev: true
@@ -1921,12 +1939,12 @@ packages:
       '@babel/plugin-transform-react-jsx-self': 7.22.5(@babel/core@7.22.5)
       '@babel/plugin-transform-react-jsx-source': 7.22.5(@babel/core@7.22.5)
       react-refresh: 0.14.0
-      vite: 4.4.6
+      vite: 4.4.6(@types/node@18.16.20)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-react@4.0.1(vite@4.4.7):
+  /@vitejs/plugin-react@4.0.1(vite@4.4.9):
     resolution: {integrity: sha512-g25lL98essfeSj43HJ0o4DMp0325XK0ITkxpgChzJU/CyemgyChtlxfnRbjfwxDGCTRxTiXtQAsdebQXKMRSOA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -1936,7 +1954,7 @@ packages:
       '@babel/plugin-transform-react-jsx-self': 7.22.5(@babel/core@7.22.5)
       '@babel/plugin-transform-react-jsx-source': 7.22.5(@babel/core@7.22.5)
       react-refresh: 0.14.0
-      vite: 4.4.7
+      vite: 4.4.9(@types/node@18.17.1)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -4344,8 +4362,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /rollup@3.27.0:
-    resolution: {integrity: sha512-aOltLCrYZ0FhJDm7fCqwTjIUEVjWjcydKBV/Zeid6Mn8BWgDCUBBWT5beM5ieForYNo/1ZHuGJdka26kvQ3Gzg==}
+  /rollup@3.29.4:
+    resolution: {integrity: sha512-oWzmBZwvYrU0iJHtDmhsm662rC15FRXmcjCk1xD771dFDx5jJ02ufAQQTn0etB2emNk4J9EZg/yWKpsn9BWGRw==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
@@ -5036,7 +5054,7 @@ packages:
       mlly: 1.4.0
       pathe: 1.1.1
       picocolors: 1.0.0
-      vite: 4.4.6(@types/node@18.17.1)
+      vite: 4.4.9(@types/node@18.17.1)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -5046,41 +5064,6 @@ packages:
       - sugarss
       - supports-color
       - terser
-    dev: true
-
-  /vite@4.4.6:
-    resolution: {integrity: sha512-EY6Mm8vJ++S3D4tNAckaZfw3JwG3wa794Vt70M6cNJ6NxT87yhq7EC8Rcap3ahyHdo8AhCmV9PTk+vG1HiYn1A==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: 0.18.10
-      postcss: 8.4.27
-      rollup: 3.26.0
-    optionalDependencies:
-      fsevents: 2.3.2
     dev: true
 
   /vite@4.4.6(@types/node@18.16.20):
@@ -5155,8 +5138,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vite@4.4.7:
-    resolution: {integrity: sha512-6pYf9QJ1mHylfVh39HpuSfMPojPSKVxZvnclX1K1FyZ1PXDOcLBibdq5t1qxJSnL63ca8Wf4zts6mD8u8oc9Fw==}
+  /vite@4.4.9(@types/node@18.17.1):
+    resolution: {integrity: sha512-2mbUn2LlUmNASWwSCNSJ/EG2HuSRTnVNaydp6vMCm5VIqJsjMfbIWtbH2kDuwUVW5mMUKKZvGPX/rqeqVvv1XA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -5183,9 +5166,10 @@ packages:
       terser:
         optional: true
     dependencies:
+      '@types/node': 18.17.1
       esbuild: 0.18.17
       postcss: 8.4.27
-      rollup: 3.27.0
+      rollup: 3.29.4
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
