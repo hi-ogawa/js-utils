@@ -14,6 +14,9 @@ export function vitePluginTinyRefresh(options?: {
   );
   return {
     name: "@hiogawa/tiny-refresh/react/vite",
+    // since esbuild drops comments https://github.com/evanw/esbuild/issues/1439,
+    // we need to enforce "pre" to see `// @hmr` comments.
+    // however this means that transform has to handle raw source code e.g. typescript files.
     enforce: "pre",
     apply(_config, env) {
       return env.command === "serve" && !env.ssrBuild;
