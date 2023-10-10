@@ -81,6 +81,25 @@ export function createHmrComponent(
       };
     }, []);
 
+    //
+    // approach 1.
+    //
+    //   h(LatestFc, props)
+    //
+    //   This renders component as a child, which makes it always re-mount on hot update since two functions are not identical.
+    //   Hook states are not preserved, but new component can add/remove hook usage since hook states reset anyways.
+    //
+    // approach 2.
+    //
+    //   LatestFc(props)
+    //
+    //   This directly calls into functional component and use it as implementation of `WrapperComponent`.
+    //   This won't cause re-mount but it must ensure hook usage didn't change, otherwise it'll crash client.
+    //   To employ this approach, we need to detect the usage of hook and conditionally `hot.invalidate`
+    //   only when hook usage is changed.
+    //   however we allow this mode via explicit "// @safe-unsafe" comment.
+    //
+
     return options.remount ? createElement(LatestFc, props) : LatestFc(props);
   };
 
@@ -104,6 +123,7 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current.options.remount !== latest.options.remount) {
       return false;
     }
+    // TODO: don't need to reset if source code is exactly same? (based current.component.toString())
     currentReg.components.set(key, latest);
     latest.listeners = current.listeners;
     if (latest.listeners) {
@@ -115,10 +135,11 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
 
 export function setupHmrVite(hot: ViteHot, registry: HmrRegistry) {
   hot.data[REGISTRY_KEY] = registry;
+
   // https://vitejs.dev/guide/api-hmr.html#hot-accept-cb
   hot.accept((newModule) => {
     // `registry` refereneced here is the one from the last module which is "accept"-ing new modules.
-    // `hot.data[LATEST_DATA]` is always updated by new module before new module is "accept"-ed.
+    // `hot.data[REGISTRY_KEY]` is always updated by new module before new module is "accept"-ed.
     const latestRegistry = hot.data[REGISTRY_KEY];
     const patchSuccess =
       newModule && latestRegistry && patchRegistry(registry, latestRegistry);
@@ -129,7 +150,7 @@ export function setupHmrVite(hot: ViteHot, registry: HmrRegistry) {
 }
 
 export function setupHmrWebpack(hot: WebpackHot, registry: HmrRegistry) {
-  // "perspective" flips for webpack as `hot.data` is passed by old module.
+  // perspective flips for webpack since `hot.data` is passed by old module.
   const lastRegistry = hot.data && hot.data[REGISTRY_KEY];
   if (lastRegistry) {
     const patchSuccess = lastRegistry && patchRegistry(lastRegistry, registry);
