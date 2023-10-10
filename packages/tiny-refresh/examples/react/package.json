@@ -2,7 +2,8 @@
   "name": "tiny-refresh-examples-react",
   "private": true,
   "scripts": {
-    "dev": "vite dev"
+    "dev": "vite dev",
+    "build": "vite build"
   },
   "devDependencies": {
     "@hiogawa/tiny-refresh": "workspace:*",
