@@ -9,6 +9,7 @@ import { type FilterPattern, type Plugin } from "vite";
 
 interface TinyReactVitePluginOptions {
   hmr?: {
+    disable?: boolean;
     include?: FilterPattern;
     exclude?: FilterPattern;
   };
@@ -21,11 +22,12 @@ export function tinyReactVitePlugin(
   options?: TinyReactVitePluginOptions
 ): Plugin[] {
   return [
-    vitePluginTinyRefresh({
-      include: options?.hmr?.include,
-      exclude: options?.hmr?.exclude,
-      runtime: "@hiogawa/tiny-react",
-    }),
+    !options?.hmr?.disable &&
+      vitePluginTinyRefresh({
+        include: options?.hmr?.include,
+        exclude: options?.hmr?.exclude,
+        runtime: "@hiogawa/tiny-react",
+      }),
     !options?.alias?.disable && aliasPlugin(),
   ].filter(typedBoolean);
 }
