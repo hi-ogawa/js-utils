@@ -66,6 +66,7 @@ export function createHmrComponent(
     listeners: new Set(),
     options,
   };
+  // TODO: use "name" extracted during transform instead of runtime.
   registry.components.set(Fc.name, hmrData);
   const { createElement, useEffect, useState } = registry.runtime;
 
@@ -123,9 +124,21 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current.options.remount !== latest.options.remount) {
       return false;
     }
-    // TODO: don't need to reset if source code is exactly same? (based current.component.toString())
     currentReg.components.set(key, latest);
     latest.listeners = current.listeners;
+    // Skip re-rendering if function code is exactly same.
+    // Note that this can cause "false-negative", for example,
+    // when a constant defined in the same file has changed
+    // and such constant is used by the component.
+    // TODO: add option to disable this via magic comment?
+    if (current.component.toString() === latest.component.toString()) {
+      continue;
+    }
+    // TODO: debug log option
+    // TODO: log with file path
+    console.log(
+      `[tiny-refresh] update '${key}' (remount = ${latest.options.remount})`
+    );
     if (latest.listeners) {
       latest.listeners.forEach((f) => f(() => latest.component));
     }

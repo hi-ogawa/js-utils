@@ -29,13 +29,14 @@ export function State() {
           +1
         </button>
       </div>
-      <StateIner value={state} />
+      <StateInner value={state} />
+      <StateInner value={state} />
     </div>
   );
 }
 
-export function StateIner(props: { value: number }) {
-  const add = 0;
+export function StateInner(props: { value: number }) {
+  const add = 100;
   return (
     <pre>
       props.value + {add} = {props.value + add}
