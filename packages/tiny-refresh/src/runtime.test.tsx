@@ -22,7 +22,7 @@ describe(setupHmrVite, () => {
       data: {},
     };
 
-    let ChildExport: React.FC;
+    let ChildExport: any;
 
     //
     // 1st version
