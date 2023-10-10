@@ -42,10 +42,11 @@ export function hmrTransform(
   ].join("\n");
 }
 
-const COMPONENT_DECL_RE = /(function|let|const)\s*(\w+)/;
+const COMPONENT_DECL_RE = /(function|var|let|const)\s*(\w+)/;
 
 // find identifier from the next line of "@hmr" comment
 //   function SomeComponent
+//   var SomeComponent
 //   let SomeComponent
 //   const SomeComponent (then `const` will be transformed to `let`)
 function transformComponentDecl(line: string): [string, string] | undefined {
