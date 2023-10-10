@@ -6,6 +6,7 @@ export function vitePluginTinyRefresh(options?: {
   exclude?: FilterPattern;
   runtime?: string;
   refreshRuntime?: string;
+  noAutoDetect?: boolean;
 }): Plugin {
   // cf. https://github.com/vitejs/vite-plugin-react/blob/2c3330b9aa40d263e50e8359eca481099700ca9e/packages/plugin-react/src/index.ts#L168-L171
   const filter = createFilter(
@@ -16,7 +17,7 @@ export function vitePluginTinyRefresh(options?: {
     name: "@hiogawa/tiny-refresh/react/vite",
     // since esbuild drops comments https://github.com/evanw/esbuild/issues/1439,
     // we need to enforce "pre" to see `// @hmr` comments.
-    // however this means that transform has to handle raw source code e.g. typescript files.
+    // however this means that transform has to handle raw source code e.g. typescript and jsx.
     enforce: "pre",
     apply(_config, env) {
       return env.command === "serve" && !env.ssrBuild;
@@ -27,6 +28,7 @@ export function vitePluginTinyRefresh(options?: {
           bundler: "vite",
           runtime: options?.runtime ?? "react",
           refreshRuntime: options?.refreshRuntime,
+          autoDetect: !options?.noAutoDetect,
         });
       }
       return;

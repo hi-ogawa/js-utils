@@ -1,11 +1,10 @@
 import { tinyassert } from "@hiogawa/utils";
 
-const PRAGMA_RE = /^\s*\/\/\s*@hmr/g;
-
 interface HmrTransformOptions {
   runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
   refreshRuntime?: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
   bundler: "vite" | "webpack4";
+  autoDetect: boolean;
 }
 
 export function hmrTransform(
@@ -18,13 +17,30 @@ export function hmrTransform(
 
   for (let i = 0; i < lines.length - 1; i++) {
     const line = lines[i];
-    if (line.match(PRAGMA_RE)) {
-      const found = transformComponentDecl(lines[i + 1]);
-      if (found) {
-        newLines[i + 1] = found[0];
-        extraCodes.push(
-          wrapCreateHmrComponent(found[1], !line.includes("@hmr-unsafe"))
-        );
+    if (options.autoDetect) {
+      // auto detect by regex
+      if (line.match(AUTO_DETECT_RE)) {
+        // extract name + transform from "const" to "let"
+        const found = transformComponentDecl(lines[i]);
+        if (found) {
+          const [newLine, name] = found;
+          newLines[i] = newLine;
+          extraCodes.push(
+            wrapCreateHmrComponent(name, !lines[i - 1]?.includes("@hmr-unsafe"))
+          );
+        }
+      }
+    } else {
+      // otherwise check comment in previous line
+      if (line.startsWith("// @hmr")) {
+        const found = transformComponentDecl(lines[i + 1]);
+        if (found) {
+          const [newLine, name] = found;
+          newLines[i + 1] = newLine;
+          extraCodes.push(
+            wrapCreateHmrComponent(name, !line.includes("@hmr-unsafe"))
+          );
+        }
       }
     }
   }
@@ -41,6 +57,9 @@ export function hmrTransform(
     options.bundler === "vite" ? FOOTER_CODE_VITE : FOOTER_CODE_WEBPACK4,
   ].join("\n");
 }
+
+const AUTO_DETECT_RE =
+  /^(export)?\s*(default)?\s*(function|var|let|const)\s*[A-Z]/;
 
 const COMPONENT_DECL_RE = /(function|var|let|const)\s*(\w+)/;
 
@@ -78,8 +97,10 @@ function spliceString(
 // re-assigning over function declaration is sketchy but seems to be okay
 // cf. https://eslint.org/docs/latest/rules/no-func-assign
 const wrapCreateHmrComponent = (name: string, remount: boolean) => /* js */ `
-var $$tmp_${name} = ${name};
-${name} = $$refresh.createHmrComponent($$registry, $$tmp_${name}, { remount: ${remount} });
+if (typeof ${name} === "function") {
+  var $$tmp_${name} = ${name};
+  ${name} = $$refresh.createHmrComponent($$registry, $$tmp_${name}, { remount: ${remount} });
+}
 `;
 
 // /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates
