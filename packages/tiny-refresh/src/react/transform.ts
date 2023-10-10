@@ -5,6 +5,7 @@ import { tinyassert } from "@hiogawa/utils";
 const PRAGMA_RE = /^\s*\/\/\s*@hmr/g;
 
 interface HmrTransformOptions {
+  runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
   bundler: "vite" | "webpack4";
 }
 
@@ -32,7 +33,7 @@ export function hmrTransform(
     return;
   }
   return [
-    HEADER_CODE,
+    headerCode(options.runtime),
     ...newLines,
     ...extraCodes,
     options.bundler === "vite" ? FOOTER_CODE_VITE : FOOTER_CODE_WEBPACK4,
@@ -44,7 +45,7 @@ const COMPONENT_DECL_RE = /(function|let|const)\s*(\w+)/;
 // find identifier from the next line of "@hmr" comment
 //   function SomeComponent
 //   let SomeComponent
-//   const SomeComponent (+ `const` will be transformed to `let`)
+//   const SomeComponent (then `const` will be transformed to `let`)
 function transformComponentDecl(line: string): [string, string] | undefined {
   const match = line.match(COMPONENT_DECL_RE);
   if (match) {
@@ -75,25 +76,30 @@ function spliceString(
 // cf. https://eslint.org/docs/latest/rules/no-func-assign
 const wrapCreateHmrComponent = (name: string, remount: boolean) => /* js */ `
 var $$tmp_${name} = ${name};
-${name} = $$lib.createHmrComponent($$registry, $$tmp_${name}, { remount: ${remount} });
+${name} = $$refresh.createHmrComponent($$registry, $$tmp_${name}, { remount: ${remount} });
 `;
 
 // /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates
-const HEADER_CODE = /* js */ `
-import * as $$lib from "@hiogawa/tiny-refresh/dist/react/runtime";
-const $$registry = $$lib.createHmrRegistry();
+const headerCode = (runtime: string) => /* js */ `
+import * as $$runtime from "${runtime}",
+import * as $$refresh from "@hiogawa/tiny-refresh/dist/react/runtime";
+const $$registry = $$refresh.createHmrRegistry({
+  createElement: $$runtime.createElement,
+  useState: $$runtime.useState,
+  useEffect: $$runtime.useEffect,
+});
 `;
 
 // for vite to detect, source code needs to include the exact "import.meta.hot.accept" expression.
 const FOOTER_CODE_VITE = /* js */ `
 if (import.meta.hot) {
-  $$lib.setupHmrVite(import.meta.hot, $$registry);
+  $$refresh.setupHmrVite(import.meta.hot, $$registry);
   () => import.meta.hot.accept();
 }
 `;
 
 const FOOTER_CODE_WEBPACK4 = /* js */ `
 if (module.hot) {
-  $$lib.setupHmrWebpack(module.hot, $$registry);
+  $$refresh.setupHmrWebpack(module.hot, $$registry);
 }
 `;

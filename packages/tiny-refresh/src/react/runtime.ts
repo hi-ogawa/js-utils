@@ -1,4 +1,5 @@
-import React from "react";
+// just borrow typing for development
+import type React from "react";
 
 // based on packages/tiny-react/src/hmr/runtime.ts
 
@@ -23,6 +24,11 @@ interface HotData {
 }
 
 interface HmrRegistry {
+  runtime: {
+    createElement: typeof React.createElement;
+    useState: typeof React.useState;
+    useEffect: typeof React.useEffect;
+  };
   components: Map<string, HmrComponentData>;
 }
 
@@ -32,8 +38,11 @@ interface HmrComponentData {
   options: HmrComponentOptions;
 }
 
-export function createHmrRegistry(): HmrRegistry {
+export function createHmrRegistry(
+  runtime: HmrRegistry["runtime"]
+): HmrRegistry {
   return {
+    runtime,
     components: new Map(),
   };
 }
@@ -53,12 +62,13 @@ export function createHmrComponent(
     options,
   };
   registry.components.set(Fc.name, hmrData);
+  const { createElement, useEffect, useState } = registry.runtime;
 
   // TODO: forward ref?
   const WrapperComponent: React.FC = (props) => {
-    const [LatestFc, setFc] = React.useState<React.FC>(() => Fc);
+    const [LatestFc, setFc] = useState<React.FC>(() => Fc);
 
-    React.useEffect(() => {
+    useEffect(() => {
       // expose setter to force update
       hmrData.listeners.add(setFc);
       return () => {
@@ -66,9 +76,7 @@ export function createHmrComponent(
       };
     }, []);
 
-    return options.remount
-      ? React.createElement(LatestFc, props)
-      : LatestFc(props);
+    return options.remount ? createElement(LatestFc, props) : LatestFc(props);
   };
 
   return WrapperComponent;
