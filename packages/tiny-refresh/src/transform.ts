@@ -6,7 +6,7 @@ const PRAGMA_RE = /^\s*\/\/\s*@hmr/g;
 
 interface HmrTransformOptions {
   runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
-  refreshRuntime?: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself for simpler dev ergonomics
+  refreshRuntime?: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
   bundler: "vite" | "webpack4";
 }
 
