@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",
+    "@hiogawa/tiny-refresh": "workspace:*",
     "vite": "^4.4.9"
   },
   "peerDependencies": {
