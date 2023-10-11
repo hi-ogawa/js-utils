@@ -132,7 +132,6 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     // Note that this can cause "false-negative", for example,
     // when a constant defined in the same file has changed
     // and such constant is used by the component.
-    // TODO: add option to disable this via magic comment?
     if (current.component.toString() === latest.component.toString()) {
       continue;
     }
