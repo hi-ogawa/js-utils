@@ -15,6 +15,7 @@ export function Outer() {
   const [state, setState] = useState(0);
   return (
     <div className="flex flex-col gap-2 border p-4">
+      <h1>Outer</h1>
       <div className="flex gap-2">
         <button
           className="antd-btn antd-btn-default px-1"
@@ -43,7 +44,7 @@ export function Inner(props: { value: number }) {
   const add = 100;
   return (
     <pre>
-      props.value + {add} = {props.value + add}
+      Inner: props.value + {add} = {props.value + add}
     </pre>
   );
 }
