@@ -28,7 +28,10 @@ test("hmr", async ({ page }) => {
   await withEditFile(
     "src/app.tsx",
     (code) => code.replace("<h1>Outer</h1>", "<h2>Outer</h2>"),
-    () => checkInner(0, 100)
+    async () => {
+      await page.locator("h2").getByText("Outer").click();
+      await checkInner(0, 100);
+    }
   );
   await checkInner(0, 100);
 
