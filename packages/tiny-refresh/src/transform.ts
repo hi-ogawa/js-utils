@@ -93,9 +93,13 @@ function spliceString(
 
 // re-assigning over function declaration is sketchy but seems to be okay
 // cf. https://eslint.org/docs/latest/rules/no-func-assign
+
+// "exotic" component (e.g. React.forwardRef) will be filtered out since they are "object"
 const wrapCreateHmrComponent = (name: string, remount: boolean) => /* js */ `
-var $$tmp_${name} = ${name};
-${name} = $$refresh.createHmrComponent($$registry, "${name}", $$tmp_${name}, { remount: ${remount} });
+if (typeof ${name} === "function" && ${name}.length <= 1) {
+  var $$tmp_${name} = ${name};
+  ${name} = $$refresh.createHmrComponent($$registry, "${name}", $$tmp_${name}, { remount: ${remount} });
+}
 `;
 
 // /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates
