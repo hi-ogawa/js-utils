@@ -17,7 +17,7 @@ export function hmrTransform(
   const extraCodes: string[] = [];
 
   for (let i = 0; i < lines.length - 1; i++) {
-    const prevLine = lines[i - 1] ?? "";
+    const prevLine = lines[i - 1] || ""; // TODO: it should be "??" but it breaks old webpack.
     const line = lines[i];
     if (
       options.autoDetect
@@ -45,8 +45,8 @@ export function hmrTransform(
   return [
     headerCode(
       options.runtime,
-      options.refreshRuntime ?? "@hiogawa/tiny-refresh",
-      options.debug ?? false
+      options.refreshRuntime || "@hiogawa/tiny-refresh",
+      options.debug || false
     ),
     ...newLines,
     ...extraCodes,
