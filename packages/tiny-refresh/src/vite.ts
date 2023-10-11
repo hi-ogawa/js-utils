@@ -7,6 +7,7 @@ export function vitePluginTinyRefresh(options?: {
   runtime?: string;
   refreshRuntime?: string;
   noAutoDetect?: boolean;
+  debug?: boolean;
 }): Plugin {
   // cf. https://github.com/vitejs/vite-plugin-react/blob/2c3330b9aa40d263e50e8359eca481099700ca9e/packages/plugin-react/src/index.ts#L168-L171
   const filter = createFilter(
@@ -29,6 +30,7 @@ export function vitePluginTinyRefresh(options?: {
           runtime: options?.runtime ?? "react",
           refreshRuntime: options?.refreshRuntime,
           autoDetect: !options?.noAutoDetect,
+          debug: options?.debug,
         });
       }
       return;

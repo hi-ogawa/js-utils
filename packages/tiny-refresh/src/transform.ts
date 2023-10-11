@@ -45,7 +45,8 @@ export function hmrTransform(
   return [
     headerCode(
       options.runtime,
-      options.refreshRuntime ?? "@hiogawa/tiny-refresh"
+      options.refreshRuntime ?? "@hiogawa/tiny-refresh",
+      options.debug ?? false
     ),
     ...newLines,
     ...extraCodes,
@@ -99,14 +100,18 @@ if (typeof ${name} === "function") {
 `;
 
 // /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates
-const headerCode = (runtime: string, refresh: string) => /* js */ `
+const headerCode = (
+  runtime: string,
+  refresh: string,
+  debug: boolean
+) => /* js */ `
 import * as $$runtime from "${runtime}";
 import * as $$refresh from "${refresh}";
 const $$registry = $$refresh.createHmrRegistry({
   createElement: $$runtime.createElement,
   useState: $$runtime.useState,
   useEffect: $$runtime.useEffect,
-});
+}, ${debug});
 `;
 
 // for vite to detect, source code needs to include the exact "import.meta.hot.accept" expression.

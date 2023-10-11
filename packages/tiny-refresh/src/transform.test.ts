@@ -37,7 +37,7 @@ function CompNooo() {
         createElement: $$runtime.createElement,
         useState: $$runtime.useState,
         useEffect: $$runtime.useEffect,
-      });
+      }, false);
 
       // @hmr
       export default function CompFn() {
@@ -122,7 +122,7 @@ const UPPER = 1;
         createElement: $$runtime.createElement,
         useState: $$runtime.useState,
         useEffect: $$runtime.useEffect,
-      });
+      }, false);
 
       export default function CompFn() {
         return <div>hello</div>;

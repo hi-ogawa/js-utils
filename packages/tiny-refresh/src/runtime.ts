@@ -34,6 +34,7 @@ interface HmrRegistry {
     useState: ReactTypes.useState;
     useEffect: ReactTypes.useEffect;
   };
+  debug?: boolean;
   components: Map<string, HmrComponentData>;
 }
 
@@ -44,10 +45,12 @@ interface HmrComponentData {
 }
 
 export function createHmrRegistry(
-  runtime: HmrRegistry["runtime"]
+  runtime: HmrRegistry["runtime"],
+  debug?: boolean
 ): HmrRegistry {
   return {
     runtime,
+    debug,
     components: new Map(),
   };
 }
@@ -134,11 +137,13 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current.component.toString() === latest.component.toString()) {
       continue;
     }
-    // TODO: optional debug log
-    console.log(
-      `[tiny-refresh] '${key}' (remount = ${latest.options.remount})`
-    );
+    if (latestReg.debug) {
+      console.log(
+        `[tiny-refresh] '${key}' (remount = ${latest.options.remount})`
+      );
+    }
     if (latest.listeners) {
+      // TODO: useTransition?
       latest.listeners.forEach((f) => f(() => latest.component));
     }
   }
