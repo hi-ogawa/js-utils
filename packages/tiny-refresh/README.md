@@ -7,9 +7,8 @@ which requires only `useState` and `useEffect` thus supporing old react v16.
 
 ## limitations
 
-- It requires explicit comment `// @hmr` before component declaration.
-- Using `// @hmr-unsafe` will preserve hook states, but each hot update must keep same hook count.
-- Changes in other components without `// @hmr` won't cause refresh.
+- By default, any change will cause components to remount and thus hook states are not preserved.
+- Adding `// @hmr-unsafe` comment above the component definition will preserve hook states, but each hot update must keep same hook count.
 
 ## usages
 
@@ -24,20 +23,8 @@ export default defineConfig({
   plugins: [
     vitePluginTinyRefresh({
       runtime: "react", // "preact/compat", "@hiogawa/tiny-react"
+      debug: true,
     }),
   ],
 });
-```
-
-```tsx
-//
-// demo.tsx
-//
-import { useState } from "react";
-
-// @hmr-unsafe
-export function Demo(props) {
-  const [state, setState] = useState(0);
-  ...
-}
 ```
