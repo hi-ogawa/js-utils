@@ -1,0 +1,28 @@
+import { defineConfig } from "@playwright/test";
+
+const port = 15173;
+
+export default defineConfig({
+  testDir: "./e2e",
+  use: {
+    baseURL: `http://localhost:${port}`,
+  },
+  projects: [
+    {
+      name: "chromium",
+      use: {
+        browserName: "chromium",
+        // https://github.com/microsoft/playwright/issues/1086#issuecomment-592227413
+        viewport: null, // adapt to browser window size specified below
+        launchOptions: {
+          args: ["--window-size=600,800"],
+        },
+      },
+    },
+  ],
+  webServer: {
+    command: `pnpm dev --port ${port}`,
+    port,
+    reuseExistingServer: true,
+  },
+});

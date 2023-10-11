@@ -4,17 +4,17 @@ export function Root() {
   return (
     <div>
       <header className="mb-2 p-2 px-4 shadow-md">tiny-refresh demo</header>
-      <div className="flex flex-col w-full max-w-xl mx-auto mt-4 border p-4">
-        <State />
+      <div className="flex flex-col w-full max-w-xl mx-auto p-4">
+        <Outer />
       </div>
     </div>
   );
 }
 
-export function State() {
+export function Outer() {
   const [state, setState] = useState(0);
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2 border p-4">
       <div className="flex gap-2">
         <button
           className="antd-btn antd-btn-default px-1"
@@ -29,13 +29,17 @@ export function State() {
           +1
         </button>
       </div>
-      <StateInner value={state} />
-      <StateInner value={state} />
+      <div id="inner1">
+        <Inner value={state} />
+      </div>
+      <div id="inner2">
+        <Inner value={state} />
+      </div>
     </div>
   );
 }
 
-export function StateInner(props: { value: number }) {
+export function Inner(props: { value: number }) {
   const add = 100;
   return (
     <pre>
