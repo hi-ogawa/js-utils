@@ -66,7 +66,7 @@ export function createHmrComponent(
     listeners: new Set(),
     options,
   };
-  // TODO: use "name" extracted during transform instead of runtime.
+  // TODO: use "name" extracted during transform instead of checking `Fc.name`.
   registry.components.set(Fc.name, hmrData);
   const { createElement, useEffect, useState } = registry.runtime;
 
@@ -134,10 +134,9 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current.component.toString() === latest.component.toString()) {
       continue;
     }
-    // TODO: debug log option
-    // TODO: log with file path
+    // TODO: optional debug log
     console.log(
-      `[tiny-refresh] update '${key}' (remount = ${latest.options.remount})`
+      `[tiny-refresh] '${key}' (remount = ${latest.options.remount})`
     );
     if (latest.listeners) {
       latest.listeners.forEach((f) => f(() => latest.component));

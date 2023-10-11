@@ -4,7 +4,8 @@ interface HmrTransformOptions {
   runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
   refreshRuntime?: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
   bundler: "vite" | "webpack4";
-  autoDetect: boolean;
+  autoDetect?: boolean;
+  debug?: boolean;
 }
 
 export function hmrTransform(
@@ -16,32 +17,26 @@ export function hmrTransform(
   const extraCodes: string[] = [];
 
   for (let i = 0; i < lines.length - 1; i++) {
+    const prevLine = lines[i - 1] ?? "";
     const line = lines[i];
-    if (options.autoDetect) {
-      // auto detect by regex
-      if (line.match(AUTO_DETECT_RE)) {
-        // extract name + transform from "const" to "let"
-        const found = transformComponentDecl(lines[i]);
-        if (found) {
-          const [newLine, name] = found;
-          newLines[i] = newLine;
-          extraCodes.push(
-            wrapCreateHmrComponent(name, !lines[i - 1]?.includes("@hmr-unsafe"))
-          );
-        }
+    if (
+      options.autoDetect
+        ? line.match(AUTO_DETECT_RE)
+        : prevLine.startsWith("// @hmr")
+    ) {
+      // extract name + transform from "const" to "let"
+      const extracted = transformComponentDecl(line);
+      if (!extracted) {
+        console.error(
+          `[tiny-refresh] invalid component definition in '${line}'`
+        );
+        continue;
       }
-    } else {
-      // otherwise check comment in previous line
-      if (line.startsWith("// @hmr")) {
-        const found = transformComponentDecl(lines[i + 1]);
-        if (found) {
-          const [newLine, name] = found;
-          newLines[i + 1] = newLine;
-          extraCodes.push(
-            wrapCreateHmrComponent(name, !line.includes("@hmr-unsafe"))
-          );
-        }
-      }
+      const [transformed, name] = extracted;
+      newLines[i] = transformed;
+      extraCodes.push(
+        wrapCreateHmrComponent(name, !prevLine.startsWith("// @hmr-unsafe"))
+      );
     }
   }
   if (extraCodes.length === 0) {
