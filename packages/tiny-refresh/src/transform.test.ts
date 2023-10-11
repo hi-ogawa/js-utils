@@ -59,22 +59,16 @@ function CompNooo() {
       }
 
 
-      if (typeof CompFn === \\"function\\") {
-        var $$tmp_CompFn = CompFn;
-        CompFn = $$refresh.createHmrComponent($$registry, \\"CompFn\\", $$tmp_CompFn, { remount: true });
-      }
+      var $$tmp_CompFn = CompFn;
+      CompFn = $$refresh.createHmrComponent($$registry, \\"CompFn\\", $$tmp_CompFn, { remount: true });
 
 
-      if (typeof CompLet === \\"function\\") {
-        var $$tmp_CompLet = CompLet;
-        CompLet = $$refresh.createHmrComponent($$registry, \\"CompLet\\", $$tmp_CompLet, { remount: true });
-      }
+      var $$tmp_CompLet = CompLet;
+      CompLet = $$refresh.createHmrComponent($$registry, \\"CompLet\\", $$tmp_CompLet, { remount: true });
 
 
-      if (typeof CompConst === \\"function\\") {
-        var $$tmp_CompConst = CompConst;
-        CompConst = $$refresh.createHmrComponent($$registry, \\"CompConst\\", $$tmp_CompConst, { remount: false });
-      }
+      var $$tmp_CompConst = CompConst;
+      CompConst = $$refresh.createHmrComponent($$registry, \\"CompConst\\", $$tmp_CompConst, { remount: false });
 
 
       if (import.meta.hot) {
@@ -146,34 +140,24 @@ const UPPER = 1;
 
 
 
-      if (typeof CompFn === \\"function\\") {
-        var $$tmp_CompFn = CompFn;
-        CompFn = $$refresh.createHmrComponent($$registry, \\"CompFn\\", $$tmp_CompFn, { remount: true });
-      }
+      var $$tmp_CompFn = CompFn;
+      CompFn = $$refresh.createHmrComponent($$registry, \\"CompFn\\", $$tmp_CompFn, { remount: true });
 
 
-      if (typeof CompLet === \\"function\\") {
-        var $$tmp_CompLet = CompLet;
-        CompLet = $$refresh.createHmrComponent($$registry, \\"CompLet\\", $$tmp_CompLet, { remount: true });
-      }
+      var $$tmp_CompLet = CompLet;
+      CompLet = $$refresh.createHmrComponent($$registry, \\"CompLet\\", $$tmp_CompLet, { remount: true });
 
 
-      if (typeof CompConst === \\"function\\") {
-        var $$tmp_CompConst = CompConst;
-        CompConst = $$refresh.createHmrComponent($$registry, \\"CompConst\\", $$tmp_CompConst, { remount: false });
-      }
+      var $$tmp_CompConst = CompConst;
+      CompConst = $$refresh.createHmrComponent($$registry, \\"CompConst\\", $$tmp_CompConst, { remount: false });
 
 
-      if (typeof CompFn2 === \\"function\\") {
-        var $$tmp_CompFn2 = CompFn2;
-        CompFn2 = $$refresh.createHmrComponent($$registry, \\"CompFn2\\", $$tmp_CompFn2, { remount: true });
-      }
+      var $$tmp_CompFn2 = CompFn2;
+      CompFn2 = $$refresh.createHmrComponent($$registry, \\"CompFn2\\", $$tmp_CompFn2, { remount: true });
 
 
-      if (typeof UPPER === \\"function\\") {
-        var $$tmp_UPPER = UPPER;
-        UPPER = $$refresh.createHmrComponent($$registry, \\"UPPER\\", $$tmp_UPPER, { remount: true });
-      }
+      var $$tmp_UPPER = UPPER;
+      UPPER = $$refresh.createHmrComponent($$registry, \\"UPPER\\", $$tmp_UPPER, { remount: true });
 
 
       if (import.meta.hot) {

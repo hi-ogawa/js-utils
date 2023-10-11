@@ -93,10 +93,8 @@ function spliceString(
 // re-assigning over function declaration is sketchy but seems to be okay
 // cf. https://eslint.org/docs/latest/rules/no-func-assign
 const wrapCreateHmrComponent = (name: string, remount: boolean) => /* js */ `
-if (typeof ${name} === "function") {
-  var $$tmp_${name} = ${name};
-  ${name} = $$refresh.createHmrComponent($$registry, "${name}", $$tmp_${name}, { remount: ${remount} });
-}
+var $$tmp_${name} = ${name};
+${name} = $$refresh.createHmrComponent($$registry, "${name}", $$tmp_${name}, { remount: ${remount} });
 `;
 
 // /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates

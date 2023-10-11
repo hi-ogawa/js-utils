@@ -65,6 +65,11 @@ export function createHmrComponent(
   Fc: ReactTypes.FC,
   options: HmrComponentOptions
 ) {
+  // "exotic" component (e.g. React.forwardRef) will be filtered out since they are "object"
+  if (typeof Fc !== "function") {
+    return;
+  }
+
   const hmrData: HmrComponentData = {
     component: Fc,
     listeners: new Set(),
@@ -73,7 +78,6 @@ export function createHmrComponent(
   registry.components.set(name, hmrData);
   const { createElement, useEffect, useState } = registry.runtime;
 
-  // TODO: forward ref?
   const WrapperComponent: ReactTypes.FC = (props) => {
     const [LatestFc, setFc] = useState(() => Fc);
 
