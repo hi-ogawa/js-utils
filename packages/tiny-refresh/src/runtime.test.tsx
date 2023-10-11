@@ -32,6 +32,7 @@ describe(setupHmrVite, () => {
 
       const Child = createHmrComponent(
         registry,
+        "Child",
         function Child() {
           return <div>1</div>;
         },
@@ -64,6 +65,7 @@ describe(setupHmrVite, () => {
 
       const Child = createHmrComponent(
         registry,
+        "Child",
         function Child() {
           return <div>2</div>;
         },
@@ -95,6 +97,7 @@ describe(setupHmrVite, () => {
 
       const Child = createHmrComponent(
         registry,
+        "Child",
         function Child() {
           return <div>3</div>;
         },

@@ -94,7 +94,7 @@ function spliceString(
 const wrapCreateHmrComponent = (name: string, remount: boolean) => /* js */ `
 if (typeof ${name} === "function") {
   var $$tmp_${name} = ${name};
-  ${name} = $$refresh.createHmrComponent($$registry, $$tmp_${name}, { remount: ${remount} });
+  ${name} = $$refresh.createHmrComponent($$registry, "${name}", $$tmp_${name}, { remount: ${remount} });
 }
 `;
 

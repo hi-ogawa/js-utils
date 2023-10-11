@@ -58,6 +58,7 @@ interface HmrComponentOptions {
 
 export function createHmrComponent(
   registry: HmrRegistry,
+  name: string,
   Fc: ReactTypes.FC,
   options: HmrComponentOptions
 ) {
@@ -66,8 +67,7 @@ export function createHmrComponent(
     listeners: new Set(),
     options,
   };
-  // TODO: use "name" extracted during transform instead of checking `Fc.name`.
-  registry.components.set(Fc.name, hmrData);
+  registry.components.set(name, hmrData);
   const { createElement, useEffect, useState } = registry.runtime;
 
   // TODO: forward ref?
@@ -98,7 +98,7 @@ export function createHmrComponent(
     //   This won't cause re-mount but it must ensure hook usage didn't change, otherwise it'll crash client.
     //   To employ this approach, we need to detect the usage of hook and conditionally `hot.invalidate`
     //   only when hook usage is changed.
-    //   however we allow this mode via explicit "// @safe-unsafe" comment.
+    //   however we allow this mode via explicit "// @hmr-unsafe" comment.
     //
 
     return options.remount ? createElement(LatestFc, props) : LatestFc(props);
