@@ -19,6 +19,7 @@ export function hmrTransform(
   for (let i = 0; i < lines.length - 1; i++) {
     const prevLine = lines[i - 1] || ""; // TODO: it should be "??" but it breaks old webpack.
     const line = lines[i];
+    // TODO: ability to opt out auto detection via @hmr-skip
     if (
       options.autoDetect
         ? line.match(AUTO_DETECT_RE)

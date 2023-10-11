@@ -66,7 +66,7 @@ export function createHmrComponent(
   options: HmrComponentOptions
 ) {
   // "exotic" component (e.g. React.forwardRef) will be filtered out since they are "object"
-  if (typeof Fc !== "function") {
+  if (typeof Fc !== "function" || Fc.length > 1) {
     return;
   }
 
