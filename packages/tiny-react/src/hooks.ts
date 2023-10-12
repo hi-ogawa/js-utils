@@ -3,16 +3,11 @@ import { tinyassert } from "@hiogawa/utils";
 // not particularly intentional but this hook module doesn't depend on any of reconciler/virtual-dom logic,
 // which tells that the hook idea itself is a general concept applicable to functional api...?
 
-type HookState = ReducerHookState | EffectHookState | RefHookState;
+type HookState = ReducerHookState | EffectHookState;
 
 type ReducerHookState = {
   type: "reducer";
   state: unknown;
-};
-
-type RefHookState = {
-  type: "ref";
-  ref: { current: unknown };
 };
 
 type EffectHookState = {
@@ -128,21 +123,6 @@ export class HookContext {
     return [state, dispatch] as const;
   };
 
-  useRef = <T>(initialState: T) => {
-    // init hook state
-    if (this.initial) {
-      this.hooks.push({
-        type: "ref",
-        ref: { current: initialState },
-      });
-    }
-    const hook = this.hooks[this.hookCount++];
-    tinyassert(hook.type === "ref");
-
-    // ref state
-    return hook.ref as { current: T };
-  };
-
   useEffect = (effect: EffectFn, deps?: unknown[]) => {
     // init hook state
     if (this.initial) {
@@ -175,7 +155,6 @@ export class HookContext {
 //
 
 export const useReducer = /* @__PURE__ */ defineHook((ctx) => ctx.useReducer);
-export const useRef = /* @__PURE__ */ defineHook((ctx) => ctx.useRef);
 export const useEffect = /* @__PURE__ */ defineHook((ctx) => ctx.useEffect);
 
 //
@@ -188,6 +167,10 @@ export function useState<T>(initialState: InitialState<T>) {
     (prev, next) => resolveNextState(prev, next),
     initialState
   );
+}
+
+export function useRef<T>(initialState: T) {
+  return useState(() => ({ current: initialState }))[0];
 }
 
 export function useMemo<T>(callback: () => T, deps: unknown[]) {

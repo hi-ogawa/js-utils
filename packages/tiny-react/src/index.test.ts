@@ -216,7 +216,6 @@ describe(render, () => {
           "notify": [Function],
           "useEffect": [Function],
           "useReducer": [Function],
-          "useRef": [Function],
         },
         "hparent": <main>
           <span>
