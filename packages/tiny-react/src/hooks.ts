@@ -10,8 +10,10 @@ type ReducerHookState = {
   state: unknown;
 };
 
+type EffectType = "layout-effect" | "effect";
+
 type EffectHookState = {
-  type: "effect";
+  type: EffectType;
   effect?: EffectFn;
   deps?: unknown[];
   cleanup?: () => void;
@@ -77,17 +79,17 @@ export class HookContext {
     }
   }
 
-  runEffect() {
+  runEffect(type: EffectType) {
     for (const hook of this.hooks) {
-      if (hook.type === "effect") {
+      if (hook.type === type) {
         runEffect(hook);
       }
     }
   }
 
-  cleanupEffect() {
+  cleanupEffect(type: EffectType) {
     for (const hook of this.hooks) {
-      if (hook.type === "effect") {
+      if (hook.type === type) {
         cleanupEffect(hook);
       }
     }
@@ -123,17 +125,17 @@ export class HookContext {
     return [state, dispatch] as const;
   };
 
-  useEffect = (effect: EffectFn, deps?: unknown[]) => {
+  useEffect = (type: EffectType, effect: EffectFn, deps?: unknown[]) => {
     // init hook state
     if (this.initial) {
       this.hooks.push({
-        type: "effect",
+        type,
         effect,
         deps,
       });
     }
     const hook = this.hooks[this.hookCount++];
-    tinyassert(hook.type === "effect");
+    tinyassert(hook.type === type);
 
     // queue effect
     tinyassert(hook.deps?.length === deps?.length);
@@ -155,11 +157,19 @@ export class HookContext {
 //
 
 export const useReducer = /* @__PURE__ */ defineHook((ctx) => ctx.useReducer);
-export const useEffect = /* @__PURE__ */ defineHook((ctx) => ctx.useEffect);
+const useEffectInner = /* @__PURE__ */ defineHook((ctx) => ctx.useEffect);
 
 //
 // hooks implemented based on core hooks
 //
+
+export function useLayoutEffect(effect: EffectFn, deps?: unknown[]) {
+  return useEffectInner("layout-effect", effect, deps);
+}
+
+export function useEffect(effect: EffectFn, deps?: unknown[]) {
+  return useEffectInner("effect", effect, deps);
+}
 
 export function useState<T>(initialState: InitialState<T>) {
   return useReducer<T, NextState<T>>(

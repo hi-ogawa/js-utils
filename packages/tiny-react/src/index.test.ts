@@ -1,7 +1,14 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { Fragment, h } from "./helper/hyperscript";
-import { useCallback, useEffect, useMemo, useRef, useState } from "./hooks";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import type { VNode } from "./virtual-dom";
 
@@ -1173,6 +1180,128 @@ describe("hooks", () => {
     `);
   });
 
+  it("useLayoutEffect", () => {
+    const mockFn = vi.fn();
+
+    function Custom(props: { value: number }) {
+      const [state, setState] = useState(0);
+
+      useLayoutEffect(() => {
+        mockFn("effect", props.value);
+        return () => {
+          mockFn("cleanup", props.value);
+        };
+      }, [props.value]);
+
+      return h.div(
+        {},
+        h.div({}, state),
+        h.button({
+          onclick: () => {
+            setState(state + 1);
+          },
+        })
+      );
+    }
+
+    const parent = document.createElement("main");
+    let bnode = render(h(Custom, { value: 0 }), parent);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            0
+          </div>
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect",
+          0,
+        ],
+      ]
+    `);
+
+    parent.querySelector("button")!.click();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            1
+          </div>
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect",
+          0,
+        ],
+      ]
+    `);
+
+    render(h(Custom, { value: 1 }), parent, bnode);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            1
+          </div>
+          <button />
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect",
+          0,
+        ],
+        [
+          "cleanup",
+          0,
+        ],
+        [
+          "effect",
+          1,
+        ],
+      ]
+    `);
+
+    render(h.div({}), parent, bnode);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div />
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect",
+          0,
+        ],
+        [
+          "cleanup",
+          0,
+        ],
+        [
+          "effect",
+          1,
+        ],
+        [
+          "cleanup",
+          1,
+        ],
+      ]
+    `);
+  });
+
+  // TODO: useEffect should be async
   it("useEffect", () => {
     const mockFn = vi.fn();
 
