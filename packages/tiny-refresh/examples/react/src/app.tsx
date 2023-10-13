@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { InnerOther } from "./other-file";
 
 export function Root() {
   return (
@@ -36,6 +37,9 @@ export function Outer() {
       <div id="inner2">
         <Inner value={state} />
       </div>
+      <div id="inner3">
+        <InnerOther value={state} />
+      </div>
     </div>
   );
 }
@@ -44,7 +48,7 @@ export function Inner(props: { value: number }) {
   const add = 100;
   return (
     <pre>
-      Inner: props.value + {add} = {props.value + add}
+      Inner: counter + {add} = {props.value + add}
     </pre>
   );
 }

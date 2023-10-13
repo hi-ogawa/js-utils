@@ -5,7 +5,7 @@ test("hmr", async ({ page }) => {
   await page.goto("/");
 
   async function checkInner(value: number, add: number) {
-    const text = `Inner: props.value + ${add} = ${value + add}`;
+    const text = `Inner: counter + ${add} = ${value + add}`;
     await page.locator("#inner1").getByText(text).click();
     await page.locator("#inner2").getByText(text).click();
   }
