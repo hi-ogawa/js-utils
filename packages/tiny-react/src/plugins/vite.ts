@@ -12,6 +12,7 @@ interface TinyReactVitePluginOptions {
     disable?: boolean;
     include?: FilterPattern;
     exclude?: FilterPattern;
+    debug?: boolean;
   };
   alias?: {
     disable?: boolean;
@@ -28,6 +29,7 @@ export function tinyReactVitePlugin(
         exclude: options?.hmr?.exclude,
         runtime: "@hiogawa/tiny-react",
         refreshRuntime: "@hiogawa/tiny-react/hmr",
+        debug: options?.hmr?.debug,
       }),
     !options?.alias?.disable && aliasPlugin(),
   ].filter(typedBoolean);

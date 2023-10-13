@@ -2,7 +2,6 @@ import { getTheme, setTheme } from "@hiogawa/theme-script";
 import { useCallback, useEffect, useRef, useState } from "@hiogawa/tiny-react";
 import { range } from "@hiogawa/utils";
 import { HmrChild } from "./hmr";
-import { HmrTransform } from "./hmr-transform";
 
 export function App() {
   return (
@@ -19,8 +18,8 @@ export function App() {
         </a>
       </header>
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto p-4">
-        <TestHmr />
         <TestTodoApp />
+        <TestHmr />
         <TestProps />
         <TestSetStateInEffect />
         <TestState />
@@ -209,6 +208,7 @@ function TestSetStateInEffect() {
 }
 
 // cf. https://github.com/adamhaile/surplus#example
+// @hmr-unsafe
 function TestTodoApp() {
   interface TodoItem {
     id: string;
@@ -342,11 +342,9 @@ function TestHmr() {
           </button>
         </div>
         <div className="border-t my-1"></div>
-        <HmrChild counter={state} />
-        <div className="border-t my-1"></div>
         <span>Test multiple instances</span>
-        <HmrTransform counter={state} />
-        <HmrTransform counter={state} />
+        <HmrChild counter={state} />
+        <HmrChild counter={state} />
       </div>
     </div>
   );

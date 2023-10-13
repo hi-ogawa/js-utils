@@ -193,8 +193,8 @@ importers:
   packages/tiny-react:
     devDependencies:
       '@hiogawa/tiny-refresh':
-        specifier: ^0.0.0
-        version: 0.0.0(vite@4.4.9)
+        specifier: ^0.0.1-pre.2
+        version: 0.0.1-pre.2(vite@4.4.9)
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1448,8 +1448,8 @@ packages:
       typescript: 5.1.6
     dev: true
 
-  /@hiogawa/tiny-refresh@0.0.0(vite@4.4.9):
-    resolution: {integrity: sha512-aMnIcyRm1aZw2oBuny1h6CFRS9cOBilyfYp918oktAfZN3B+uJCv/Tw+e/Uo5Vq+gRuPQlKGTmh4KLcOhen1Bw==}
+  /@hiogawa/tiny-refresh@0.0.1-pre.2(vite@4.4.9):
+    resolution: {integrity: sha512-NLDOPWMW84951y7YA/XKVP/sk/iPplLJ4ah/B3WcmevWcYWegVp5Vb7/F7y+JWhuSxYtW9v8r362SgVXCr47xQ==}
     peerDependencies:
       react: '*'
       vite: '*'
