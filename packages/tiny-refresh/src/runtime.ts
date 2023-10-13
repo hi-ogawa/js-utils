@@ -170,20 +170,10 @@ export function setupHmrVite(hot: ViteHot, registry: HmrRegistry) {
     // `registry` refereneced here is the one from the last module which is "accept"-ing new modules.
     // `hot.data[REGISTRY_KEY]` is always updated by new module before new module is "accept"-ed.
     const latestRegistry = hot.data[REGISTRY_KEY];
-
-    // for this case, probably better not to full reload?
-    if (!newModule || !latestRegistry) {
+    const patchSuccess =
+      newModule && latestRegistry && patchRegistry(registry, latestRegistry);
+    if (!patchSuccess) {
       hot.invalidate();
-      return;
-    }
-
-    if (!patchRegistry(registry, latestRegistry)) {
-      // when child module calls `hot.invalidate()`, it will propagate to parent module.
-      // if such parent module has also `setupHmrVite`, then it will simply self-accept and full window reload will not be triggered.
-      // So, probably it would be more pragmatic and significant simplification to start with force full reload here
-      // instead of doing `hot.invalidate()` and trying hard to synchronize `registry` and `latestRegistry` somehow.
-      console.log(`[tiny-refresh] full reload`);
-      window.location.reload();
     }
   });
 }
@@ -194,8 +184,7 @@ export function setupHmrWebpack(hot: WebpackHot, registry: HmrRegistry) {
   if (lastRegistry) {
     const patchSuccess = lastRegistry && patchRegistry(lastRegistry, registry);
     if (!patchSuccess) {
-      console.log(`[tiny-refresh] full reload`);
-      window.location.reload();
+      hot.invalidate();
     }
   }
 
