@@ -4,6 +4,10 @@ import { test } from "@playwright/test";
 test("hmr", async ({ page }) => {
   await page.goto("/");
 
+  async function increment() {
+    await page.getByRole("button", { name: "+1" }).first().click();
+  }
+
   async function checkInner(value: number, add: number) {
     const text = `Inner: counter + ${add} = ${value + add}`;
     await page.locator("#inner1").getByText(text).click();
@@ -13,7 +17,7 @@ test("hmr", async ({ page }) => {
   await checkInner(0, 100);
 
   // increment
-  await page.getByRole("button", { name: "+1" }).click();
+  await increment();
   await checkInner(1, 100);
 
   // updating 'Inner' keeps 'Outer' state
@@ -27,16 +31,16 @@ test("hmr", async ({ page }) => {
   // updating 'Outer' resets state
   await withEditFile(
     "src/app.tsx",
-    (code) => code.replace("<h1>Outer</h1>", "<h2>Outer</h2>"),
+    (code) => code.replace("<h1>outer</h1>", "<h2>outer</h2>"),
     async () => {
-      await page.locator("h2").getByText("Outer").click();
+      await page.locator("h2").getByText("outer").click();
       await checkInner(0, 100);
     }
   );
   await checkInner(0, 100);
 
   // increment
-  await page.getByRole("button", { name: "+1" }).click();
+  await increment();
   await checkInner(1, 100);
 
   // add @hmr-unsafe
@@ -52,7 +56,7 @@ test("hmr", async ({ page }) => {
       await checkInner(0, 100);
 
       // increment
-      await page.getByRole("button", { name: "+1" }).click();
+      await increment();
       await checkInner(1, 100);
 
       // update 'Outer' (make increment double)
@@ -64,7 +68,7 @@ test("hmr", async ({ page }) => {
           await checkInner(1, 100);
 
           // increment
-          await page.getByRole("button", { name: "+1" }).click();
+          await increment();
           await checkInner(3, 100);
 
           // update 'Inner'
