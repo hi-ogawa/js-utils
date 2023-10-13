@@ -10,6 +10,7 @@ import {
   useState,
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
+import { sleepFrame } from "./test-utils";
 import type { VNode } from "./virtual-dom";
 
 describe(render, () => {
@@ -1301,10 +1302,7 @@ describe("hooks", () => {
     `);
   });
 
-  // TODO: useEffect is async (run on next frame with requestAnimationFrame)
-  //       so testing might be more complicated.
-  //       would we need `act` util like react testing?
-  it("useEffect", () => {
+  it("useEffect", async () => {
     const mockFn = vi.fn();
 
     function Custom(props: { value: number }) {
@@ -1330,6 +1328,8 @@ describe("hooks", () => {
 
     const parent = document.createElement("main");
     let bnode = render(h(Custom, { value: 0 }), parent);
+    await sleepFrame();
+
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1350,6 +1350,8 @@ describe("hooks", () => {
     `);
 
     parent.querySelector("button")!.click();
+    await sleepFrame();
+
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1370,6 +1372,8 @@ describe("hooks", () => {
     `);
 
     render(h(Custom, { value: 1 }), parent, bnode);
+    await sleepFrame();
+
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1398,6 +1402,8 @@ describe("hooks", () => {
     `);
 
     render(h.div({}), parent, bnode);
+    await sleepFrame();
+
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div />

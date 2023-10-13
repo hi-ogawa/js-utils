@@ -3,6 +3,7 @@ import type { FC } from "../helper/common";
 import { h } from "../helper/hyperscript";
 import { useEffect, useState } from "../hooks";
 import { render } from "../reconciler";
+import { sleepFrame } from "../test-utils";
 import {
   type HotContext,
   createHmrComponent,
@@ -11,7 +12,7 @@ import {
 } from "./runtime";
 
 describe(setupHmr, () => {
-  it("basic", () => {
+  it("basic", async () => {
     let firstOnNewModule!: (newModule: {} | undefined) => void;
 
     const hot: HotContext = {
@@ -84,10 +85,12 @@ describe(setupHmr, () => {
     }
 
     firstOnNewModule({});
+    await sleepFrame();
+
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-          2
+          1
         </div>
       </main>
     `);
@@ -115,6 +118,8 @@ describe(setupHmr, () => {
     }
 
     firstOnNewModule({});
+    await sleepFrame();
+
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>

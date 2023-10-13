@@ -430,16 +430,13 @@ class EffectManager {
       customNode.hookContext.runEffect("layout-effect");
     }
 
-    // TODO: asynchronously in requestAnimationFrame
-    for (const customNode of this.effectNodes) {
-      customNode.hookContext.runEffect("effect");
-    }
-    // requestAnimationFrame(() => {
-    //   for (const customNode of this.effectNodes) {
-    //     if (customNode.hparent) {
-    //       customNode.hookContext.runEffect("effect");
-    //     }
-    //   }
-    // });
+    // TODO: is it robust against multiple synchronous render?
+    requestAnimationFrame(() => {
+      for (const customNode of this.effectNodes) {
+        if (customNode.hparent) {
+          customNode.hookContext.runEffect("effect");
+        }
+      }
+    });
   }
 }
