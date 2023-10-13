@@ -77,7 +77,6 @@ export function createHmrComponent(
     const [LatestFc, setFc] = useState(() => Fc);
 
     useEffect(() => {
-      console.log("== useEffect", name);
       // expose setter to force update
       hmrData.listeners.add(setFc);
       return () => {
@@ -133,11 +132,9 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current.component.toString() === latest.component.toString()) {
       continue;
     }
-    if (latestReg.debug) {
-      console.log(
-        `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount})`
-      );
-    }
+    console.log(
+      `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount})`
+    );
     for (const setState of latest.listeners) {
       setState(() => latest.component);
     }
@@ -159,7 +156,7 @@ export function setupHmrVite(hot: ViteHot, registry: HmrRegistry) {
       // when child module calls `hot.invalidate()`, it'll propagate to parent module.
       // if such parent module has also `setupHmrVite`, then it will simply self-accept and full window reload will not be triggered.
       // So, probably it would be more pragmatic and significant simplification to start with force full reload here
-      // instead of doing `hot.invalidate()` while trying to synchronize `registry` and `latestRegistry`.
+      // instead of doing `hot.invalidate()` and trying hard to synchronize `registry` and `latestRegistry` somehow.
       console.log(`[tiny-refresh] full reload`);
       window.location.reload();
     }
