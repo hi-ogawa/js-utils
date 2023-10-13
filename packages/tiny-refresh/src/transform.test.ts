@@ -104,6 +104,12 @@ function CompFn2() {
   return <div>hello</div>;
 }
 
+// @hmr-disable
+function CompNooo() {
+  return <div>hello</div>;
+}
+
+
 const lower = 0;
 const UPPER = 1;
 
@@ -140,6 +146,12 @@ const UPPER = 1;
       function CompFn2() {
         return <div>hello</div>;
       }
+
+      // @hmr-disable
+      function CompNooo() {
+        return <div>hello</div>;
+      }
+
 
       const lower = 0;
       let UPPER = 1;
@@ -182,5 +194,27 @@ const UPPER = 1;
       }
       "
     `);
+  });
+
+  it("auto-detect", () => {
+    const input = `\
+// @hmr-disable-all
+
+export default function CompFn() {
+  return <div>hello</div>;
+}
+
+export let CompLet = () => {
+  return <div>hello</div>;
+}
+
+`;
+    expect(
+      hmrTransform(input, {
+        runtime: "react",
+        bundler: "vite",
+        autoDetect: true,
+      })
+    ).toMatchInlineSnapshot("undefined");
   });
 });

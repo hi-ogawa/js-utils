@@ -16,12 +16,17 @@ export function hmrTransform(
   const newLines = [...lines];
   const extraCodes: string[] = [];
 
-  for (let i = 0; i < lines.length - 1; i++) {
+  for (let i = 0; i < lines.length; i++) {
     const prevLine = lines[i - 1] || ""; // TODO: it should be "??" but it breaks old webpack.
     const line = lines[i];
-    // TODO: ability to opt out
-    // - per file?
-    // - per component?
+    // disable per file
+    if (line.startsWith("// @hmr-disable-all")) {
+      return;
+    }
+    // disable per component
+    if (prevLine.startsWith("// @hmr-disable")) {
+      continue;
+    }
     if (
       options.autoDetect
         ? line.match(AUTO_DETECT_RE)
