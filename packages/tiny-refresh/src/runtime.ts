@@ -74,7 +74,7 @@ export function createHmrComponent(
 
   const { createElement, useEffect, useState } = registry.runtime;
 
-  const WrapperComponent: ReactTypes.FC = (props) => {
+  const WrapperFc: ReactTypes.FC = (props) => {
     const [latest, setLatest] = useState(() => current);
 
     useEffect(() => {
@@ -88,14 +88,14 @@ export function createHmrComponent(
     //
     // approach 1.
     //
-    //   h(LatestFc, props)
+    //   createElement(fc, props)
     //
     //   This renders component as a child, which makes it always re-mount on hot update since two functions are not identical.
     //   Hook states are not preserved, but new component can add/remove hook usage since hook states reset anyways.
     //
     // approach 2.
     //
-    //   LatestFc(props)
+    //   fc(props)
     //
     //   This directly calls into functional component and use it as implementation of `WrapperComponent`.
     //   This won't cause re-mount but it must ensure hook usage didn't change, otherwise it'll crash client.
@@ -106,10 +106,26 @@ export function createHmrComponent(
 
     return latest.options.remount
       ? createElement(latest.component, props)
-      : latest.component(props);
+      : createElement(UnsafeWrapperFc, { latest, props });
   };
 
-  return WrapperComponent;
+  const UnsafeWrapperFc: ReactTypes.FC = ({
+    latest,
+    props,
+  }: {
+    latest: HmrComponentData;
+    props: any;
+  }) => {
+    return latest.component(props);
+  };
+
+  // patch Function.name for react error stacktrace
+  Object.defineProperty(WrapperFc, "name", { value: `${name}_refresh` });
+  Object.defineProperty(UnsafeWrapperFc, "name", {
+    value: `${name}_refresh_unsafe`,
+  });
+
+  return WrapperFc;
 }
 
 function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
@@ -120,15 +136,13 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
   for (const key of keys) {
     const current = currentReg.componentMap.get(key);
     const latest = latestReg.componentMap.get(key);
-    if (
-      !current ||
-      !latest ||
-      current.options.remount !== latest.options.remount
-    ) {
+    if (!current || !latest) {
       return false;
     }
-    // copy over listeners from current component
+
+    // copy over some states from current component
     latest.listeners = current.listeners;
+
     // Skip re-rendering if function code is exactly same.
     // Note that this can cause "false-negative", for example,
     // when a constant defined in the same file has changed
