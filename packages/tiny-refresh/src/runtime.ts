@@ -35,12 +35,12 @@ interface HmrRegistry {
     useEffect: ReactTypes.useEffect;
   };
   debug?: boolean;
-  components: Map<string, HmrComponentData>;
+  componentMap: Map<string, HmrComponentData>;
 }
 
 interface HmrComponentData {
   component: ReactTypes.FC;
-  listeners: Set<(fc: () => ReactTypes.FC) => void>;
+  listeners: Set<(latest: HmrComponentData) => void>;
   options: HmrComponentOptions;
 }
 
@@ -51,7 +51,7 @@ export function createHmrRegistry(
   return {
     runtime,
     debug,
-    components: new Map(),
+    componentMap: new Map(),
   };
 }
 
@@ -65,22 +65,23 @@ export function createHmrComponent(
   Fc: ReactTypes.FC,
   options: HmrComponentOptions
 ) {
-  const hmrData: HmrComponentData = {
+  const current: HmrComponentData = {
     component: Fc,
     listeners: new Set(),
     options,
   };
-  registry.components.set(name, hmrData);
+  registry.componentMap.set(name, current);
+
   const { createElement, useEffect, useState } = registry.runtime;
 
   const WrapperComponent: ReactTypes.FC = (props) => {
-    const [LatestFc, setFc] = useState(() => Fc);
+    const [latest, setLatest] = useState(() => current);
 
     useEffect(() => {
       // expose setter to force update
-      hmrData.listeners.add(setFc);
+      current.listeners.add(setLatest);
       return () => {
-        hmrData.listeners.delete(setFc);
+        current.listeners.delete(setLatest);
       };
     }, []);
 
@@ -103,7 +104,9 @@ export function createHmrComponent(
     //   however we allow this mode via explicit "// @hmr-unsafe" comment.
     //
 
-    return options.remount ? createElement(LatestFc, props) : LatestFc(props);
+    return latest.options.remount
+      ? createElement(latest.component, props)
+      : latest.component(props);
   };
 
   return WrapperComponent;
@@ -111,12 +114,12 @@ export function createHmrComponent(
 
 function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
   const keys = new Set([
-    ...currentReg.components.keys(),
-    ...latestReg.components.keys(),
+    ...currentReg.componentMap.keys(),
+    ...latestReg.componentMap.keys(),
   ]);
   for (const key of keys) {
-    const current = currentReg.components.get(key);
-    const latest = latestReg.components.get(key);
+    const current = currentReg.componentMap.get(key);
+    const latest = latestReg.componentMap.get(key);
     if (
       !current ||
       !latest ||
@@ -124,7 +127,8 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     ) {
       return false;
     }
-    latest.listeners = current.listeners; // copy over listeners from current component
+    // copy over listeners from current component
+    latest.listeners = current.listeners;
     // Skip re-rendering if function code is exactly same.
     // Note that this can cause "false-negative", for example,
     // when a constant defined in the same file has changed
@@ -136,7 +140,7 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
       `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount})`
     );
     for (const setState of latest.listeners) {
-      setState(() => latest.component);
+      setState(latest);
     }
   }
   return true;
@@ -153,7 +157,7 @@ export function setupHmrVite(hot: ViteHot, registry: HmrRegistry) {
     const patchSuccess =
       newModule && latestRegistry && patchRegistry(registry, latestRegistry);
     if (!patchSuccess) {
-      // when child module calls `hot.invalidate()`, it'll propagate to parent module.
+      // when child module calls `hot.invalidate()`, it will propagate to parent module.
       // if such parent module has also `setupHmrVite`, then it will simply self-accept and full window reload will not be triggered.
       // So, probably it would be more pragmatic and significant simplification to start with force full reload here
       // instead of doing `hot.invalidate()` and trying hard to synchronize `registry` and `latestRegistry` somehow.
