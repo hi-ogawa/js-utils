@@ -120,16 +120,15 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current === latest) {
       continue;
     }
-    if (!current || !latest) {
+    if (
+      !current ||
+      !latest ||
+      current.options.remount !== latest.options.remount
+    ) {
       return false;
     }
-    // need to update registry even when `hot.invalidate`
-    // since parent module (importer) keeps references to old child modules (importee).
     currentReg.components.set(key, latest);
-    latest.listeners = current.listeners;
-    if (current.options.remount !== latest.options.remount) {
-      return false;
-    }
+    latest.listeners = current.listeners; // TODO: why is this necessary?
     // Skip re-rendering if function code is exactly same.
     // Note that this can cause "false-negative", for example,
     // when a constant defined in the same file has changed
@@ -137,14 +136,15 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current.component.toString() === latest.component.toString()) {
       continue;
     }
-    if (latestReg.debug) {
+    if (currentReg.debug) {
       console.log(
-        `[tiny-refresh] '${key}' (remount = ${latest.options.remount})`
+        `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount})`
       );
     }
     if (latest.listeners) {
-      // TODO: useTransition?
-      latest.listeners.forEach((f) => f(() => latest.component));
+      for (const setState of latest.listeners) {
+        setState(() => latest.component);
+      }
     }
   }
   return true;
@@ -161,7 +161,12 @@ export function setupHmrVite(hot: ViteHot, registry: HmrRegistry) {
     const patchSuccess =
       newModule && latestRegistry && patchRegistry(registry, latestRegistry);
     if (!patchSuccess) {
-      hot.invalidate();
+      // when child module calls `hot.invalidate()`, it'll propagate to parent module.
+      // if such parent module has also `setupHmrVite`, then it will simply self-accept and full window reload will not be triggered.
+      // So, probably it would be more pragmatic and significant simplification to start with force full reload here
+      // instead of doing `hot.invalidate()` while trying to synchronize `registry` and `latestRegistry`.
+      console.log(`[tiny-refresh] full reload`);
+      window.location.reload();
     }
   });
 }
@@ -172,7 +177,8 @@ export function setupHmrWebpack(hot: WebpackHot, registry: HmrRegistry) {
   if (lastRegistry) {
     const patchSuccess = lastRegistry && patchRegistry(lastRegistry, registry);
     if (!patchSuccess) {
-      hot.invalidate();
+      console.log(`[tiny-refresh] full reload`);
+      window.location.reload();
     }
   }
 
