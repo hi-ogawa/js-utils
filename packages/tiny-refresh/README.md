@@ -23,7 +23,6 @@ export default defineConfig({
   plugins: [
     vitePluginTinyRefresh({
       runtime: "react", // "preact/compat", "@hiogawa/tiny-react"
-      debug: true,
     }),
   ],
 });

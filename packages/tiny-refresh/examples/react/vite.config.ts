@@ -3,11 +3,6 @@ import unocss from "unocss/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [
-    unocss() as any,
-    vitePluginTinyRefresh({
-      debug: true,
-    }),
-  ],
+  plugins: [unocss() as any, vitePluginTinyRefresh()],
   clearScreen: false,
 });
