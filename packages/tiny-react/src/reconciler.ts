@@ -75,7 +75,9 @@ function reconcileNode(
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
         reconcileTagProps(bnode, vnode.props, {});
         placeChild(bnode.hnode, hparent, preSlot, true);
-        effectManager.queueRef(bnode);
+        // effectManager.queueRef(bnode);
+        effectManager.refNodes.push(bnode);
+        // effectManager.
       }
       bnode.child.parent = bnode;
       break;
@@ -167,7 +169,7 @@ function reconcileNode(
       bnode.hparent = hparent;
       bnode.child.parent = bnode;
       bnode.slot = getSlot(bnode.child);
-      effectManager.queueEffect(bnode);
+      effectManager.effectNodes.push(bnode);
 
       // expose re-rendering via hooks
       const bcustom = bnode; // type-guard
@@ -401,7 +403,8 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
       break;
     }
     case "custom": {
-      bnode.hookContext.cleanupEffect();
+      bnode.hookContext.cleanupEffect("layout-effect");
+      bnode.hookContext.cleanupEffect("effect");
       bnode.hparent = undefined;
       unmountNode(bnode.child, skipRemove);
       break;
@@ -409,27 +412,31 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
   }
 }
 
+// single instance per `render` and only `run` once
 class EffectManager {
-  private refs: (() => void)[] = [];
-  private effects: (() => void)[] = [];
-
-  queueRef(bnode: BTag) {
-    const { ref, hnode } = bnode;
-    if (ref) {
-      this.refs.push(() => ref(hnode));
-    }
-  }
-
-  queueEffect(node: BCustom) {
-    this.effects.push(() => node.hookContext.runEffect());
-  }
+  // TODO: effect ordering? (currently DFS exit time ordering)
+  refNodes: BTag[] = [];
+  effectNodes: BCustom[] = [];
 
   run() {
-    this.refs.forEach((f) => f());
-    this.refs = [];
+    // TODO: node could be already unmounted?
+    for (const tagNode of this.refNodes) {
+      if (tagNode.ref) {
+        tagNode.ref(tagNode.hnode);
+      }
+    }
 
-    // TODO: traverses all hooks of all custom nodes. probably can optimize.
-    this.effects.forEach((f) => f());
-    this.effects = [];
+    for (const customNode of this.effectNodes) {
+      customNode.hookContext.runEffect("layout-effect");
+    }
+
+    // TODO: is it robust against multiple synchronous render?
+    requestAnimationFrame(() => {
+      for (const customNode of this.effectNodes) {
+        if (customNode.hparent) {
+          customNode.hookContext.runEffect("effect");
+        }
+      }
+    });
   }
 }
