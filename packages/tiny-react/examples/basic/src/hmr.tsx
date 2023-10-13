@@ -5,7 +5,7 @@ export function HmrChild(props: { counter: number }) {
   const add = 100;
   return (
     <div className="flex flex-col gap-1">
-      <h2 className="text-lg">HmrChild </h2>
+      <h2 className="text-lg">HmrChild</h2>
       <span>
         Parent Counter + {add} = {props.counter + add}
       </span>
