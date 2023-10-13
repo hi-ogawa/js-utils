@@ -77,6 +77,7 @@ export function createHmrComponent(
     const [LatestFc, setFc] = useState(() => Fc);
 
     useEffect(() => {
+      console.log("== useEffect", name);
       // expose setter to force update
       hmrData.listeners.add(setFc);
       return () => {
@@ -117,9 +118,6 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
   for (const key of keys) {
     const current = currentReg.components.get(key);
     const latest = latestReg.components.get(key);
-    if (current === latest) {
-      continue;
-    }
     if (
       !current ||
       !latest ||
@@ -127,8 +125,7 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     ) {
       return false;
     }
-    currentReg.components.set(key, latest);
-    latest.listeners = current.listeners; // TODO: why is this necessary?
+    latest.listeners = current.listeners; // copy over listeners from current component
     // Skip re-rendering if function code is exactly same.
     // Note that this can cause "false-negative", for example,
     // when a constant defined in the same file has changed
@@ -136,15 +133,13 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current.component.toString() === latest.component.toString()) {
       continue;
     }
-    if (currentReg.debug) {
+    if (latestReg.debug) {
       console.log(
         `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount})`
       );
     }
-    if (latest.listeners) {
-      for (const setState of latest.listeners) {
-        setState(() => latest.component);
-      }
+    for (const setState of latest.listeners) {
+      setState(() => latest.component);
     }
   }
   return true;
