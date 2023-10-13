@@ -412,24 +412,34 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
   }
 }
 
+// single instance per `render` and only `run` once
 class EffectManager {
+  // TODO: effect ordering? (currently DFS exit time ordering)
   refNodes: BTag[] = [];
   effectNodes: BCustom[] = [];
 
   run() {
+    // TODO: node could be already unmounted?
     for (const tagNode of this.refNodes) {
       if (tagNode.ref) {
         tagNode.ref(tagNode.hnode);
       }
     }
-    this.refNodes = [];
 
     for (const customNode of this.effectNodes) {
       customNode.hookContext.runEffect("layout-effect");
+    }
 
-      // TODO: "effect" should run on next frame.
+    // TODO
+    for (const customNode of this.effectNodes) {
       customNode.hookContext.runEffect("effect");
     }
-    this.effectNodes = [];
+    // requestAnimationFrame(() => {
+    //   for (const customNode of this.effectNodes) {
+    //     if (customNode.hparent) {
+    //       customNode.hookContext.runEffect("effect");
+    //     }
+    //   }
+    // });
   }
 }

@@ -12,6 +12,8 @@ type ReducerHookState = {
 
 type EffectType = "layout-effect" | "effect";
 
+// TODO: need to accumulate multiple effects for single hook
+//       since `useEffect` can run multiple times before the first effect runs asynchrnously
 type EffectHookState = {
   type: EffectType;
   effect?: EffectFn;
