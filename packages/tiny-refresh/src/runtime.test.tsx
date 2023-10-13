@@ -1,6 +1,6 @@
 import { act, cleanup, render } from "@testing-library/react";
 import React from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   type ViteHot,
   createHmrComponent,
@@ -11,7 +11,7 @@ import {
 afterEach(cleanup);
 
 describe(setupHmrVite, () => {
-  it("basic", () => {
+  it("basic", async () => {
     let firstOnNewModule!: (newModule: {} | undefined) => void;
 
     const hot: ViteHot = {
@@ -24,6 +24,8 @@ describe(setupHmrVite, () => {
 
     let ChildExport: any;
 
+    const mockFn = vi.fn();
+
     //
     // 1st version
     //
@@ -34,6 +36,12 @@ describe(setupHmrVite, () => {
         registry,
         "Child",
         function Child() {
+          React.useEffect(() => {
+            mockFn("effect-setup-1");
+            return () => {
+              mockFn("effect-cleanup-1");
+            };
+          }, []);
           return <div>1</div>;
         },
         { remount: true }
@@ -46,7 +54,7 @@ describe(setupHmrVite, () => {
     function Parent() {
       return <ChildExport />;
     }
-    let result = render(<Parent />);
+    let result = await act(() => render(<Parent />));
     expect(result.baseElement).toMatchInlineSnapshot(`
       <body>
         <div>
@@ -56,9 +64,16 @@ describe(setupHmrVite, () => {
         </div>
       </body>
     `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect-setup-1",
+        ],
+      ]
+    `);
 
     //
-    // 2nd version
+    // 2nd version (remount mode allows modifying hooks)
     //
     {
       const registry = createHmrRegistry(React);
@@ -88,6 +103,16 @@ describe(setupHmrVite, () => {
         </div>
       </body>
     `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect-setup-1",
+        ],
+        [
+          "effect-cleanup-1",
+        ],
+      ]
+    `);
 
     //
     // 3rd version
@@ -99,6 +124,12 @@ describe(setupHmrVite, () => {
         registry,
         "Child",
         function Child() {
+          React.useEffect(() => {
+            mockFn("effect-setup-3");
+            return () => {
+              mockFn("effect-cleanup-3");
+            };
+          }, []);
           return <div>3</div>;
         },
         { remount: true }
@@ -117,6 +148,19 @@ describe(setupHmrVite, () => {
           </div>
         </div>
       </body>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "effect-setup-1",
+        ],
+        [
+          "effect-cleanup-1",
+        ],
+        [
+          "effect-setup-3",
+        ],
+      ]
     `);
   });
 });
