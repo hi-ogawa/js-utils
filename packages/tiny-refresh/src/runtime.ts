@@ -14,7 +14,7 @@ const REGISTRY_KEY = Symbol.for("tiny-refresh.react");
 export interface ViteHot {
   data: HotData;
   accept: (onNewModule: (newModule?: unknown) => void) => void;
-  invalidate: () => void;
+  invalidate: (message?: string) => void;
 }
 
 interface WebpackHot {
@@ -117,17 +117,19 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
   for (const key of keys) {
     const current = currentReg.components.get(key);
     const latest = latestReg.components.get(key);
-    if (!current || !latest) {
-      return false;
-    }
     if (current === latest) {
       continue;
     }
+    if (!current || !latest) {
+      return false;
+    }
+    // need to update registry even when `hot.invalidate`
+    // since parent module (importer) keeps references to old child modules (importee).
+    currentReg.components.set(key, latest);
+    latest.listeners = current.listeners;
     if (current.options.remount !== latest.options.remount) {
       return false;
     }
-    currentReg.components.set(key, latest);
-    latest.listeners = current.listeners;
     // Skip re-rendering if function code is exactly same.
     // Note that this can cause "false-negative", for example,
     // when a constant defined in the same file has changed
