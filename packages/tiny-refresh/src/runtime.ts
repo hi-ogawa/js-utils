@@ -150,9 +150,11 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (current.component.toString() === latest.component.toString()) {
       continue;
     }
-    console.log(
-      `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount})`
-    );
+    if (latestReg.debug) {
+      console.log(
+        `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount}, listeners.size = ${latest.listeners.size})`
+      );
+    }
     for (const setState of latest.listeners) {
       setState(latest);
     }

@@ -29,6 +29,7 @@ export function vitePluginTinyRefresh(options?: {
           runtime: options?.runtime ?? "react",
           refreshRuntime: options?.refreshRuntime,
           autoDetect: !options?.noAutoDetect,
+          debug: true,
         });
       }
       return;

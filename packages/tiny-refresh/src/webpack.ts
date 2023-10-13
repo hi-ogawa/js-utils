@@ -6,6 +6,7 @@ export default function tinyRefreshLoader(source: string) {
       bundler: "webpack4",
       runtime: "react",
       autoDetect: true,
+      debug: true,
     }) ?? source
   );
 }
