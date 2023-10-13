@@ -170,9 +170,14 @@ export function setupHmrVite(hot: ViteHot, registry: HmrRegistry) {
     // `registry` refereneced here is the one from the last module which is "accept"-ing new modules.
     // `hot.data[REGISTRY_KEY]` is always updated by new module before new module is "accept"-ed.
     const latestRegistry = hot.data[REGISTRY_KEY];
-    const patchSuccess =
-      newModule && latestRegistry && patchRegistry(registry, latestRegistry);
-    if (!patchSuccess) {
+
+    // for this case, probably better not to full reload?
+    if (!newModule || !latestRegistry) {
+      hot.invalidate();
+      return;
+    }
+
+    if (!patchRegistry(registry, latestRegistry)) {
       // when child module calls `hot.invalidate()`, it will propagate to parent module.
       // if such parent module has also `setupHmrVite`, then it will simply self-accept and full window reload will not be triggered.
       // So, probably it would be more pragmatic and significant simplification to start with force full reload here
