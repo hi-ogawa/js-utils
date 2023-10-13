@@ -12,11 +12,11 @@ afterEach(cleanup);
 
 describe(setupHmrVite, () => {
   it("basic", async () => {
-    let firstOnNewModule!: (newModule: {} | undefined) => void;
+    const acceptCallbacks: ((newModule?: unknown) => void)[] = [];
 
     const hot: ViteHot = {
-      accept: (onNewModule) => {
-        firstOnNewModule ??= onNewModule;
+      accept: (callback) => {
+        acceptCallbacks.push(callback);
       },
       invalidate: () => {},
       data: {},
@@ -32,7 +32,7 @@ describe(setupHmrVite, () => {
     {
       const registry = createHmrRegistry(React);
 
-      const Child = createHmrComponent(
+      ChildExport = createHmrComponent(
         registry,
         "Child",
         function Child() {
@@ -46,7 +46,6 @@ describe(setupHmrVite, () => {
         },
         { remount: true }
       );
-      ChildExport = Child;
 
       setupHmrVite(hot, registry);
     }
@@ -78,7 +77,8 @@ describe(setupHmrVite, () => {
     {
       const registry = createHmrRegistry(React);
 
-      const Child = createHmrComponent(
+      // hot update's export doesn't affect original version of export
+      createHmrComponent(
         registry,
         "Child",
         function Child() {
@@ -86,14 +86,12 @@ describe(setupHmrVite, () => {
         },
         { remount: true }
       );
-      // this export itself doesn't affect original version of export
-      Child;
 
       setupHmrVite(hot, registry);
     }
 
-    // simulate 1st version's hot.accept
-    act(() => firstOnNewModule({}));
+    // simulate last version's `hot.accept`
+    act(() => acceptCallbacks[0]({}));
     expect(result.baseElement).toMatchInlineSnapshot(`
       <body>
         <div>
@@ -120,7 +118,7 @@ describe(setupHmrVite, () => {
     {
       const registry = createHmrRegistry(React);
 
-      const Child = createHmrComponent(
+      createHmrComponent(
         registry,
         "Child",
         function Child() {
@@ -134,12 +132,11 @@ describe(setupHmrVite, () => {
         },
         { remount: true }
       );
-      Child;
 
       setupHmrVite(hot, registry);
     }
 
-    act(() => firstOnNewModule({}));
+    act(() => acceptCallbacks[1]({}));
     expect(result.baseElement).toMatchInlineSnapshot(`
       <body>
         <div>
