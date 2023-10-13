@@ -1,3 +1,5 @@
+import { tinyassert } from "@hiogawa/utils";
+
 // inline minimal react typing
 namespace ReactTypes {
   export type FC = (props: any) => any;
@@ -40,7 +42,7 @@ interface HmrRegistry {
 
 interface HmrComponentData {
   component: ReactTypes.FC;
-  listeners: Set<(fc: () => ReactTypes.FC) => void>;
+  listeners: Set<() => void>;
   options: HmrComponentOptions;
 }
 
@@ -73,14 +75,27 @@ export function createHmrComponent(
   registry.components.set(name, hmrData);
   const { createElement, useEffect, useState } = registry.runtime;
 
+  // const KeyedWrapper: ReactTypes.FC = (props) => {
+  //   registry.components.get(name);
+  //   // createElement()
+  //   // return
+  //   // return options.remount ? wrapperProps
+  // }
+
   const WrapperComponent: ReactTypes.FC = (props) => {
-    const [LatestFc, setFc] = useState(() => Fc);
+    // const [LatestFc, setFc] = useState(() => Fc);
+    // LatestFc;
+
+    const [key, setKey] = useState(0);
+    key;
+    // const forceUpdate = () => setKey((prev) => prev + 1);
 
     useEffect(() => {
-      // expose setter to force update
-      hmrData.listeners.add(setFc);
+      // expose force update
+      const forceUpdate = () => setKey((prev) => prev + 1);
+      hmrData.listeners.add(forceUpdate);
       return () => {
-        hmrData.listeners.delete(setFc);
+        hmrData.listeners.delete(forceUpdate);
       };
     }, []);
 
@@ -103,7 +118,15 @@ export function createHmrComponent(
     //   however we allow this mode via explicit "// @hmr-unsafe" comment.
     //
 
-    return options.remount ? createElement(LatestFc, props) : LatestFc(props);
+    // get latest component from registry
+    const latest = registry.components.get(name);
+    tinyassert(latest, `[bug:tiny-refresh] not found '${name}'`);
+
+    return latest.options.remount
+      ? createElement(latest.component, props)
+      : latest.component(props);
+
+    // return options.remount ? createElement(LatestFc, props) : LatestFc(props);
   };
 
   return WrapperComponent;
@@ -114,6 +137,8 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     ...currentReg.components.keys(),
     ...latestReg.components.keys(),
   ]);
+  // const updates: (() => void)[] = [];
+
   for (const key of keys) {
     const current = currentReg.components.get(key);
     const latest = latestReg.components.get(key);
@@ -124,21 +149,29 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     ) {
       return false;
     }
-    latest.listeners = current.listeners; // copy over listeners from current component
+    // currentReg.components.set(key, latest);
+
+    // latest.listeners = current.listeners; // copy over listeners from current component
+
     // Skip re-rendering if function code is exactly same.
     // Note that this can cause "false-negative", for example,
     // when a constant defined in the same file has changed
     // and such constant is used by the component.
-    if (current.component.toString() === latest.component.toString()) {
+    const skip = current.component.toString() === latest.component.toString();
+    current.component = latest.component;
+    current.options = latest.options;
+    if (skip) {
       continue;
     }
     console.log(
       `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount})`
     );
-    for (const setState of latest.listeners) {
-      setState(() => latest.component);
+    for (const listener of current.listeners) {
+      listener();
     }
   }
+  // pass over whole map so that old module can access latest
+  latestReg.components = currentReg.components;
   return true;
 }
 

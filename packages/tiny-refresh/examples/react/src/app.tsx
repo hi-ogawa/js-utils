@@ -48,7 +48,7 @@ export function Outer() {
 }
 
 export function Inner(props: { value: number }) {
-  const add = 1010;
+  const add = 100000;
   return (
     <pre>
       Inner: counter + {add} = {props.value + add}
