@@ -430,7 +430,7 @@ class EffectManager {
       customNode.hookContext.runEffect("layout-effect");
     }
 
-    // TODO
+    // TODO: asynchronously in requestAnimationFrame
     for (const customNode of this.effectNodes) {
       customNode.hookContext.runEffect("effect");
     }

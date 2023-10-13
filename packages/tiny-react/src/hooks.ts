@@ -12,36 +12,20 @@ type ReducerHookState = {
 
 type EffectType = "layout-effect" | "effect";
 
-// TODO: need to accumulate multiple effects for single hook
-//       since `useEffect` can run multiple times before the first effect runs asynchrnously
 type EffectHookState = {
   type: EffectType;
-  effect?: EffectFn;
   deps?: unknown[];
-  cleanup?: () => void;
+  // when synchronously rendering multiple times,
+  // multiple effects could accumulate since `useEffect` is asynchronous.
+  pendings: PendingEffect[];
+};
+
+type PendingEffect = {
+  effect?: EffectFn;
+  cleanup?: (() => void) | void;
 };
 
 type EffectFn = () => (() => void) | void;
-
-function runEffect(hook: EffectHookState) {
-  if (hook.effect) {
-    // cleanup last effect only when there is a new effect
-    if (hook.cleanup) {
-      hook.cleanup();
-      hook.cleanup = undefined;
-    }
-    const effect = hook.effect;
-    hook.cleanup = effect() ?? undefined;
-    hook.effect = undefined;
-  }
-}
-
-function cleanupEffect(hook: EffectHookState) {
-  if (hook.cleanup) {
-    hook.cleanup();
-    hook.cleanup = undefined;
-  }
-}
 
 type InitialState<T> = T | (() => T);
 
@@ -84,7 +68,20 @@ export class HookContext {
   runEffect(type: EffectType) {
     for (const hook of this.hooks) {
       if (hook.type === type) {
-        runEffect(hook);
+        hook.pendings.forEach((pending, i) => {
+          if (pending.effect) {
+            tinyassert(!pending.cleanup);
+            pending.cleanup = pending.effect();
+            pending.effect = undefined;
+          }
+          // also consume "cleanup" except the last effect
+          if (i < hook.pendings.length - 1) {
+            if (pending.cleanup) {
+              pending.cleanup();
+            }
+          }
+        });
+        hook.pendings = hook.pendings.slice(-1);
       }
     }
   }
@@ -92,7 +89,12 @@ export class HookContext {
   cleanupEffect(type: EffectType) {
     for (const hook of this.hooks) {
       if (hook.type === type) {
-        cleanupEffect(hook);
+        for (const pending of hook.pendings) {
+          if (pending.cleanup) {
+            pending.cleanup();
+          }
+        }
+        hook.pendings = [];
       }
     }
   }
@@ -132,8 +134,8 @@ export class HookContext {
     if (this.initial) {
       this.hooks.push({
         type,
-        effect,
         deps,
+        pendings: [{ effect }],
       });
     }
     const hook = this.hooks[this.hookCount++];
@@ -145,11 +147,8 @@ export class HookContext {
       !this.initial &&
       !(hook.deps && deps && isEqualShallow(hook.deps, deps))
     ) {
-      // Last effect should've been already done.
-      // Otherwise, it's likely effect itself caused "force update", which is not currently supported.
-      tinyassert(!hook.effect, "repeated render caused by useEffect?");
-      hook.effect = effect;
       hook.deps = deps;
+      hook.pendings.push({ effect });
     }
   };
 }
