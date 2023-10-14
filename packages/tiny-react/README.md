@@ -14,10 +14,11 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 
 ## unsupported
 
-- forwardRef
+- context
 - ssr
 - suspense
 - error boundary
+- forwardRef
 - dangerouslySetInnerHTML
 - mutable ref
 - defaultValue
