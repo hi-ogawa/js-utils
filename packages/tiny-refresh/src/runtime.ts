@@ -97,11 +97,10 @@ export function createHmrComponent(
     //
     //   fc(props)
     //
-    //   This directly calls into functional component and use it as implementation of `WrapperComponent`.
+    //   This directly calls into functional component and use it as implementation of `UnsafeWrapperFc`.
     //   This won't cause re-mount but it must ensure hook usage didn't change, otherwise it'll crash client.
-    //   To employ this approach, we need to detect the usage of hook and conditionally `hot.invalidate`
-    //   only when hook usage is changed.
-    //   however we allow this mode via explicit "// @hmr-unsafe" comment.
+    //   Ideally, to employ this approach, we need to detect the usage of hook and force remount when hook usage is changed.
+    //   For now, however, we allow this mode via explicit "// @hmr-unsafe" comment.
     //
 
     return latest.options.remount
