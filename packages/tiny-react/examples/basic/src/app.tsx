@@ -183,7 +183,7 @@ function TestSetStateInEffect() {
   }, [state]);
 
   return (
-    <div className="border p-2 flex flex-col gap-2">
+    <div className="border p-2 flex flex-col gap-2" data-testid="TestSetStateInEffect">
       <h1>Test SetState in useEffect</h1>
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">

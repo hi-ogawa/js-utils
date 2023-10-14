@@ -9,6 +9,7 @@
     "build:vite": "vite build",
     "build:tsc": "tsc",
     "build:vercel": "bash misc/vercel/build.sh",
+    "test-e2e": "playwright test",
     "release": "vercel deploy --prebuilt .",
     "release-production": "vercel deploy --prebuilt . --prod"
   },

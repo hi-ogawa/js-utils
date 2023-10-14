@@ -22,8 +22,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `pnpm dev --port ${port}`,
     port,
+    command: `pnpm dev:vite --port ${port}`,
     reuseExistingServer: true,
   },
   retries: process.env.CI ? 2 : 0,
