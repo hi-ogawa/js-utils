@@ -1,2 +1,2 @@
-// re-export refresh runtime to simplify dependency
+// re-export tiny-refresh to simplify dependency
 export * from "@hiogawa/tiny-refresh";
