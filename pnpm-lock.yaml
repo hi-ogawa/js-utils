@@ -193,7 +193,7 @@ importers:
   packages/tiny-react:
     devDependencies:
       '@hiogawa/tiny-refresh':
-        specifier: ^0.0.1-pre.8
+        specifier: workspace:*
         version: link:../tiny-refresh
       '@hiogawa/utils':
         specifier: workspace:*
