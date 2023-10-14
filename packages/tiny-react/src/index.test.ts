@@ -1,5 +1,6 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
+import { createRoot, memo } from "./compat";
 import { Fragment, h } from "./helper/hyperscript";
 import {
   useCallback,
@@ -11,7 +12,7 @@ import {
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import { sleepFrame } from "./test-utils";
-import type { VNode } from "./virtual-dom";
+import { type VNode, emptyNode } from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {
@@ -1517,6 +1518,138 @@ describe("ref", () => {
         ],
         [
           "SPAN",
+        ],
+      ]
+    `);
+  });
+});
+
+describe(memo, () => {
+  it("basic", () => {
+    const mockFn = vi.fn();
+
+    const Custom = memo(function Custom(props: {
+      label: string;
+      value: number;
+    }) {
+      mockFn(props.label, props.value);
+      return h.div({}, props.label, props.value);
+    });
+
+    const parent = document.createElement("main");
+    const root = createRoot(parent);
+    const child = emptyNode(); // TODO: currently each emptyNode has different identity
+
+    root.render(h(Custom, { label: "hi", value: 0 }, child));
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          hi
+          0
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "hi",
+          0,
+        ],
+      ]
+    `);
+
+    root.render(h(Custom, { label: "hi", value: 0 }, child));
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          hi
+          0
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "hi",
+          0,
+        ],
+      ]
+    `);
+
+    root.render(h(Custom, { label: "hello", value: 0 }, child));
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          hello
+          0
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "hi",
+          0,
+        ],
+        [
+          "hello",
+          0,
+        ],
+      ]
+    `);
+
+    root.render(h(Custom, { label: "hi", value: 0 }, child));
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          hi
+          0
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "hi",
+          0,
+        ],
+        [
+          "hello",
+          0,
+        ],
+        [
+          "hi",
+          0,
+        ],
+      ]
+    `);
+
+    root.render(h(Custom, { label: "hi", value: 1 }, child));
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          hi
+          1
+        </div>
+      </main>
+    `);
+    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "hi",
+          0,
+        ],
+        [
+          "hello",
+          0,
+        ],
+        [
+          "hi",
+          0,
+        ],
+        [
+          "hi",
+          1,
         ],
       ]
     `);

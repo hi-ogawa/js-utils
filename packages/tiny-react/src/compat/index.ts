@@ -39,10 +39,36 @@ export function createRoot(container: Element) {
   };
 }
 
-// TODO https://react.dev/reference/react/memo
+// https://react.dev/reference/react/memo
 export function memo<P extends object>(
   fc: FC<P>,
-  _propsAreEqual?: (prevProps: Readonly<P>, nextProps: Readonly<P>) => boolean
+  propsAreEqual: (
+    prevProps: Readonly<P>,
+    nextProps: Readonly<P>
+  ) => boolean = objectShallowEqual
 ): FC<P> {
-  return fc;
+  let prev: { props: Readonly<P>; result: VNode } | undefined;
+  function Memo(props: P) {
+    if (!prev || !propsAreEqual(prev.props, props)) {
+      prev = { props, result: fc(props) };
+    }
+    return prev.result;
+  }
+  Memo.displayName = `Memo(${(fc as any).displayName || fc.name})`;
+  return Memo;
+}
+
+// from preact https://github.com/preactjs/preact/blob/4b1a7e9276e04676b8d3f8a8257469e2f732e8d4/compat/src/util.js#L19-L23
+function objectShallowEqual(x: object, y: object): boolean {
+  for (const k in x) {
+    if (!(k in y)) {
+      return false;
+    }
+  }
+  for (const k in y) {
+    if ((x as any)[k] !== (y as any)[k]) {
+      return false;
+    }
+  }
+  return true;
 }
