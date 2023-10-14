@@ -16,6 +16,5 @@ jobs:
       - run: pnpm lint-check
       - run: pnpm build
       - run: pnpm tsc
-      - run: pnpm exec playwright install chromium
       - run: pnpm test
       - run: npx typedoc
