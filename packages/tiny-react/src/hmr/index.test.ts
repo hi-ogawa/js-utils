@@ -5,7 +5,6 @@ import {
   createHmrRegistry,
   setupHmrVite,
 } from ".";
-import type { FC } from "../helper/common";
 import { createElement, h } from "../helper/hyperscript";
 import { useEffect, useState } from "../hooks";
 import { render } from "../reconciler";
@@ -23,7 +22,7 @@ describe(setupHmrVite, () => {
       data: {},
     };
 
-    let ChildExport: FC;
+    let ChildExport: any;
 
     function Parent() {
       return h(ChildExport, {});
