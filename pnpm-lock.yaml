@@ -1485,7 +1485,7 @@ packages:
       '@unocss/preset-uno': 0.56.4
       '@unocss/reset': 0.48.5
       local-pkg: 0.4.3
-      unocss: 0.53.6(postcss@8.4.27)(vite@4.4.9)
+      unocss: 0.53.6(postcss@8.4.27)(vite@4.4.6)
     dev: true
 
   /@hiogawa/unocss-preset-antd@2.2.1-pre.7(unocss@0.56.4):
