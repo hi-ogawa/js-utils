@@ -1,4 +1,4 @@
-import { unocssPresetAntd } from "@hiogawa/unocss-preset-antd";
+import { antdPreset } from "@hiogawa/unocss-preset-antd";
 import {
   defineConfig,
   presetIcons,
@@ -8,6 +8,6 @@ import {
 } from "unocss";
 
 export default defineConfig({
-  presets: [unocssPresetAntd(), presetUno(), presetIcons()],
+  presets: [antdPreset(), presetUno(), presetIcons()],
   transformers: [transformerDirectives(), transformerVariantGroup()],
 });
