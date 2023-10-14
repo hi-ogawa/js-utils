@@ -5,8 +5,8 @@ import { useState } from "../../../dist";
 // @hmr-unsafe
 export function JsFrameworkBenchmarkApp() {
   const [selected, setSelected] = useState<number | undefined>(undefined);
-  const [n, setN] = useState(10);
-  const [items, setItems] = useState(() => generateItems(n));
+  const [n, setN] = useState(1000);
+  const [items, setItems] = useState(() => generateItems(0));
 
   return (
     <div className="border p-2 flex flex-col gap-2">
