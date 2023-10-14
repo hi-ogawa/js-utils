@@ -1,7 +1,7 @@
 // inline minimal react typing
 namespace ReactTypes {
-  export type FC = (props: any) => any;
-  export type createElement = (...args: any[]) => any;
+  export type FC = (props: any) => unknown;
+  export type createElement = (...args: any[]) => unknown;
   export type useState = <T>(
     init: T | (() => T)
   ) => [T, (next: T | ((prev: T) => T)) => void];
