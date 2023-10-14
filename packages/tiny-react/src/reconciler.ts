@@ -75,9 +75,7 @@ function reconcileNode(
         bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
         reconcileTagProps(bnode, vnode.props, {});
         placeChild(bnode.hnode, hparent, preSlot, true);
-        // effectManager.queueRef(bnode);
         effectManager.refNodes.push(bnode);
-        // effectManager.
       }
       bnode.child.parent = bnode;
       break;
