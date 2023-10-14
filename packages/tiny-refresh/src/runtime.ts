@@ -34,7 +34,7 @@ interface HmrRegistry {
     useState: ReactTypes.useState;
     useEffect: ReactTypes.useEffect;
   };
-  debug?: boolean;
+  debug?: boolean; // to hide log for testing
   componentMap: Map<string, HmrComponentData>;
 }
 
@@ -150,7 +150,8 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
       continue;
     }
     if (latestReg.debug) {
-      console.log(
+      // cf. "[vite] hot updated" log https://github.com/vitejs/vite/pull/8855
+      console.debug(
         `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount}, listeners.size = ${latest.listeners.size})`
       );
     }
