@@ -25,4 +25,6 @@ export default defineConfig({
     port,
     reuseExistingServer: true,
   },
+  retries: process.env.CI ? 2 : 0,
+  forbidOnly: Boolean(process.env.CI),
 });
