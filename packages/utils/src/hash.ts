@@ -11,8 +11,8 @@ export function hashInt32(x: number): number {
 export class HashRng {
   private state: number;
 
-  constructor(seed: number) {
-    this.state = hashInt32(seed | 1);
+  constructor(seed: number = 1) {
+    this.state = hashInt32(seed);
   }
 
   int32(): number {
