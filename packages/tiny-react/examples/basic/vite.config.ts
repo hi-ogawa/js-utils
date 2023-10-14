@@ -16,7 +16,9 @@ export default defineConfig({
       react({
         jsxImportSource: "@hiogawa/tiny-react",
       }),
-    tinyReactVitePlugin(),
+    tinyReactVitePlugin({
+      hmr: { debug: true },
+    }),
     unocss(),
     themeScriptPlugin(),
   ],

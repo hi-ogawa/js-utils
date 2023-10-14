@@ -1,6 +1,6 @@
+import { vitePluginTinyRefresh } from "@hiogawa/tiny-refresh/dist/vite";
 import { typedBoolean } from "@hiogawa/utils";
-import { type FilterPattern, type Plugin, createFilter } from "vite";
-import { hmrTransform } from "../hmr/transform";
+import { type FilterPattern, type Plugin } from "vite";
 
 // cf.
 // https://github.com/preactjs/preset-vite
@@ -9,6 +9,7 @@ import { hmrTransform } from "../hmr/transform";
 
 interface TinyReactVitePluginOptions {
   hmr?: {
+    disable?: boolean;
     include?: FilterPattern;
     exclude?: FilterPattern;
   };
@@ -21,30 +22,15 @@ export function tinyReactVitePlugin(
   options?: TinyReactVitePluginOptions
 ): Plugin[] {
   return [
-    hmrPlugin(options?.hmr),
+    !options?.hmr?.disable &&
+      vitePluginTinyRefresh({
+        include: options?.hmr?.include,
+        exclude: options?.hmr?.exclude,
+        runtime: "@hiogawa/tiny-react",
+        refreshRuntime: "@hiogawa/tiny-react/hmr",
+      }),
     !options?.alias?.disable && aliasPlugin(),
   ].filter(typedBoolean);
-}
-
-function hmrPlugin(options: TinyReactVitePluginOptions["hmr"]): Plugin {
-  // cf. https://github.com/vitejs/vite-plugin-react/blob/2c3330b9aa40d263e50e8359eca481099700ca9e/packages/plugin-react/src/index.ts#L168-L171
-  const filter = createFilter(
-    options?.include ?? /\.[tj]sx?$/,
-    options?.exclude ?? /\/node_modules\//
-  );
-  return {
-    name: "@hiogawa/tiny-react:hmr",
-    enforce: "pre",
-    apply(_config, env) {
-      return env.command === "serve" && !env.ssrBuild;
-    },
-    transform(code, id, _options) {
-      if (filter(id)) {
-        return hmrTransform(code);
-      }
-      return;
-    },
-  };
 }
 
 function aliasPlugin(): Plugin {
