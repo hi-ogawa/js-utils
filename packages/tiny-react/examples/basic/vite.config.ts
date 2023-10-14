@@ -8,9 +8,5 @@ export default defineConfig({
     outDir: "./dist/vite",
     minify: true, // set `false` to verify transpilated output easily
   },
-  plugins: [
-    tinyReactVitePlugin(),
-    unocss(),
-    themeScriptPlugin(),
-  ],
+  plugins: [tinyReactVitePlugin(), unocss(), themeScriptPlugin()],
 });

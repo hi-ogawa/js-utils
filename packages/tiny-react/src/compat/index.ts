@@ -1,3 +1,4 @@
+import type { FC } from "../helper/common";
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
 import { type BNode, type VNode, emptyNode } from "../virtual-dom";
@@ -36,4 +37,12 @@ export function createRoot(container: Element) {
       render(emptyNode(), container, bnode);
     },
   };
+}
+
+// TODO https://react.dev/reference/react/memo
+export function memo<P extends object>(
+  fc: FC<P>,
+  _propsAreEqual?: (prevProps: Readonly<P>, nextProps: Readonly<P>) => boolean
+): FC<P> {
+  return fc;
 }
