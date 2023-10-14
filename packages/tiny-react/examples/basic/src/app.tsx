@@ -327,7 +327,7 @@ function TestHmr() {
       <h1 className="text-lg">TestHmr</h1>
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <span>Counter = {state}</span>
+          <span>parent = {state}</span>
           <button
             className="antd-btn antd-btn-default px-1"
             onclick={() => setState((prev) => prev - 1)}
@@ -342,9 +342,9 @@ function TestHmr() {
           </button>
         </div>
         <div className="border-t my-1"></div>
-        <span>Test multiple instances</span>
-        <HmrChild counter={state} />
-        <HmrChild counter={state} />
+        <HmrChild name="child1" counter={state} />
+        <div className="border-t my-1"></div>
+        <HmrChild name="child2" counter={state} />
       </div>
     </div>
   );
