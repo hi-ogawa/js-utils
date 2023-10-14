@@ -51,6 +51,9 @@ describe(range, () => {
       ]
     `);
     expect(range(3, 3)).toMatchInlineSnapshot("[]");
+
+    expect(range(1, 0)).toMatchInlineSnapshot("[]");
+    expect(range(-1)).toMatchInlineSnapshot("[]");
   });
 });
 
