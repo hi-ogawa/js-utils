@@ -24,6 +24,7 @@
     "@hiogawa/sort-package-json": "workspace:*",
     "@hiogawa/utils": "workspace:*",
     "@hiogawa/utils-node": "workspace:*",
+    "@playwright/test": "^1.39.0",
     "@tsconfig/strictest": "^2.0.1",
     "esbuild": "^0.18.10",
     "prettier": "^2.8.8",
