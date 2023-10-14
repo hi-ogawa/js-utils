@@ -2,6 +2,7 @@ import { getTheme, setTheme } from "@hiogawa/theme-script";
 import { useCallback, useEffect, useRef, useState } from "@hiogawa/tiny-react";
 import { range } from "@hiogawa/utils";
 import { HmrChild } from "./hmr";
+import { JsFrameworkBenchmarkApp } from "./js-framework-benchmark";
 
 export function App() {
   return (
@@ -18,6 +19,7 @@ export function App() {
         </a>
       </header>
       <div className="flex flex-col gap-4 w-full max-w-xl mx-auto p-4">
+        <JsFrameworkBenchmarkApp />
         <TestTodoApp />
         <TestHmr />
         <TestProps />
