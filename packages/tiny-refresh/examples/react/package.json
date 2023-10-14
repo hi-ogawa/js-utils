@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "test": "pnpm -s test-e2e",
     "test-e2e": "playwright test"
   },
   "devDependencies": {
