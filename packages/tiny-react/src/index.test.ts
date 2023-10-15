@@ -12,7 +12,7 @@ import {
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import { sleepFrame } from "./test-utils";
-import { type VNode, emptyNode } from "./virtual-dom";
+import { type VNode } from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {
