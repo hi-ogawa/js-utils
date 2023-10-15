@@ -12,13 +12,12 @@ export type HNode = Node;
 export type HTag = Element;
 export type HText = Text;
 
-// node type (use symbol for debuggability?)
-// TODO: perf between string, number, symbol
-export const NODE_TYPE_EMPTY = Symbol.for("empty");
-export const NODE_TYPE_TAG = Symbol.for("tag");
-export const NODE_TYPE_TEXT = Symbol.for("text");
-export const NODE_TYPE_CUSTOM = Symbol.for("custom");
-export const NODE_TYPE_FRAGMENT = Symbol.for("fragment");
+// node type (TODO: check perf between string, number, symbol)
+export const NODE_TYPE_EMPTY = "empty" as const;
+export const NODE_TYPE_TAG = "tag" as const;
+export const NODE_TYPE_TEXT = "text" as const;
+export const NODE_TYPE_CUSTOM = "custom" as const;
+export const NODE_TYPE_FRAGMENT = "fragment" as const;
 
 //
 // virtual node (immutable)
