@@ -1,5 +1,9 @@
 import {
   EMPTY_VNODE,
+  NODE_TYPE_CUSTOM,
+  NODE_TYPE_FRAGMENT,
+  NODE_TYPE_TAG,
+  NODE_TYPE_TEXT,
   type NodeKey,
   type Props,
   type VNode,
@@ -32,7 +36,7 @@ export function createElement(
   if (typeof tag === "string") {
     const { ref, ...propsNoKeyNoRef } = propsNoKey as { ref?: any };
     return {
-      type: "tag",
+      type: NODE_TYPE_TAG,
       name: tag,
       key,
       ref,
@@ -41,7 +45,7 @@ export function createElement(
     };
   } else if (typeof tag === "function") {
     return {
-      type: "custom",
+      type: NODE_TYPE_CUSTOM,
       key,
       props: {
         ...propsNoKey,
@@ -62,7 +66,7 @@ export function Fragment(props: { children?: ComponentChildren }): VNode {
 function normalizeComponentChildren(children?: ComponentChildren): VNode {
   if (Array.isArray(children)) {
     return {
-      type: "fragment",
+      type: NODE_TYPE_FRAGMENT,
       children: children.map((c) => normalizeComponentChildren(c)),
     };
   }
@@ -80,7 +84,7 @@ function normalizeComponentChild(child: ComponentChild): VNode {
   }
   if (typeof child === "string" || typeof child === "number") {
     return {
-      type: "text",
+      type: NODE_TYPE_TEXT,
       data: String(child),
     };
   }

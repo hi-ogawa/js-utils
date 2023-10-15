@@ -7,6 +7,11 @@ import {
   type BTag,
   type BText,
   type HNode,
+  NODE_TYPE_CUSTOM,
+  NODE_TYPE_EMPTY,
+  NODE_TYPE_FRAGMENT,
+  NODE_TYPE_TAG,
+  NODE_TYPE_TEXT,
   type NodeKey,
   type Props,
   type VCustom,
@@ -37,17 +42,17 @@ function reconcileNode(
   effectManager: EffectManager
 ): BNode {
   switch (vnode.type) {
-    case "empty": {
-      if (bnode.type === "empty") {
+    case NODE_TYPE_EMPTY: {
+      if (bnode.type === NODE_TYPE_EMPTY) {
       } else {
         unmount(bnode);
         bnode = emptyNode();
       }
       break;
     }
-    case "tag": {
+    case NODE_TYPE_TAG: {
       if (
-        bnode.type === "tag" &&
+        bnode.type === NODE_TYPE_TAG &&
         bnode.key === vnode.key &&
         bnode.ref === vnode.ref &&
         bnode.name === vnode.name
@@ -80,8 +85,8 @@ function reconcileNode(
       bnode.child.parent = bnode;
       break;
     }
-    case "text": {
-      if (bnode.type === "text") {
+    case NODE_TYPE_TEXT: {
+      if (bnode.type === NODE_TYPE_TEXT) {
         if (bnode.data !== vnode.data) {
           bnode.hnode.data = vnode.data;
           bnode.data = vnode.data;
@@ -95,12 +100,12 @@ function reconcileNode(
       }
       break;
     }
-    case "fragment": {
+    case NODE_TYPE_FRAGMENT: {
       // TODO: learn from
       // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
       // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
       // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
-      if (bnode.type === "fragment" && bnode.key === vnode.key) {
+      if (bnode.type === NODE_TYPE_FRAGMENT && bnode.key === vnode.key) {
         const [newChildren, oldChildren] = alignChildrenByKey(
           vnode.children,
           bnode.children
@@ -135,9 +140,9 @@ function reconcileNode(
       }
       break;
     }
-    case "custom": {
+    case NODE_TYPE_CUSTOM: {
       if (
-        bnode.type === "custom" &&
+        bnode.type === NODE_TYPE_CUSTOM &&
         bnode.key === vnode.key &&
         bnode.render === vnode.render
       ) {
@@ -233,11 +238,11 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
 function findPreviousSlot(child: BNode): HNode | undefined {
   let parent = child.parent;
   while (parent) {
-    if (parent.type === "tag") {
+    if (parent.type === NODE_TYPE_TAG) {
       // no slot i.e. new node will be the first child within parent tag
       return;
     }
-    if (parent.type === "fragment") {
+    if (parent.type === NODE_TYPE_FRAGMENT) {
       // TODO
       // need faster look up within BFragment.children?
       // though this wouldn't be so bad practically since we traverse up to only first BTag ancestor
@@ -264,13 +269,13 @@ function findPreviousSlot(child: BNode): HNode | undefined {
 function updateParentSlot(child: BNode) {
   let parent = child.parent;
   while (parent) {
-    if (parent.type === "tag") {
+    if (parent.type === NODE_TYPE_TAG) {
       return;
     }
-    if (parent.type === "custom") {
+    if (parent.type === NODE_TYPE_CUSTOM) {
       parent.slot = getSlot(child);
     }
-    if (parent.type === "fragment") {
+    if (parent.type === NODE_TYPE_FRAGMENT) {
       // TODO: could optimize something?
       let slot: HNode | undefined;
       for (const c of parent.children) {
@@ -378,10 +383,10 @@ function unmount(bnode: BNode) {
 
 function unmountNode(bnode: BNode, skipRemove: boolean) {
   switch (bnode.type) {
-    case "empty": {
+    case NODE_TYPE_EMPTY: {
       break;
     }
-    case "tag": {
+    case NODE_TYPE_TAG: {
       // skipRemove children since parent will detach subtree
       unmountNode(bnode.child, /* skipRemove */ true);
       if (!skipRemove) {
@@ -390,17 +395,17 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
       }
       break;
     }
-    case "text": {
+    case NODE_TYPE_TEXT: {
       bnode.hnode.remove();
       break;
     }
-    case "fragment": {
+    case NODE_TYPE_FRAGMENT: {
       for (const child of bnode.children) {
         unmountNode(child, skipRemove);
       }
       break;
     }
-    case "custom": {
+    case NODE_TYPE_CUSTOM: {
       bnode.hookContext.cleanupEffect("layout-effect");
       bnode.hookContext.cleanupEffect("effect");
       bnode.hparent = undefined;
