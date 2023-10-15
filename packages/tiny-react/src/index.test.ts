@@ -68,6 +68,19 @@ describe(render, () => {
               },
               "ref": undefined,
               "type": "tag",
+              "vnode": {
+                "child": {
+                  "data": "world",
+                  "type": "text",
+                },
+                "key": undefined,
+                "name": "span",
+                "props": {
+                  "className": "text-red",
+                },
+                "ref": undefined,
+                "type": "tag",
+              },
             },
           ],
           "parent": [Circular],
@@ -96,6 +109,37 @@ describe(render, () => {
         },
         "ref": undefined,
         "type": "tag",
+        "vnode": {
+          "child": {
+            "children": [
+              {
+                "data": "hello",
+                "type": "text",
+              },
+              {
+                "child": {
+                  "data": "world",
+                  "type": "text",
+                },
+                "key": undefined,
+                "name": "span",
+                "props": {
+                  "className": "text-red",
+                },
+                "ref": undefined,
+                "type": "tag",
+              },
+            ],
+            "type": "fragment",
+          },
+          "key": undefined,
+          "name": "div",
+          "props": {
+            "className": "flex items-center gap-2",
+          },
+          "ref": undefined,
+          "type": "tag",
+        },
       }
     `);
     vnode = h.div({ className: "flex items-center gap-2" }, "reconcile");
@@ -130,6 +174,19 @@ describe(render, () => {
         },
         "ref": undefined,
         "type": "tag",
+        "vnode": {
+          "child": {
+            "data": "reconcile",
+            "type": "text",
+          },
+          "key": undefined,
+          "name": "div",
+          "props": {
+            "className": "flex items-center gap-2",
+          },
+          "ref": undefined,
+          "type": "tag",
+        },
       }
     `);
   });
@@ -174,6 +231,17 @@ describe(render, () => {
                 "props": {},
                 "ref": undefined,
                 "type": "tag",
+                "vnode": {
+                  "child": {
+                    "data": "hello",
+                    "type": "text",
+                  },
+                  "key": undefined,
+                  "name": "span",
+                  "props": {},
+                  "ref": undefined,
+                  "type": "tag",
+                },
               },
               {
                 "data": "world",
@@ -199,6 +267,33 @@ describe(render, () => {
           "props": {},
           "ref": undefined,
           "type": "tag",
+          "vnode": {
+            "child": {
+              "children": [
+                {
+                  "child": {
+                    "data": "hello",
+                    "type": "text",
+                  },
+                  "key": undefined,
+                  "name": "span",
+                  "props": {},
+                  "ref": undefined,
+                  "type": "tag",
+                },
+                {
+                  "data": "world",
+                  "type": "text",
+                },
+              ],
+              "type": "fragment",
+            },
+            "key": undefined,
+            "name": "div",
+            "props": {},
+            "ref": undefined,
+            "type": "tag",
+          },
         },
         "hookContext": HookContext {
           "hookCount": 0,

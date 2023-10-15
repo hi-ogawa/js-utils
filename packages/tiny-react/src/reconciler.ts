@@ -49,7 +49,13 @@ function reconcileNode(
       bnode = emptyNode();
     }
   } else if (vnode.type === NODE_TYPE_TAG) {
-    if (
+    if (bnode.type === NODE_TYPE_TAG && bnode.vnode === vnode) {
+      // TODO: is it correct since immutable? but then isn't this effective only for `memo` component?
+      // TODO: how about effect or custom component inside? (probably okay since custom component is supposed to re-render itself)
+      // TODO: can we generalize this to all node types? (probably so)
+      // TODO: can we also skip `placeChild`? (probably not. ideally for mutating path, child placing should be managed by "caller-side" e.g. Fragment?)
+      placeChild(bnode.hnode, hparent, preSlot, false);
+    } else if (
       bnode.type === NODE_TYPE_TAG &&
       bnode.key === vnode.key &&
       bnode.ref === vnode.ref &&
@@ -64,6 +70,7 @@ function reconcileNode(
         undefined,
         effectManager
       );
+      bnode.vnode = vnode;
       placeChild(bnode.hnode, hparent, preSlot, false);
     } else {
       unmount(bnode);
@@ -75,7 +82,13 @@ function reconcileNode(
         undefined,
         effectManager
       );
-      bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
+      bnode = {
+        ...vnode,
+        vnode,
+        child,
+        hnode,
+        listeners: new Map(),
+      } satisfies BTag;
       reconcileTagProps(bnode, vnode.props, {});
       placeChild(bnode.hnode, hparent, preSlot, true);
       effectManager.refNodes.push(bnode);

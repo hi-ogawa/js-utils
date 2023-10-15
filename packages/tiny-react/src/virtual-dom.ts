@@ -76,6 +76,7 @@ export type BEmpty = VEmpty & {
 };
 
 export type BTag = Omit<VTag, "child"> & {
+  vnode: VTag;
   parent?: BNodeParent;
   child: BNode;
   hnode: HTag;
