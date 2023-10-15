@@ -22,12 +22,17 @@ export function JsFrameworkBenchmarkApp() {
 
   return (
     <div className="border p-2 flex flex-col gap-2">
-      <a
-        href="https://github.com/krausest/js-framework-benchmark"
-        target="_blank"
-      >
-        <h1 className="text-lg hover:underline">js-framework-benchmark</h1>
-      </a>
+      <h1 className="text-lg">Benchmark</h1>
+      <span className="text-sm text-colorTextSecondary">
+        Same benchmark operations as{" "}
+        <a
+          className="antd-link"
+          href="https://github.com/krausest/js-framework-benchmark"
+          target="_blank"
+        >
+          js-framework-benchmark
+        </a>
+      </span>
       <div className="flex flex-col gap-1">
         Parameters
         <label className="flex items-center gap-3 px-2">
