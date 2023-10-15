@@ -62,6 +62,9 @@ export function memo<P extends object>(
 
 // from preact https://github.com/preactjs/preact/blob/4b1a7e9276e04676b8d3f8a8257469e2f732e8d4/compat/src/util.js#L19-L23
 function objectShallowEqual(x: object, y: object): boolean {
+  if (x === y) {
+    return true;
+  }
   for (const k in x) {
     if (!(k in y)) {
       return false;

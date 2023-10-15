@@ -127,6 +127,7 @@ function reconcileNode(
         preSlot,
         effectManager
       );
+      // TODO: move bchild placing logic to parent? at least for mutating path?
       preSlot = getSlot(bchild) ?? preSlot;
       bnode.slot = getSlot(bchild) ?? bnode.slot;
       bnode.children[i] = bchild;
@@ -320,6 +321,9 @@ function alignChildrenByKey(
 // https://github.com/ryansolid/dom-expressions/blob/a2bd455055f5736bb591abe69a5f5b52568b9ea6/packages/babel-plugin-jsx-dom-expressions/src/dom/element.js#L219-L246
 // https://github.com/ryansolid/dom-expressions/blob/a2bd455055f5736bb591abe69a5f5b52568b9ea6/packages/dom-expressions/src/constants.js#L30-L39
 function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
+  if (props === oldProps) {
+    return;
+  }
   for (const k in oldProps) {
     if (!(k in props)) {
       setTagProp(bnode, k, null);
