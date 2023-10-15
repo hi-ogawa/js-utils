@@ -27,37 +27,37 @@ describe("hyperscript", () => {
               "key": "abc",
               "props": {
                 "children": {
-                  "type": Symbol(empty),
+                  "type": "empty",
                 },
                 "value": "hello",
               },
               "render": [Function],
-              "type": Symbol(custom),
+              "type": "custom",
             },
             {
-              "type": Symbol(empty),
+              "type": "empty",
             },
             {
               "data": "0",
-              "type": Symbol(text),
+              "type": "text",
             },
             {
               "key": undefined,
               "props": {
                 "children": {
-                  "type": Symbol(empty),
+                  "type": "empty",
                 },
               },
               "render": [Function],
-              "type": Symbol(custom),
+              "type": "custom",
             },
             {
-              "type": Symbol(empty),
+              "type": "empty",
             },
             {
               "child": {
                 "data": "world",
-                "type": Symbol(text),
+                "type": "text",
               },
               "key": 0,
               "name": "span",
@@ -65,41 +65,41 @@ describe("hyperscript", () => {
                 "className": "text-red",
               },
               "ref": [Function],
-              "type": Symbol(tag),
+              "type": "tag",
             },
             {
               "child": {
                 "data": "0",
-                "type": Symbol(text),
+                "type": "text",
               },
               "key": undefined,
               "name": "span",
               "props": {},
               "ref": undefined,
-              "type": Symbol(tag),
+              "type": "tag",
             },
             {
               "child": {
                 "children": [
                   {
                     "data": "0",
-                    "type": Symbol(text),
+                    "type": "text",
                   },
                   {
                     "data": "1",
-                    "type": Symbol(text),
+                    "type": "text",
                   },
                 ],
-                "type": Symbol(fragment),
+                "type": "fragment",
               },
               "key": undefined,
               "name": "span",
               "props": {},
               "ref": undefined,
-              "type": Symbol(tag),
+              "type": "tag",
             },
           ],
-          "type": Symbol(fragment),
+          "type": "fragment",
         },
         "key": undefined,
         "name": "div",
@@ -107,7 +107,7 @@ describe("hyperscript", () => {
           "className": "flex",
         },
         "ref": undefined,
-        "type": Symbol(tag),
+        "type": "tag",
       }
     `);
   });
