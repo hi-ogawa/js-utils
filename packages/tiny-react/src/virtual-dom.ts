@@ -24,7 +24,9 @@ export const NODE_TYPE_FRAGMENT = "fragment" as const;
 //
 
 // TODO: optimize object shape?
-export type VNode = VEmpty | VTag | VText | VCustom | VFragment;
+export type VNode = VEmpty2 | VEmpty | VTag | VText | VCustom | VFragment;
+
+export type VEmpty2 = null;
 
 // TODO: safe to optmize into singleton constant?
 export type VEmpty = {
@@ -114,7 +116,12 @@ export const EMPTY_VNODE: VEmpty = {
   type: NODE_TYPE_EMPTY,
 };
 
+export const EMPTY_VNODE2 = null satisfies VEmpty2;
+
 export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
+  if (node === EMPTY_VNODE2) {
+    return;
+  }
   if (
     node.type === NODE_TYPE_TAG ||
     node.type === NODE_TYPE_CUSTOM ||
