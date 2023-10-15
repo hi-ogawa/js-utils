@@ -41,146 +41,138 @@ function reconcileNode(
   preSlot: HNode | undefined,
   effectManager: EffectManager
 ): BNode {
-  switch (vnode.type) {
-    case NODE_TYPE_EMPTY: {
-      if (bnode.type === NODE_TYPE_EMPTY) {
-      } else {
-        unmount(bnode);
-        bnode = emptyNode();
-      }
-      break;
+  // switch by vnode.type, then in each case, another branch to whether mutate or re-mount
+  if (vnode.type === NODE_TYPE_EMPTY) {
+    if (bnode.type === NODE_TYPE_EMPTY) {
+    } else {
+      unmount(bnode);
+      bnode = emptyNode();
     }
-    case NODE_TYPE_TAG: {
-      if (
-        bnode.type === NODE_TYPE_TAG &&
-        bnode.key === vnode.key &&
-        bnode.ref === vnode.ref &&
-        bnode.name === vnode.name
-      ) {
-        reconcileTagProps(bnode, vnode.props, bnode.props);
-        bnode.props = vnode.props;
-        bnode.child = reconcileNode(
-          vnode.child,
-          bnode.child,
-          bnode.hnode,
-          undefined,
-          effectManager
-        );
-        placeChild(bnode.hnode, hparent, preSlot, false);
-      } else {
-        unmount(bnode);
-        const hnode = document.createElement(vnode.name);
-        const child = reconcileNode(
-          vnode.child,
-          emptyNode(),
-          hnode,
-          undefined,
-          effectManager
-        );
-        bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
-        reconcileTagProps(bnode, vnode.props, {});
-        placeChild(bnode.hnode, hparent, preSlot, true);
-        effectManager.refNodes.push(bnode);
-      }
-      bnode.child.parent = bnode;
-      break;
+  } else if (vnode.type === NODE_TYPE_TAG) {
+    if (
+      bnode.type === NODE_TYPE_TAG &&
+      bnode.key === vnode.key &&
+      bnode.ref === vnode.ref &&
+      bnode.name === vnode.name
+    ) {
+      reconcileTagProps(bnode, vnode.props, bnode.props);
+      bnode.props = vnode.props;
+      bnode.child = reconcileNode(
+        vnode.child,
+        bnode.child,
+        bnode.hnode,
+        undefined,
+        effectManager
+      );
+      placeChild(bnode.hnode, hparent, preSlot, false);
+    } else {
+      unmount(bnode);
+      const hnode = document.createElement(vnode.name);
+      const child = reconcileNode(
+        vnode.child,
+        emptyNode(),
+        hnode,
+        undefined,
+        effectManager
+      );
+      bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
+      reconcileTagProps(bnode, vnode.props, {});
+      placeChild(bnode.hnode, hparent, preSlot, true);
+      effectManager.refNodes.push(bnode);
     }
-    case NODE_TYPE_TEXT: {
-      if (bnode.type === NODE_TYPE_TEXT) {
-        if (bnode.data !== vnode.data) {
-          bnode.hnode.data = vnode.data;
-          bnode.data = vnode.data;
-        }
-        placeChild(bnode.hnode, hparent, preSlot, false);
-      } else {
-        unmount(bnode);
-        const hnode = document.createTextNode(vnode.data);
-        bnode = { ...vnode, hnode } satisfies BText;
-        placeChild(bnode.hnode, hparent, preSlot, true);
+    bnode.child.parent = bnode;
+  } else if (vnode.type === NODE_TYPE_TEXT) {
+    if (bnode.type === NODE_TYPE_TEXT) {
+      if (bnode.data !== vnode.data) {
+        bnode.hnode.data = vnode.data;
+        bnode.data = vnode.data;
       }
-      break;
+      placeChild(bnode.hnode, hparent, preSlot, false);
+    } else {
+      unmount(bnode);
+      const hnode = document.createTextNode(vnode.data);
+      bnode = { ...vnode, hnode } satisfies BText;
+      placeChild(bnode.hnode, hparent, preSlot, true);
     }
-    case NODE_TYPE_FRAGMENT: {
-      // TODO: learn from
-      // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
-      // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
-      // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
-      if (bnode.type === NODE_TYPE_FRAGMENT && bnode.key === vnode.key) {
-        const [newChildren, oldChildren] = alignChildrenByKey(
-          vnode.children,
-          bnode.children
-        );
-        bnode.children = newChildren;
-        for (const bnode of oldChildren) {
-          unmount(bnode);
-        }
-      } else {
+  } else if (vnode.type === NODE_TYPE_FRAGMENT) {
+    // TODO: learn from
+    // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
+    // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
+    // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
+    if (bnode.type === NODE_TYPE_FRAGMENT && bnode.key === vnode.key) {
+      const [newChildren, oldChildren] = alignChildrenByKey(
+        vnode.children,
+        bnode.children
+      );
+      bnode.children = newChildren;
+      for (const bnode of oldChildren) {
         unmount(bnode);
-        bnode = { ...vnode, children: [] } satisfies BFragment;
       }
-      // unmount excess bnode.children
-      const bchildren = bnode.children;
-      for (const bchild of bchildren.slice(vnode.children.length)) {
-        unmount(bchild);
-      }
-      // reconcile vnode.children
-      bnode.slot = undefined;
-      for (let i = 0; i < vnode.children.length; i++) {
-        const bchild = reconcileNode(
-          vnode.children[i],
-          bchildren[i] ?? emptyNode(),
-          hparent,
-          preSlot,
-          effectManager
-        );
-        preSlot = getSlot(bchild) ?? preSlot;
-        bnode.slot = getSlot(bchild) ?? bnode.slot;
-        bnode.children[i] = bchild;
-        bchild.parent = bnode;
-      }
-      break;
+    } else {
+      unmount(bnode);
+      bnode = { ...vnode, children: [] } satisfies BFragment;
     }
-    case NODE_TYPE_CUSTOM: {
-      if (
-        bnode.type === NODE_TYPE_CUSTOM &&
-        bnode.key === vnode.key &&
-        bnode.render === vnode.render
-      ) {
-        bnode.hookContext.notify = updateCustomNodeUnsupported;
-        const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
-        bnode.child = reconcileNode(
-          vchild,
-          bnode.child,
-          hparent,
-          preSlot,
-          effectManager
-        );
-        bnode.props = vnode.props;
-      } else {
-        unmount(bnode);
-        const hookContext = new HookContext(updateCustomNodeUnsupported);
-        const vchild = hookContext.wrap(() => vnode.render(vnode.props));
-        const child = reconcileNode(
-          vchild,
-          emptyNode(),
-          hparent,
-          preSlot,
-          effectManager
-        );
-        bnode = { ...vnode, child, hookContext } satisfies BCustom;
-      }
-      bnode.hparent = hparent;
-      bnode.child.parent = bnode;
-      bnode.slot = getSlot(bnode.child);
-      effectManager.effectNodes.push(bnode);
+    // unmount excess bnode.children
+    const bchildren = bnode.children;
+    for (const bchild of bchildren.slice(vnode.children.length)) {
+      unmount(bchild);
+    }
+    // reconcile vnode.children
+    bnode.slot = undefined;
+    for (let i = 0; i < vnode.children.length; i++) {
+      const bchild = reconcileNode(
+        vnode.children[i],
+        bchildren[i] ?? emptyNode(),
+        hparent,
+        preSlot,
+        effectManager
+      );
+      preSlot = getSlot(bchild) ?? preSlot;
+      bnode.slot = getSlot(bchild) ?? bnode.slot;
+      bnode.children[i] = bchild;
+      bchild.parent = bnode;
+    }
+  } else if (vnode.type === NODE_TYPE_CUSTOM) {
+    if (
+      bnode.type === NODE_TYPE_CUSTOM &&
+      bnode.key === vnode.key &&
+      bnode.render === vnode.render
+    ) {
+      bnode.hookContext.notify = updateCustomNodeUnsupported;
+      const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
+      bnode.child = reconcileNode(
+        vchild,
+        bnode.child,
+        hparent,
+        preSlot,
+        effectManager
+      );
+      bnode.props = vnode.props;
+    } else {
+      unmount(bnode);
+      const hookContext = new HookContext(updateCustomNodeUnsupported);
+      const vchild = hookContext.wrap(() => vnode.render(vnode.props));
+      const child = reconcileNode(
+        vchild,
+        emptyNode(),
+        hparent,
+        preSlot,
+        effectManager
+      );
+      bnode = { ...vnode, child, hookContext } satisfies BCustom;
+    }
+    bnode.hparent = hparent;
+    bnode.child.parent = bnode;
+    bnode.slot = getSlot(bnode.child);
+    effectManager.effectNodes.push(bnode);
 
-      // expose re-rendering via hooks
-      const bcustom = bnode; // type-guard
-      bnode.hookContext.notify = () => {
-        updateCustomNode(vnode, bcustom);
-      };
-      break;
-    }
+    // expose re-rendering via hooks
+    const bcustom = bnode; // type-guard
+    bnode.hookContext.notify = () => {
+      updateCustomNode(vnode, bcustom);
+    };
+  } else {
+    vnode satisfies never;
   }
   return bnode;
 }
@@ -382,36 +374,28 @@ function unmount(bnode: BNode) {
 }
 
 function unmountNode(bnode: BNode, skipRemove: boolean) {
-  switch (bnode.type) {
-    case NODE_TYPE_EMPTY: {
-      break;
-    }
-    case NODE_TYPE_TAG: {
-      // skipRemove children since parent will detach subtree
-      unmountNode(bnode.child, /* skipRemove */ true);
-      if (!skipRemove) {
-        bnode.hnode.remove();
-        bnode.ref?.(null);
-      }
-      break;
-    }
-    case NODE_TYPE_TEXT: {
+  if (bnode.type === NODE_TYPE_EMPTY) {
+    return;
+  } else if (bnode.type === NODE_TYPE_TAG) {
+    // skipRemove children since parent will detach subtree
+    unmountNode(bnode.child, /* skipRemove */ true);
+    if (!skipRemove) {
       bnode.hnode.remove();
-      break;
+      bnode.ref?.(null);
     }
-    case NODE_TYPE_FRAGMENT: {
-      for (const child of bnode.children) {
-        unmountNode(child, skipRemove);
-      }
-      break;
+  } else if (bnode.type === NODE_TYPE_TEXT) {
+    bnode.hnode.remove();
+  } else if (bnode.type === NODE_TYPE_FRAGMENT) {
+    for (const child of bnode.children) {
+      unmountNode(child, skipRemove);
     }
-    case NODE_TYPE_CUSTOM: {
-      bnode.hookContext.cleanupEffect("layout-effect");
-      bnode.hookContext.cleanupEffect("effect");
-      bnode.hparent = undefined;
-      unmountNode(bnode.child, skipRemove);
-      break;
-    }
+  } else if (bnode.type === NODE_TYPE_CUSTOM) {
+    bnode.hookContext.cleanupEffect("layout-effect");
+    bnode.hookContext.cleanupEffect("effect");
+    bnode.hparent = undefined;
+    unmountNode(bnode.child, skipRemove);
+  } else {
+    bnode satisfies never;
   }
 }
 
