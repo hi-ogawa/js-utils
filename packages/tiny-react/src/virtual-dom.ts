@@ -26,7 +26,6 @@ export const NODE_TYPE_FRAGMENT = "fragment" as const;
 // TODO: optimize object shape?
 export type VNode = VEmpty | VTag | VText | VCustom | VFragment;
 
-// TODO: safe to optmize into singleton constant?
 export type VEmpty = {
   type: typeof NODE_TYPE_EMPTY;
 };
@@ -69,21 +68,15 @@ export type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
 export type BNodeParent = BTag | BCustom | BFragment;
 
-export type BEmpty = VEmpty & {
-  // not needed since only we need to traverse up only from BCustom?
-  // but for now, make it easier by having uniform `BNode.parent` type
-  parent?: BNodeParent;
-};
+export type BEmpty = VEmpty;
 
 export type BTag = Omit<VTag, "child"> & {
-  parent?: BNodeParent;
   child: BNode;
   hnode: HTag;
   listeners: Map<string, () => void>;
 };
 
 export type BText = VText & {
-  parent?: BNodeParent;
   hnode: HText;
 };
 
@@ -101,18 +94,9 @@ export type BFragment = Omit<VFragment, "children"> & {
   slot?: HNode;
 };
 
-export function emptyNode(): VNode & BNode {
-  return {
-    type: NODE_TYPE_EMPTY,
-  };
-}
-
-// TODO: identical empty vnode?
-//       for now, this would be critical to not break `memo(Component)` shallow equal with empty children.
-//       ideally, we could VNode to accomodate `null | string | number` primitives...
-export const EMPTY_VNODE: VEmpty = {
+export const EMPTY_NODE: VNode & BNode = {
   type: NODE_TYPE_EMPTY,
-};
+} satisfies VEmpty;
 
 export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
   if (
@@ -134,4 +118,18 @@ export function getSlot(node: BNode): HNode | undefined {
     return node.hnode;
   }
   return node.slot;
+}
+
+// bnode parent traversal is only for BCustom and BFragment
+export function getBNodeParent(node: BNode): BNodeParent | undefined {
+  if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
+    return node.parent;
+  }
+  return;
+}
+
+export function setBNodeParent(node: BNode, parent: BNodeParent) {
+  if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
+    node.parent = parent;
+  }
 }
