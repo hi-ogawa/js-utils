@@ -218,9 +218,7 @@ describe(render, () => {
         </main>,
         "key": undefined,
         "props": {
-          "children": {
-            "type": "empty",
-          },
+          "children": null,
           "value": "hello",
         },
         "render": [Function],

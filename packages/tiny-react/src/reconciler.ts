@@ -42,7 +42,7 @@ function reconcileNode(
   effectManager: EffectManager
 ): BNode {
   // switch by vnode.type, then in each case, another branch to whether mutate or re-mount
-  if (vnode === null || vnode.type === NODE_TYPE_EMPTY) {
+  if (vnode === null) {
     if (bnode.type === NODE_TYPE_EMPTY) {
     } else {
       unmount(bnode);

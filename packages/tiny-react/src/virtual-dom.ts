@@ -24,14 +24,9 @@ export const NODE_TYPE_FRAGMENT = "fragment" as const;
 //
 
 // TODO: optimize object shape?
-export type VNode = VEmpty2 | VEmpty | VTag | VText | VCustom | VFragment;
+export type VNode = VEmpty | VTag | VText | VCustom | VFragment;
 
-export type VEmpty2 = null;
-
-// TODO: safe to optmize into singleton constant?
-export type VEmpty = {
-  type: typeof NODE_TYPE_EMPTY;
-};
+export type VEmpty = null;
 
 // dom element
 export type VTag = {
@@ -71,7 +66,8 @@ export type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
 export type BNodeParent = BTag | BCustom | BFragment;
 
-export type BEmpty = VEmpty & {
+export type BEmpty = {
+  type: typeof NODE_TYPE_EMPTY;
   // not needed since only we need to traverse up only from BCustom?
   // but for now, make it easier by having uniform `BNode.parent` type
   parent?: BNodeParent;
@@ -103,23 +99,16 @@ export type BFragment = Omit<VFragment, "children"> & {
   slot?: HNode;
 };
 
-export function emptyNode(): VNode & BNode {
+export function emptyNode(): BNode {
   return {
     type: NODE_TYPE_EMPTY,
-  };
+  } satisfies BEmpty;
 }
 
-// TODO: identical empty vnode?
-//       for now, this would be critical to not break `memo(Component)` shallow equal with empty children.
-//       ideally, we could VNode to accomodate `null | string | number` primitives...
-export const EMPTY_VNODE: VEmpty = {
-  type: NODE_TYPE_EMPTY,
-};
-
-export const EMPTY_VNODE2 = null satisfies VEmpty2;
+export const EMPTY_VNODE = null satisfies VEmpty;
 
 export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
-  if (node === EMPTY_VNODE2) {
+  if (node === EMPTY_VNODE) {
     return;
   }
   if (

@@ -26,17 +26,13 @@ describe("hyperscript", () => {
             {
               "key": "abc",
               "props": {
-                "children": {
-                  "type": "empty",
-                },
+                "children": null,
                 "value": "hello",
               },
               "render": [Function],
               "type": "custom",
             },
-            {
-              "type": "empty",
-            },
+            null,
             {
               "data": "0",
               "type": "text",
@@ -44,16 +40,12 @@ describe("hyperscript", () => {
             {
               "key": undefined,
               "props": {
-                "children": {
-                  "type": "empty",
-                },
+                "children": null,
               },
               "render": [Function],
               "type": "custom",
             },
-            {
-              "type": "empty",
-            },
+            null,
             {
               "child": {
                 "data": "world",
