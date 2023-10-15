@@ -286,16 +286,14 @@ function alignChildrenByKey(
 ): [BNode[], BNode[]] {
   const keyMap = new Map<NodeKey, number>();
 
-  vnodes.forEach((vnode, i) => {
-    const key = getNodeKey(vnode);
-    if (typeof key !== "undefined") {
+  for (let i = 0; i < vnodes.length; i++) {
+    const key = getNodeKey(vnodes[i]);
+    if (typeof key !== "undefined" && !keyMap.has(key)) {
       keyMap.set(key, i);
+    } else {
+      // give up if no nodes are not fully uniquely keyed
+      return [bnodes, []];
     }
-  });
-
-  // for now, handle only when all nodes have keys
-  if (keyMap.size !== vnodes.length) {
-    return [bnodes, []];
   }
 
   const newBnodes = vnodes.map(() => emptyNode());
