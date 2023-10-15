@@ -33,10 +33,7 @@ describe("hyperscript", () => {
               "type": 2,
             },
             null,
-            {
-              "data": "0",
-              "type": 1,
-            },
+            "0",
             {
               "key": undefined,
               "props": {
@@ -47,10 +44,7 @@ describe("hyperscript", () => {
             },
             null,
             {
-              "child": {
-                "data": "world",
-                "type": 1,
-              },
+              "child": "world",
               "key": 0,
               "name": "span",
               "props": {
@@ -60,10 +54,7 @@ describe("hyperscript", () => {
               "type": 0,
             },
             {
-              "child": {
-                "data": "0",
-                "type": 1,
-              },
+              "child": "0",
               "key": undefined,
               "name": "span",
               "props": {},
@@ -73,14 +64,8 @@ describe("hyperscript", () => {
             {
               "child": {
                 "children": [
-                  {
-                    "data": "0",
-                    "type": 1,
-                  },
-                  {
-                    "data": "1",
-                    "type": 1,
-                  },
+                  "0",
+                  "1",
                 ],
                 "type": 3,
               },

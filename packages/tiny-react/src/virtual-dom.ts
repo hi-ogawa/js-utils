@@ -38,10 +38,7 @@ export type VTag = {
 };
 
 // text node
-export type VText = {
-  type: typeof NODE_TYPE_TEXT;
-  data: string;
-};
+export type VText = string;
 
 // user-defined functional component
 export type VCustom = {
@@ -73,7 +70,9 @@ export type BTag = Omit<VTag, "child"> & {
   listeners: Map<string, () => void>;
 };
 
-export type BText = VText & {
+export type BText = {
+  type: typeof NODE_TYPE_TEXT;
+  data: string;
   hnode: HText;
 };
 
@@ -93,8 +92,16 @@ export type BFragment = Omit<VFragment, "children"> & {
 
 export const EMPTY_NODE = null satisfies VEmpty;
 
+export function isEmptyNode(node: VNode | BNode): node is VEmpty {
+  return node === null;
+}
+
+export function isVText(node: VNode | BNode): node is VText {
+  return typeof node === "string";
+}
+
 export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
-  if (node === EMPTY_NODE) {
+  if (isEmptyNode(node) || isVText(node)) {
     return;
   }
   if (

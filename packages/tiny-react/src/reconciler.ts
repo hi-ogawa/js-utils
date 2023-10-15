@@ -19,6 +19,8 @@ import {
   getBNodeParent,
   getNodeKey,
   getSlot,
+  isEmptyNode,
+  isVText,
   setBNodeParent,
 } from "./virtual-dom";
 
@@ -43,11 +45,23 @@ function reconcileNode(
   effectManager: EffectManager
 ): BNode {
   // switch by vnode.type, then in each case, another branch to whether mutate or re-mount
-  if (vnode === null) {
-    if (bnode === EMPTY_NODE) {
-    } else {
+  if (isEmptyNode(vnode)) {
+    if (!isEmptyNode(bnode)) {
       unmount(bnode);
       bnode = EMPTY_NODE;
+    }
+  } else if (isVText(vnode)) {
+    if (bnode && bnode.type === NODE_TYPE_TEXT) {
+      if (bnode.data !== vnode) {
+        bnode.hnode.data = vnode;
+        bnode.data = vnode;
+      }
+      placeChild(bnode.hnode, hparent, preSlot, false);
+    } else {
+      unmount(bnode);
+      const hnode = document.createTextNode(vnode);
+      bnode = { type: NODE_TYPE_TEXT, data: vnode, hnode } satisfies BText;
+      placeChild(bnode.hnode, hparent, preSlot, true);
     }
   } else if (vnode.type === NODE_TYPE_TAG) {
     if (
@@ -83,19 +97,6 @@ function reconcileNode(
       effectManager.refNodes.push(bnode);
     }
     setBNodeParent(bnode.child, bnode);
-  } else if (vnode.type === NODE_TYPE_TEXT) {
-    if (bnode && bnode.type === NODE_TYPE_TEXT) {
-      if (bnode.data !== vnode.data) {
-        bnode.hnode.data = vnode.data;
-        bnode.data = vnode.data;
-      }
-      placeChild(bnode.hnode, hparent, preSlot, false);
-    } else {
-      unmount(bnode);
-      const hnode = document.createTextNode(vnode.data);
-      bnode = { ...vnode, hnode } satisfies BText;
-      placeChild(bnode.hnode, hparent, preSlot, true);
-    }
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
     // TODO: learn from
     // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416

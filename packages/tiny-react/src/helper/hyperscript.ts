@@ -3,10 +3,10 @@ import {
   NODE_TYPE_CUSTOM,
   NODE_TYPE_FRAGMENT,
   NODE_TYPE_TAG,
-  NODE_TYPE_TEXT,
   type NodeKey,
   type Props,
   type VNode,
+  type VText,
 } from "../virtual-dom";
 import type {
   ComponentChild,
@@ -83,10 +83,7 @@ function normalizeComponentChild(child: ComponentChild): VNode {
     return EMPTY_NODE;
   }
   if (typeof child === "string" || typeof child === "number") {
-    return {
-      type: NODE_TYPE_TEXT,
-      data: String(child),
-    };
+    return String(child) satisfies VText;
   }
   return child;
 }
