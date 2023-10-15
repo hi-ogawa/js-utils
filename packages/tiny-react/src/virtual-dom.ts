@@ -13,7 +13,6 @@ export type HTag = Element;
 export type HText = Text;
 
 // node type (TODO: check perf between string, number, symbol)
-export const NODE_TYPE_EMPTY = "empty" as const;
 export const NODE_TYPE_TAG = "tag" as const;
 export const NODE_TYPE_TEXT = "text" as const;
 export const NODE_TYPE_CUSTOM = "custom" as const;
@@ -66,9 +65,7 @@ export type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
 export type BNodeParent = BTag | BCustom | BFragment;
 
-export type BEmpty = {
-  type: typeof NODE_TYPE_EMPTY;
-};
+export type BEmpty = null;
 
 export type BTag = Omit<VTag, "child"> & {
   child: BNode;
@@ -94,16 +91,10 @@ export type BFragment = Omit<VFragment, "children"> & {
   slot?: HNode;
 };
 
-export function emptyNode(): BNode {
-  return {
-    type: NODE_TYPE_EMPTY,
-  } satisfies BEmpty;
-}
-
-export const EMPTY_VNODE = null satisfies VEmpty;
+export const EMPTY_NODE = null satisfies VEmpty;
 
 export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
-  if (node === EMPTY_VNODE) {
+  if (node === EMPTY_NODE) {
     return;
   }
   if (
@@ -118,7 +109,7 @@ export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
 
 // "slot" is the last HNode inside the BNode subtree
 export function getSlot(node: BNode): HNode | undefined {
-  if (node.type === NODE_TYPE_EMPTY) {
+  if (node === EMPTY_NODE) {
     return;
   }
   if (node.type === NODE_TYPE_TAG || node.type === NODE_TYPE_TEXT) {
@@ -129,6 +120,9 @@ export function getSlot(node: BNode): HNode | undefined {
 
 // bnode parent traversal is only for BCustom and BFragment
 export function getBNodeParent(node: BNode): BNodeParent | undefined {
+  if (node === EMPTY_NODE) {
+    return;
+  }
   if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
     return node.parent;
   }
@@ -136,6 +130,9 @@ export function getBNodeParent(node: BNode): BNodeParent | undefined {
 }
 
 export function setBNodeParent(node: BNode, parent: BNodeParent) {
+  if (node === EMPTY_NODE) {
+    return;
+  }
   if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
     node.parent = parent;
   }

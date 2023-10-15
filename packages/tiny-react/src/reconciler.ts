@@ -6,9 +6,9 @@ import {
   type BNode,
   type BTag,
   type BText,
+  EMPTY_NODE,
   type HNode,
   NODE_TYPE_CUSTOM,
-  NODE_TYPE_EMPTY,
   NODE_TYPE_FRAGMENT,
   NODE_TYPE_TAG,
   NODE_TYPE_TEXT,
@@ -16,7 +16,6 @@ import {
   type Props,
   type VCustom,
   type VNode,
-  emptyNode,
   getBNodeParent,
   getNodeKey,
   getSlot,
@@ -27,7 +26,7 @@ export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
   const effectManager = new EffectManager();
   const newBnode = reconcileNode(
     vnode,
-    bnode ?? emptyNode(),
+    bnode ?? EMPTY_NODE,
     parent,
     undefined,
     effectManager
@@ -45,13 +44,14 @@ function reconcileNode(
 ): BNode {
   // switch by vnode.type, then in each case, another branch to whether mutate or re-mount
   if (vnode === null) {
-    if (bnode.type === NODE_TYPE_EMPTY) {
+    if (bnode === EMPTY_NODE) {
     } else {
       unmount(bnode);
-      bnode = emptyNode();
+      bnode = EMPTY_NODE;
     }
   } else if (vnode.type === NODE_TYPE_TAG) {
     if (
+      bnode &&
       bnode.type === NODE_TYPE_TAG &&
       bnode.key === vnode.key &&
       bnode.ref === vnode.ref &&
@@ -72,7 +72,7 @@ function reconcileNode(
       const hnode = document.createElement(vnode.name);
       const child = reconcileNode(
         vnode.child,
-        emptyNode(),
+        EMPTY_NODE,
         hnode,
         undefined,
         effectManager
@@ -84,7 +84,7 @@ function reconcileNode(
     }
     setBNodeParent(bnode.child, bnode);
   } else if (vnode.type === NODE_TYPE_TEXT) {
-    if (bnode.type === NODE_TYPE_TEXT) {
+    if (bnode && bnode.type === NODE_TYPE_TEXT) {
       if (bnode.data !== vnode.data) {
         bnode.hnode.data = vnode.data;
         bnode.data = vnode.data;
@@ -101,7 +101,7 @@ function reconcileNode(
     // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
     // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
     // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
-    if (bnode.type === NODE_TYPE_FRAGMENT && bnode.key === vnode.key) {
+    if (bnode && bnode.type === NODE_TYPE_FRAGMENT && bnode.key === vnode.key) {
       const [newChildren, oldChildren] = alignChildrenByKey(
         vnode.children,
         bnode.children
@@ -124,7 +124,7 @@ function reconcileNode(
     for (let i = 0; i < vnode.children.length; i++) {
       const bchild = reconcileNode(
         vnode.children[i],
-        bchildren[i] ?? emptyNode(),
+        bchildren[i] ?? EMPTY_NODE,
         hparent,
         preSlot,
         effectManager
@@ -136,6 +136,7 @@ function reconcileNode(
     }
   } else if (vnode.type === NODE_TYPE_CUSTOM) {
     if (
+      bnode &&
       bnode.type === NODE_TYPE_CUSTOM &&
       bnode.key === vnode.key &&
       bnode.render === vnode.render
@@ -156,7 +157,7 @@ function reconcileNode(
       const vchild = hookContext.wrap(() => vnode.render(vnode.props));
       const child = reconcileNode(
         vchild,
-        emptyNode(),
+        EMPTY_NODE,
         hparent,
         preSlot,
         effectManager
@@ -300,7 +301,7 @@ function alignChildrenByKey(
     return [bnodes, []];
   }
 
-  const newBnodes = vnodes.map(() => emptyNode());
+  const newBnodes: BNode[] = vnodes.map(() => EMPTY_NODE);
   const oldBnodes: BNode[] = [];
 
   for (const bnode of bnodes) {
@@ -376,7 +377,7 @@ function unmount(bnode: BNode) {
 }
 
 function unmountNode(bnode: BNode, skipRemove: boolean) {
-  if (bnode.type === NODE_TYPE_EMPTY) {
+  if (bnode === EMPTY_NODE) {
     return;
   } else if (bnode.type === NODE_TYPE_TAG) {
     // skipRemove children since parent will detach subtree
