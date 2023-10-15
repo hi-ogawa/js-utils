@@ -54,7 +54,7 @@ export function _typeCheck() {
 
   // @ts-expect-error constraint by JSX.ElementType
   <Custom3 />;
-  // @ts-expect-error
+
   <Custom4 />;
 
   // fragment
