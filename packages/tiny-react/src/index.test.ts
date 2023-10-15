@@ -44,13 +44,13 @@ describe(render, () => {
             {
               "data": "hello",
               "hnode": hello,
-              "type": "text",
+              "type": 1,
             },
             {
               "child": {
                 "data": "world",
                 "hnode": world,
-                "type": "text",
+                "type": 1,
               },
               "hnode": <span
                 class="text-red"
@@ -64,7 +64,7 @@ describe(render, () => {
                 "className": "text-red",
               },
               "ref": undefined,
-              "type": "tag",
+              "type": 0,
             },
           ],
           "parent": [Circular],
@@ -73,7 +73,7 @@ describe(render, () => {
           >
             world
           </span>,
-          "type": "fragment",
+          "type": 3,
         },
         "hnode": <div
           class="flex items-center gap-2"
@@ -92,7 +92,7 @@ describe(render, () => {
           "className": "flex items-center gap-2",
         },
         "ref": undefined,
-        "type": "tag",
+        "type": 0,
       }
     `);
     vnode = h.div({ className: "flex items-center gap-2" }, "reconcile");
@@ -111,7 +111,7 @@ describe(render, () => {
         "child": {
           "data": "reconcile",
           "hnode": reconcile,
-          "type": "text",
+          "type": 1,
         },
         "hnode": <div
           class="flex items-center gap-2"
@@ -125,7 +125,7 @@ describe(render, () => {
           "className": "flex items-center gap-2",
         },
         "ref": undefined,
-        "type": "tag",
+        "type": 0,
       }
     `);
   });
@@ -157,7 +157,7 @@ describe(render, () => {
                 "child": {
                   "data": "hello",
                   "hnode": hello,
-                  "type": "text",
+                  "type": 1,
                 },
                 "hnode": <span>
                   hello
@@ -167,17 +167,17 @@ describe(render, () => {
                 "name": "span",
                 "props": {},
                 "ref": undefined,
-                "type": "tag",
+                "type": 0,
               },
               {
                 "data": "world",
                 "hnode": world,
-                "type": "text",
+                "type": 1,
               },
             ],
             "parent": [Circular],
             "slot": world,
-            "type": "fragment",
+            "type": 3,
           },
           "hnode": <div>
             <span>
@@ -190,7 +190,7 @@ describe(render, () => {
           "name": "div",
           "props": {},
           "ref": undefined,
-          "type": "tag",
+          "type": 0,
         },
         "hookContext": HookContext {
           "hookCount": 0,
@@ -220,7 +220,7 @@ describe(render, () => {
           </span>
           world
         </div>,
-        "type": "custom",
+        "type": 2,
       }
     `);
   });

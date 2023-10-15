@@ -13,10 +13,10 @@ export type HTag = Element;
 export type HText = Text;
 
 // node type (TODO: check perf between string, number, symbol)
-export const NODE_TYPE_TAG = "tag" as const;
-export const NODE_TYPE_TEXT = "text" as const;
-export const NODE_TYPE_CUSTOM = "custom" as const;
-export const NODE_TYPE_FRAGMENT = "fragment" as const;
+export const NODE_TYPE_TAG = 0 as const;
+export const NODE_TYPE_TEXT = 1 as const;
+export const NODE_TYPE_CUSTOM = 2 as const;
+export const NODE_TYPE_FRAGMENT = 3 as const;
 
 //
 // virtual node (immutable)

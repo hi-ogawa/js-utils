@@ -30,12 +30,12 @@ describe("hyperscript", () => {
                 "value": "hello",
               },
               "render": [Function],
-              "type": "custom",
+              "type": 2,
             },
             null,
             {
               "data": "0",
-              "type": "text",
+              "type": 1,
             },
             {
               "key": undefined,
@@ -43,13 +43,13 @@ describe("hyperscript", () => {
                 "children": null,
               },
               "render": [Function],
-              "type": "custom",
+              "type": 2,
             },
             null,
             {
               "child": {
                 "data": "world",
-                "type": "text",
+                "type": 1,
               },
               "key": 0,
               "name": "span",
@@ -57,41 +57,41 @@ describe("hyperscript", () => {
                 "className": "text-red",
               },
               "ref": [Function],
-              "type": "tag",
+              "type": 0,
             },
             {
               "child": {
                 "data": "0",
-                "type": "text",
+                "type": 1,
               },
               "key": undefined,
               "name": "span",
               "props": {},
               "ref": undefined,
-              "type": "tag",
+              "type": 0,
             },
             {
               "child": {
                 "children": [
                   {
                     "data": "0",
-                    "type": "text",
+                    "type": 1,
                   },
                   {
                     "data": "1",
-                    "type": "text",
+                    "type": 1,
                   },
                 ],
-                "type": "fragment",
+                "type": 3,
               },
               "key": undefined,
               "name": "span",
               "props": {},
               "ref": undefined,
-              "type": "tag",
+              "type": 0,
             },
           ],
-          "type": "fragment",
+          "type": 3,
         },
         "key": undefined,
         "name": "div",
@@ -99,7 +99,7 @@ describe("hyperscript", () => {
           "className": "flex",
         },
         "ref": undefined,
-        "type": "tag",
+        "type": 0,
       }
     `);
   });
