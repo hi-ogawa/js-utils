@@ -68,20 +68,15 @@ export type BNodeParent = BTag | BCustom | BFragment;
 
 export type BEmpty = {
   type: typeof NODE_TYPE_EMPTY;
-  // not needed since only we need to traverse up only from BCustom?
-  // but for now, make it easier by having uniform `BNode.parent` type
-  parent?: BNodeParent;
 };
 
 export type BTag = Omit<VTag, "child"> & {
-  parent?: BNodeParent;
   child: BNode;
   hnode: HTag;
   listeners: Map<string, () => void>;
 };
 
 export type BText = VText & {
-  parent?: BNodeParent;
   hnode: HText;
 };
 
@@ -130,4 +125,18 @@ export function getSlot(node: BNode): HNode | undefined {
     return node.hnode;
   }
   return node.slot;
+}
+
+// bnode parent traversal is only for BCustom and BFragment
+export function getBNodeParent(node: BNode): BNodeParent | undefined {
+  if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
+    return node.parent;
+  }
+  return;
+}
+
+export function setBNodeParent(node: BNode, parent: BNodeParent) {
+  if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
+    node.parent = parent;
+  }
 }

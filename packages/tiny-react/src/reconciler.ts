@@ -17,8 +17,10 @@ import {
   type VCustom,
   type VNode,
   emptyNode,
+  getBNodeParent,
   getNodeKey,
   getSlot,
+  setBNodeParent,
 } from "./virtual-dom";
 
 export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
@@ -80,7 +82,7 @@ function reconcileNode(
       placeChild(bnode.hnode, hparent, preSlot, true);
       effectManager.refNodes.push(bnode);
     }
-    bnode.child.parent = bnode;
+    setBNodeParent(bnode.child, bnode);
   } else if (vnode.type === NODE_TYPE_TEXT) {
     if (bnode.type === NODE_TYPE_TEXT) {
       if (bnode.data !== vnode.data) {
@@ -130,7 +132,7 @@ function reconcileNode(
       preSlot = getSlot(bchild) ?? preSlot;
       bnode.slot = getSlot(bchild) ?? bnode.slot;
       bnode.children[i] = bchild;
-      bchild.parent = bnode;
+      setBNodeParent(bchild, bnode);
     }
   } else if (vnode.type === NODE_TYPE_CUSTOM) {
     if (
@@ -162,7 +164,7 @@ function reconcileNode(
       bnode = { ...vnode, child, hookContext } satisfies BCustom;
     }
     bnode.hparent = hparent;
-    bnode.child.parent = bnode;
+    setBNodeParent(bnode.child, bnode);
     bnode.slot = getSlot(bnode.child);
     effectManager.effectNodes.push(bnode);
 
@@ -228,7 +230,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
 }
 
 function findPreviousSlot(child: BNode): HNode | undefined {
-  let parent = child.parent;
+  let parent = getBNodeParent(child);
   while (parent) {
     if (parent.type === NODE_TYPE_TAG) {
       // no slot i.e. new node will be the first child within parent tag
@@ -253,13 +255,13 @@ function findPreviousSlot(child: BNode): HNode | undefined {
     }
     // go up to parent also when parent.type === "custom"
     child = parent;
-    parent = child.parent;
+    parent = getBNodeParent(child);
   }
   return;
 }
 
 function updateParentSlot(child: BNode) {
-  let parent = child.parent;
+  let parent = getBNodeParent(child);
   while (parent) {
     if (parent.type === NODE_TYPE_TAG) {
       return;
@@ -276,7 +278,7 @@ function updateParentSlot(child: BNode) {
       parent.slot = slot;
     }
     child = parent;
-    parent = child.parent;
+    parent = getBNodeParent(child);
   }
 }
 

@@ -44,14 +44,12 @@ describe(render, () => {
             {
               "data": "hello",
               "hnode": hello,
-              "parent": [Circular],
               "type": "text",
             },
             {
               "child": {
                 "data": "world",
                 "hnode": world,
-                "parent": [Circular],
                 "type": "text",
               },
               "hnode": <span
@@ -62,7 +60,6 @@ describe(render, () => {
               "key": undefined,
               "listeners": Map {},
               "name": "span",
-              "parent": [Circular],
               "props": {
                 "className": "text-red",
               },
@@ -114,7 +111,6 @@ describe(render, () => {
         "child": {
           "data": "reconcile",
           "hnode": reconcile,
-          "parent": [Circular],
           "type": "text",
         },
         "hnode": <div
@@ -161,7 +157,6 @@ describe(render, () => {
                 "child": {
                   "data": "hello",
                   "hnode": hello,
-                  "parent": [Circular],
                   "type": "text",
                 },
                 "hnode": <span>
@@ -170,7 +165,6 @@ describe(render, () => {
                 "key": undefined,
                 "listeners": Map {},
                 "name": "span",
-                "parent": [Circular],
                 "props": {},
                 "ref": undefined,
                 "type": "tag",
@@ -178,7 +172,6 @@ describe(render, () => {
               {
                 "data": "world",
                 "hnode": world,
-                "parent": [Circular],
                 "type": "text",
               },
             ],
@@ -195,7 +188,6 @@ describe(render, () => {
           "key": undefined,
           "listeners": Map {},
           "name": "div",
-          "parent": [Circular],
           "props": {},
           "ref": undefined,
           "type": "tag",
