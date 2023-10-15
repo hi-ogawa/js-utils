@@ -1,7 +1,7 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { createRoot, memo } from "./compat";
-import { Fragment, h } from "./helper/hyperscript";
+import { Fragment, createElement, h } from "./helper/hyperscript";
 import {
   useCallback,
   useEffect,
@@ -12,33 +12,15 @@ import {
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import { sleepFrame } from "./test-utils";
-import { type VNode } from "./virtual-dom";
+import { getSlot } from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {
-    let vnode: VNode = {
-      type: "tag",
-      name: "div",
-      props: { class: "flex items-center gap-2" },
-      child: {
-        type: "fragment",
-        children: [
-          {
-            type: "text",
-            data: "hello",
-          },
-          {
-            type: "tag",
-            name: "span",
-            props: { class: "text-red" },
-            child: {
-              type: "text",
-              data: "world",
-            },
-          },
-        ],
-      },
-    };
+    let vnode = h.div(
+      { className: "flex items-center gap-2" },
+      "hello",
+      h.span({ className: "text-red" }, "world")
+    );
     const parent = document.createElement("main");
     let bnode = render(vnode, parent);
     expect(parent).toMatchInlineSnapshot(`
@@ -77,12 +59,14 @@ describe(render, () => {
               >
                 world
               </span>,
+              "key": undefined,
               "listeners": Map {},
               "name": "span",
               "parent": [Circular],
               "props": {
-                "class": "text-red",
+                "className": "text-red",
               },
+              "ref": undefined,
               "type": "tag",
             },
           ],
@@ -104,21 +88,17 @@ describe(render, () => {
             world
           </span>
         </div>,
+        "key": undefined,
         "listeners": Map {},
         "name": "div",
         "props": {
-          "class": "flex items-center gap-2",
+          "className": "flex items-center gap-2",
         },
+        "ref": undefined,
         "type": "tag",
       }
     `);
-    vnode = {
-      ...vnode,
-      child: {
-        type: "text",
-        data: "reconcile",
-      },
-    };
+    vnode = h.div({ className: "flex items-center gap-2" }, "reconcile");
     bnode = render(vnode, parent, bnode);
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -142,79 +122,83 @@ describe(render, () => {
         >
           reconcile
         </div>,
+        "key": undefined,
         "listeners": Map {},
         "name": "div",
         "props": {
-          "class": "flex items-center gap-2",
+          "className": "flex items-center gap-2",
         },
+        "ref": undefined,
         "type": "tag",
       }
     `);
   });
 
   it("custom", () => {
-    const vnode: VNode = {
-      type: "custom",
-      props: { value: "hello" },
-      render: (props) => ({
-        type: "fragment",
-        children: [
-          {
-            type: "tag",
-            name: "span",
-            props: {},
-            child: {
-              type: "text",
-              data: (props as any).value,
-            },
-          },
-          {
-            type: "text",
-            data: "world",
-          },
-        ],
-      }),
-    };
+    function Custom(props: { value: string }) {
+      return h.div({}, h.span({}, props.value), "world");
+    }
+
+    const vnode = h(Custom, { value: "hello" });
     const parent = document.createElement("main");
     const bnode = render(vnode, parent);
     expect(parent).toMatchInlineSnapshot(`
       <main>
-        <span>
-          hello
-        </span>
-        world
+        <div>
+          <span>
+            hello
+          </span>
+          world
+        </div>
       </main>
     `);
     expect(bnode).toMatchInlineSnapshot(`
       {
         "child": {
-          "children": [
-            {
-              "child": {
-                "data": "hello",
-                "hnode": hello,
+          "child": {
+            "children": [
+              {
+                "child": {
+                  "data": "hello",
+                  "hnode": hello,
+                  "parent": [Circular],
+                  "type": "text",
+                },
+                "hnode": <span>
+                  hello
+                </span>,
+                "key": undefined,
+                "listeners": Map {},
+                "name": "span",
+                "parent": [Circular],
+                "props": {},
+                "ref": undefined,
+                "type": "tag",
+              },
+              {
+                "data": "world",
+                "hnode": world,
                 "parent": [Circular],
                 "type": "text",
               },
-              "hnode": <span>
-                hello
-              </span>,
-              "listeners": Map {},
-              "name": "span",
-              "parent": [Circular],
-              "props": {},
-              "type": "tag",
-            },
-            {
-              "data": "world",
-              "hnode": world,
-              "parent": [Circular],
-              "type": "text",
-            },
-          ],
+            ],
+            "parent": [Circular],
+            "slot": world,
+            "type": "fragment",
+          },
+          "hnode": <div>
+            <span>
+              hello
+            </span>
+            world
+          </div>,
+          "key": undefined,
+          "listeners": Map {},
+          "name": "div",
           "parent": [Circular],
-          "slot": world,
-          "type": "fragment",
+          "props": {},
+          "ref": undefined,
+          "type": "tag",
         },
         "hookContext": HookContext {
           "hookCount": 0,
@@ -225,26 +209,38 @@ describe(render, () => {
           "useReducer": [Function],
         },
         "hparent": <main>
+          <div>
+            <span>
+              hello
+            </span>
+            world
+          </div>
+        </main>,
+        "key": undefined,
+        "props": {
+          "children": {
+            "type": "empty",
+          },
+          "value": "hello",
+        },
+        "render": [Function],
+        "slot": <div>
           <span>
             hello
           </span>
           world
-        </main>,
-        "props": {
-          "value": "hello",
-        },
-        "render": [Function],
-        "slot": world,
+        </div>,
         "type": "custom",
       }
     `);
   });
 
   it("fragment children key basic", () => {
-    const vnode: VNode = {
-      type: "fragment",
-      children: [..."abc"].map((key) => h.span({ key }, key)),
-    };
+    let vnode = h(Fragment, {}, [
+      h.span({ key: "a" }, "a"),
+      h.span({ key: "b" }, "b"),
+      h.span({ key: "c" }, "c"),
+    ]);
     const parent = document.createElement("main");
 
     // initial render
@@ -288,13 +284,12 @@ describe(render, () => {
       </main>
     `);
 
-    // update fragment children while keeping key
-    tinyassert(vnode.type === "fragment");
-    vnode.children.reverse();
-    tinyassert(vnode.children[0].type === "tag");
-    vnode.children[0].props = {
-      "data-new-prop": "boom",
-    };
+    // update children while keeping key
+    vnode = h(Fragment, {}, [
+      h.span({ key: "c", ["data-new-prop" as any]: "boom" }, "c"),
+      h.span({ key: "b" }, "b"),
+      h.span({ key: "a" }, "a"),
+    ]);
 
     // re-render should keep mutated dom
     render(vnode, parent, bnode);
@@ -322,10 +317,7 @@ describe(render, () => {
   });
 
   it("fragment children key - append", () => {
-    let vnode: VNode = {
-      type: "fragment",
-      children: [],
-    };
+    let vnode = h(Fragment, {});
     const parent = document.createElement("main");
 
     const hchild = (key: string) => h.div({ key }, key);
@@ -333,10 +325,7 @@ describe(render, () => {
     let bnode = render(vnode, parent);
     expect(parent).toMatchInlineSnapshot("<main />");
 
-    vnode = {
-      type: "fragment",
-      children: [hchild("a")],
-    };
+    vnode = h(Fragment, {}, [hchild("a")]);
     bnode = render(vnode, parent, bnode);
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -346,10 +335,7 @@ describe(render, () => {
       </main>
     `);
 
-    vnode = {
-      type: "fragment",
-      children: [hchild("a"), hchild("b")],
-    };
+    vnode = h(Fragment, {}, [hchild("a"), hchild("b")]);
     bnode = render(vnode, parent, bnode);
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -626,25 +612,24 @@ describe(render, () => {
 
 describe(updateCustomNode, () => {
   it("basic", () => {
-    let vnode = {
-      type: "fragment",
-      children: [
-        {
-          type: "custom",
-          props: {
-            tag: "div",
-          },
-          render: (props: any) => h(props.tag, {}, "x"),
-        },
-        {
-          type: "custom",
-          props: {
-            tag: "span",
-          },
-          render: (props: any) => h(props.tag, {}, "y"),
-        },
-      ],
-    } satisfies VNode;
+    // check inner component re-rendering to fixup parent BNode.slot
+
+    let update1!: (tag: string) => void;
+    let update2!: (tag: string) => void;
+
+    function Custom1() {
+      const [tag, setTag] = useState("div");
+      update1 = setTag;
+      return createElement(tag, {}, "x");
+    }
+
+    function Custom2() {
+      const [tag, setTag] = useState("span");
+      update2 = setTag;
+      return createElement(tag, {}, "y");
+    }
+
+    let vnode = h(Fragment, {}, h(Custom1, {}), h(Custom2, {}));
     const parent = document.createElement("main");
 
     let bnode = render(vnode, parent);
@@ -658,23 +643,13 @@ describe(updateCustomNode, () => {
         </span>
       </main>
     `);
-    tinyassert(bnode.type === "fragment");
-    expect(bnode.slot).toMatchInlineSnapshot(`
+    expect(getSlot(bnode)).toMatchInlineSnapshot(`
       <span>
         y
       </span>
     `);
 
-    tinyassert(bnode.children[0].type === "custom");
-    updateCustomNode(
-      {
-        ...vnode.children[0],
-        props: {
-          tag: "p",
-        },
-      },
-      bnode.children[0]
-    );
+    update1("p");
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <p>
@@ -685,22 +660,13 @@ describe(updateCustomNode, () => {
         </span>
       </main>
     `);
-    expect(bnode.slot).toMatchInlineSnapshot(`
+    expect(getSlot(bnode)).toMatchInlineSnapshot(`
       <span>
         y
       </span>
     `);
 
-    tinyassert(bnode.children[1].type === "custom");
-    updateCustomNode(
-      {
-        ...vnode.children[1],
-        props: {
-          tag: "b",
-        },
-      },
-      bnode.children[1]
-    );
+    update2("b");
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <p>
@@ -711,7 +677,7 @@ describe(updateCustomNode, () => {
         </b>
       </main>
     `);
-    expect(bnode.slot).toMatchInlineSnapshot(`
+    expect(getSlot(bnode)).toMatchInlineSnapshot(`
       <b>
         y
       </b>
@@ -1725,81 +1691,6 @@ describe(memo, () => {
           1,
         ],
       ]
-    `);
-  });
-});
-
-describe("hyperscript", () => {
-  it("basic", () => {
-    const parent = document.createElement("main");
-    function Custom(props: { value: string }) {
-      return h.input({ placeholder: props.value });
-    }
-    const vnode = h.div(
-      { className: "flex" },
-      h(Custom, { value: "hello" }),
-      null,
-      h.span({ className: "text-red" }, "world")
-    );
-    expect(vnode).toMatchInlineSnapshot(`
-      {
-        "child": {
-          "children": [
-            {
-              "key": undefined,
-              "props": {
-                "children": {
-                  "type": "empty",
-                },
-                "value": "hello",
-              },
-              "render": [Function],
-              "type": "custom",
-            },
-            {
-              "type": "empty",
-            },
-            {
-              "child": {
-                "data": "world",
-                "type": "text",
-              },
-              "key": undefined,
-              "name": "span",
-              "props": {
-                "className": "text-red",
-              },
-              "ref": undefined,
-              "type": "tag",
-            },
-          ],
-          "type": "fragment",
-        },
-        "key": undefined,
-        "name": "div",
-        "props": {
-          "className": "flex",
-        },
-        "ref": undefined,
-        "type": "tag",
-      }
-    `);
-    render(vnode, parent);
-    expect(parent).toMatchInlineSnapshot(`
-      <main>
-        <div
-          class="flex"
-        >
-          <input
-            placeholder="hello"
-          />
-          <span
-            class="text-red"
-          >
-            world
-          </span>
-        </div>
-      </main>
     `);
   });
 });
