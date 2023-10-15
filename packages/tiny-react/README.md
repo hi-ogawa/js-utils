@@ -14,8 +14,8 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 
 ## unsupported
 
-- context
-- ssr
+- ssr https://github.com/hi-ogawa/js-utils/pull/150
+- context https://github.com/hi-ogawa/js-utils/pull/151
 - suspense
 - error boundary
 - forwardRef
