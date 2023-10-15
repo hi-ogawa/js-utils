@@ -47,14 +47,16 @@ export function memo<P extends object>(
     nextProps: Readonly<P>
   ) => boolean = objectShallowEqual
 ): FC<P> {
-  let prev: { props: Readonly<P>; result: VNode } | undefined;
   function Memo(props: P) {
-    if (!prev || !propsAreEqual(prev.props, props)) {
-      prev = { props, result: fc(props) };
+    const prev = useRef<{ props: Readonly<P>; result: VNode } | undefined>(
+      undefined
+    );
+    if (!prev.current || !propsAreEqual(prev.current.props, props)) {
+      prev.current = { props, result: fc(props) };
     }
-    return prev.result;
+    return prev.current.result;
   }
-  Memo.displayName = `Memo(${(fc as any).displayName || fc.name})`;
+  Object.defineProperty(Memo, "name", { value: `Memo(${fc.name})` });
   return Memo;
 }
 

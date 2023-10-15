@@ -100,6 +100,13 @@ export function emptyNode(): VNode & BNode {
   };
 }
 
+// TODO: identical empty vnode?
+//       for now, this would be critical to not break `memo(Component)` shallow equal with empty children.
+//       ideally, we could VNode to accomodate `null | string | number` primitives...
+export const EMPTY_VNODE: VEmpty = {
+  type: "empty",
+};
+
 export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
   if (
     node.type === "tag" ||

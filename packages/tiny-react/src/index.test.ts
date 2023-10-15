@@ -1538,13 +1538,22 @@ describe(memo, () => {
 
     const parent = document.createElement("main");
     const root = createRoot(parent);
-    const child = emptyNode(); // TODO: currently each emptyNode has different identity
-
-    root.render(h(Custom, { label: "hi", value: 0 }, child));
+    root.render(
+      h(
+        Fragment,
+        {},
+        h(Custom, { label: "x-hi", value: 0 }),
+        h(Custom, { label: "y-hi", value: 0 })
+      )
+    );
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-          hi
+          x-hi
+          0
+        </div>
+        <div>
+          y-hi
           0
         </div>
       </main>
@@ -1552,17 +1561,32 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "hi",
+          "x-hi",
+          0,
+        ],
+        [
+          "y-hi",
           0,
         ],
       ]
     `);
 
-    root.render(h(Custom, { label: "hi", value: 0 }, child));
+    root.render(
+      h(
+        Fragment,
+        {},
+        h(Custom, { label: "x-hi", value: 0 }),
+        h(Custom, { label: "y-hi", value: 0 })
+      )
+    );
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-          hi
+          x-hi
+          0
+        </div>
+        <div>
+          y-hi
           0
         </div>
       </main>
@@ -1570,17 +1594,32 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "hi",
+          "x-hi",
+          0,
+        ],
+        [
+          "y-hi",
           0,
         ],
       ]
     `);
 
-    root.render(h(Custom, { label: "hello", value: 0 }, child));
+    root.render(
+      h(
+        Fragment,
+        {},
+        h(Custom, { label: "x-hello", value: 0 }),
+        h(Custom, { label: "y-hi", value: 0 })
+      )
+    );
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-          hello
+          x-hello
+          0
+        </div>
+        <div>
+          y-hi
           0
         </div>
       </main>
@@ -1588,21 +1627,36 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "hi",
+          "x-hi",
           0,
         ],
         [
-          "hello",
+          "y-hi",
+          0,
+        ],
+        [
+          "x-hello",
           0,
         ],
       ]
     `);
 
-    root.render(h(Custom, { label: "hi", value: 0 }, child));
+    root.render(
+      h(
+        Fragment,
+        {},
+        h(Custom, { label: "x-hi", value: 0 }),
+        h(Custom, { label: "y-hi", value: 0 })
+      )
+    );
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-          hi
+          x-hi
+          0
+        </div>
+        <div>
+          y-hi
           0
         </div>
       </main>
@@ -1610,45 +1664,64 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "hi",
+          "x-hi",
           0,
         ],
         [
-          "hello",
+          "y-hi",
           0,
         ],
         [
-          "hi",
+          "x-hello",
+          0,
+        ],
+        [
+          "x-hi",
           0,
         ],
       ]
     `);
 
-    root.render(h(Custom, { label: "hi", value: 1 }, child));
+    root.render(
+      h(
+        Fragment,
+        {},
+        h(Custom, { label: "x-hi", value: 1 }),
+        h(Custom, { label: "y-hi", value: 0 })
+      )
+    );
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-          hi
+          x-hi
           1
         </div>
+        <div>
+          y-hi
+          0
+        </div>
       </main>
     `);
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "hi",
+          "x-hi",
           0,
         ],
         [
-          "hello",
+          "y-hi",
           0,
         ],
         [
-          "hi",
+          "x-hello",
           0,
         ],
         [
-          "hi",
+          "x-hi",
+          0,
+        ],
+        [
+          "x-hi",
           1,
         ],
       ]

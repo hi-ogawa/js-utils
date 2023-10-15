@@ -41,7 +41,7 @@ function reconcileNode(
       if (bnode.type === "empty") {
       } else {
         unmount(bnode);
-        bnode = { ...vnode };
+        bnode = emptyNode();
       }
       break;
     }

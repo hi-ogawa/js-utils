@@ -1,4 +1,9 @@
-import { type NodeKey, type Props, type VNode } from "../virtual-dom";
+import {
+  EMPTY_VNODE,
+  type NodeKey,
+  type Props,
+  type VNode,
+} from "../virtual-dom";
 import type {
   ComponentChild,
   ComponentChildren,
@@ -65,14 +70,13 @@ function normalizeComponentChildren(children?: ComponentChildren): VNode {
 }
 
 function normalizeComponentChild(child: ComponentChild): VNode {
+  // TODO: instantiating new object for child/children would break shallow equal used for `memo(Component)`
   if (
     child === null ||
     typeof child === "undefined" ||
     typeof child === "boolean"
   ) {
-    return {
-      type: "empty",
-    };
+    return EMPTY_VNODE;
   }
   if (typeof child === "string" || typeof child === "number") {
     return {

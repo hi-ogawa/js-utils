@@ -1,12 +1,24 @@
+import { memo, useCallback, useState } from "@hiogawa/tiny-react";
 import { range } from "@hiogawa/utils";
-import { useState } from "../../../dist";
 
 // benchmark tasks from https://github.com/krausest/js-framework-benchmark
 // @hmr-unsafe
 export function JsFrameworkBenchmarkApp() {
   const [selected, setSelected] = useState<number | undefined>(undefined);
+
   const [n, setN] = useState(1000);
+
   const [items, setItems] = useState(() => generateItems(0));
+
+  const selectItem = useCallback(
+    (id: number) => setSelected((prev) => (prev === id ? undefined : id)),
+    []
+  );
+
+  const deleteItem = useCallback(
+    (id: number) => setItems((prev) => prev.filter((other) => other.id !== id)),
+    []
+  );
 
   return (
     <div className="border p-2 flex flex-col gap-2">
@@ -95,36 +107,56 @@ export function JsFrameworkBenchmarkApp() {
       </div>
       <div className="flex flex-col">
         {items.map((item) => (
-          <div
+          <MemoItemCompoment
             key={item.id}
-            className={cls(
-              "flex items-center p-2 px-4 first:border-t-0 border-t hover:bg-colorFillTertiary duration-300",
-              selected === item.id && "!bg-colorFillSecondary"
-            )}
-          >
-            <span className="flex-none text-sm text-colorTextSecondary w-[100px]">
-              {item.id}
-            </span>
-            <span
-              className="flex-1 cursor-pointer"
-              onclick={() => {
-                setSelected((prev) => (prev === item.id ? undefined : item.id));
-              }}
-            >
-              {item.label}
-            </span>
-            <span
-              className="antd-btn antd-btn-ghost i-ri-close-line w-5 h-5"
-              onclick={() => {
-                setItems(items.filter((other) => other.id !== item.id));
-              }}
-            ></span>
-          </div>
+            item={item}
+            isSelected={selected === item.id}
+            onSelect={selectItem}
+            onDelete={deleteItem}
+          />
         ))}
       </div>
     </div>
   );
 }
+
+// @hmr-disable
+function ItemComponent({
+  item,
+  isSelected,
+  onSelect,
+  onDelete,
+}: {
+  item: ItemData;
+  isSelected: boolean;
+  onSelect: (id: number) => void;
+  onDelete: (id: number) => void;
+}) {
+  return (
+    <div
+      key={item.id}
+      className={cls(
+        "flex items-center p-2 px-4 first:border-t-0 border-t hover:bg-colorFillTertiary duration-300",
+        isSelected && "!bg-colorFillSecondary"
+      )}
+    >
+      <span className="flex-none text-sm text-colorTextSecondary w-[100px]">
+        {item.id}
+      </span>
+      {/* re-attaching event listener is critical, but having `useCallback` here matters less since `ItemComponent` itself is memoized already */}
+      <span className="flex-1 cursor-pointer" onclick={() => onSelect(item.id)}>
+        {item.label}
+      </span>
+      <span
+        className="antd-btn antd-btn-ghost i-ri-close-line w-5 h-5"
+        onclick={() => onDelete(item.id)}
+      />
+    </div>
+  );
+}
+
+// @hmr-disable
+const MemoItemCompoment = memo(ItemComponent);
 
 interface ItemData {
   id: number;
@@ -135,7 +167,7 @@ function cls(...args: unknown[]) {
   return args.filter(Boolean).join(" ");
 }
 
-let nextItemId = 0;
+let nextItemId = 1;
 
 function generateItems(n: number) {
   return range(n).map(() => generateItem());
