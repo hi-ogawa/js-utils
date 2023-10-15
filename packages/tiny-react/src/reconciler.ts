@@ -75,7 +75,17 @@ function reconcileNode(
         undefined,
         effectManager
       );
-      bnode = { ...vnode, child, hnode, listeners: new Map() } satisfies BTag;
+      bnode = {
+        type: vnode.type,
+        name: vnode.name,
+        key: vnode.key,
+        ref: vnode.ref,
+        props: vnode.props,
+        parent: undefined,
+        child,
+        hnode,
+        listeners: new Map(),
+      } satisfies BTag;
       reconcileTagProps(bnode, vnode.props, {});
       placeChild(bnode.hnode, hparent, preSlot, true);
       effectManager.refNodes.push(bnode);
@@ -91,7 +101,12 @@ function reconcileNode(
     } else {
       unmount(bnode);
       const hnode = document.createTextNode(vnode.data);
-      bnode = { ...vnode, hnode } satisfies BText;
+      bnode = {
+        type: vnode.type,
+        data: vnode.data,
+        parent: undefined,
+        hnode,
+      } satisfies BText;
       placeChild(bnode.hnode, hparent, preSlot, true);
     }
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
@@ -110,7 +125,13 @@ function reconcileNode(
       }
     } else {
       unmount(bnode);
-      bnode = { ...vnode, children: [] } satisfies BFragment;
+      bnode = {
+        type: vnode.type,
+        key: vnode.key,
+        parent: undefined,
+        slot: undefined,
+        children: [],
+      } satisfies BFragment;
     }
     // unmount excess bnode.children
     const bchildren = bnode.children;
@@ -159,7 +180,17 @@ function reconcileNode(
         preSlot,
         effectManager
       );
-      bnode = { ...vnode, child, hookContext } satisfies BCustom;
+      bnode = {
+        type: vnode.type,
+        key: vnode.key,
+        render: vnode.render,
+        props: vnode.props,
+        hparent: undefined,
+        parent: undefined,
+        slot: undefined,
+        child,
+        hookContext,
+      } satisfies BCustom;
     }
     bnode.hparent = hparent;
     bnode.child.parent = bnode;

@@ -70,6 +70,7 @@ describe(render, () => {
               "type": "tag",
             },
           ],
+          "key": undefined,
           "parent": [Circular],
           "slot": <span
             class="text-red"
@@ -91,6 +92,7 @@ describe(render, () => {
         "key": undefined,
         "listeners": Map {},
         "name": "div",
+        "parent": undefined,
         "props": {
           "className": "flex items-center gap-2",
         },
@@ -125,6 +127,7 @@ describe(render, () => {
         "key": undefined,
         "listeners": Map {},
         "name": "div",
+        "parent": undefined,
         "props": {
           "className": "flex items-center gap-2",
         },
@@ -182,6 +185,7 @@ describe(render, () => {
                 "type": "text",
               },
             ],
+            "key": undefined,
             "parent": [Circular],
             "slot": world,
             "type": "fragment",
@@ -217,6 +221,7 @@ describe(render, () => {
           </div>
         </main>,
         "key": undefined,
+        "parent": undefined,
         "props": {
           "children": {
             "type": "empty",
