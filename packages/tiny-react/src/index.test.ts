@@ -45,14 +45,14 @@ describe(render, () => {
               "data": "hello",
               "hnode": hello,
               "parent": [Circular],
-              "type": "text",
+              "type": Symbol(text),
             },
             {
               "child": {
                 "data": "world",
                 "hnode": world,
                 "parent": [Circular],
-                "type": "text",
+                "type": Symbol(text),
               },
               "hnode": <span
                 class="text-red"
@@ -67,7 +67,7 @@ describe(render, () => {
                 "className": "text-red",
               },
               "ref": undefined,
-              "type": "tag",
+              "type": Symbol(tag),
             },
           ],
           "parent": [Circular],
@@ -76,7 +76,7 @@ describe(render, () => {
           >
             world
           </span>,
-          "type": "fragment",
+          "type": Symbol(fragment),
         },
         "hnode": <div
           class="flex items-center gap-2"
@@ -95,7 +95,7 @@ describe(render, () => {
           "className": "flex items-center gap-2",
         },
         "ref": undefined,
-        "type": "tag",
+        "type": Symbol(tag),
       }
     `);
     vnode = h.div({ className: "flex items-center gap-2" }, "reconcile");
@@ -115,7 +115,7 @@ describe(render, () => {
           "data": "reconcile",
           "hnode": reconcile,
           "parent": [Circular],
-          "type": "text",
+          "type": Symbol(text),
         },
         "hnode": <div
           class="flex items-center gap-2"
@@ -129,7 +129,7 @@ describe(render, () => {
           "className": "flex items-center gap-2",
         },
         "ref": undefined,
-        "type": "tag",
+        "type": Symbol(tag),
       }
     `);
   });
@@ -162,7 +162,7 @@ describe(render, () => {
                   "data": "hello",
                   "hnode": hello,
                   "parent": [Circular],
-                  "type": "text",
+                  "type": Symbol(text),
                 },
                 "hnode": <span>
                   hello
@@ -173,18 +173,18 @@ describe(render, () => {
                 "parent": [Circular],
                 "props": {},
                 "ref": undefined,
-                "type": "tag",
+                "type": Symbol(tag),
               },
               {
                 "data": "world",
                 "hnode": world,
                 "parent": [Circular],
-                "type": "text",
+                "type": Symbol(text),
               },
             ],
             "parent": [Circular],
             "slot": world,
-            "type": "fragment",
+            "type": Symbol(fragment),
           },
           "hnode": <div>
             <span>
@@ -198,7 +198,7 @@ describe(render, () => {
           "parent": [Circular],
           "props": {},
           "ref": undefined,
-          "type": "tag",
+          "type": Symbol(tag),
         },
         "hookContext": HookContext {
           "hookCount": 0,
@@ -219,7 +219,7 @@ describe(render, () => {
         "key": undefined,
         "props": {
           "children": {
-            "type": "empty",
+            "type": Symbol(empty),
           },
           "value": "hello",
         },
@@ -230,7 +230,7 @@ describe(render, () => {
           </span>
           world
         </div>,
-        "type": "custom",
+        "type": Symbol(custom),
       }
     `);
   });
