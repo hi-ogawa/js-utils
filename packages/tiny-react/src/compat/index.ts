@@ -1,7 +1,6 @@
-import type { FC } from "../helper/common";
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
-import { type BNode, type VNode, emptyNode } from "../virtual-dom";
+import { type BNode, type FC, type VNode, emptyNode } from "../virtual-dom";
 
 // non comprehensive compatibility features
 

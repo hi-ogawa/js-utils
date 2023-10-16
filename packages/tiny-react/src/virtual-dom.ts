@@ -6,6 +6,7 @@ import type { HookContext } from "./hooks";
 
 export type NodeKey = string | number;
 export type Props = Record<string, unknown>;
+export type FC<P = any> = (props: P) => VNode;
 
 // host node
 export type HNode = Node;
@@ -91,7 +92,7 @@ export type BCustom = VCustom & {
   parent?: BNodeParent;
   child: BNode;
   slot?: HNode;
-  hparent?: HNode;
+  hparent?: HNode; // undefined after unmounted (this flag seems necessary to skip already scheduled re-rendering after unmount)
   hookContext: HookContext;
 };
 
