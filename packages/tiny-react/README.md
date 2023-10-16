@@ -10,17 +10,21 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - functional component
 - hooks
 - jsx-runtime (similar typescript DX as react)
-- hmr (with vite plugin)
+- HMR (via [`tiny-refresh`](https://github.com/hi-ogawa/js-utils/blob/a93f919c083c3ab0f505f1179124397c8f8f1b0d/packages/tiny-refresh/README.md))
 
 ## unsupported
 
-- defaultValue prop
-- dangerouslySetInnerHTML prop
-- mutable ref prop
-- onChange prop
-- portal
+- ssr https://github.com/hi-ogawa/js-utils/pull/150
+- context https://github.com/hi-ogawa/js-utils/pull/151
+- suspense
+- error boundary
 - forwardRef
-- useLayoutEffect
+- portal
+- dangerouslySetInnerHTML
+- mutable ref
+- defaultValue
+- onChange
+- svg
 - ...
 
 ## example

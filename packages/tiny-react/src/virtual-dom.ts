@@ -13,6 +13,13 @@ export type HNode = Node;
 export type HTag = Element;
 export type HText = Text;
 
+// node type (TODO: check perf between string, number, symbol)
+export const NODE_TYPE_EMPTY = "empty" as const;
+export const NODE_TYPE_TAG = "tag" as const;
+export const NODE_TYPE_TEXT = "text" as const;
+export const NODE_TYPE_CUSTOM = "custom" as const;
+export const NODE_TYPE_FRAGMENT = "fragment" as const;
+
 //
 // virtual node (immutable)
 //
@@ -22,12 +29,12 @@ export type VNode = VEmpty | VTag | VText | VCustom | VFragment;
 
 // TODO: safe to optmize into singleton constant?
 export type VEmpty = {
-  type: "empty";
+  type: typeof NODE_TYPE_EMPTY;
 };
 
 // dom element
 export type VTag = {
-  type: "tag";
+  type: typeof NODE_TYPE_TAG;
   key?: NodeKey;
   name: string; // tagName
   props: Props;
@@ -37,20 +44,20 @@ export type VTag = {
 
 // text node
 export type VText = {
-  type: "text";
+  type: typeof NODE_TYPE_TEXT;
   data: string;
 };
 
 // user-defined functional component
 export type VCustom = {
-  type: "custom";
+  type: typeof NODE_TYPE_CUSTOM;
   key?: NodeKey;
   props: Props;
   render: (props: Props) => VNode;
 };
 
 export type VFragment = {
-  type: "fragment";
+  type: typeof NODE_TYPE_FRAGMENT;
   key?: NodeKey;
   children: VNode[];
 };
@@ -98,15 +105,22 @@ export type BFragment = Omit<VFragment, "children"> & {
 
 export function emptyNode(): VNode & BNode {
   return {
-    type: "empty",
+    type: NODE_TYPE_EMPTY,
   };
 }
 
+// TODO: identical empty vnode?
+//       for now, this would be critical to not break `memo(Component)` shallow equal with empty children.
+//       ideally, we could VNode to accomodate `null | string | number` primitives...
+export const EMPTY_VNODE: VEmpty = {
+  type: NODE_TYPE_EMPTY,
+};
+
 export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
   if (
-    node.type === "tag" ||
-    node.type === "custom" ||
-    node.type === "fragment"
+    node.type === NODE_TYPE_TAG ||
+    node.type === NODE_TYPE_CUSTOM ||
+    node.type === NODE_TYPE_FRAGMENT
   ) {
     return node.key;
   }
@@ -115,10 +129,10 @@ export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
 
 // "slot" is the last HNode inside the BNode subtree
 export function getSlot(node: BNode): HNode | undefined {
-  if (node.type === "empty") {
+  if (node.type === NODE_TYPE_EMPTY) {
     return;
   }
-  if (node.type === "tag" || node.type === "text") {
+  if (node.type === NODE_TYPE_TAG || node.type === NODE_TYPE_TEXT) {
     return node.hnode;
   }
   return node.slot;

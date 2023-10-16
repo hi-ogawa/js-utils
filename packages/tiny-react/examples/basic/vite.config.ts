@@ -1,6 +1,5 @@
 import { themeScriptPlugin } from "@hiogawa/theme-script/dist/vite";
 import { tinyReactVitePlugin } from "@hiogawa/tiny-react/dist/plugins/vite";
-import react from "@vitejs/plugin-react";
 import unocss from "unocss/vite";
 import { defineConfig } from "vite";
 
@@ -9,15 +8,5 @@ export default defineConfig({
     outDir: "./dist/vite",
     minify: true, // set `false` to verify transpilated output easily
   },
-  plugins: [
-    // test babel transpilation used by this plugin.
-    // without the plugin, esbuild will takes care of it based on tsconfig.json.
-    false &&
-      react({
-        jsxImportSource: "@hiogawa/tiny-react",
-      }),
-    tinyReactVitePlugin(),
-    unocss(),
-    themeScriptPlugin(),
-  ],
+  plugins: [tinyReactVitePlugin(), unocss(), themeScriptPlugin()],
 });

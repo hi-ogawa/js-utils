@@ -26,6 +26,10 @@ export function _typeCheck() {
   // @ts-expect-error constraint by keyof JSX.IntrinsicElements
   <xxx />;
 
+  // @ts-expect-error no svg support
+  // prettier-ignore
+  <svg><path d=""></path></svg>;
+
   <Custom1 value="" opt={0} />;
 
   <Custom1 value=""></Custom1>;

@@ -35,6 +35,12 @@
       "path": "packages/tiny-react/examples/basic"
     },
     {
+      "path": "packages/tiny-refresh"
+    },
+    {
+      "path": "packages/tiny-refresh/examples/react"
+    },
+    {
       "path": "packages/tiny-rpc"
     },
     {

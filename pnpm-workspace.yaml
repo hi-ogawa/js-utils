@@ -3,3 +3,4 @@ packages:
   - packages/tiny-sql/examples/*
   - packages/tiny-react/examples/*
   - packages/theme-script/examples/*
+  - packages/tiny-refresh/examples/*

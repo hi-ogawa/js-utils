@@ -9,6 +9,7 @@
     "build:vite": "vite build",
     "build:tsc": "tsc",
     "build:vercel": "bash misc/vercel/build.sh",
+    "test-e2e": "playwright test",
     "release": "vercel deploy --prebuilt .",
     "release-production": "vercel deploy --prebuilt . --prod"
   },
@@ -18,9 +19,8 @@
     "@hiogawa/unocss-preset-antd": "2.2.1-pre.7",
     "@hiogawa/utils": "workspace:*",
     "@iconify-json/ri": "^1.1.10",
-    "@vitejs/plugin-react": "^4.0.1",
-    "unocss": "^0.56.4",
-    "vite": "^4.4.9"
+    "unocss": "^0.56.5",
+    "vite": "^4.4.11"
   },
   "volta": {
     "extends": "../../package.json"
