@@ -58,6 +58,7 @@ function reconcileNode(
   isHydrate: boolean
 ): BNode {
   if (isHydrate) {
+    tinyassert(bnode.type === NODE_TYPE_EMPTY);
     bnode = hydrateNode(vnode, hparent, preSlot);
     preSlot = getSlot(bnode) ?? preSlot;
   }
