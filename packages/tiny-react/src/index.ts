@@ -1,8 +1,7 @@
 export { render, hydrate } from "./reconciler";
-export type { VNode } from "./virtual-dom";
-export { Fragment, h } from "./helper/hyperscript";
-export type { ComponentChildren, ComponentChild, FC } from "./helper/common";
+export type { VNode, FC } from "./virtual-dom";
+export { Fragment, h, createElement } from "./helper/hyperscript";
+export type { ComponentChildren, ComponentChild } from "./helper/common";
 export * from "./hooks";
 export * from "./compat";
-export * from "./hmr/runtime";
 export * from "./ssr/render";

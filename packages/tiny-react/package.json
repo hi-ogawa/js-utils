@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/tiny-react",
-  "version": "0.0.1-pre.5",
+  "version": "0.0.1",
   "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/tiny-react",
   "repository": {
     "type": "git",
@@ -25,6 +25,11 @@
       "require": "./dist/helper/jsx-runtime.cjs",
       "types": "./dist/helper/jsx-runtime.d.ts"
     },
+    "./hmr": {
+      "import": "./dist/hmr/index.js",
+      "require": "./dist/hmr/index.cjs",
+      "types": "./dist/hmr/index.d.ts"
+    },
     "./dist/plugins/vite": {
       "import": "./dist/plugins/vite.js",
       "require": "./dist/plugins/vite.cjs",
@@ -44,8 +49,9 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
+    "@hiogawa/tiny-refresh": "workspace:*",
     "@hiogawa/utils": "workspace:*",
-    "vite": "^4.4.9"
+    "vite": "^4.4.11"
   },
   "peerDependencies": {
     "vite": "*"

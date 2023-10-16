@@ -3,46 +3,29 @@ import { tinyassert } from "@hiogawa/utils";
 // not particularly intentional but this hook module doesn't depend on any of reconciler/virtual-dom logic,
 // which tells that the hook idea itself is a general concept applicable to functional api...?
 
-type HookState = ReducerHookState | EffectHookState | RefHookState;
+type HookState = ReducerHookState | EffectHookState;
 
 type ReducerHookState = {
   type: "reducer";
   state: unknown;
 };
 
-type RefHookState = {
-  type: "ref";
-  ref: { current: unknown };
-};
+type EffectType = "layout-effect" | "effect";
 
 type EffectHookState = {
-  type: "effect";
-  effect?: EffectFn;
+  type: EffectType;
   deps?: unknown[];
-  cleanup?: () => void;
+  // when synchronously rendering multiple times,
+  // multiple effects could accumulate since `useEffect` is asynchronous.
+  pendings: PendingEffect[];
+};
+
+type PendingEffect = {
+  effect?: EffectFn;
+  cleanup?: (() => void) | void;
 };
 
 type EffectFn = () => (() => void) | void;
-
-function runEffect(hook: EffectHookState) {
-  if (hook.effect) {
-    // cleanup last effect only when there is a new effect
-    if (hook.cleanup) {
-      hook.cleanup();
-      hook.cleanup = undefined;
-    }
-    const effect = hook.effect;
-    hook.cleanup = effect() ?? undefined;
-    hook.effect = undefined;
-  }
-}
-
-function cleanupEffect(hook: EffectHookState) {
-  if (hook.cleanup) {
-    hook.cleanup();
-    hook.cleanup = undefined;
-  }
-}
 
 type InitialState<T> = T | (() => T);
 
@@ -82,18 +65,36 @@ export class HookContext {
     }
   }
 
-  runEffect() {
+  runEffect(type: EffectType) {
     for (const hook of this.hooks) {
-      if (hook.type === "effect") {
-        runEffect(hook);
+      if (hook.type === type) {
+        hook.pendings.forEach((pending, i) => {
+          if (pending.effect) {
+            tinyassert(!pending.cleanup);
+            pending.cleanup = pending.effect();
+            pending.effect = undefined;
+          }
+          // also consume "cleanup" except the last effect
+          if (i < hook.pendings.length - 1) {
+            if (pending.cleanup) {
+              pending.cleanup();
+            }
+          }
+        });
+        hook.pendings = hook.pendings.slice(-1);
       }
     }
   }
 
-  cleanupEffect() {
+  cleanupEffect(type: EffectType) {
     for (const hook of this.hooks) {
-      if (hook.type === "effect") {
-        cleanupEffect(hook);
+      if (hook.type === type) {
+        for (const pending of hook.pendings) {
+          if (pending.cleanup) {
+            pending.cleanup();
+          }
+        }
+        hook.pendings = [];
       }
     }
   }
@@ -105,7 +106,7 @@ export class HookContext {
   useReducer = <S, A>(
     reducer: (prevState: S, action: A) => S,
     initialState: InitialState<S>
-  ) => {
+  ): [S, (action: A) => void] => {
     // init hook state
     if (this.initial) {
       this.hooks.push({
@@ -118,42 +119,27 @@ export class HookContext {
 
     // reducer
     const state = hook.state as S;
-    const dispatch = (next: A) => {
-      const nextState = reducer(hook.state as S, next);
+    const dispatch = (action: A) => {
+      const nextState = reducer(hook.state as S, action);
       if (hook.state !== nextState) {
         hook.state = nextState;
         this.notify();
       }
     };
-    return [state, dispatch] as const;
+    return [state, dispatch];
   };
 
-  useRef = <T>(initialState: T) => {
+  useEffect = (type: EffectType, effect: EffectFn, deps?: unknown[]) => {
     // init hook state
     if (this.initial) {
       this.hooks.push({
-        type: "ref",
-        ref: { current: initialState },
-      });
-    }
-    const hook = this.hooks[this.hookCount++];
-    tinyassert(hook.type === "ref");
-
-    // ref state
-    return hook.ref as { current: T };
-  };
-
-  useEffect = (effect: EffectFn, deps?: unknown[]) => {
-    // init hook state
-    if (this.initial) {
-      this.hooks.push({
-        type: "effect",
-        effect,
+        type,
         deps,
+        pendings: [{ effect }],
       });
     }
     const hook = this.hooks[this.hookCount++];
-    tinyassert(hook.type === "effect");
+    tinyassert(hook.type === type);
 
     // queue effect
     tinyassert(hook.deps?.length === deps?.length);
@@ -161,11 +147,8 @@ export class HookContext {
       !this.initial &&
       !(hook.deps && deps && isEqualShallow(hook.deps, deps))
     ) {
-      // Last effect should've been already done.
-      // Otherwise, it's likely effect itself caused "force update", which is not currently supported.
-      tinyassert(!hook.effect, "repeated render caused by useEffect?");
-      hook.effect = effect;
       hook.deps = deps;
+      hook.pendings.push({ effect });
     }
   };
 }
@@ -175,18 +158,29 @@ export class HookContext {
 //
 
 export const useReducer = /* @__PURE__ */ defineHook((ctx) => ctx.useReducer);
-export const useRef = /* @__PURE__ */ defineHook((ctx) => ctx.useRef);
-export const useEffect = /* @__PURE__ */ defineHook((ctx) => ctx.useEffect);
+const useEffectInner = /* @__PURE__ */ defineHook((ctx) => ctx.useEffect);
 
 //
 // hooks implemented based on core hooks
 //
+
+export function useLayoutEffect(effect: EffectFn, deps?: unknown[]) {
+  return useEffectInner("layout-effect", effect, deps);
+}
+
+export function useEffect(effect: EffectFn, deps?: unknown[]) {
+  return useEffectInner("effect", effect, deps);
+}
 
 export function useState<T>(initialState: InitialState<T>) {
   return useReducer<T, NextState<T>>(
     (prev, next) => resolveNextState(prev, next),
     initialState
   );
+}
+
+export function useRef<T>(initialState: T) {
+  return useState(() => ({ current: initialState }))[0];
 }
 
 export function useMemo<T>(callback: () => T, deps: unknown[]) {
