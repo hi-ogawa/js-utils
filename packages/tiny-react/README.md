@@ -19,6 +19,7 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - suspense
 - error boundary
 - forwardRef
+- portal
 - dangerouslySetInnerHTML
 - mutable ref
 - defaultValue
