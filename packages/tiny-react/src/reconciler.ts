@@ -211,49 +211,44 @@ function hydrateNode(
   hparent: HNode,
   preSlot: HNode | undefined
 ): BNode {
-  switch (vnode.type) {
-    case "empty": {
-      return emptyNode();
-    }
-    case "tag": {
-      const hnode = getSlotTargetNode(hparent, preSlot);
-      // TODO: warning instead of hard error?
-      // TODO: check props mismatch?
-      tinyassert(
-        hnode instanceof Element && hnode.tagName.toLowerCase() === vnode.name,
-        `tag hydration mismatch (actual: '${hnode?.nodeName}', expected: '${vnode.name}')`
-      );
-      return {
-        ...vnode,
-        props: {}, // for now, no prop mismatch check and let client repeat reconcilation against empty props
-        child: emptyNode(),
-        hnode,
-        listeners: new Map(),
-      } satisfies BTag;
-    }
-    case "text": {
-      const hnode = getSlotTargetNode(hparent, preSlot);
-      tinyassert(
-        hnode instanceof Text,
-        `text hydration mismatch (actual: '${hnode?.nodeName}', expected: '#text')`
-      );
-      tinyassert(
-        hnode.data === vnode.data,
-        `text hydration mismatch (actual: '${hnode.data}', expected: '${vnode.data}')`
-      );
-      return { ...vnode, hnode } satisfies BText;
-    }
-    case "fragment": {
-      return { ...vnode, children: [] } satisfies BFragment;
-    }
-    case "custom": {
-      return {
-        ...vnode,
-        child: emptyNode(),
-        hookContext: new HookContext(updateCustomNodeUnsupported),
-      } satisfies BCustom;
-    }
+  if (vnode.type === NODE_TYPE_EMPTY) {
+    return emptyNode();
+  } else if (vnode.type === NODE_TYPE_TAG) {
+    const hnode = getSlotTargetNode(hparent, preSlot);
+    // TODO: warning instead of hard error?
+    // TODO: check props mismatch?
+    tinyassert(
+      hnode instanceof Element && hnode.tagName.toLowerCase() === vnode.name,
+      `tag hydration mismatch (actual: '${hnode?.nodeName}', expected: '${vnode.name}')`
+    );
+    return {
+      ...vnode,
+      props: {}, // for now, no prop mismatch check and let client repeat reconcilation against empty props
+      child: emptyNode(),
+      hnode,
+      listeners: new Map(),
+    } satisfies BTag;
+  } else if (vnode.type === NODE_TYPE_TEXT) {
+    const hnode = getSlotTargetNode(hparent, preSlot);
+    tinyassert(
+      hnode instanceof Text,
+      `text hydration mismatch (actual: '${hnode?.nodeName}', expected: '#text')`
+    );
+    tinyassert(
+      hnode.data === vnode.data,
+      `text hydration mismatch (actual: '${hnode.data}', expected: '${vnode.data}')`
+    );
+    return { ...vnode, hnode } satisfies BText;
+  } else if (vnode.type === NODE_TYPE_FRAGMENT) {
+    return { ...vnode, children: [] } satisfies BFragment;
+  } else if (vnode.type === NODE_TYPE_CUSTOM) {
+    return {
+      ...vnode,
+      child: emptyNode(),
+      hookContext: new HookContext(updateCustomNodeUnsupported),
+    } satisfies BCustom;
   }
+  return vnode satisfies never;
 }
 
 // `hnode` is positioned after `preSlot` within `hparent`
