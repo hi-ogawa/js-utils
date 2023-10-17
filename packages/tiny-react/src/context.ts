@@ -3,9 +3,9 @@ import {
   type Context,
   type ContextKey,
   type ContextMap,
+  EMPTY_NODE,
   type FC,
   type VNode,
-  emptyNode,
 } from "./virtual-dom";
 
 export function createContext<T>(defaultValue: T): Context<T> {
@@ -13,7 +13,7 @@ export function createContext<T>(defaultValue: T): Context<T> {
 
   const Provider: FC<{ value: T; children?: VNode }> = (props) => {
     RenderContextManager.push(key, props.value);
-    return props.children ?? emptyNode();
+    return props.children ?? EMPTY_NODE;
   };
 
   return { key, Provider, defaultValue };
