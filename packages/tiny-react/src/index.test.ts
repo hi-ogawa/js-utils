@@ -43,7 +43,6 @@ describe(render, () => {
           "children": [
             {
               "hnode": hello,
-              "parent": [Circular],
               "type": "text",
               "vnode": {
                 "data": "hello",
@@ -53,7 +52,6 @@ describe(render, () => {
             {
               "child": {
                 "hnode": world,
-                "parent": [Circular],
                 "type": "text",
                 "vnode": {
                   "data": "world",
@@ -66,7 +64,6 @@ describe(render, () => {
                 world
               </span>,
               "listeners": Map {},
-              "parent": [Circular],
               "type": "tag",
               "vnode": {
                 "child": {
@@ -124,7 +121,6 @@ describe(render, () => {
           </span>
         </div>,
         "listeners": Map {},
-        "parent": undefined,
         "type": "tag",
         "vnode": {
           "child": {
@@ -174,7 +170,6 @@ describe(render, () => {
       {
         "child": {
           "hnode": reconcile,
-          "parent": [Circular],
           "type": "text",
           "vnode": {
             "data": "reconcile",
@@ -187,7 +182,6 @@ describe(render, () => {
           reconcile
         </div>,
         "listeners": Map {},
-        "parent": undefined,
         "type": "tag",
         "vnode": {
           "child": {
@@ -232,7 +226,6 @@ describe(render, () => {
               {
                 "child": {
                   "hnode": hello,
-                  "parent": [Circular],
                   "type": "text",
                   "vnode": {
                     "data": "hello",
@@ -243,7 +236,6 @@ describe(render, () => {
                   hello
                 </span>,
                 "listeners": Map {},
-                "parent": [Circular],
                 "type": "tag",
                 "vnode": {
                   "child": {
@@ -259,7 +251,6 @@ describe(render, () => {
               },
               {
                 "hnode": world,
-                "parent": [Circular],
                 "type": "text",
                 "vnode": {
                   "data": "world",
@@ -298,7 +289,6 @@ describe(render, () => {
             world
           </div>,
           "listeners": Map {},
-          "parent": [Circular],
           "type": "tag",
           "vnode": {
             "child": {

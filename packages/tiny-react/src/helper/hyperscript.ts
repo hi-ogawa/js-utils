@@ -1,5 +1,5 @@
 import {
-  EMPTY_VNODE,
+  EMPTY_NODE,
   NODE_TYPE_CUSTOM,
   NODE_TYPE_FRAGMENT,
   NODE_TYPE_TAG,
@@ -80,7 +80,7 @@ function normalizeComponentChild(child: ComponentChild): VNode {
     typeof child === "undefined" ||
     typeof child === "boolean"
   ) {
-    return EMPTY_VNODE;
+    return EMPTY_NODE;
   }
   if (typeof child === "string" || typeof child === "number") {
     return {

@@ -70,17 +70,11 @@ export type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
 export type BNodeParent = BTag | BCustom | BFragment;
 
-export type BEmpty = {
-  type: typeof NODE_TYPE_EMPTY;
-  // not needed since only we need to traverse up only from BCustom?
-  // but for now, make it easier by having uniform `BNode.parent` type
-  parent?: BNodeParent;
-};
+export type BEmpty = VEmpty;
 
 export type BTag = {
   type: typeof NODE_TYPE_TAG;
   vnode: VTag;
-  parent?: BNodeParent;
   child: BNode;
   hnode: HTag;
   listeners: Map<string, () => void>;
@@ -89,7 +83,6 @@ export type BTag = {
 export type BText = {
   type: typeof NODE_TYPE_TEXT;
   vnode: VText;
-  parent?: BNodeParent;
   hnode: HText;
 };
 
@@ -111,17 +104,7 @@ export type BFragment = {
   slot?: HNode;
 };
 
-export function emptyBNode(): BEmpty {
-  return {
-    type: NODE_TYPE_EMPTY,
-    parent: undefined,
-  };
-}
-
-// TODO: identical empty vnode?
-//       for now, this would be critical to not break `memo(Component)` shallow equal with empty children.
-//       ideally, we could VNode to accomodate `null | string | number` primitives...
-export const EMPTY_VNODE: VEmpty = {
+export const EMPTY_NODE: VEmpty = {
   type: NODE_TYPE_EMPTY,
 };
 
@@ -156,4 +139,18 @@ export function getBNodeSlot(node: BNode): HNode | undefined {
     return node.hnode;
   }
   return node.slot;
+}
+
+// bnode parent traversal is only for BCustom and BFragment
+export function getBNodeParent(node: BNode): BNodeParent | undefined {
+  if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
+    return node.parent;
+  }
+  return;
+}
+
+export function setBNodeParent(node: BNode, parent: BNodeParent) {
+  if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
+    node.parent = parent;
+  }
 }

@@ -6,6 +6,7 @@ import {
   type BNode,
   type BTag,
   type BText,
+  EMPTY_NODE,
   type HNode,
   NODE_TYPE_CUSTOM,
   NODE_TYPE_EMPTY,
@@ -16,17 +17,18 @@ import {
   type Props,
   type VCustom,
   type VNode,
-  emptyBNode,
   getBNodeKey,
+  getBNodeParent,
   getBNodeSlot,
   getVNodeKey,
+  setBNodeParent,
 } from "./virtual-dom";
 
 export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
   const effectManager = new EffectManager();
   const newBnode = reconcileNode(
     vnode,
-    bnode ?? emptyBNode(),
+    bnode ?? EMPTY_NODE,
     parent,
     undefined,
     effectManager
@@ -47,7 +49,7 @@ function reconcileNode(
     if (bnode.type === NODE_TYPE_EMPTY) {
     } else {
       unmount(bnode);
-      bnode = emptyBNode();
+      bnode = EMPTY_NODE;
     }
   } else if (vnode.type === NODE_TYPE_TAG) {
     if (
@@ -71,7 +73,7 @@ function reconcileNode(
       const hnode = document.createElement(vnode.name);
       const child = reconcileNode(
         vnode.child,
-        emptyBNode(),
+        EMPTY_NODE,
         hnode,
         undefined,
         effectManager
@@ -82,13 +84,12 @@ function reconcileNode(
         child,
         hnode,
         listeners: new Map(),
-        parent: undefined,
       } satisfies BTag;
       reconcileTagProps(bnode, vnode.props, {});
       placeChild(bnode.hnode, hparent, preSlot, true);
       effectManager.refNodes.push(bnode);
     }
-    bnode.child.parent = bnode;
+    setBNodeParent(bnode.child, bnode);
   } else if (vnode.type === NODE_TYPE_TEXT) {
     if (bnode.type === NODE_TYPE_TEXT) {
       if (bnode.vnode.data !== vnode.data) {
@@ -103,7 +104,6 @@ function reconcileNode(
         type: vnode.type,
         vnode,
         hnode,
-        parent: undefined,
       } satisfies BText;
       placeChild(bnode.hnode, hparent, preSlot, true);
     }
@@ -142,7 +142,7 @@ function reconcileNode(
     for (let i = 0; i < vnode.children.length; i++) {
       const bchild = reconcileNode(
         vnode.children[i],
-        bchildren[i] ?? emptyBNode(),
+        bchildren[i] ?? EMPTY_NODE,
         hparent,
         preSlot,
         effectManager
@@ -150,7 +150,7 @@ function reconcileNode(
       preSlot = getBNodeSlot(bchild) ?? preSlot;
       bnode.slot = getBNodeSlot(bchild) ?? bnode.slot;
       bnode.children[i] = bchild;
-      bchild.parent = bnode;
+      setBNodeParent(bchild, bnode);
     }
   } else if (vnode.type === NODE_TYPE_CUSTOM) {
     if (
@@ -174,7 +174,7 @@ function reconcileNode(
       const vchild = hookContext.wrap(() => vnode.render(vnode.props));
       const child = reconcileNode(
         vchild,
-        emptyBNode(),
+        EMPTY_NODE,
         hparent,
         preSlot,
         effectManager
@@ -190,7 +190,7 @@ function reconcileNode(
       } satisfies BCustom;
     }
     bnode.hparent = hparent;
-    bnode.child.parent = bnode;
+    setBNodeParent(bnode.child, bnode);
     bnode.slot = getBNodeSlot(bnode.child);
     effectManager.effectNodes.push(bnode);
 
@@ -256,7 +256,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
 }
 
 function findPreviousSlot(child: BNode): HNode | undefined {
-  let parent = child.parent;
+  let parent = getBNodeParent(child);
   while (parent) {
     if (parent.type === NODE_TYPE_TAG) {
       // no slot i.e. new node will be the first child within parent tag
@@ -287,7 +287,7 @@ function findPreviousSlot(child: BNode): HNode | undefined {
 }
 
 function updateParentSlot(child: BNode) {
-  let parent = child.parent;
+  let parent = getBNodeParent(child);
   while (parent) {
     if (parent.type === NODE_TYPE_TAG) {
       return;
@@ -326,7 +326,7 @@ function alignChildrenByKey(
     return [bnodes, []];
   }
 
-  const newBnodes: BNode[] = vnodes.map(() => emptyBNode());
+  const newBnodes: BNode[] = vnodes.map(() => EMPTY_NODE);
   const oldBnodes: BNode[] = [];
 
   for (const bnode of bnodes) {
