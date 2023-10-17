@@ -70,25 +70,32 @@ export type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
 export type BNodeParent = BTag | BCustom | BFragment;
 
-export type BEmpty = VEmpty & {
+export type BEmpty = {
+  type: typeof NODE_TYPE_EMPTY;
   // not needed since only we need to traverse up only from BCustom?
   // but for now, make it easier by having uniform `BNode.parent` type
   parent?: BNodeParent;
 };
 
-export type BTag = Omit<VTag, "child"> & {
+export type BTag = {
+  type: typeof NODE_TYPE_TAG;
+  vnode: VTag;
   parent?: BNodeParent;
   child: BNode;
   hnode: HTag;
   listeners: Map<string, () => void>;
 };
 
-export type BText = VText & {
+export type BText = {
+  type: typeof NODE_TYPE_TEXT;
+  vnode: VText;
   parent?: BNodeParent;
   hnode: HText;
 };
 
-export type BCustom = VCustom & {
+export type BCustom = {
+  type: typeof NODE_TYPE_CUSTOM;
+  vnode: VCustom;
   parent?: BNodeParent;
   child: BNode;
   slot?: HNode;
@@ -96,15 +103,18 @@ export type BCustom = VCustom & {
   hookContext: HookContext;
 };
 
-export type BFragment = Omit<VFragment, "children"> & {
+export type BFragment = {
+  type: typeof NODE_TYPE_FRAGMENT;
+  vnode: VFragment;
   parent?: BNodeParent;
   children: BNode[];
   slot?: HNode;
 };
 
-export function emptyNode(): VNode & BNode {
+export function emptyBNode(): BEmpty {
   return {
     type: NODE_TYPE_EMPTY,
+    parent: undefined,
   };
 }
 
@@ -115,13 +125,24 @@ export const EMPTY_VNODE: VEmpty = {
   type: NODE_TYPE_EMPTY,
 };
 
-export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
+export function getVNodeKey(node: VNode): NodeKey | undefined {
   if (
     node.type === NODE_TYPE_TAG ||
     node.type === NODE_TYPE_CUSTOM ||
     node.type === NODE_TYPE_FRAGMENT
   ) {
     return node.key;
+  }
+  return;
+}
+
+export function getBNodeKey(node: BNode): NodeKey | undefined {
+  if (
+    node.type === NODE_TYPE_TAG ||
+    node.type === NODE_TYPE_CUSTOM ||
+    node.type === NODE_TYPE_FRAGMENT
+  ) {
+    return node.vnode.key;
   }
   return;
 }
