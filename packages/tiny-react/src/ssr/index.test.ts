@@ -38,6 +38,8 @@ describe(hydrate, () => {
         </div>
       </main>
     `);
+
+    // check element ideneity is preserved
     expect(parent.querySelector("div")).toBe(div);
     expect(parent.querySelector("span")).toBe(span);
   });

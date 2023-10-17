@@ -79,7 +79,11 @@ function reconcileNode(
       bnode.vnode.ref === vnode.ref &&
       bnode.vnode.name === vnode.name
     ) {
-      reconcileTagProps(bnode, vnode.props, bnode.vnode.props);
+      if (isHydrate) {
+        hydrateTagProps(bnode, vnode.props);
+      } else {
+        reconcileTagProps(bnode, vnode.props, bnode.vnode.props);
+      }
       bnode.vnode = vnode;
       bnode.child = reconcileNode(
         vnode.child,
@@ -251,12 +255,7 @@ function hydrateNode(
     );
     return {
       type: vnode.type,
-      // TODO: for now let `reconcileTagProps` to setup all props.
-      //       ideally, we should check props mismatch and only setup event listener.
-      vnode: {
-        ...vnode,
-        props: {},
-      },
+      vnode,
       child: EMPTY_NODE,
       hnode,
       listeners: new Map(),
@@ -449,6 +448,15 @@ function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
   for (const k in props) {
     if (props[k] !== oldProps[k]) {
       setTagProp(bnode, k, props[k]);
+    }
+  }
+}
+
+function hydrateTagProps(bnode: BTag, props: Props) {
+  // TODO: check props mismatch?
+  for (const key in props) {
+    if (key.startsWith("on")) {
+      setTagProp(bnode, key, props[key]);
     }
   }
 }
