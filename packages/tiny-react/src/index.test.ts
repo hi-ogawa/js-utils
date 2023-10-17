@@ -12,7 +12,7 @@ import {
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import { sleepFrame } from "./test-utils";
-import { getSlot } from "./virtual-dom";
+import { getBNodeSlot } from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {
@@ -42,32 +42,42 @@ describe(render, () => {
         "child": {
           "children": [
             {
-              "data": "hello",
               "hnode": hello,
-              "parent": [Circular],
               "type": "text",
+              "vnode": {
+                "data": "hello",
+                "type": "text",
+              },
             },
             {
               "child": {
-                "data": "world",
                 "hnode": world,
-                "parent": [Circular],
                 "type": "text",
+                "vnode": {
+                  "data": "world",
+                  "type": "text",
+                },
               },
               "hnode": <span
                 class="text-red"
               >
                 world
               </span>,
-              "key": undefined,
               "listeners": Map {},
-              "name": "span",
-              "parent": [Circular],
-              "props": {
-                "className": "text-red",
-              },
-              "ref": undefined,
               "type": "tag",
+              "vnode": {
+                "child": {
+                  "data": "world",
+                  "type": "text",
+                },
+                "key": undefined,
+                "name": "span",
+                "props": {
+                  "className": "text-red",
+                },
+                "ref": undefined,
+                "type": "tag",
+              },
             },
           ],
           "parent": [Circular],
@@ -77,6 +87,28 @@ describe(render, () => {
             world
           </span>,
           "type": "fragment",
+          "vnode": {
+            "children": [
+              {
+                "data": "hello",
+                "type": "text",
+              },
+              {
+                "child": {
+                  "data": "world",
+                  "type": "text",
+                },
+                "key": undefined,
+                "name": "span",
+                "props": {
+                  "className": "text-red",
+                },
+                "ref": undefined,
+                "type": "tag",
+              },
+            ],
+            "type": "fragment",
+          },
         },
         "hnode": <div
           class="flex items-center gap-2"
@@ -88,14 +120,39 @@ describe(render, () => {
             world
           </span>
         </div>,
-        "key": undefined,
         "listeners": Map {},
-        "name": "div",
-        "props": {
-          "className": "flex items-center gap-2",
-        },
-        "ref": undefined,
         "type": "tag",
+        "vnode": {
+          "child": {
+            "children": [
+              {
+                "data": "hello",
+                "type": "text",
+              },
+              {
+                "child": {
+                  "data": "world",
+                  "type": "text",
+                },
+                "key": undefined,
+                "name": "span",
+                "props": {
+                  "className": "text-red",
+                },
+                "ref": undefined,
+                "type": "tag",
+              },
+            ],
+            "type": "fragment",
+          },
+          "key": undefined,
+          "name": "div",
+          "props": {
+            "className": "flex items-center gap-2",
+          },
+          "ref": undefined,
+          "type": "tag",
+        },
       }
     `);
     vnode = h.div({ className: "flex items-center gap-2" }, "reconcile");
@@ -112,24 +169,33 @@ describe(render, () => {
     expect(bnode).toMatchInlineSnapshot(`
       {
         "child": {
-          "data": "reconcile",
           "hnode": reconcile,
-          "parent": [Circular],
           "type": "text",
+          "vnode": {
+            "data": "reconcile",
+            "type": "text",
+          },
         },
         "hnode": <div
           class="flex items-center gap-2"
         >
           reconcile
         </div>,
-        "key": undefined,
         "listeners": Map {},
-        "name": "div",
-        "props": {
-          "className": "flex items-center gap-2",
-        },
-        "ref": undefined,
         "type": "tag",
+        "vnode": {
+          "child": {
+            "data": "reconcile",
+            "type": "text",
+          },
+          "key": undefined,
+          "name": "div",
+          "props": {
+            "className": "flex items-center gap-2",
+          },
+          "ref": undefined,
+          "type": "tag",
+        },
       }
     `);
   });
@@ -159,32 +225,62 @@ describe(render, () => {
             "children": [
               {
                 "child": {
-                  "data": "hello",
                   "hnode": hello,
-                  "parent": [Circular],
                   "type": "text",
+                  "vnode": {
+                    "data": "hello",
+                    "type": "text",
+                  },
                 },
                 "hnode": <span>
                   hello
                 </span>,
-                "key": undefined,
                 "listeners": Map {},
-                "name": "span",
-                "parent": [Circular],
-                "props": {},
-                "ref": undefined,
                 "type": "tag",
+                "vnode": {
+                  "child": {
+                    "data": "hello",
+                    "type": "text",
+                  },
+                  "key": undefined,
+                  "name": "span",
+                  "props": {},
+                  "ref": undefined,
+                  "type": "tag",
+                },
               },
               {
-                "data": "world",
                 "hnode": world,
-                "parent": [Circular],
                 "type": "text",
+                "vnode": {
+                  "data": "world",
+                  "type": "text",
+                },
               },
             ],
             "parent": [Circular],
             "slot": world,
             "type": "fragment",
+            "vnode": {
+              "children": [
+                {
+                  "child": {
+                    "data": "hello",
+                    "type": "text",
+                  },
+                  "key": undefined,
+                  "name": "span",
+                  "props": {},
+                  "ref": undefined,
+                  "type": "tag",
+                },
+                {
+                  "data": "world",
+                  "type": "text",
+                },
+              ],
+              "type": "fragment",
+            },
           },
           "hnode": <div>
             <span>
@@ -192,13 +288,35 @@ describe(render, () => {
             </span>
             world
           </div>,
-          "key": undefined,
           "listeners": Map {},
-          "name": "div",
-          "parent": [Circular],
-          "props": {},
-          "ref": undefined,
           "type": "tag",
+          "vnode": {
+            "child": {
+              "children": [
+                {
+                  "child": {
+                    "data": "hello",
+                    "type": "text",
+                  },
+                  "key": undefined,
+                  "name": "span",
+                  "props": {},
+                  "ref": undefined,
+                  "type": "tag",
+                },
+                {
+                  "data": "world",
+                  "type": "text",
+                },
+              ],
+              "type": "fragment",
+            },
+            "key": undefined,
+            "name": "div",
+            "props": {},
+            "ref": undefined,
+            "type": "tag",
+          },
         },
         "hookContext": HookContext {
           "hookCount": 0,
@@ -216,14 +334,7 @@ describe(render, () => {
             world
           </div>
         </main>,
-        "key": undefined,
-        "props": {
-          "children": {
-            "type": "empty",
-          },
-          "value": "hello",
-        },
-        "render": [Function],
+        "parent": undefined,
         "slot": <div>
           <span>
             hello
@@ -231,6 +342,17 @@ describe(render, () => {
           world
         </div>,
         "type": "custom",
+        "vnode": {
+          "key": undefined,
+          "props": {
+            "children": {
+              "type": "empty",
+            },
+            "value": "hello",
+          },
+          "render": [Function],
+          "type": "custom",
+        },
       }
     `);
   });
@@ -643,7 +765,7 @@ describe(updateCustomNode, () => {
         </span>
       </main>
     `);
-    expect(getSlot(bnode)).toMatchInlineSnapshot(`
+    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
       <span>
         y
       </span>
@@ -660,7 +782,7 @@ describe(updateCustomNode, () => {
         </span>
       </main>
     `);
-    expect(getSlot(bnode)).toMatchInlineSnapshot(`
+    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
       <span>
         y
       </span>
@@ -677,7 +799,7 @@ describe(updateCustomNode, () => {
         </b>
       </main>
     `);
-    expect(getSlot(bnode)).toMatchInlineSnapshot(`
+    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
       <b>
         y
       </b>
