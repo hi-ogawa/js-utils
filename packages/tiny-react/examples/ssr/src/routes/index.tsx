@@ -81,11 +81,11 @@ function TestServerUrl() {
 function TestEdgeCases() {
   return (
     <div className="border p-2 flex flex-col gap-2">
-      <h1>Test edge cases (TODO)</h1>
+      <h1>Test edge cases</h1>
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
           <span className="text-colorTextSecondary flex flex-col gap-1">
-            HTML attributes (e.g. maxLength, readOnly, ...)
+            TODO: HTML attributes (e.g. maxLength, readOnly, ...)
           </span>
           <input
             className="antd-input px-1"
@@ -98,11 +98,11 @@ function TestEdgeCases() {
           <span className="text-colorTextSecondary flex flex-col gap-1">
             textarea value
           </span>
-          <textarea className="antd-input p-1" value="hello" />
+          <textarea className="antd-input p-1" value="h<e&l>lo" />
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-colorTextSecondary flex flex-col gap-1">
-            select value
+            TODO: select value
           </span>
           <select className="antd-input p-1" value="hello">
             <option value="">none</option>

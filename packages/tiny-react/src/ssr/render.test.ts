@@ -45,11 +45,7 @@ describe(renderToString, () => {
     );
   });
 
-  //
-  // TODO
-  //
-
-  it("attribute-lowercase", () => {
+  it("TODO-attribute-lowercase", () => {
     // not kebab case but lower case
     // cf. https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/util.js#L4
     const vnode = h.input({
@@ -63,15 +59,13 @@ describe(renderToString, () => {
   });
 
   it("tag-textarea", () => {
-    // textarea value should be inside the tag
-    //   <textarea>hello</textarea>
     const vnode = h.textarea({ value: "hello" });
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<textarea value=\\"hello\\"></textarea>"'
+      '"<textarea>hello</textarea>"'
     );
   });
 
-  it("tag-select", () => {
+  it("TODO-tag-select", () => {
     // "selected" should be added to option
     const vnode = h.select(
       { value: "a" },

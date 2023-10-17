@@ -32,13 +32,11 @@ export function renderToString(vnode: VNode): string {
   }
 }
 
-// TODO: learn more from https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/index.js#L322
-// - textarea value
-// - select value
-// - dangerouslySetInnerHTML
+// cf. https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/index.js#L322
 function renderTag(vnode: VTag) {
   const { name, props, child } = vnode;
-  let result = `<${name}`;
+  let openTag = `<${name}`;
+  let innerHTML = renderToString(child);
   for (let k in props) {
     let v = props[k];
     if (v == null || k.startsWith("on")) {
@@ -47,14 +45,25 @@ function renderTag(vnode: VTag) {
     if (k === "className") {
       k = "class";
     }
+    if (k === "value") {
+      if (name === "textarea") {
+        innerHTML = escapeHtml(String(v));
+        continue;
+      }
+      // TODO
+      if (name === "selected") {
+      }
+      if (name === "option") {
+      }
+    }
     k = camelToKebab(k);
     v = escapeHtml(String(v));
-    result += ` ${k}="${v}"`;
+    openTag += ` ${k}="${v}"`;
   }
   if (VOID_ELEMENTS.has(name)) {
-    return result + "/>";
+    return `${openTag}/>`;
   }
-  return result + ">" + renderToString(child) + `</${name}>`;
+  return `${openTag}>${innerHTML}</${name}>`;
 }
 
 // https://developer.mozilla.org/en-US/docs/Glossary/Void_element
