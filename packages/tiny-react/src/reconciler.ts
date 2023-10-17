@@ -65,7 +65,6 @@ function reconcileNode(
     bnode = hydrateNode(vnode, hparent, preSlot);
     preSlot = getBNodeSlot(bnode) ?? preSlot;
   }
-  // switch by vnode.type, then in each case, another branch to whether mutate or re-mount
   if (vnode.type === NODE_TYPE_EMPTY) {
     if (bnode.type === NODE_TYPE_EMPTY) {
     } else {
