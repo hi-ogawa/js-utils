@@ -1,6 +1,85 @@
 import { HookContext } from "../hooks";
 import { updateCustomNodeUnsupported } from "../reconciler";
-import type { VNode, VTag } from "../virtual-dom";
+import {
+  NODE_TYPE_CUSTOM,
+  NODE_TYPE_EMPTY,
+  NODE_TYPE_FRAGMENT,
+  NODE_TYPE_TAG,
+  NODE_TYPE_TEXT,
+  type VNode,
+  type VTag,
+} from "../virtual-dom";
+
+export class SsrManager {
+  selectTagStack: VTag[] = [];
+
+  renderToString(vnode: VNode): string {
+    if (vnode.type === NODE_TYPE_EMPTY) {
+      return "";
+    } else if (vnode.type === NODE_TYPE_TAG) {
+      return renderTag(vnode);
+    } else if (vnode.type === NODE_TYPE_TEXT) {
+      return escapeHtml(vnode.data);
+    } else if (vnode.type === NODE_TYPE_CUSTOM) {
+      const { render, props } = vnode;
+      const hookContext = new HookContext(updateCustomNodeUnsupported);
+      const vchild = hookContext.wrap(() => render(props));
+      return renderToString(vchild);
+    } else if (vnode.type === NODE_TYPE_FRAGMENT) {
+      // note that whitespace between children is handled by JSX transpilation e.g.
+      // https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&corejs=3.21&spec=false&loose=false&code_lz=DwEwlgbgfAhgBAIzgbwEQGNUF80my1AU22AHpxog&debug=false&forceAllTransforms=false&modules=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=env%2Creact%2Cstage-2&prettier=false&targets=&version=7.23.1&externalPlugins=&assumptions=%7B%7D
+      // <div>a b {"c"}{"d"} {"e"}</div> => { children: ["a b ", "c", "d", " ", "e"] }
+      let result = "";
+      for (const vchild of vnode.children) {
+        result += renderToString(vchild);
+      }
+      return result;
+    }
+    return vnode satisfies never;
+  }
+
+  renderTagToString(vnode: VTag) {
+    const { name, props, child } = vnode;
+    let result = `<${name}`;
+    let innerOverride: string | undefined;
+    for (let k in props) {
+      let v = props[k];
+      if (v == null || k.startsWith("on")) {
+        continue;
+      }
+      if (k === "className") {
+        k = "class";
+      }
+      if (k === "value") {
+        if (name === "textarea") {
+          innerOverride = escapeHtml(String(v));
+        }
+        if (name === "select") {
+          continue;
+        }
+        if (name === "option") {
+          const select = this.selectTagStack.at(-1);
+          if (select && select.props["value"] === props["value"]) {
+            result += ` selected="true"`;
+          }
+        }
+      }
+      k = camelToKebab(k);
+      v = escapeHtml(String(v));
+      result += ` ${k}="${v}"`;
+    }
+    if (VOID_ELEMENTS.has(name)) {
+      return result + "/>";
+    }
+    if (typeof innerOverride === "string") {
+      return `${result}>${innerOverride}</${name}>`;
+    }
+    if (name === "select") this.selectTagStack.push(vnode);
+    const inner = renderToString(child);
+    if (name === "select") this.selectTagStack.pop();
+    return `${result}>${inner}</${name}>`;
+  }
+}
 
 export function renderToString(vnode: VNode): string {
   switch (vnode.type) {
