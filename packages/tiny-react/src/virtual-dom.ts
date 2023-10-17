@@ -70,25 +70,25 @@ export type BNode = BEmpty | BTag | BText | BCustom | BFragment;
 
 export type BNodeParent = BTag | BCustom | BFragment;
 
-export type BEmpty = VEmpty & {
-  // not needed since only we need to traverse up only from BCustom?
-  // but for now, make it easier by having uniform `BNode.parent` type
-  parent?: BNodeParent;
-};
+export type BEmpty = VEmpty;
 
-export type BTag = Omit<VTag, "child"> & {
-  parent?: BNodeParent;
+export type BTag = {
+  type: typeof NODE_TYPE_TAG;
+  vnode: VTag;
   child: BNode;
   hnode: HTag;
   listeners: Map<string, () => void>;
 };
 
-export type BText = VText & {
-  parent?: BNodeParent;
+export type BText = {
+  type: typeof NODE_TYPE_TEXT;
+  vnode: VText;
   hnode: HText;
 };
 
-export type BCustom = VCustom & {
+export type BCustom = {
+  type: typeof NODE_TYPE_CUSTOM;
+  vnode: VCustom;
   parent?: BNodeParent;
   child: BNode;
   slot?: HNode;
@@ -97,26 +97,19 @@ export type BCustom = VCustom & {
   contextMap: ContextMap;
 };
 
-export type BFragment = Omit<VFragment, "children"> & {
+export type BFragment = {
+  type: typeof NODE_TYPE_FRAGMENT;
+  vnode: VFragment;
   parent?: BNodeParent;
   children: BNode[];
   slot?: HNode;
 };
 
-export function emptyNode(): VNode & BNode {
-  return {
-    type: NODE_TYPE_EMPTY,
-  };
-}
-
-// TODO: identical empty vnode?
-//       for now, this would be critical to not break `memo(Component)` shallow equal with empty children.
-//       ideally, we could VNode to accomodate `null | string | number` primitives...
-export const EMPTY_VNODE: VEmpty = {
+export const EMPTY_NODE: VEmpty = {
   type: NODE_TYPE_EMPTY,
 };
 
-export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
+export function getVNodeKey(node: VNode): NodeKey | undefined {
   if (
     node.type === NODE_TYPE_TAG ||
     node.type === NODE_TYPE_CUSTOM ||
@@ -127,8 +120,19 @@ export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
   return;
 }
 
+export function getBNodeKey(node: BNode): NodeKey | undefined {
+  if (
+    node.type === NODE_TYPE_TAG ||
+    node.type === NODE_TYPE_CUSTOM ||
+    node.type === NODE_TYPE_FRAGMENT
+  ) {
+    return node.vnode.key;
+  }
+  return;
+}
+
 // "slot" is the last HNode inside the BNode subtree
-export function getSlot(node: BNode): HNode | undefined {
+export function getBNodeSlot(node: BNode): HNode | undefined {
   if (node.type === NODE_TYPE_EMPTY) {
     return;
   }
@@ -136,6 +140,20 @@ export function getSlot(node: BNode): HNode | undefined {
     return node.hnode;
   }
   return node.slot;
+}
+
+// bnode parent traversal is only for BCustom and BFragment
+export function getBNodeParent(node: BNode): BNodeParent | undefined {
+  if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
+    return node.parent;
+  }
+  return;
+}
+
+export function setBNodeParent(node: BNode, parent: BNodeParent) {
+  if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
+    node.parent = parent;
+  }
 }
 
 //
