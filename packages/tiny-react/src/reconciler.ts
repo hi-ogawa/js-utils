@@ -17,8 +17,8 @@ import {
   type VCustom,
   type VNode,
   emptyNode,
+  getBNodeSlot,
   getNodeKey,
-  getSlot,
 } from "./virtual-dom";
 
 export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
@@ -127,8 +127,8 @@ function reconcileNode(
         preSlot,
         effectManager
       );
-      preSlot = getSlot(bchild) ?? preSlot;
-      bnode.slot = getSlot(bchild) ?? bnode.slot;
+      preSlot = getBNodeSlot(bchild) ?? preSlot;
+      bnode.slot = getBNodeSlot(bchild) ?? bnode.slot;
       bnode.children[i] = bchild;
       bchild.parent = bnode;
     }
@@ -163,10 +163,10 @@ function reconcileNode(
     }
     bnode.hparent = hparent;
     bnode.child.parent = bnode;
-    bnode.slot = getSlot(bnode.child);
+    bnode.slot = getBNodeSlot(bnode.child);
     effectManager.effectNodes.push(bnode);
 
-    // expose re-rendering via hooks
+    // expose self re-rendering for hooks
     const bcustom = bnode; // type-guard
     bnode.hookContext.notify = () => {
       updateCustomNode(vnode, bcustom);
@@ -202,7 +202,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     return;
   }
 
-  const oldSlot = getSlot(bnode);
+  const oldSlot = getBNodeSlot(bnode);
 
   // traverse ancestors to find "slot"
   const preSlot = findPreviousSlot(bnode);
@@ -219,7 +219,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
   tinyassert(newBnode === bnode); // reconciled over itself without unmount (i.e. should be same `key` and `render`)
 
   // fix up ancestors slot
-  const newSlot = getSlot(bnode);
+  const newSlot = getBNodeSlot(bnode);
   if (oldSlot !== newSlot) {
     updateParentSlot(bnode);
   }
@@ -248,7 +248,7 @@ function findPreviousSlot(child: BNode): HNode | undefined {
           }
           break;
         }
-        slot = getSlot(c) ?? slot;
+        slot = getBNodeSlot(c) ?? slot;
       }
     }
     // go up to parent also when parent.type === "custom"
@@ -265,13 +265,13 @@ function updateParentSlot(child: BNode) {
       return;
     }
     if (parent.type === NODE_TYPE_CUSTOM) {
-      parent.slot = getSlot(child);
+      parent.slot = getBNodeSlot(child);
     }
     if (parent.type === NODE_TYPE_FRAGMENT) {
       // TODO: could optimize something?
       let slot: HNode | undefined;
       for (const c of parent.children) {
-        slot = getSlot(c) ?? slot;
+        slot = getBNodeSlot(c) ?? slot;
       }
       parent.slot = slot;
     }

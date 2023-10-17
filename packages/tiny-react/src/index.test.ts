@@ -12,7 +12,7 @@ import {
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import { sleepFrame } from "./test-utils";
-import { getSlot } from "./virtual-dom";
+import { getBNodeSlot } from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {
@@ -643,7 +643,7 @@ describe(updateCustomNode, () => {
         </span>
       </main>
     `);
-    expect(getSlot(bnode)).toMatchInlineSnapshot(`
+    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
       <span>
         y
       </span>
@@ -660,7 +660,7 @@ describe(updateCustomNode, () => {
         </span>
       </main>
     `);
-    expect(getSlot(bnode)).toMatchInlineSnapshot(`
+    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
       <span>
         y
       </span>
@@ -677,7 +677,7 @@ describe(updateCustomNode, () => {
         </b>
       </main>
     `);
-    expect(getSlot(bnode)).toMatchInlineSnapshot(`
+    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
       <b>
         y
       </b>

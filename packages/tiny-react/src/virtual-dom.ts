@@ -127,7 +127,7 @@ export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
 }
 
 // "slot" is the last HNode inside the BNode subtree
-export function getSlot(node: BNode): HNode | undefined {
+export function getBNodeSlot(node: BNode): HNode | undefined {
   if (node.type === NODE_TYPE_EMPTY) {
     return;
   }
