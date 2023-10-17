@@ -35,6 +35,9 @@ importers:
       '@tsconfig/strictest':
         specifier: ^2.0.1
         version: 2.0.1
+      '@types/node':
+        specifier: ^20.8.6
+        version: 20.8.6
       esbuild:
         specifier: ^0.18.10
         version: 0.18.10
@@ -167,7 +170,7 @@ importers:
         version: 0.56.5(postcss@8.4.31)(vite@4.4.11)
       vite:
         specifier: ^4.4.11
-        version: 4.4.11(@types/node@20.8.4)
+        version: 4.4.11(@types/node@18.16.20)
 
   packages/tiny-cli:
     devDependencies:
@@ -190,6 +193,42 @@ importers:
         specifier: ^18.17.1
         version: 18.17.1
 
+  packages/tiny-react:
+    devDependencies:
+      '@hiogawa/tiny-refresh':
+        specifier: workspace:*
+        version: link:../tiny-refresh
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+      vite:
+        specifier: ^4.4.11
+        version: 4.4.11(@types/node@18.16.20)
+
+  packages/tiny-react/examples/basic:
+    devDependencies:
+      '@hiogawa/theme-script':
+        specifier: workspace:*
+        version: link:../../../theme-script
+      '@hiogawa/tiny-react':
+        specifier: workspace:*
+        version: link:../..
+      '@hiogawa/unocss-preset-antd':
+        specifier: 2.2.1-pre.7
+        version: 2.2.1-pre.7(unocss@0.56.5)
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../../../utils
+      '@iconify-json/ri':
+        specifier: ^1.1.10
+        version: 1.1.10
+      unocss:
+        specifier: ^0.56.5
+        version: 0.56.5(postcss@8.4.31)(vite@4.4.11)
+      vite:
+        specifier: ^4.4.11
+        version: 4.4.11(@types/node@18.16.20)
+
   packages/tiny-refresh:
     devDependencies:
       '@hiogawa/utils':
@@ -206,7 +245,7 @@ importers:
         version: 18.2.0
       vite:
         specifier: ^4.4.11
-        version: 4.4.11(@types/node@20.8.4)
+        version: 4.4.11(@types/node@18.16.20)
 
   packages/tiny-refresh/examples/react:
     devDependencies:
@@ -225,9 +264,6 @@ importers:
       '@iconify-json/ri':
         specifier: ^1.1.10
         version: 1.1.10
-      '@types/node':
-        specifier: ^20.8.4
-        version: 20.8.4
       '@types/react':
         specifier: ^18.2.14
         version: 18.2.14
@@ -245,7 +281,7 @@ importers:
         version: 0.56.5(postcss@8.4.31)(vite@4.4.11)
       vite:
         specifier: ^4.4.11
-        version: 4.4.11(@types/node@20.8.4)
+        version: 4.4.11(@types/node@18.16.20)
 
   packages/tiny-rpc:
     devDependencies:
@@ -1508,12 +1544,7 @@ packages:
     dependencies:
       '@jridgewell/set-array': 1.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
-      '@jridgewell/trace-mapping': 0.3.18
-    dev: true
-
-  /@jridgewell/resolve-uri@3.1.0:
-    resolution: {integrity: sha512-F2msla3tad+Mfht5cJq7LSXcdudKTWCVYUgw6pLFOOHSTtZlj6SWNYAp+AhuqLmWdBO2X5hPrLcu8cVP8fy28w==}
-    engines: {node: '>=6.0.0'}
+      '@jridgewell/trace-mapping': 0.3.19
     dev: true
 
   /@jridgewell/resolve-uri@3.1.1:
@@ -1526,19 +1557,8 @@ packages:
     engines: {node: '>=6.0.0'}
     dev: true
 
-  /@jridgewell/sourcemap-codec@1.4.14:
-    resolution: {integrity: sha512-XPSJHWmi394fuUuzDnGz1wiKqWfo1yXecHQMRf2l6hztTO+nPru658AyDngaBe7isIxEkRsPR3FZh+s7iVa4Uw==}
-    dev: true
-
   /@jridgewell/sourcemap-codec@1.4.15:
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
-    dev: true
-
-  /@jridgewell/trace-mapping@0.3.18:
-    resolution: {integrity: sha512-w+niJYzMHdd7USdiH2U6869nqhD2nbfZXND5Yp93qIbEmnDNk7PD48o+YchRVpzMU7M6jVCbenTR7PA1FLQ9pA==}
-    dependencies:
-      '@jridgewell/resolve-uri': 3.1.0
-      '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
   /@jridgewell/trace-mapping@0.3.19:
@@ -1684,7 +1704,7 @@ packages:
   /@types/better-sqlite3@7.6.4:
     resolution: {integrity: sha512-dzrRZCYPXIXfSR1/surNbJ/grU3scTaygS0OMzjlGf71i9sc2fGyHPXXiXmEvNIoE0cGwsanEFMVJxPXmco9Eg==}
     dependencies:
-      '@types/node': 20.8.4
+      '@types/node': 20.8.6
     dev: true
 
   /@types/chai-subset@1.3.3:
@@ -1731,8 +1751,8 @@ packages:
     resolution: {integrity: sha512-Gi5wRGPbbyOTX+4Y2iULQ27oUPrefaB0PxGQJnfyWN3kvEDGM3mIB5M/gQLmitZf7A9FmLeaqxD3L1CXpm3VKQ==}
     dev: true
 
-  /@types/node@20.8.4:
-    resolution: {integrity: sha512-ZVPnqU58giiCjSxjVUESDtdPk4QR5WQhhINbc9UBrKLU68MX5BF6kbQzTrkwbolyr0X8ChBpXfavr5mZFKZQ5A==}
+  /@types/node@20.8.6:
+    resolution: {integrity: sha512-eWO4K2Ji70QzKUqRy6oyJWUeB7+g2cRagT3T/nxYibYcT4y2BDL8lqolRXjTHmkZCdJfIPaY73KbJAZmcryxTQ==}
     dependencies:
       undici-types: 5.25.3
     dev: true
@@ -1784,7 +1804,7 @@ packages:
       '@unocss/core': 0.56.5
       '@unocss/reset': 0.56.5
       '@unocss/vite': 0.56.5(vite@4.4.11)
-      vite: 4.4.11
+      vite: 4.4.11(@types/node@18.16.20)
     transitivePeerDependencies:
       - rollup
     dev: true
@@ -1979,7 +1999,7 @@ packages:
       chokidar: 3.5.3
       fast-glob: 3.3.1
       magic-string: 0.30.5
-      vite: 4.4.11
+      vite: 4.4.11(@types/node@18.16.20)
     transitivePeerDependencies:
       - rollup
     dev: true
@@ -5057,7 +5077,7 @@ packages:
       '@unocss/transformer-directives': 0.56.5
       '@unocss/transformer-variant-group': 0.56.5
       '@unocss/vite': 0.56.5(vite@4.4.11)
-      vite: 4.4.11
+      vite: 4.4.11(@types/node@18.16.20)
     transitivePeerDependencies:
       - postcss
       - rollup
@@ -5082,7 +5102,7 @@ packages:
       spdx-expression-parse: 3.0.1
     dev: true
 
-  /vite-node@0.32.2(@types/node@20.8.4):
+  /vite-node@0.32.2(@types/node@20.8.6):
     resolution: {integrity: sha512-dTQ1DCLwl2aEseov7cfQ+kDMNJpM1ebpyMMMwWzBvLbis8Nla/6c9WQcqpPssTwS6Rp/+U6KwlIj8Eapw4bLdA==}
     engines: {node: '>=v14.18.0'}
     hasBin: true
@@ -5092,7 +5112,7 @@ packages:
       mlly: 1.4.0
       pathe: 1.1.1
       picocolors: 1.0.0
-      vite: 4.4.9(@types/node@20.8.4)
+      vite: 4.4.11(@types/node@20.8.6)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -5102,41 +5122,6 @@ packages:
       - sugarss
       - supports-color
       - terser
-    dev: true
-
-  /vite@4.4.11:
-    resolution: {integrity: sha512-ksNZJlkcU9b0lBwAGZGGaZHCMqHsc8OpgtoYhsQ4/I2v5cnpmmmqe5pM4nv/4Hn6G/2GhTdj0DhZh2e+Er1q5A==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: 0.18.20
-      postcss: 8.4.31
-      rollup: 3.29.4
-    optionalDependencies:
-      fsevents: 2.3.3
     dev: true
 
   /vite@4.4.11(@types/node@18.16.20):
@@ -5175,7 +5160,7 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /vite@4.4.11(@types/node@20.8.4):
+  /vite@4.4.11(@types/node@20.8.6):
     resolution: {integrity: sha512-ksNZJlkcU9b0lBwAGZGGaZHCMqHsc8OpgtoYhsQ4/I2v5cnpmmmqe5pM4nv/4Hn6G/2GhTdj0DhZh2e+Er1q5A==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -5203,7 +5188,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.8.4
+      '@types/node': 20.8.6
       esbuild: 0.18.20
       postcss: 8.4.31
       rollup: 3.29.4
@@ -5211,7 +5196,7 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /vite@4.4.6(@types/node@20.8.4):
+  /vite@4.4.6(@types/node@20.8.6):
     resolution: {integrity: sha512-EY6Mm8vJ++S3D4tNAckaZfw3JwG3wa794Vt70M6cNJ6NxT87yhq7EC8Rcap3ahyHdo8AhCmV9PTk+vG1HiYn1A==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -5239,43 +5224,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.8.4
-      esbuild: 0.18.17
-      postcss: 8.4.27
-      rollup: 3.29.4
-    optionalDependencies:
-      fsevents: 2.3.3
-    dev: true
-
-  /vite@4.4.9(@types/node@20.8.4):
-    resolution: {integrity: sha512-2mbUn2LlUmNASWwSCNSJ/EG2HuSRTnVNaydp6vMCm5VIqJsjMfbIWtbH2kDuwUVW5mMUKKZvGPX/rqeqVvv1XA==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      '@types/node': 20.8.4
+      '@types/node': 20.8.6
       esbuild: 0.18.17
       postcss: 8.4.27
       rollup: 3.29.4
@@ -5316,7 +5265,7 @@ packages:
     dependencies:
       '@types/chai': 4.3.5
       '@types/chai-subset': 1.3.3
-      '@types/node': 20.8.4
+      '@types/node': 20.8.6
       '@vitest/expect': 0.32.2
       '@vitest/runner': 0.32.2
       '@vitest/snapshot': 0.32.2
@@ -5336,8 +5285,8 @@ packages:
       strip-literal: 1.0.1
       tinybench: 2.5.0
       tinypool: 0.5.0
-      vite: 4.4.6(@types/node@20.8.4)
-      vite-node: 0.32.2(@types/node@20.8.4)
+      vite: 4.4.6(@types/node@20.8.6)
+      vite-node: 0.32.2(@types/node@20.8.6)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less

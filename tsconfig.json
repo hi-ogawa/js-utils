@@ -29,6 +29,12 @@
       "path": "packages/tiny-jwt"
     },
     {
+      "path": "packages/tiny-react"
+    },
+    {
+      "path": "packages/tiny-react/examples/basic"
+    },
+    {
       "path": "packages/tiny-refresh"
     },
     {

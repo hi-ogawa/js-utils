@@ -26,6 +26,7 @@
     "@hiogawa/utils-node": "workspace:*",
     "@playwright/test": "^1.39.0",
     "@tsconfig/strictest": "^2.0.1",
+    "@types/node": "^20.8.6",
     "esbuild": "^0.18.10",
     "prettier": "^2.8.8",
     "tsup": "^7.1.0",
