@@ -103,7 +103,7 @@ export function isEmptyNode(node: VNode | BNode): node is VEmpty {
   return node === null;
 }
 
-export function isVText(node: VNode | BNode): node is VText {
+export function isVText(node: VNode): node is VText {
   return typeof node === "string";
 }
 
