@@ -12,7 +12,7 @@ import {
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import { sleepFrame } from "./test-utils";
-import { getSlot } from "./virtual-dom";
+import { getBNodeSlot } from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {
@@ -42,29 +42,33 @@ describe(render, () => {
         "child": {
           "children": [
             {
-              "data": "hello",
               "hnode": hello,
               "type": 1,
+              "vnode": "hello",
             },
             {
               "child": {
-                "data": "world",
                 "hnode": world,
                 "type": 1,
+                "vnode": "world",
               },
               "hnode": <span
                 class="text-red"
               >
                 world
               </span>,
-              "key": undefined,
               "listeners": Map {},
-              "name": "span",
-              "props": {
-                "className": "text-red",
-              },
-              "ref": undefined,
               "type": 0,
+              "vnode": {
+                "child": "world",
+                "key": undefined,
+                "name": "span",
+                "props": {
+                  "className": "text-red",
+                },
+                "ref": undefined,
+                "type": 0,
+              },
             },
           ],
           "parent": [Circular],
@@ -74,6 +78,22 @@ describe(render, () => {
             world
           </span>,
           "type": 3,
+          "vnode": {
+            "children": [
+              "hello",
+              {
+                "child": "world",
+                "key": undefined,
+                "name": "span",
+                "props": {
+                  "className": "text-red",
+                },
+                "ref": undefined,
+                "type": 0,
+              },
+            ],
+            "type": 3,
+          },
         },
         "hnode": <div
           class="flex items-center gap-2"
@@ -85,14 +105,33 @@ describe(render, () => {
             world
           </span>
         </div>,
-        "key": undefined,
         "listeners": Map {},
-        "name": "div",
-        "props": {
-          "className": "flex items-center gap-2",
-        },
-        "ref": undefined,
         "type": 0,
+        "vnode": {
+          "child": {
+            "children": [
+              "hello",
+              {
+                "child": "world",
+                "key": undefined,
+                "name": "span",
+                "props": {
+                  "className": "text-red",
+                },
+                "ref": undefined,
+                "type": 0,
+              },
+            ],
+            "type": 3,
+          },
+          "key": undefined,
+          "name": "div",
+          "props": {
+            "className": "flex items-center gap-2",
+          },
+          "ref": undefined,
+          "type": 0,
+        },
       }
     `);
     vnode = h.div({ className: "flex items-center gap-2" }, "reconcile");
@@ -109,23 +148,27 @@ describe(render, () => {
     expect(bnode).toMatchInlineSnapshot(`
       {
         "child": {
-          "data": "reconcile",
           "hnode": reconcile,
           "type": 1,
+          "vnode": "reconcile",
         },
         "hnode": <div
           class="flex items-center gap-2"
         >
           reconcile
         </div>,
-        "key": undefined,
         "listeners": Map {},
-        "name": "div",
-        "props": {
-          "className": "flex items-center gap-2",
-        },
-        "ref": undefined,
         "type": 0,
+        "vnode": {
+          "child": "reconcile",
+          "key": undefined,
+          "name": "div",
+          "props": {
+            "className": "flex items-center gap-2",
+          },
+          "ref": undefined,
+          "type": 0,
+        },
       }
     `);
   });
@@ -155,29 +198,47 @@ describe(render, () => {
             "children": [
               {
                 "child": {
-                  "data": "hello",
                   "hnode": hello,
                   "type": 1,
+                  "vnode": "hello",
                 },
                 "hnode": <span>
                   hello
                 </span>,
-                "key": undefined,
                 "listeners": Map {},
-                "name": "span",
-                "props": {},
-                "ref": undefined,
                 "type": 0,
+                "vnode": {
+                  "child": "hello",
+                  "key": undefined,
+                  "name": "span",
+                  "props": {},
+                  "ref": undefined,
+                  "type": 0,
+                },
               },
               {
-                "data": "world",
                 "hnode": world,
                 "type": 1,
+                "vnode": "world",
               },
             ],
             "parent": [Circular],
             "slot": world,
             "type": 3,
+            "vnode": {
+              "children": [
+                {
+                  "child": "hello",
+                  "key": undefined,
+                  "name": "span",
+                  "props": {},
+                  "ref": undefined,
+                  "type": 0,
+                },
+                "world",
+              ],
+              "type": 3,
+            },
           },
           "hnode": <div>
             <span>
@@ -185,12 +246,29 @@ describe(render, () => {
             </span>
             world
           </div>,
-          "key": undefined,
           "listeners": Map {},
-          "name": "div",
-          "props": {},
-          "ref": undefined,
           "type": 0,
+          "vnode": {
+            "child": {
+              "children": [
+                {
+                  "child": "hello",
+                  "key": undefined,
+                  "name": "span",
+                  "props": {},
+                  "ref": undefined,
+                  "type": 0,
+                },
+                "world",
+              ],
+              "type": 3,
+            },
+            "key": undefined,
+            "name": "div",
+            "props": {},
+            "ref": undefined,
+            "type": 0,
+          },
         },
         "hookContext": HookContext {
           "hookCount": 0,
@@ -208,12 +286,7 @@ describe(render, () => {
             world
           </div>
         </main>,
-        "key": undefined,
-        "props": {
-          "children": null,
-          "value": "hello",
-        },
-        "render": [Function],
+        "parent": undefined,
         "slot": <div>
           <span>
             hello
@@ -221,6 +294,15 @@ describe(render, () => {
           world
         </div>,
         "type": 2,
+        "vnode": {
+          "key": undefined,
+          "props": {
+            "children": null,
+            "value": "hello",
+          },
+          "render": [Function],
+          "type": 2,
+        },
       }
     `);
   });
@@ -633,7 +715,7 @@ describe(updateCustomNode, () => {
         </span>
       </main>
     `);
-    expect(getSlot(bnode)).toMatchInlineSnapshot(`
+    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
       <span>
         y
       </span>
@@ -650,7 +732,7 @@ describe(updateCustomNode, () => {
         </span>
       </main>
     `);
-    expect(getSlot(bnode)).toMatchInlineSnapshot(`
+    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
       <span>
         y
       </span>
@@ -667,7 +749,7 @@ describe(updateCustomNode, () => {
         </b>
       </main>
     `);
-    expect(getSlot(bnode)).toMatchInlineSnapshot(`
+    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
       <b>
         y
       </b>

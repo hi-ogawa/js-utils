@@ -6,6 +6,7 @@ import type { HookContext } from "./hooks";
 
 export type NodeKey = string | number;
 export type Props = Record<string, unknown>;
+export type FC<P = any> = (props: P) => VNode;
 
 // host node
 export type HNode = Node;
@@ -64,7 +65,9 @@ export type BNodeParent = BTag | BCustom | BFragment;
 
 export type BEmpty = null;
 
-export type BTag = Omit<VTag, "child"> & {
+export type BTag = {
+  type: typeof NODE_TYPE_TAG;
+  vnode: VTag;
   child: BNode;
   hnode: HTag;
   listeners: Map<string, () => void>;
@@ -72,19 +75,23 @@ export type BTag = Omit<VTag, "child"> & {
 
 export type BText = {
   type: typeof NODE_TYPE_TEXT;
-  data: string;
+  vnode: VText;
   hnode: HText;
 };
 
-export type BCustom = VCustom & {
+export type BCustom = {
+  type: typeof NODE_TYPE_CUSTOM;
+  vnode: VCustom;
   parent?: BNodeParent;
   child: BNode;
   slot?: HNode;
-  hparent?: HNode;
+  hparent?: HNode; // undefined after unmounted (this flag seems necessary to skip already scheduled re-rendering after unmount)
   hookContext: HookContext;
 };
 
-export type BFragment = Omit<VFragment, "children"> & {
+export type BFragment = {
+  type: typeof NODE_TYPE_FRAGMENT;
+  vnode: VFragment;
   parent?: BNodeParent;
   children: BNode[];
   slot?: HNode;
@@ -100,7 +107,7 @@ export function isVText(node: VNode | BNode): node is VText {
   return typeof node === "string";
 }
 
-export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
+export function getVNodeKey(node: VNode): NodeKey | undefined {
   if (isEmptyNode(node) || isVText(node)) {
     return;
   }
@@ -114,8 +121,22 @@ export function getNodeKey(node: VNode | BNode): NodeKey | undefined {
   return;
 }
 
+export function getBNodeKey(node: BNode): NodeKey | undefined {
+  if (node === EMPTY_NODE) {
+    return;
+  }
+  if (
+    node.type === NODE_TYPE_TAG ||
+    node.type === NODE_TYPE_CUSTOM ||
+    node.type === NODE_TYPE_FRAGMENT
+  ) {
+    return node.vnode.key;
+  }
+  return;
+}
+
 // "slot" is the last HNode inside the BNode subtree
-export function getSlot(node: BNode): HNode | undefined {
+export function getBNodeSlot(node: BNode): HNode | undefined {
   if (node === EMPTY_NODE) {
     return;
   }
