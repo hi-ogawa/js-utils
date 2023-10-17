@@ -1,7 +1,6 @@
-import type { FC } from "../helper/common";
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
-import { type BNode, type VNode, emptyNode } from "../virtual-dom";
+import { type BNode, EMPTY_NODE, type FC, type VNode } from "../virtual-dom";
 
 // non comprehensive compatibility features
 
@@ -34,7 +33,7 @@ export function createRoot(container: Element) {
       bnode = render(vnode, container, bnode);
     },
     unmount() {
-      render(emptyNode(), container, bnode);
+      render(EMPTY_NODE, container, bnode);
     },
   };
 }
