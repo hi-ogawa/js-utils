@@ -189,17 +189,22 @@ function reconcileNode(
       bnode.vnode.key === vnode.key &&
       bnode.vnode.render === vnode.render
     ) {
-      bnode.hookContext.notify = updateCustomNodeUnsupported;
-      const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
-      bnode.child = reconcileNode(
-        vchild,
-        bnode.child,
-        hparent,
-        preSlot,
-        effectManager,
-        isHydrate
-      );
-      bnode.vnode = vnode;
+      // memo vnode
+      // TODO: force render for root updateCustomNode
+      // TODO: probably this breaks when we need to `placeChild(..., false)` of descendents
+      if (bnode.vnode !== vnode) {
+        bnode.hookContext.notify = updateCustomNodeUnsupported;
+        const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
+        bnode.child = reconcileNode(
+          vchild,
+          bnode.child,
+          hparent,
+          preSlot,
+          effectManager,
+          isHydrate
+        );
+        bnode.vnode = vnode;
+      }
     } else {
       unmount(bnode);
       const hookContext = new HookContext(updateCustomNodeUnsupported);
