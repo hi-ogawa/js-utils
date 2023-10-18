@@ -1,3 +1,4 @@
+import { createElement } from "../helper/hyperscript";
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
 import { type BNode, EMPTY_NODE, type FC, type VNode } from "../virtual-dom";
@@ -39,7 +40,7 @@ export function createRoot(container: Element) {
 }
 
 // https://react.dev/reference/react/memo
-export function memo<P extends object>(
+export function memo<P extends {}>(
   fc: FC<P>,
   propsAreEqual: (
     prevProps: Readonly<P>,
@@ -51,7 +52,7 @@ export function memo<P extends object>(
       undefined
     );
     if (!prev.current || !propsAreEqual(prev.current.props, props)) {
-      prev.current = { props, result: fc(props) };
+      prev.current = { props, result: createElement(fc, props) };
     }
     return prev.current.result;
   }
