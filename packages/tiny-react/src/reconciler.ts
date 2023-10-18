@@ -24,27 +24,47 @@ import {
   setBNodeParent,
 } from "./virtual-dom";
 
-export function render(vnode: VNode, parent: HNode, bnode?: BNode) {
+export function render(
+  vnode: VNode,
+  parent: HNode,
+  bnode: BNode = EMPTY_NODE,
+  hydration: boolean = false
+) {
   const effectManager = new EffectManager();
   const newBnode = reconcileNode(
     vnode,
-    bnode ?? EMPTY_NODE,
+    bnode,
     parent,
     undefined,
-    effectManager
+    effectManager,
+    hydration
   );
   effectManager.run();
   return newBnode;
 }
 
+export function hydrate(vnode: VNode, parent: HNode) {
+  return render(vnode, parent, undefined, true);
+}
+
+// Recursively traverse VNode with simple switch by VNode.type.
+// Each case has either "mutating" or "mounting" reconcilation path.
+// For "mutating" path, input BNode is mutated.
+// For "mounting" path, new BNode is created and returned.
+// Hydration will mimic "mutating" path by (partially) creating expected BNode.
 function reconcileNode(
   vnode: VNode,
-  bnode: BNode, // mutated when reconciled over same bnode
+  bnode: BNode,
   hparent: HNode,
   preSlot: HNode | undefined,
-  effectManager: EffectManager
+  effectManager: EffectManager,
+  isHydrate: boolean
 ): BNode {
-  // switch by vnode.type, then in each case, another branch to whether mutate or re-mount
+  if (isHydrate) {
+    tinyassert(bnode.type === NODE_TYPE_EMPTY);
+    bnode = hydrateNode(vnode, hparent, preSlot);
+    preSlot = getBNodeSlot(bnode) ?? preSlot;
+  }
   if (vnode.type === NODE_TYPE_EMPTY) {
     if (bnode.type === NODE_TYPE_EMPTY) {
     } else {
@@ -52,23 +72,30 @@ function reconcileNode(
       bnode = EMPTY_NODE;
     }
   } else if (vnode.type === NODE_TYPE_TAG) {
+    let queueRef = isHydrate; // ref callback on mount or hydrate;
     if (
       bnode.type === NODE_TYPE_TAG &&
       bnode.vnode.key === vnode.key &&
       bnode.vnode.ref === vnode.ref &&
       bnode.vnode.name === vnode.name
     ) {
-      reconcileTagProps(bnode, vnode.props, bnode.vnode.props);
+      if (isHydrate) {
+        hydrateTagProps(bnode, vnode.props);
+      } else {
+        reconcileTagProps(bnode, vnode.props, bnode.vnode.props);
+      }
       bnode.vnode = vnode;
       bnode.child = reconcileNode(
         vnode.child,
         bnode.child,
         bnode.hnode,
         undefined,
-        effectManager
+        effectManager,
+        isHydrate
       );
       placeChild(bnode.hnode, hparent, preSlot, false);
     } else {
+      queueRef = true;
       unmount(bnode);
       const hnode = document.createElement(vnode.name);
       const child = reconcileNode(
@@ -76,7 +103,8 @@ function reconcileNode(
         EMPTY_NODE,
         hnode,
         undefined,
-        effectManager
+        effectManager,
+        isHydrate
       );
       bnode = {
         type: vnode.type,
@@ -87,6 +115,8 @@ function reconcileNode(
       } satisfies BTag;
       reconcileTagProps(bnode, vnode.props, {});
       placeChild(bnode.hnode, hparent, preSlot, true);
+    }
+    if (queueRef) {
       effectManager.refNodes.push(bnode);
     }
     setBNodeParent(bnode.child, bnode);
@@ -145,7 +175,8 @@ function reconcileNode(
         bchildren[i] ?? EMPTY_NODE,
         hparent,
         preSlot,
-        effectManager
+        effectManager,
+        isHydrate
       );
       preSlot = getBNodeSlot(bchild) ?? preSlot;
       bnode.slot = getBNodeSlot(bchild) ?? bnode.slot;
@@ -165,7 +196,8 @@ function reconcileNode(
         bnode.child,
         hparent,
         preSlot,
-        effectManager
+        effectManager,
+        isHydrate
       );
       bnode.vnode = vnode;
     } else {
@@ -177,7 +209,8 @@ function reconcileNode(
         EMPTY_NODE,
         hparent,
         preSlot,
-        effectManager
+        effectManager,
+        isHydrate
       );
       bnode = {
         type: vnode.type,
@@ -205,6 +238,55 @@ function reconcileNode(
   return bnode;
 }
 
+function hydrateNode(
+  vnode: VNode,
+  hparent: HNode,
+  preSlot: HNode | undefined
+): BNode {
+  if (vnode.type === NODE_TYPE_EMPTY) {
+    return EMPTY_NODE;
+  } else if (vnode.type === NODE_TYPE_TAG) {
+    const hnode = getSlotTargetNode(hparent, preSlot);
+    // TODO: warning instead of hard error?
+    // TODO: check props mismatch?
+    tinyassert(
+      hnode instanceof Element && hnode.tagName.toLowerCase() === vnode.name,
+      `tag hydration mismatch (actual: '${hnode?.nodeName}', expected: '${vnode.name}')`
+    );
+    return {
+      type: vnode.type,
+      vnode,
+      child: EMPTY_NODE,
+      hnode,
+      listeners: new Map(),
+    } satisfies BTag;
+  } else if (vnode.type === NODE_TYPE_TEXT) {
+    const hnode = getSlotTargetNode(hparent, preSlot);
+    tinyassert(
+      hnode instanceof Text,
+      `text hydration mismatch (actual: '${hnode?.nodeName}', expected: '#text')`
+    );
+    tinyassert(
+      hnode.data === vnode.data,
+      `text hydration mismatch (actual: '${hnode.data}', expected: '${vnode.data}')`
+    );
+    return { type: vnode.type, vnode, hnode } satisfies BText;
+  } else if (vnode.type === NODE_TYPE_FRAGMENT) {
+    return { type: vnode.type, vnode, children: [] } satisfies BFragment;
+  } else if (vnode.type === NODE_TYPE_CUSTOM) {
+    return {
+      type: vnode.type,
+      vnode,
+      child: EMPTY_NODE,
+      hookContext: new HookContext(updateCustomNodeUnsupported),
+      hparent: undefined,
+      parent: undefined,
+      slot: undefined,
+    } satisfies BCustom;
+  }
+  return vnode satisfies never;
+}
+
 // `hnode` is positioned after `preSlot` within `hparent`
 function placeChild(
   hnode: HNode,
@@ -212,10 +294,17 @@ function placeChild(
   preSlot: HNode | undefined,
   init: boolean
 ) {
-  const slotNext = preSlot ? preSlot.nextSibling : hparent.firstChild;
+  const slotNext = getSlotTargetNode(hparent, preSlot);
   if (init || !(hnode === slotNext || hnode.nextSibling === slotNext)) {
     hparent.insertBefore(hnode, slotNext);
   }
+}
+
+function getSlotTargetNode(
+  hparent: HNode,
+  preSlot: HNode | undefined
+): HNode | null {
+  return preSlot ? preSlot.nextSibling : hparent.firstChild;
 }
 
 export function updateCustomNodeUnsupported() {
@@ -242,7 +331,8 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     bnode,
     bnode.hparent,
     preSlot,
-    effectManager
+    effectManager,
+    false
   );
   tinyassert(newBnode === bnode); // reconciled over itself without unmount (i.e. should be same `key` and `render`)
 
@@ -358,6 +448,15 @@ function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
   for (const k in props) {
     if (props[k] !== oldProps[k]) {
       setTagProp(bnode, k, props[k]);
+    }
+  }
+}
+
+function hydrateTagProps(bnode: BTag, props: Props) {
+  // TODO: check props mismatch?
+  for (const key in props) {
+    if (key.startsWith("on")) {
+      setTagProp(bnode, key, props[key]);
     }
   }
 }
