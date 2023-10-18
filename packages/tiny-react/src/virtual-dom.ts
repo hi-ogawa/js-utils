@@ -168,7 +168,27 @@ export interface Context<T> {
   defaultValue: T;
 }
 
-export type ContextMap = Map<ContextKey, unknown>;
+export class ContextStore<T> {
+  public initial = true;
+  private listeners = new Set<() => void>();
+
+  constructor(public value: T) {}
+
+  subscribe(listener: () => void) {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  notify() {
+    for (const listener of this.listeners) {
+      listener();
+    }
+  }
+}
+
+export type ContextMap = Map<ContextKey, ContextStore<any>>;
 
 export function getBNodeContextMap(node: BNode): ContextMap | undefined {
   if (node.type === "custom") {
