@@ -85,7 +85,7 @@ function TestEdgeCases() {
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
           <span className="text-colorTextSecondary flex flex-col gap-1">
-            TODO: HTML attributes (e.g. maxLength, readOnly, ...)
+            HTML attributes (e.g. maxLength, readOnly, ...)
           </span>
           <input
             className="antd-input px-1"
@@ -96,13 +96,13 @@ function TestEdgeCases() {
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-colorTextSecondary flex flex-col gap-1">
-            textarea value
+            'textarea.value' rendered inside
           </span>
           <textarea className="antd-input p-1" value="h<e&l>lo" />
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-colorTextSecondary flex flex-col gap-1">
-            TODO: select value
+            'select.value' replaced by matching 'option.selected' inside
           </span>
           <select className="antd-input p-1" value="hello">
             <option value="">none</option>

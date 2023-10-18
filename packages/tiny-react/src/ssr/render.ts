@@ -1,69 +1,104 @@
 import { HookContext } from "../hooks";
 import { updateCustomNodeUnsupported } from "../reconciler";
-import type { VNode, VTag } from "../virtual-dom";
+import {
+  NODE_TYPE_CUSTOM,
+  NODE_TYPE_EMPTY,
+  NODE_TYPE_FRAGMENT,
+  NODE_TYPE_TAG,
+  NODE_TYPE_TEXT,
+  type VNode,
+  type VTag,
+} from "../virtual-dom";
 
 export function renderToString(vnode: VNode): string {
-  switch (vnode.type) {
-    case "empty": {
+  return new SsrManager().render(vnode);
+}
+
+class SsrManager {
+  selectTagStack: VTag[] = [];
+
+  render(vnode: VNode): string {
+    if (vnode.type === NODE_TYPE_EMPTY) {
       return "";
-    }
-    case "tag": {
-      return renderTag(vnode);
-    }
-    case "text": {
+    } else if (vnode.type === NODE_TYPE_TAG) {
+      return this.renderTag(vnode);
+    } else if (vnode.type === NODE_TYPE_TEXT) {
       return escapeHtml(vnode.data);
-    }
-    case "custom": {
+    } else if (vnode.type === NODE_TYPE_CUSTOM) {
       const { render, props } = vnode;
       const hookContext = new HookContext(updateCustomNodeUnsupported);
       const vchild = hookContext.wrap(() => render(props));
-      return renderToString(vchild);
-    }
-    case "fragment": {
-      // assume children whitespace is handled by JSX transpilation e.g.
+      return this.render(vchild);
+    } else if (vnode.type === NODE_TYPE_FRAGMENT) {
+      // note that whitespaces between children are injected during JSX transpilation e.g.
       // https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&corejs=3.21&spec=false&loose=false&code_lz=DwEwlgbgfAhgBAIzgbwEQGNUF80my1AU22AHpxog&debug=false&forceAllTransforms=false&modules=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=env%2Creact%2Cstage-2&prettier=false&targets=&version=7.23.1&externalPlugins=&assumptions=%7B%7D
       // <div>a b {"c"}{"d"} {"e"}</div> => { children: ["a b ", "c", "d", " ", "e"] }
       let result = "";
       for (const vchild of vnode.children) {
-        result += renderToString(vchild);
+        result += this.render(vchild);
       }
       return result;
     }
+    return vnode satisfies never;
   }
-}
 
-// cf. https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/index.js#L322
-function renderTag(vnode: VTag) {
-  const { name, props, child } = vnode;
-  let openTag = `<${name}`;
-  let innerHTML = renderToString(child);
-  for (let k in props) {
-    let v = props[k];
-    if (v == null || k.startsWith("on")) {
-      continue;
-    }
-    if (k === "className") {
-      k = "class";
-    }
-    if (k === "value") {
-      if (name === "textarea") {
-        innerHTML = escapeHtml(String(v));
+  // cf. https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/index.js#L322
+  renderTag(vnode: VTag) {
+    const { name, props, child } = vnode;
+    let openTag = `<${name}`;
+    let innerOverride: string | undefined;
+    for (let k in props) {
+      let v = props[k];
+      if (v == null || k.startsWith("on")) {
         continue;
       }
-      // TODO
-      if (name === "selected") {
+      if (k === "className") {
+        k = "class";
       }
-      if (name === "option") {
+      if (k === "value") {
+        if (name === "textarea") {
+          innerOverride = escapeHtml(String(v));
+          continue;
+        }
+        if (name === "select") {
+          // `select.value` will be replace with decendent's `option.selected`
+          continue;
+        }
+        if (name === "option") {
+          const select = this.selectTagStack.at(-1);
+          if (select && select.props["value"] === v) {
+            openTag += ` selected="true"`;
+          }
+        }
       }
+      // TODO: more edge cases (svg, etc...)
+      if (k.startsWith("aria")) {
+        k = camelToKebab(k);
+      } else {
+        k = k.toLowerCase();
+      }
+      v = escapeHtml(String(v));
+      openTag += ` ${k}="${v}"`;
     }
-    k = camelToKebab(k);
-    v = escapeHtml(String(v));
-    openTag += ` ${k}="${v}"`;
+    // self-closing
+    if (VOID_ELEMENTS.has(name)) {
+      return openTag + "/>";
+    }
+    // textarea.value
+    if (typeof innerOverride === "string") {
+      return `${openTag}>${innerOverride}</${name}>`;
+    }
+
+    // keep track of <select> and recurse
+    if (name === "select") {
+      this.selectTagStack.push(vnode);
+    }
+    const inner = this.render(child);
+    if (name === "select") {
+      this.selectTagStack.pop();
+    }
+    return `${openTag}>${inner}</${name}>`;
   }
-  if (VOID_ELEMENTS.has(name)) {
-    return `${openTag}/>`;
-  }
-  return `${openTag}>${innerHTML}</${name}>`;
 }
 
 // https://developer.mozilla.org/en-US/docs/Glossary/Void_element

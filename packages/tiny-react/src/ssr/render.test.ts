@@ -45,7 +45,7 @@ describe(renderToString, () => {
     );
   });
 
-  it("TODO-attribute-lowercase", () => {
+  it("attributes", () => {
     // not kebab case but lower case
     // cf. https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/util.js#L4
     const vnode = h.input({
@@ -54,7 +54,7 @@ describe(renderToString, () => {
       inputMode: "numeric",
     });
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<input max-length=\\"0\\" read-only=\\"true\\" input-mode=\\"numeric\\"/>"'
+      '"<input maxlength=\\"0\\" readonly=\\"true\\" inputmode=\\"numeric\\"/>"'
     );
   });
 
@@ -65,15 +65,14 @@ describe(renderToString, () => {
     );
   });
 
-  it("TODO-tag-select", () => {
-    // "selected" should be added to option
+  it("tag-select", () => {
     const vnode = h.select(
-      { value: "a" },
+      { value: "b" },
       h.option({ value: "a" }, "x"),
       h.option({ value: "b" }, "y")
     );
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<select value=\\"a\\"><option value=\\"a\\">x</option><option value=\\"b\\">y</option></select>"'
+      '"<select><option value=\\"a\\">x</option><option selected=\\"true\\" value=\\"b\\">y</option></select>"'
     );
   });
 });
