@@ -1,5 +1,5 @@
 {
-  "name": "tiny-react-examples-jsx",
+  "name": "tiny-react-examples-basic",
   "private": true,
   "scripts": {
     "dev": "pnpm run /^dev:/",
