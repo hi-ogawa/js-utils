@@ -43,10 +43,7 @@ export function useContext<T>(context: Context<T>): T {
   const forceUpdate = useReducer((prev, _action: void) => !prev, false)[1];
 
   useEffect(() => {
-    if (store) {
-      return store.subscribe(forceUpdate);
-    }
-    return;
+    return store?.subscribe(forceUpdate);
   }, [store]);
 
   return store ? store.value : context.defaultValue;
