@@ -216,7 +216,6 @@ function reconcileNode(
     } else {
       unmount(bnode);
       const hookContext = new HookContext(updateCustomNodeUnsupported);
-      // const vchild = hookContext.wrap(() => vnode.render(vnode.props));
       const [vchild, childContextMap] = hookContext.wrap(() =>
         RenderContextManager.wrap(contextMap, () => vnode.render(vnode.props))
       );
