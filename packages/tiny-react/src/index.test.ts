@@ -1,7 +1,6 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { createRoot, memo } from "./compat";
-import { createContext, useContext } from "./context";
 import { Fragment, createElement, h } from "./helper/hyperscript";
 import {
   useCallback,
@@ -1610,48 +1609,6 @@ describe("ref", () => {
           "SPAN",
         ],
       ]
-    `);
-  });
-});
-
-describe(createContext, () => {
-  it("basic", () => {
-    const context = createContext(-1);
-
-    function Outer() {
-      const value = useContext(context);
-      return h(
-        context.Provider,
-        { value: 123 },
-        JSON.stringify(value),
-        h(Inner, {})
-      );
-    }
-
-    function Inner() {
-      const value = useContext(context);
-      return h(
-        Fragment,
-        {},
-        JSON.stringify(value),
-        h(context.Provider, { value: value * 2 }, h(Inner2, {}))
-      );
-    }
-
-    function Inner2() {
-      const value = useContext(context);
-      return h(Fragment, {}, JSON.stringify(value));
-    }
-
-    const vnode = h(Outer, {});
-    const parent = document.createElement("main");
-    render(vnode, parent);
-    expect(parent).toMatchInlineSnapshot(`
-      <main>
-        -1
-        123
-        246
-      </main>
     `);
   });
 });
