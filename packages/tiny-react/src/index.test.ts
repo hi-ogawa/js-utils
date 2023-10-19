@@ -2,7 +2,6 @@ import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { createRoot, memo } from "./compat";
 import { Fragment, createElement, h } from "./helper/hyperscript";
-import { jsx2 } from "./helper/jsx-runtime";
 import {
   useCallback,
   useEffect,
@@ -13,7 +12,7 @@ import {
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import { sleepFrame } from "./test-utils";
-import { EMPTY_NODE, getBNodeSlot } from "./virtual-dom";
+import { EMPTY_NODE, createVNode, getBNodeSlot } from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {
@@ -1582,7 +1581,7 @@ describe("custom-children", () => {
     const root = createRoot(parent);
     const vnode = h.div(
       {},
-      jsx2(Custom, { children: "hello" }, "key1"),
+      createVNode(Custom, { children: "hello" }, "key1"),
       createElement(Custom, { key: "key2" }, "hello")
     );
     root.render(vnode);
