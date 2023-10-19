@@ -80,6 +80,14 @@ describe(render, () => {
               },
             },
           ],
+          "hrange": [
+            hello,
+            <span
+              class="text-red"
+            >
+              world
+            </span>,
+          ],
           "parent": [Circular],
           "slot": hello,
           "type": "fragment",
@@ -254,6 +262,12 @@ describe(render, () => {
                 },
               },
             ],
+            "hrange": [
+              <span>
+                hello
+              </span>,
+              world,
+            ],
             "parent": [Circular],
             "slot": <span>
               hello
@@ -332,6 +346,20 @@ describe(render, () => {
             world
           </div>
         </main>,
+        "hrange": [
+          <div>
+            <span>
+              hello
+            </span>
+            world
+          </div>,
+          <div>
+            <span>
+              hello
+            </span>
+            world
+          </div>,
+        ],
         "parent": undefined,
         "slot": <div>
           <span>

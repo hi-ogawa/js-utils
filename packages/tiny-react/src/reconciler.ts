@@ -1,5 +1,6 @@
 import { tinyassert } from "@hiogawa/utils";
 import { HookContext } from "./hooks";
+import { isEqualShallow } from "./utils";
 import {
   type BCustom,
   type BFragment,
@@ -19,6 +20,7 @@ import {
   type VNode,
   getBNodeKey,
   getBNodeParent,
+  getBNodeRange,
   getBNodeSlot,
   getVNodeKey,
   setBNodeParent,
@@ -142,12 +144,16 @@ function reconcileNode(
     // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
     // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
     // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
+    let isReordering = false;
     if (bnode.type === NODE_TYPE_FRAGMENT && bnode.vnode.key === vnode.key) {
       const [newChildren, oldChildren] = alignChildrenByKey(
         vnode.children,
         bnode.children
       );
-      bnode.children = newChildren;
+      if (!isEqualShallow(bnode.children, newChildren)) {
+        isReordering = true;
+        bnode.children = newChildren;
+      }
       for (const bnode of oldChildren) {
         unmount(bnode);
       }
@@ -169,6 +175,7 @@ function reconcileNode(
     }
     // reconcile vnode.children
     bnode.slot = undefined;
+    bnode.hrange = undefined;
     for (let i = vnode.children.length - 1; i >= 0; i--) {
       const bchild = reconcileNode(
         vnode.children[i],
@@ -178,6 +185,20 @@ function reconcileNode(
         effectManager,
         isHydrate
       );
+      const hrange = getBNodeRange(bchild);
+      if (hrange) {
+        if (!bnode.hrange) {
+          bnode.hrange = [...hrange];
+        } else {
+          bnode.hrange[0] = hrange[0];
+        }
+        if (isReordering) {
+          // TODO: this should replace each `placeChild` when mutating VTag, VText
+          // TODO: slot-fixup in updateCustomNode also has to be adjusted
+          // placeBNode(bchild, hparent, hnextSibling);
+          placeBNode;
+        }
+      }
       hnextSibling = getBNodeSlot(bchild) ?? hnextSibling;
       bnode.slot = getBNodeSlot(bchild) ?? bnode.slot;
       bnode.children[i] = bchild;
@@ -225,6 +246,7 @@ function reconcileNode(
     bnode.hparent = hparent;
     setBNodeParent(bnode.child, bnode);
     bnode.slot = getBNodeSlot(bnode.child);
+    bnode.hrange = getBNodeRange(bnode.child);
     effectManager.effectNodes.push(bnode);
 
     // expose self re-rendering for hooks
@@ -287,14 +309,40 @@ function hydrateNode(
   return vnode satisfies never;
 }
 
+// TODO: should use it only for "mounting" case
 function placeChild(
   hparent: HNode,
   hnode: HNode,
   hnextSibling: HNode | null,
-  init: boolean
+  isMount: boolean
 ) {
-  if (init || hnode.nextSibling !== hnextSibling) {
+  if (isMount || hnode.nextSibling !== hnextSibling) {
     hparent.insertBefore(hnode, hnextSibling);
+  }
+}
+
+function placeChildrenRange(
+  first: HNode,
+  last: HNode,
+  hparent: HNode,
+  hnextSibling: HNode | null
+) {
+  let hnode = last;
+  while (true) {
+    hparent.insertBefore(hnode, hnextSibling);
+    if (first === hnode) {
+      break;
+    }
+    hnextSibling = hnode;
+    tinyassert(hnode.previousSibling);
+    hnode = hnode.previousSibling;
+  }
+}
+
+function placeBNode(bnode: BNode, hparent: HNode, hnextSibling: HNode | null) {
+  const hrange = getBNodeRange(bnode);
+  if (hrange) {
+    placeChildrenRange(hrange[0], hrange[1], hparent, hnextSibling);
   }
 }
 
@@ -311,6 +359,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
   }
 
   const oldSlot = getBNodeSlot(bnode);
+  const oldRange = getBNodeRange(bnode);
 
   // traverse ancestors to find "slot"
   const hnextSibling = findNextSibling(bnode);
@@ -326,6 +375,15 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     false
   );
   tinyassert(newBnode === bnode); // reconciled over itself without unmount (i.e. should be same `key` and `render`)
+
+  // fix up ancestors range
+  const newRange = getBNodeRange(bnode);
+  if (
+    oldRange !== newRange ||
+    (oldRange && newRange && !isEqualShallow(oldRange, newRange))
+  ) {
+    updateParentRange(bnode);
+  }
 
   // fix up ancestors slot
   const newSlot = getBNodeSlot(bnode);
@@ -384,6 +442,33 @@ function updateParentSlot(child: BNode) {
         slot = getBNodeSlot(c) ?? slot;
       }
       parent.slot = slot;
+    }
+    child = parent;
+    parent = child.parent;
+  }
+}
+
+function updateParentRange(child: BNode) {
+  let parent = getBNodeParent(child);
+  while (parent) {
+    if (parent.type === NODE_TYPE_TAG) {
+      return;
+    }
+    if (parent.type === NODE_TYPE_CUSTOM) {
+      parent.hrange = getBNodeRange(child);
+    }
+    if (parent.type === NODE_TYPE_FRAGMENT) {
+      parent.hrange = undefined;
+      for (const c of parent.children) {
+        const hrange = getBNodeRange(c);
+        if (hrange) {
+          if (!parent.hrange) {
+            parent.hrange = [...hrange];
+          } else {
+            parent.hrange[0] = hrange[0];
+          }
+        }
+      }
     }
     child = parent;
     parent = child.parent;

@@ -1,4 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
+import { isEqualShallow } from "./utils";
 
 // not particularly intentional but this hook module doesn't depend on any of reconciler/virtual-dom logic,
 // which tells that the hook idea itself is a general concept applicable to functional api...?
@@ -215,8 +216,4 @@ function defineHook<T>(implement: (ctx: HookContext) => T): T {
       return Reflect.apply(implement(HookContext.current) as any, ...args);
     },
   }) as T;
-}
-
-function isEqualShallow(xs: unknown[], ys: unknown[]) {
-  return xs.length === ys.length && xs.every((x, i) => x === ys[i]);
 }

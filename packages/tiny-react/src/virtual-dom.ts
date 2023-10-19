@@ -91,7 +91,9 @@ export type BCustom = {
   vnode: VCustom;
   parent?: BNodeParent;
   child: BNode;
+  // TOD: replace `slot` with `hrange`
   slot?: HNode;
+  hrange?: [HNode, HNode];
   hparent?: HNode; // undefined after unmounted (this flag seems necessary to skip already scheduled re-rendering after unmount)
   hookContext: HookContext;
 };
@@ -102,6 +104,7 @@ export type BFragment = {
   parent?: BNodeParent;
   children: BNode[];
   slot?: HNode;
+  hrange?: [HNode, HNode];
 };
 
 export const EMPTY_NODE: VEmpty = {
@@ -139,6 +142,16 @@ export function getBNodeSlot(node: BNode): HNode | undefined {
     return node.hnode;
   }
   return node.slot;
+}
+
+export function getBNodeRange(node: BNode): [HNode, HNode] | undefined {
+  if (node.type === NODE_TYPE_EMPTY) {
+    return;
+  }
+  if (node.type === NODE_TYPE_TAG || node.type === NODE_TYPE_TEXT) {
+    return [node.hnode, node.hnode];
+  }
+  return node.hrange;
 }
 
 // bnode parent traversal is only for BCustom and BFragment
