@@ -190,8 +190,8 @@ function reconcileNode(
       bnode.vnode.render === vnode.render
     ) {
       // memo vnode
-      // TODO: force render for root updateCustomNode
       // TODO: probably this breaks when we need to `placeChild(..., false)` of descendents
+      // TODO: `bnode.vnode === vnode` check should also work be applied for BTag, BText, BFragment
       if (bnode.vnode !== vnode) {
         bnode.hookContext.notify = updateCustomNodeUnsupported;
         const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
@@ -331,6 +331,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
 
   // reconcile
   const effectManager = new EffectManager();
+  bnode.vnode = { ...vnode }; // TODO: quick hack to not memo top custom itself
   const newBnode = reconcileNode(
     vnode,
     bnode,

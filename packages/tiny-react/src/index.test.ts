@@ -1163,9 +1163,9 @@ describe("hooks", () => {
       );
     }
 
-    let vnode = h(Custom, {});
     const parent = document.createElement("main");
-    let bnode = render(vnode, parent);
+    const root = createRoot(parent);
+    root.render(h(Custom, {}));
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1176,7 +1176,7 @@ describe("hooks", () => {
       </main>
     `);
 
-    render(vnode, parent, bnode);
+    root.render(h(Custom, {}));
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
