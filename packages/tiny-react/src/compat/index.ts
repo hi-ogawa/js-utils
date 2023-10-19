@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
-import { type BNode, EMPTY_NODE, type FC, type VNode } from "../virtual-dom";
+import {
+  type BNode,
+  EMPTY_NODE,
+  type FC,
+  NODE_TYPE_CUSTOM,
+  type VCustom,
+  type VNode,
+} from "../virtual-dom";
 
 // non comprehensive compatibility features
 
@@ -39,21 +46,20 @@ export function createRoot(container: Element) {
 }
 
 // https://react.dev/reference/react/memo
-export function memo<P extends object>(
+export function memo<P extends {}>(
   fc: FC<P>,
-  propsAreEqual: (
-    prevProps: Readonly<P>,
-    nextProps: Readonly<P>
-  ) => boolean = objectShallowEqual
+  propsAreEqual: (prevProps: {}, nextProps: {}) => boolean = objectShallowEqual
 ): FC<P> {
   function Memo(props: P) {
-    const prev = useRef<{ props: Readonly<P>; result: VNode } | undefined>(
-      undefined
-    );
+    const prev = useRef<VCustom | undefined>(undefined);
     if (!prev.current || !propsAreEqual(prev.current.props, props)) {
-      prev.current = { props, result: fc(props) };
+      prev.current = {
+        type: NODE_TYPE_CUSTOM,
+        render: fc as FC<any>,
+        props,
+      };
     }
-    return prev.current.result;
+    return prev.current;
   }
   Object.defineProperty(Memo, "name", { value: `Memo(${fc.name})` });
   return Memo;
