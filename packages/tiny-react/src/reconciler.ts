@@ -24,6 +24,7 @@ import {
   getBNodeSlot,
   getVNodeKey,
   setBNodeParent,
+  isReservedTagProp,
 } from "./virtual-dom";
 
 export function render(
@@ -464,6 +465,9 @@ function hydrateTagProps(bnode: BTag, props: Props) {
 }
 
 function setTagProp(bnode: BTag, key: string, value: unknown) {
+  if (isReservedTagProp(key)) {
+    return;
+  }
   const { listeners, hnode } = bnode;
 
   if (key.startsWith("on")) {

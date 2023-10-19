@@ -1,11 +1,9 @@
 import {
   EMPTY_NODE,
-  NODE_TYPE_CUSTOM,
   NODE_TYPE_FRAGMENT,
-  NODE_TYPE_TAG,
   NODE_TYPE_TEXT,
+  createVNode,
   type NodeKey,
-  type Props,
   type VNode,
 } from "../virtual-dom";
 import type {
@@ -17,44 +15,18 @@ import { type JSX } from "./jsx-namespace";
 
 export function createElement(
   tag: ComponentType,
-  props: Props,
-  ...children: ComponentChildren[]
+  { key, ...props }: { key?: NodeKey },
+  ...restChildren: ComponentChildren[]
 ): VNode {
-  const { key, ...propsNoKey } = props as { key?: NodeKey };
-
   // unwrap single child to skip trivial fragment.
   // this should be "safe" by the assumption that
   // example such as:
-  //   createElement("div", {}, ...["some-varing", "id-list"].map(key => h("input", { key })))
+  //   h("div", {}, ...["some-varing", "id-list"].map(key => h("input", { key })))
   // should be written without spreading
-  //   createElement("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
+  //   h("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
   // this should be guaranteed when `h` is used via jsx-runtime-based transpilation.
-  const child = normalizeComponentChildren(
-    children.length <= 1 ? children[0] : children
-  );
-
-  if (typeof tag === "string") {
-    const { ref, ...propsNoKeyNoRef } = propsNoKey as { ref?: any };
-    return {
-      type: NODE_TYPE_TAG,
-      name: tag,
-      key,
-      ref,
-      props: propsNoKeyNoRef,
-      child,
-    };
-  } else if (typeof tag === "function") {
-    return {
-      type: NODE_TYPE_CUSTOM,
-      key,
-      props: {
-        ...propsNoKey,
-        children: child,
-      },
-      render: tag,
-    };
-  }
-  return tag satisfies never;
+  const children: ComponentChildren = restChildren.length <= 1 ? restChildren[0] : restChildren;
+  return createVNode(tag, { ...props, children }, key);
 }
 
 // we can probably optimize Fragment creation directly as { type: "fragment" }
@@ -63,7 +35,7 @@ export function Fragment(props: { children?: ComponentChildren }): VNode {
   return normalizeComponentChildren(props.children);
 }
 
-// TODO: move to core
+// TODO: move to virtual-dom.ts
 export function normalizeComponentChildren(
   children?: ComponentChildren
 ): VNode {

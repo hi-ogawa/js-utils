@@ -1,4 +1,3 @@
-import type { ComponentChildren } from "./helper/common";
 import type { HookContext } from "./hooks";
 
 //
@@ -25,17 +24,11 @@ export const NODE_TYPE_FRAGMENT = "fragment" as const;
 // virtual node (immutable)
 //
 
-// TODO: optimize object shape?
 export type VNode = VEmpty | VTag | VText | VCustom | VFragment;
 
-// TODO: safe to optmize into singleton constant?
 export type VEmpty = {
   type: typeof NODE_TYPE_EMPTY;
 };
-
-// special props keys
-export const RESERVED_PROPS = ["ref", "children"] as const;
-export type ReservedProp = (typeof RESERVED_PROPS)[number];
 
 // dom element
 export type VTag = {
@@ -44,13 +37,13 @@ export type VTag = {
   name: string; // tagName
   props: Props & {
     ref?: (el: HTag | null) => VNode;
-    // TODO: avoid too much recursive types in core?
     children?: ComponentChildren;
   };
-  // TODO
-  // child: VNode;
-  // ref?: (el: HTag | null) => VNode; // core only supports callback. maybe { current: T } can be implemented in compat layer.
 };
+
+export function isReservedTagProp(key: string) {
+  return key === "ref" || key === "children";
+}
 
 // text node
 export type VText = {
@@ -114,6 +107,11 @@ export type BFragment = {
   slot?: HNode;
 };
 
+//
+// helpers
+//
+
+// empty node singleton
 export const EMPTY_NODE: VEmpty = {
   type: NODE_TYPE_EMPTY,
 };
@@ -163,4 +161,45 @@ export function setBNodeParent(node: BNode, parent: BNodeParent) {
   if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
     node.parent = parent;
   }
+}
+
+//
+// jsx-runtime compatible VNode factory
+//
+
+export type ComponentType = string | FC;
+
+export type ComponentChild =
+  | VNode
+  | string
+  | number
+  | null
+  | undefined
+  | boolean;
+
+export type ComponentChildren = ComponentChild | ComponentChildren[];
+
+// jsx-runtime compatible VNode factory
+export function createVNode(
+  tag: ComponentType,
+  props: {},
+  key?: NodeKey
+): VNode {
+  if (typeof tag === "string") {
+    return {
+      type: NODE_TYPE_TAG,
+      name: tag,
+      key,
+      props,
+    } satisfies VTag;
+  }
+  if (typeof tag === "function") {
+    return {
+      type: NODE_TYPE_CUSTOM,
+      render: tag,
+      key,
+      props,
+    } satisfies VCustom;
+  }
+  return tag satisfies never;
 }

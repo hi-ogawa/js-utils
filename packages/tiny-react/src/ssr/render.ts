@@ -7,6 +7,7 @@ import {
   NODE_TYPE_FRAGMENT,
   NODE_TYPE_TAG,
   NODE_TYPE_TEXT,
+  isReservedTagProp,
   type VNode,
   type VTag,
 } from "../virtual-dom";
@@ -49,7 +50,7 @@ class SsrManager {
     let openTag = `<${name}`;
     let innerOverride: string | undefined;
     for (let k in props) {
-      if (k === "ref" || k === "children") {
+      if (isReservedTagProp(k)) {
         continue;
       }
       let v = props[k];
