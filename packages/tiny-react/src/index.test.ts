@@ -1615,7 +1615,7 @@ describe("ref", () => {
 describe(memo, () => {
   it("basic", async () => {
     const mockFn = vi.fn();
-    const mockFnSnapshot = () => mockFn.mock.calls.map(args => args[0]);
+    const mockFnSnapshot = () => mockFn.mock.calls.map((args) => args[0]);
 
     const Custom = memo(function Custom(props: {
       label: string;
@@ -1687,7 +1687,7 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFnSnapshot()).toMatchInlineSnapshot('[]');
+    expect(mockFnSnapshot()).toMatchInlineSnapshot("[]");
 
     mockFn.mockReset();
     root.render(
