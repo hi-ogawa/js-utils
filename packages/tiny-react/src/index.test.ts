@@ -1,7 +1,7 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { createRoot, memo } from "./compat";
-import { Fragment, createElement, h } from "./helper/hyperscript";
+import { h } from "./helper/hyperscript";
 import {
   useCallback,
   useEffect,
@@ -12,7 +12,13 @@ import {
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import { sleepFrame } from "./test-utils";
-import { EMPTY_NODE, createVNode, getBNodeSlot } from "./virtual-dom";
+import {
+  EMPTY_NODE,
+  Fragment,
+  createElement,
+  createVNode,
+  getBNodeSlot,
+} from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {

@@ -1,5 +1,4 @@
 import { tinyassert } from "@hiogawa/utils";
-import { normalizeComponentChildren } from "./helper/hyperscript";
 import { HookContext } from "./hooks";
 import {
   type BCustom,
@@ -23,6 +22,7 @@ import {
   getBNodeSlot,
   getVNodeKey,
   isReservedTagProp,
+  normalizeComponentChildren,
   setBNodeParent,
 } from "./virtual-dom";
 

@@ -1,4 +1,3 @@
-import { normalizeComponentChildren } from "../helper/hyperscript";
 import { HookContext } from "../hooks";
 import { updateCustomNodeUnsupported } from "../reconciler";
 import {
@@ -10,6 +9,7 @@ import {
   type VNode,
   type VTag,
   isReservedTagProp,
+  normalizeComponentChildren,
 } from "../virtual-dom";
 
 export function renderToString(vnode: VNode): string {

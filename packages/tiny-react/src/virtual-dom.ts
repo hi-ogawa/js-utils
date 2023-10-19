@@ -179,7 +179,7 @@ export type ComponentChild =
 
 export type ComponentChildren = ComponentChild | ComponentChildren[];
 
-// jsx-runtime compatible VNode factory
+// jsx-runtime compatible virtual node factory
 export function createVNode(
   tag: ComponentType,
   props: {},
@@ -202,4 +202,58 @@ export function createVNode(
     } satisfies VCustom;
   }
   return tag satisfies never;
+}
+
+// traditional virtual node factory with rest arguments
+export function createElement(
+  tag: ComponentType,
+  { key, ...props }: { key?: NodeKey },
+  ...restChildren: ComponentChildren[]
+): VNode {
+  // unwrap single child to skip trivial fragment.
+  // this should be "safe" by the assumption that
+  // example such as:
+  //   h("div", {}, ...["some-varing", "id-list"].map(key => h("input", { key })))
+  // should be written without spreading
+  //   h("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
+  // this should be guaranteed when `h` is used via jsx-runtime-based transpilation.
+  const children: ComponentChildren =
+    restChildren.length <= 1 ? restChildren[0] : restChildren;
+  return createVNode(tag, { ...props, children }, key);
+}
+
+// we can probably optimize Fragment creation directly as VFragment
+// but for now we wrap as VCustom, which also helps testing the robustness of architecture
+export function Fragment(props: { children?: ComponentChildren }): VNode {
+  return normalizeComponentChildren(props.children);
+}
+
+export function normalizeComponentChildren(
+  children?: ComponentChildren
+): VNode {
+  if (Array.isArray(children)) {
+    return {
+      type: NODE_TYPE_FRAGMENT,
+      children: children.map((c) => normalizeComponentChildren(c)),
+    };
+  }
+  return normalizeComponentChild(children);
+}
+
+function normalizeComponentChild(child: ComponentChild): VNode {
+  // TODO: instantiating new object for child/children would break shallow equal used for `memo(Component)`
+  if (
+    child === null ||
+    typeof child === "undefined" ||
+    typeof child === "boolean"
+  ) {
+    return EMPTY_NODE;
+  }
+  if (typeof child === "string" || typeof child === "number") {
+    return {
+      type: NODE_TYPE_TEXT,
+      data: String(child),
+    };
+  }
+  return child;
 }

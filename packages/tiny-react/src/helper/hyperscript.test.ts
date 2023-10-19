@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Fragment, h } from "./hyperscript";
+import { Fragment } from "../virtual-dom";
+import { h } from "./hyperscript";
 
 describe("hyperscript", () => {
   it("basic", () => {

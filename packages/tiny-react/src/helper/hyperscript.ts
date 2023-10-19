@@ -1,71 +1,6 @@
-import {
-  EMPTY_NODE,
-  NODE_TYPE_FRAGMENT,
-  NODE_TYPE_TEXT,
-  type NodeKey,
-  type VNode,
-  createVNode,
-} from "../virtual-dom";
-import type {
-  ComponentChild,
-  ComponentChildren,
-  ComponentType,
-} from "./common";
+import { type VNode, createElement } from "../virtual-dom";
+import type { ComponentChildren } from "./common";
 import { type JSX } from "./jsx-namespace";
-
-export function createElement(
-  tag: ComponentType,
-  { key, ...props }: { key?: NodeKey },
-  ...restChildren: ComponentChildren[]
-): VNode {
-  // unwrap single child to skip trivial fragment.
-  // this should be "safe" by the assumption that
-  // example such as:
-  //   h("div", {}, ...["some-varing", "id-list"].map(key => h("input", { key })))
-  // should be written without spreading
-  //   h("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
-  // this should be guaranteed when `h` is used via jsx-runtime-based transpilation.
-  const children: ComponentChildren =
-    restChildren.length <= 1 ? restChildren[0] : restChildren;
-  return createVNode(tag, { ...props, children }, key);
-}
-
-// we can probably optimize Fragment creation directly as { type: "fragment" }
-// but for now we wrap as { type: "custom" }, which also helps testing the robustness of architecture
-export function Fragment(props: { children?: ComponentChildren }): VNode {
-  return normalizeComponentChildren(props.children);
-}
-
-// TODO: move to virtual-dom.ts
-export function normalizeComponentChildren(
-  children?: ComponentChildren
-): VNode {
-  if (Array.isArray(children)) {
-    return {
-      type: NODE_TYPE_FRAGMENT,
-      children: children.map((c) => normalizeComponentChildren(c)),
-    };
-  }
-  return normalizeComponentChild(children);
-}
-
-function normalizeComponentChild(child: ComponentChild): VNode {
-  // TODO: instantiating new object for child/children would break shallow equal used for `memo(Component)`
-  if (
-    child === null ||
-    typeof child === "undefined" ||
-    typeof child === "boolean"
-  ) {
-    return EMPTY_NODE;
-  }
-  if (typeof child === "string" || typeof child === "number") {
-    return {
-      type: NODE_TYPE_TEXT,
-      data: String(child),
-    };
-  }
-  return child;
-}
 
 //
 // type-safe createElement wrapper
@@ -89,6 +24,7 @@ interface Hyperscript extends HyperscriptIntrinsic, HyperscriptCustom {}
 type HyperscriptIntrinsic = {
   [K in keyof JSX.IntrinsicElements]: (
     props: JSX.IntrinsicElements[K],
+    // TODO: remove and force inside props
     ...children: ComponentChildren[]
   ) => VNode;
 };

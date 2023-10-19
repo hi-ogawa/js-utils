@@ -1,5 +1,4 @@
-import { createVNode } from "../virtual-dom";
-import { Fragment } from "./hyperscript";
+import { Fragment, createVNode } from "../virtual-dom";
 import type { JSX } from "./jsx-namespace";
 
 // jsx-runtime convention for transpilers
