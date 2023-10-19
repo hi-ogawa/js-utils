@@ -6,6 +6,7 @@ import {
   EMPTY_NODE,
   type FC,
   NODE_TYPE_CUSTOM,
+  type VCustom,
   type VNode,
 } from "../virtual-dom";
 
@@ -47,30 +48,56 @@ export function createRoot(container: Element) {
 
 // https://react.dev/reference/react/memo
 export function memo<P extends {}>(
-  fc: FC<P>,
-  propsAreEqual: (
-    prevProps: Readonly<P>,
-    nextProps: Readonly<P>
-  ) => boolean = objectShallowEqual
+  Fc: FC<P>,
+  isEqualProps: (prev: {}, next: {}) => boolean = objectShallowEqual
 ): FC<P> {
   function Memo(props: P) {
-    const prev = useRef<{ props: Readonly<P>; result: VNode } | undefined>(
-      undefined
-    );
-    if (!prev.current || !propsAreEqual(prev.current.props, props)) {
-      prev.current = {
-        props,
-        result: {
-          type: NODE_TYPE_CUSTOM,
-          render: once(fc) as FC<any>,
-          props,
-        },
-      };
-    }
-    return prev.current.result;
+    const [manager] = useState(() => new MemoManager(Fc, props, isEqualProps));
+    manager.update(props);
+    return manager.vnode;
   }
-  Object.defineProperty(Memo, "name", { value: `Memo(${fc.name})` });
+  Object.defineProperty(Memo, "name", { value: `Memo(${Fc.name})` });
   return Memo;
+}
+
+class MemoManager {
+  public vnode: VCustom;
+
+  // TODO
+  // currently single `VCustom.render` identity is required, but `FcOnce` must be invalidated on update.
+  // this cache is not necessary if "identical vnode" optimization is implemented.
+  // with that optimization, simple this should work:
+  //   vnode = {
+  //     type: NODE_TYPE_CUSTOM,
+  //     render: Fc,
+  //     props,
+  //   }
+  private FcOnce: FC<{}>;
+  private render = (props: {}) => this.FcOnce(props);
+
+  constructor(
+    private Fc: FC<any>,
+    props: {},
+    private isEqualProps: (prev: {}, next: {}) => boolean
+  ) {
+    this.vnode = {
+      type: NODE_TYPE_CUSTOM,
+      render: this.render,
+      props,
+    };
+    this.FcOnce = once(this.Fc);
+  }
+
+  update(props: {}) {
+    if (!this.isEqualProps(this.vnode.props, props)) {
+      this.vnode = {
+        type: NODE_TYPE_CUSTOM,
+        render: this.render,
+        props,
+      };
+      this.FcOnce = once(this.Fc);
+    }
+  }
 }
 
 // from preact https://github.com/preactjs/preact/blob/4b1a7e9276e04676b8d3f8a8257469e2f732e8d4/compat/src/util.js#L19-L23

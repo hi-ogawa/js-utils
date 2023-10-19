@@ -1731,7 +1731,6 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    // TODO: it shouldn't dispose
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
@@ -1747,13 +1746,7 @@ describe(memo, () => {
           "[effect] y-hi 0",
         ],
         [
-          "[dispose] x-hi 0",
-        ],
-        [
           "[render] x-hello 0",
-        ],
-        [
-          "[effect] x-hello 0",
         ],
       ]
     `);
@@ -1794,22 +1787,10 @@ describe(memo, () => {
           "[effect] y-hi 0",
         ],
         [
-          "[dispose] x-hi 0",
-        ],
-        [
           "[render] x-hello 0",
         ],
         [
-          "[effect] x-hello 0",
-        ],
-        [
-          "[dispose] x-hello 0",
-        ],
-        [
           "[render] x-hi 0",
-        ],
-        [
-          "[effect] x-hi 0",
         ],
       ]
     `);
@@ -1849,25 +1830,10 @@ describe(memo, () => {
           "[effect] y-hi 0",
         ],
         [
-          "[dispose] x-hi 0",
-        ],
-        [
           "[render] x-hello 0",
         ],
         [
-          "[effect] x-hello 0",
-        ],
-        [
-          "[dispose] x-hello 0",
-        ],
-        [
           "[render] x-hi 0",
-        ],
-        [
-          "[effect] x-hi 0",
-        ],
-        [
-          "[dispose] x-hi 0",
         ],
         [
           "[render] x-hi 1",
