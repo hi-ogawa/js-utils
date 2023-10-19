@@ -51,15 +51,15 @@ export function memo<P extends {}>(
   propsAreEqual: (prevProps: {}, nextProps: {}) => boolean = objectShallowEqual
 ): FC<P> {
   function Memo(props: P) {
-    const prev = useRef<VCustom | undefined>(undefined);
-    if (!prev.current || !propsAreEqual(prev.current.props, props)) {
-      prev.current = {
+    const ref = useRef<VCustom | undefined>(undefined);
+    if (!ref.current || !propsAreEqual(ref.current.props, props)) {
+      ref.current = {
         type: NODE_TYPE_CUSTOM,
         render: Fc as FC<any>,
         props,
       };
     }
-    return prev.current;
+    return ref.current;
   }
   Object.defineProperty(Memo, "name", { value: `Memo(${Fc.name})` });
   return Memo;
