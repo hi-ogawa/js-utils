@@ -24,6 +24,7 @@ export const NODE_TYPE_FRAGMENT = "fragment" as const;
 // virtual node (immutable)
 //
 
+// TODO: optimize object shape?
 export type VNode = VEmpty | VTag | VText | VCustom | VFragment;
 
 export type VEmpty = {
