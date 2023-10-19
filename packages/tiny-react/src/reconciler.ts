@@ -95,7 +95,8 @@ function reconcileNode(
         effectManager,
         isHydrate
       );
-      placeChild(hparent, bnode.hnode, hnextSibling, false);
+      reinsertBNodeRange(bnode.child, bnode.hnode, null);
+      // placeChild(hparent, bnode.hnode, hnextSibling, false);
     } else {
       queueRef = true;
       unmount(bnode);
@@ -116,7 +117,8 @@ function reconcileNode(
         listeners: new Map(),
       } satisfies BTag;
       reconcileTagProps(bnode, vnode.props, {});
-      placeChild(hparent, bnode.hnode, hnextSibling, true);
+      hparent.insertBefore(hnode, hnextSibling);
+      // placeChild(hparent, bnode.hnode, hnextSibling, true);
     }
     if (queueRef) {
       effectManager.refNodes.push(bnode);
@@ -128,7 +130,7 @@ function reconcileNode(
         bnode.hnode.data = vnode.data;
       }
       bnode.vnode = vnode;
-      placeChild(hparent, bnode.hnode, hnextSibling, false);
+      // placeChild(hparent, bnode.hnode, hnextSibling, false);
     } else {
       unmount(bnode);
       const hnode = document.createTextNode(vnode.data);
@@ -137,23 +139,20 @@ function reconcileNode(
         vnode,
         hnode,
       } satisfies BText;
-      placeChild(hparent, bnode.hnode, hnextSibling, true);
+      hparent.insertBefore(hnode, hnextSibling);
+      // placeChild(hparent, bnode.hnode, hnextSibling, true);
     }
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
     // TODO: learn from
     // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
     // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
     // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
-    let isReordering = false;
     if (bnode.type === NODE_TYPE_FRAGMENT && bnode.vnode.key === vnode.key) {
       const [newChildren, oldChildren] = alignChildrenByKey(
         vnode.children,
         bnode.children
       );
-      if (!isEqualShallow(bnode.children, newChildren)) {
-        isReordering = true;
-        bnode.children = newChildren;
-      }
+      bnode.children = newChildren;
       for (const bnode of oldChildren) {
         unmount(bnode);
       }
@@ -192,13 +191,8 @@ function reconcileNode(
         } else {
           bnode.hrange[0] = hrange[0];
         }
-        if (isReordering) {
-          // TODO: this should replace each `placeChild` when mutating VTag, VText
-          // TODO: slot-fixup in updateCustomNode also has to be adjusted
-          // placeBNode(bchild, hparent, hnextSibling);
-          placeBNode;
-        }
       }
+      reinsertBNodeRange(bchild, hparent, hnextSibling);
       hnextSibling = getBNodeSlot(bchild) ?? hnextSibling;
       bnode.slot = getBNodeSlot(bchild) ?? bnode.slot;
       bnode.children[i] = bchild;
@@ -220,6 +214,7 @@ function reconcileNode(
         effectManager,
         isHydrate
       );
+      reinsertBNodeRange(bnode.child, hparent, hnextSibling);
       bnode.vnode = vnode;
     } else {
       unmount(bnode);
@@ -310,18 +305,18 @@ function hydrateNode(
 }
 
 // TODO: should use it only for "mounting" case
-function placeChild(
-  hparent: HNode,
-  hnode: HNode,
-  hnextSibling: HNode | null,
-  isMount: boolean
-) {
-  if (isMount || hnode.nextSibling !== hnextSibling) {
-    hparent.insertBefore(hnode, hnextSibling);
-  }
-}
+// function placeChild(
+//   hparent: HNode,
+//   hnode: HNode,
+//   hnextSibling: HNode | null,
+//   isMount: boolean
+// ) {
+//   if (isMount || hnode.nextSibling !== hnextSibling) {
+//     hparent.insertBefore(hnode, hnextSibling);
+//   }
+// }
 
-function placeChildrenRange(
+function reinsertHNodeRange(
   first: HNode,
   last: HNode,
   hparent: HNode,
@@ -339,10 +334,14 @@ function placeChildrenRange(
   }
 }
 
-function placeBNode(bnode: BNode, hparent: HNode, hnextSibling: HNode | null) {
+function reinsertBNodeRange(
+  bnode: BNode,
+  hparent: HNode,
+  hnextSibling: HNode | null
+) {
   const hrange = getBNodeRange(bnode);
-  if (hrange) {
-    placeChildrenRange(hrange[0], hrange[1], hparent, hnextSibling);
+  if (hrange && hrange[1].nextSibling !== hnextSibling) {
+    reinsertHNodeRange(hrange[0], hrange[1], hparent, hnextSibling);
   }
 }
 
