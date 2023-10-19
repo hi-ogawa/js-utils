@@ -222,7 +222,7 @@ export function createElement(
   return createVNode(tag, { ...props, children }, key);
 }
 
-// we can probably optimize Fragment creation directly as VFragment
+// we can probably optimize Fragment creation directly as VFragment in `createVNode`
 // but for now we wrap as VCustom, which also helps testing the robustness of architecture
 export function Fragment(props: { children?: ComponentChildren }): VNode {
   return normalizeComponentChildren(props.children);
@@ -241,7 +241,6 @@ export function normalizeComponentChildren(
 }
 
 function normalizeComponentChild(child: ComponentChild): VNode {
-  // TODO: instantiating new object for child/children would break shallow equal used for `memo(Component)`
   if (
     child === null ||
     typeof child === "undefined" ||

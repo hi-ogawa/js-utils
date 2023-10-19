@@ -24,7 +24,6 @@ interface Hyperscript extends HyperscriptIntrinsic, HyperscriptCustom {}
 type HyperscriptIntrinsic = {
   [K in keyof JSX.IntrinsicElements]: (
     props: JSX.IntrinsicElements[K],
-    // TODO: remove and force inside props
     ...children: ComponentChildren[]
   ) => VNode;
 };
