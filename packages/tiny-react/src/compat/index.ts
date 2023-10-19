@@ -1,7 +1,12 @@
-import { createElement } from "../helper/hyperscript";
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
-import { type BNode, EMPTY_NODE, type FC, type VNode } from "../virtual-dom";
+import {
+  type BNode,
+  EMPTY_NODE,
+  type FC,
+  NODE_TYPE_CUSTOM,
+  type VNode,
+} from "../virtual-dom";
 
 // non comprehensive compatibility features
 
@@ -52,10 +57,13 @@ export function memo<P extends {}>(
       undefined
     );
     if (!prev.current || !propsAreEqual(prev.current.props, props)) {
-      createElement;
       prev.current = {
         props,
-        result: createElement(fc, props),
+        result: {
+          type: NODE_TYPE_CUSTOM,
+          render: fc as FC<any>,
+          props,
+        },
       };
     }
     return prev.current.result;
