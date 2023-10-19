@@ -1,5 +1,8 @@
-import { type VNode, createElement } from "../virtual-dom";
-import type { ComponentChildren } from "./common";
+import {
+  type ComponentChildren,
+  type VNode,
+  createElement,
+} from "../virtual-dom";
 import { type JSX } from "./jsx-namespace";
 
 //
