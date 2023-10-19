@@ -1,3 +1,4 @@
+import { once } from "@hiogawa/utils";
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
 import {
@@ -47,7 +48,7 @@ export function createRoot(container: Element) {
 
 // https://react.dev/reference/react/memo
 export function memo<P extends {}>(
-  fc: FC<P>,
+  Fc: FC<P>,
   propsAreEqual: (prevProps: {}, nextProps: {}) => boolean = objectShallowEqual
 ): FC<P> {
   function Memo(props: P) {
@@ -55,13 +56,13 @@ export function memo<P extends {}>(
     if (!prev.current || !propsAreEqual(prev.current.props, props)) {
       prev.current = {
         type: NODE_TYPE_CUSTOM,
-        render: fc as FC<any>,
+        render: Fc as FC<any>,
         props,
       };
     }
     return prev.current;
   }
-  Object.defineProperty(Memo, "name", { value: `Memo(${fc.name})` });
+  Object.defineProperty(Memo, "name", { value: `Memo(${Fc.name})` });
   return Memo;
 }
 

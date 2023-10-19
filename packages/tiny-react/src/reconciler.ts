@@ -22,6 +22,8 @@ import {
   getBNodeParent,
   getBNodeRange,
   getVNodeKey,
+  isReservedTagProp,
+  normalizeComponentChildren,
   setBNodeParent,
 } from "./virtual-dom";
 
@@ -86,8 +88,8 @@ function reconcileNode(
     if (
       bnode.type === NODE_TYPE_TAG &&
       bnode.vnode.key === vnode.key &&
-      bnode.vnode.ref === vnode.ref &&
-      bnode.vnode.name === vnode.name
+      bnode.vnode.name === vnode.name &&
+      bnode.vnode.props.ref === vnode.props.ref
     ) {
       if (isHydrate) {
         hydrateTagProps(bnode, vnode.props);
@@ -96,7 +98,7 @@ function reconcileNode(
       }
       bnode.vnode = vnode;
       bnode.child = reconcileNode(
-        vnode.child,
+        normalizeComponentChildren(vnode.props.children),
         bnode.child,
         bnode.hnode,
         null,
@@ -109,7 +111,7 @@ function reconcileNode(
       unmount(bnode);
       const hnode = document.createElement(vnode.name);
       const child = reconcileNode(
-        vnode.child,
+        normalizeComponentChildren(vnode.props.children),
         EMPTY_NODE,
         hnode,
         null,
@@ -515,6 +517,9 @@ function hydrateTagProps(bnode: BTag, props: Props) {
 }
 
 function setTagProp(bnode: BTag, key: string, value: unknown) {
+  if (isReservedTagProp(key)) {
+    return;
+  }
   const { listeners, hnode } = bnode;
 
   if (key.startsWith("on")) {
@@ -561,7 +566,9 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
     unmountNode(bnode.child, /* skipRemove */ true);
     if (!skipRemove) {
       bnode.hnode.remove();
-      bnode.vnode.ref?.(null);
+      if (bnode.vnode.props.ref) {
+        bnode.vnode.props.ref(null);
+      }
     }
   } else if (bnode.type === NODE_TYPE_TEXT) {
     bnode.hnode.remove();
@@ -588,8 +595,8 @@ class EffectManager {
   run() {
     // TODO: node could be already unmounted?
     for (const tagNode of this.refNodes) {
-      if (tagNode.vnode.ref) {
-        tagNode.vnode.ref(tagNode.hnode);
+      if (tagNode.vnode.props.ref) {
+        tagNode.vnode.props.ref(tagNode.hnode);
       }
     }
 

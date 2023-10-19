@@ -1,7 +1,7 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { createRoot, memo } from "./compat";
-import { Fragment, createElement, h } from "./helper/hyperscript";
+import { h } from "./helper/hyperscript";
 import {
   useCallback,
   useEffect,
@@ -12,7 +12,13 @@ import {
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import { sleepFrame } from "./test-utils";
-import { getBNodeRange } from "./virtual-dom";
+import {
+  EMPTY_NODE,
+  Fragment,
+  createElement,
+  createVNode,
+  getBNodeRange,
+} from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {
@@ -66,16 +72,12 @@ describe(render, () => {
               "listeners": Map {},
               "type": "tag",
               "vnode": {
-                "child": {
-                  "data": "world",
-                  "type": "text",
-                },
                 "key": undefined,
                 "name": "span",
                 "props": {
+                  "children": "world",
                   "className": "text-red",
                 },
-                "ref": undefined,
                 "type": "tag",
               },
             },
@@ -97,16 +99,12 @@ describe(render, () => {
                 "type": "text",
               },
               {
-                "child": {
-                  "data": "world",
-                  "type": "text",
-                },
                 "key": undefined,
                 "name": "span",
                 "props": {
+                  "children": "world",
                   "className": "text-red",
                 },
-                "ref": undefined,
                 "type": "tag",
               },
             ],
@@ -126,34 +124,23 @@ describe(render, () => {
         "listeners": Map {},
         "type": "tag",
         "vnode": {
-          "child": {
-            "children": [
-              {
-                "data": "hello",
-                "type": "text",
-              },
-              {
-                "child": {
-                  "data": "world",
-                  "type": "text",
-                },
-                "key": undefined,
-                "name": "span",
-                "props": {
-                  "className": "text-red",
-                },
-                "ref": undefined,
-                "type": "tag",
-              },
-            ],
-            "type": "fragment",
-          },
           "key": undefined,
           "name": "div",
           "props": {
+            "children": [
+              "hello",
+              {
+                "key": undefined,
+                "name": "span",
+                "props": {
+                  "children": "world",
+                  "className": "text-red",
+                },
+                "type": "tag",
+              },
+            ],
             "className": "flex items-center gap-2",
           },
-          "ref": undefined,
           "type": "tag",
         },
       }
@@ -187,16 +174,12 @@ describe(render, () => {
         "listeners": Map {},
         "type": "tag",
         "vnode": {
-          "child": {
-            "data": "reconcile",
-            "type": "text",
-          },
           "key": undefined,
           "name": "div",
           "props": {
+            "children": "reconcile",
             "className": "flex items-center gap-2",
           },
-          "ref": undefined,
           "type": "tag",
         },
       }
@@ -241,14 +224,11 @@ describe(render, () => {
                 "listeners": Map {},
                 "type": "tag",
                 "vnode": {
-                  "child": {
-                    "data": "hello",
-                    "type": "text",
-                  },
                   "key": undefined,
                   "name": "span",
-                  "props": {},
-                  "ref": undefined,
+                  "props": {
+                    "children": "hello",
+                  },
                   "type": "tag",
                 },
               },
@@ -272,14 +252,11 @@ describe(render, () => {
             "vnode": {
               "children": [
                 {
-                  "child": {
-                    "data": "hello",
-                    "type": "text",
-                  },
                   "key": undefined,
                   "name": "span",
-                  "props": {},
-                  "ref": undefined,
+                  "props": {
+                    "children": "hello",
+                  },
                   "type": "tag",
                 },
                 {
@@ -299,30 +276,21 @@ describe(render, () => {
           "listeners": Map {},
           "type": "tag",
           "vnode": {
-            "child": {
-              "children": [
-                {
-                  "child": {
-                    "data": "hello",
-                    "type": "text",
-                  },
-                  "key": undefined,
-                  "name": "span",
-                  "props": {},
-                  "ref": undefined,
-                  "type": "tag",
-                },
-                {
-                  "data": "world",
-                  "type": "text",
-                },
-              ],
-              "type": "fragment",
-            },
             "key": undefined,
             "name": "div",
-            "props": {},
-            "ref": undefined,
+            "props": {
+              "children": [
+                {
+                  "key": undefined,
+                  "name": "span",
+                  "props": {
+                    "children": "hello",
+                  },
+                  "type": "tag",
+                },
+                "world",
+              ],
+            },
             "type": "tag",
           },
         },
@@ -361,9 +329,7 @@ describe(render, () => {
         "vnode": {
           "key": undefined,
           "props": {
-            "children": {
-              "type": "empty",
-            },
+            "children": undefined,
             "value": "hello",
           },
           "render": [Function],
@@ -750,7 +716,7 @@ describe(render, () => {
 
 describe(updateCustomNode, () => {
   it("basic", () => {
-    // check inner component re-rendering to fixup parent BNode.slot
+    // verify that inner component re-rendering will fixup parent BNode.slot
 
     let update1!: (tag: string) => void;
     let update2!: (tag: string) => void;
@@ -758,13 +724,13 @@ describe(updateCustomNode, () => {
     function Custom1() {
       const [tag, setTag] = useState("div");
       update1 = setTag;
-      return createElement(tag, {}, "x");
+      return h[tag as "div"]({}, "x");
     }
 
     function Custom2() {
       const [tag, setTag] = useState("span");
       update2 = setTag;
-      return createElement(tag, {}, "y");
+      return h[tag as "div"]({}, "y");
     }
 
     let vnode = h(Fragment, {}, h(Custom1, {}), h(Custom2, {}));
@@ -1643,15 +1609,79 @@ describe("ref", () => {
   });
 });
 
-describe(memo, () => {
+describe("custom-children", () => {
   it("basic", () => {
+    function Custom(props: { children: string }) {
+      return h.div({}, JSON.stringify(props));
+    }
+    const parent = document.createElement("main");
+    const root = createRoot(parent);
+    const vnode = h.div(
+      {},
+      createVNode(Custom, { children: "hello" }, "key1"),
+      createElement(Custom, { key: "key2" }, "hello")
+    );
+    root.render(vnode);
+    expect(vnode).toMatchInlineSnapshot(`
+      {
+        "key": undefined,
+        "name": "div",
+        "props": {
+          "children": [
+            {
+              "key": "key1",
+              "props": {
+                "children": "hello",
+              },
+              "render": [Function],
+              "type": "custom",
+            },
+            {
+              "key": "key2",
+              "props": {
+                "children": "hello",
+              },
+              "render": [Function],
+              "type": "custom",
+            },
+          ],
+        },
+        "type": "tag",
+      }
+    `);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            {"children":"hello"}
+          </div>
+          <div>
+            {"children":"hello"}
+          </div>
+        </div>
+      </main>
+    `);
+  });
+});
+
+describe(memo, () => {
+  it("basic", async () => {
     const mockFn = vi.fn();
+    const mockFnSnapshot = () => mockFn.mock.calls.map((args) => args[0]);
 
     const Custom = memo(function Custom(props: {
       label: string;
       value: number;
     }) {
-      mockFn(props.label, props.value);
+      mockFn(`[render] ${props.label} ${props.value}`);
+
+      useEffect(() => {
+        mockFn(`[effect] ${props.label} ${props.value}`);
+        return () => {
+          mockFn(`[dispose] ${props.label} ${props.value}`);
+        };
+      }, []);
+
       return h.div({}, props.label, props.value);
     });
 
@@ -1665,6 +1695,7 @@ describe(memo, () => {
         h(Custom, { label: "y-hi", value: 0 })
       )
     );
+    await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1677,19 +1708,16 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
       [
-        [
-          "y-hi",
-          0,
-        ],
-        [
-          "x-hi",
-          0,
-        ],
+        "[render] y-hi 0",
+        "[render] x-hi 0",
+        "[effect] y-hi 0",
+        "[effect] x-hi 0",
       ]
     `);
 
+    mockFn.mockReset();
     root.render(
       h(
         Fragment,
@@ -1698,6 +1726,7 @@ describe(memo, () => {
         h(Custom, { label: "y-hi", value: 0 })
       )
     );
+    await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1710,19 +1739,9 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
-      [
-        [
-          "y-hi",
-          0,
-        ],
-        [
-          "x-hi",
-          0,
-        ],
-      ]
-    `);
+    expect(mockFnSnapshot()).toMatchInlineSnapshot("[]");
 
+    mockFn.mockReset();
     root.render(
       h(
         Fragment,
@@ -1731,6 +1750,7 @@ describe(memo, () => {
         h(Custom, { label: "y-hi", value: 0 })
       )
     );
+    await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1743,23 +1763,13 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
       [
-        [
-          "y-hi",
-          0,
-        ],
-        [
-          "x-hi",
-          0,
-        ],
-        [
-          "x-hello",
-          0,
-        ],
+        "[render] x-hello 0",
       ]
     `);
 
+    mockFn.mockReset();
     root.render(
       h(
         Fragment,
@@ -1768,6 +1778,7 @@ describe(memo, () => {
         h(Custom, { label: "y-hi", value: 0 })
       )
     );
+    await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1780,27 +1791,13 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
       [
-        [
-          "y-hi",
-          0,
-        ],
-        [
-          "x-hi",
-          0,
-        ],
-        [
-          "x-hello",
-          0,
-        ],
-        [
-          "x-hi",
-          0,
-        ],
+        "[render] x-hi 0",
       ]
     `);
 
+    mockFn.mockReset();
     root.render(
       h(
         Fragment,
@@ -1821,28 +1818,19 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
       [
-        [
-          "y-hi",
-          0,
-        ],
-        [
-          "x-hi",
-          0,
-        ],
-        [
-          "x-hello",
-          0,
-        ],
-        [
-          "x-hi",
-          0,
-        ],
-        [
-          "x-hi",
-          1,
-        ],
+        "[render] x-hi 1",
+      ]
+    `);
+
+    mockFn.mockReset();
+    root.render(EMPTY_NODE);
+    expect(parent).toMatchInlineSnapshot("<main />");
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
+      [
+        "[dispose] x-hi 0",
+        "[dispose] y-hi 0",
       ]
     `);
   });
