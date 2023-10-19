@@ -12,6 +12,7 @@ This simplified runtime architecture is inspired by [`solid-refresh`](https://gi
 - By default, any change will cause components to remount and thus hook states are not preserved.
 - Adding `// @hmr-unsafe` comment above the component definition will preserve hook states, but each hot update must keep same hook count.
 - Each component will be wrapped with extra component `(ComponentName)_refresh`.
+- Changing constants outside of component defnition won't trigger refresh since `Function.toString` is used to detect change.
 
 ## usages
 
