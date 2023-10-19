@@ -31,5 +31,6 @@ type HyperscriptIntrinsic = {
 type HyperscriptCustom = <P>(
   tag: (props: P) => VNode,
   props: P & JSX.IntrinsicAttributes,
+  // TODO: infer `children` types from `P`?
   ...children: ComponentChildren[]
 ) => VNode;
