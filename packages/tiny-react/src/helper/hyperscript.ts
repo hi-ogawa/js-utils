@@ -63,7 +63,10 @@ export function Fragment(props: { children?: ComponentChildren }): VNode {
   return normalizeComponentChildren(props.children);
 }
 
-function normalizeComponentChildren(children?: ComponentChildren): VNode {
+// TODO: move to core
+export function normalizeComponentChildren(
+  children?: ComponentChildren
+): VNode {
   if (Array.isArray(children)) {
     return {
       type: NODE_TYPE_FRAGMENT,

@@ -1,3 +1,4 @@
+import type { ComponentChildren } from "./helper/common";
 import type { HookContext } from "./hooks";
 
 //
@@ -32,23 +33,24 @@ export type VEmpty = {
   type: typeof NODE_TYPE_EMPTY;
 };
 
+// special props keys
+export const RESERVED_PROPS = ["ref", "children"] as const;
+export type ReservedProp = (typeof RESERVED_PROPS)[number];
+
 // dom element
 export type VTag = {
   type: typeof NODE_TYPE_TAG;
   key?: NodeKey;
   name: string; // tagName
-  props: Props;
-  child: VNode;
-  ref?: (el: HTag | null) => VNode; // core only supports callback. maybe { current: T } can be implemented in compat layer.
+  props: Props & {
+    ref?: (el: HTag | null) => VNode;
+    // TODO: avoid too much recursive types in core?
+    children?: ComponentChildren;
+  };
+  // TODO
+  // child: VNode;
+  // ref?: (el: HTag | null) => VNode; // core only supports callback. maybe { current: T } can be implemented in compat layer.
 };
-
-// TODO
-export interface VTagLazy {
-  type: typeof NODE_TYPE_TAG;
-  name: string;
-  key: NodeKey;
-  props: Props;
-}
 
 // text node
 export type VText = {

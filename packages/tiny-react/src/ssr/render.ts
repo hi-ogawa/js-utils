@@ -1,3 +1,4 @@
+import { normalizeComponentChildren } from "../helper/hyperscript";
 import { HookContext } from "../hooks";
 import { updateCustomNodeUnsupported } from "../reconciler";
 import {
@@ -44,10 +45,13 @@ class SsrManager {
 
   // cf. https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/index.js#L322
   renderTag(vnode: VTag) {
-    const { name, props, child } = vnode;
+    const { name, props } = vnode;
     let openTag = `<${name}`;
     let innerOverride: string | undefined;
     for (let k in props) {
+      if (k === "ref" || k === "children") {
+        continue;
+      }
       let v = props[k];
       if (v == null || k.startsWith("on")) {
         continue;
@@ -93,7 +97,7 @@ class SsrManager {
     if (name === "select") {
       this.selectTagStack.push(vnode);
     }
-    const inner = this.render(child);
+    const inner = this.render(normalizeComponentChildren(props.children));
     if (name === "select") {
       this.selectTagStack.pop();
     }

@@ -1,4 +1,6 @@
 import { tinyassert } from "@hiogawa/utils";
+import type { ComponentChildren } from "./helper/common";
+import { normalizeComponentChildren } from "./helper/hyperscript";
 import { HookContext } from "./hooks";
 import {
   type BCustom,
@@ -76,8 +78,8 @@ function reconcileNode(
     if (
       bnode.type === NODE_TYPE_TAG &&
       bnode.vnode.key === vnode.key &&
-      bnode.vnode.ref === vnode.ref &&
-      bnode.vnode.name === vnode.name
+      bnode.vnode.name === vnode.name &&
+      bnode.vnode.props.ref === vnode.props.ref
     ) {
       if (isHydrate) {
         hydrateTagProps(bnode, vnode.props);
@@ -86,7 +88,7 @@ function reconcileNode(
       }
       bnode.vnode = vnode;
       bnode.child = reconcileNode(
-        vnode.child,
+        normalizeComponentChildren(vnode.props.children as ComponentChildren),
         bnode.child,
         bnode.hnode,
         undefined,
@@ -99,7 +101,7 @@ function reconcileNode(
       unmount(bnode);
       const hnode = document.createElement(vnode.name);
       const child = reconcileNode(
-        vnode.child,
+        normalizeComponentChildren(vnode.props.children as ComponentChildren),
         EMPTY_NODE,
         hnode,
         undefined,
@@ -508,7 +510,10 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
     unmountNode(bnode.child, /* skipRemove */ true);
     if (!skipRemove) {
       bnode.hnode.remove();
-      bnode.vnode.ref?.(null);
+      if (bnode.vnode.props.ref) {
+        tinyassert(typeof bnode.vnode.props.ref === "function");
+        bnode.vnode.props.ref(null);
+      }
     }
   } else if (bnode.type === NODE_TYPE_TEXT) {
     bnode.hnode.remove();
@@ -535,8 +540,9 @@ class EffectManager {
   run() {
     // TODO: node could be already unmounted?
     for (const tagNode of this.refNodes) {
-      if (tagNode.vnode.ref) {
-        tagNode.vnode.ref(tagNode.hnode);
+      if (tagNode.vnode.props.ref) {
+        tinyassert(typeof tagNode.vnode.props.ref === "function");
+        tagNode.vnode.props.ref(tagNode.hnode);
       }
     }
 
