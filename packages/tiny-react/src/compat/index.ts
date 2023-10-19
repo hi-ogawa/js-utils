@@ -1,3 +1,4 @@
+import { once } from "@hiogawa/utils";
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
 import {
@@ -61,7 +62,7 @@ export function memo<P extends {}>(
         props,
         result: {
           type: NODE_TYPE_CUSTOM,
-          render: fc as FC<any>,
+          render: once(fc) as FC<any>,
           props,
         },
       };

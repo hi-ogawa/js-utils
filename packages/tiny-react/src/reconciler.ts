@@ -189,22 +189,17 @@ function reconcileNode(
       bnode.vnode.key === vnode.key &&
       bnode.vnode.render === vnode.render
     ) {
-      // memo vnode
-      // TODO: probably this breaks when we need to `placeChild(..., false)` of descendents
-      // TODO: `bnode.vnode === vnode` check should also work be applied for BTag, BText, BFragment
-      if (bnode.vnode !== vnode) {
-        bnode.hookContext.notify = updateCustomNodeUnsupported;
-        const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
-        bnode.child = reconcileNode(
-          vchild,
-          bnode.child,
-          hparent,
-          preSlot,
-          effectManager,
-          isHydrate
-        );
-        bnode.vnode = vnode;
-      }
+      bnode.hookContext.notify = updateCustomNodeUnsupported;
+      const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
+      bnode.child = reconcileNode(
+        vchild,
+        bnode.child,
+        hparent,
+        preSlot,
+        effectManager,
+        isHydrate
+      );
+      bnode.vnode = vnode;
     } else {
       unmount(bnode);
       const hookContext = new HookContext(updateCustomNodeUnsupported);
@@ -331,7 +326,6 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
 
   // reconcile
   const effectManager = new EffectManager();
-  bnode.vnode = { ...vnode }; // TODO: quick hack to not memo top custom itself
   const newBnode = reconcileNode(
     vnode,
     bnode,
