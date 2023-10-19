@@ -52,8 +52,15 @@ export function memo<P extends {}>(
   isEqualProps: (prev: {}, next: {}) => boolean = objectShallowEqual
 ): FC<P> {
   function Memo(props: P) {
-    // This is a little convoluted since here we need to make `VCustom.render` stable,
+    // we need to make `VCustom.render` stable,
     // but `once(Fc)` has to be invalidated on props change.
+    // after "identical vnode" optimization is implemented,
+    // it can be simplified to
+    //   {
+    //     type: NODE_TYPE_CUSTOM,
+    //     render: Fc,
+    //     props,
+    //   }
     const [state] = useState(() => {
       const state: {
         render: FC;
@@ -65,13 +72,6 @@ export function memo<P extends {}>(
     });
 
     if (!state.current || !isEqualProps(state.current.vnode.props, props)) {
-      // After "identical vnode" optimization is implemented,
-      // it can be directly simplified
-      //   {
-      //     type: NODE_TYPE_CUSTOM,
-      //     render: Fc,
-      //     props,
-      //   }
       state.current = {
         vnode: {
           type: NODE_TYPE_CUSTOM,
