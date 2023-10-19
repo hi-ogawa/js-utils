@@ -1,5 +1,4 @@
 import { tinyassert } from "@hiogawa/utils";
-import type { ComponentChildren } from "./helper/common";
 import { normalizeComponentChildren } from "./helper/hyperscript";
 import { HookContext } from "./hooks";
 import {
@@ -23,8 +22,8 @@ import {
   getBNodeParent,
   getBNodeSlot,
   getVNodeKey,
-  setBNodeParent,
   isReservedTagProp,
+  setBNodeParent,
 } from "./virtual-dom";
 
 export function render(
@@ -89,7 +88,7 @@ function reconcileNode(
       }
       bnode.vnode = vnode;
       bnode.child = reconcileNode(
-        normalizeComponentChildren(vnode.props.children as ComponentChildren),
+        normalizeComponentChildren(vnode.props.children),
         bnode.child,
         bnode.hnode,
         undefined,
@@ -102,7 +101,7 @@ function reconcileNode(
       unmount(bnode);
       const hnode = document.createElement(vnode.name);
       const child = reconcileNode(
-        normalizeComponentChildren(vnode.props.children as ComponentChildren),
+        normalizeComponentChildren(vnode.props.children),
         EMPTY_NODE,
         hnode,
         undefined,
@@ -515,7 +514,6 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
     if (!skipRemove) {
       bnode.hnode.remove();
       if (bnode.vnode.props.ref) {
-        tinyassert(typeof bnode.vnode.props.ref === "function");
         bnode.vnode.props.ref(null);
       }
     }
@@ -545,7 +543,6 @@ class EffectManager {
     // TODO: node could be already unmounted?
     for (const tagNode of this.refNodes) {
       if (tagNode.vnode.props.ref) {
-        tinyassert(typeof tagNode.vnode.props.ref === "function");
         tagNode.vnode.props.ref(tagNode.hnode);
       }
     }

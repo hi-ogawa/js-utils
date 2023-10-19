@@ -7,9 +7,9 @@ import {
   NODE_TYPE_FRAGMENT,
   NODE_TYPE_TAG,
   NODE_TYPE_TEXT,
-  isReservedTagProp,
   type VNode,
   type VTag,
+  isReservedTagProp,
 } from "../virtual-dom";
 
 export function renderToString(vnode: VNode): string {

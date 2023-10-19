@@ -21,92 +21,62 @@ describe("hyperscript", () => {
     );
     expect(vnode).toMatchInlineSnapshot(`
       {
-        "child": {
+        "key": undefined,
+        "name": "div",
+        "props": {
           "children": [
             {
               "key": "abc",
               "props": {
-                "children": {
-                  "type": "empty",
-                },
+                "children": undefined,
                 "value": "hello",
               },
               "render": [Function],
               "type": "custom",
             },
-            {
-              "type": "empty",
-            },
-            {
-              "data": "0",
-              "type": "text",
-            },
+            null,
+            0,
             {
               "key": undefined,
               "props": {
-                "children": {
-                  "type": "empty",
-                },
+                "children": undefined,
               },
               "render": [Function],
               "type": "custom",
             },
+            undefined,
             {
-              "type": "empty",
-            },
-            {
-              "child": {
-                "data": "world",
-                "type": "text",
-              },
               "key": 0,
               "name": "span",
               "props": {
+                "children": "world",
                 "className": "text-red",
+                "ref": [Function],
               },
-              "ref": [Function],
               "type": "tag",
             },
             {
-              "child": {
-                "data": "0",
-                "type": "text",
-              },
               "key": undefined,
               "name": "span",
-              "props": {},
-              "ref": undefined,
+              "props": {
+                "children": 0,
+              },
               "type": "tag",
             },
             {
-              "child": {
+              "key": undefined,
+              "name": "span",
+              "props": {
                 "children": [
-                  {
-                    "data": "0",
-                    "type": "text",
-                  },
-                  {
-                    "data": "1",
-                    "type": "text",
-                  },
+                  0,
+                  1,
                 ],
-                "type": "fragment",
               },
-              "key": undefined,
-              "name": "span",
-              "props": {},
-              "ref": undefined,
               "type": "tag",
             },
           ],
-          "type": "fragment",
-        },
-        "key": undefined,
-        "name": "div",
-        "props": {
           "className": "flex",
         },
-        "ref": undefined,
         "type": "tag",
       }
     `);

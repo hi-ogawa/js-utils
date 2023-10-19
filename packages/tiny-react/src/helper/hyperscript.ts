@@ -2,9 +2,9 @@ import {
   EMPTY_NODE,
   NODE_TYPE_FRAGMENT,
   NODE_TYPE_TEXT,
-  createVNode,
   type NodeKey,
   type VNode,
+  createVNode,
 } from "../virtual-dom";
 import type {
   ComponentChild,
@@ -25,7 +25,8 @@ export function createElement(
   // should be written without spreading
   //   h("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
   // this should be guaranteed when `h` is used via jsx-runtime-based transpilation.
-  const children: ComponentChildren = restChildren.length <= 1 ? restChildren[0] : restChildren;
+  const children: ComponentChildren =
+    restChildren.length <= 1 ? restChildren[0] : restChildren;
   return createVNode(tag, { ...props, children }, key);
 }
 

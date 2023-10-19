@@ -67,16 +67,12 @@ describe(render, () => {
               "listeners": Map {},
               "type": "tag",
               "vnode": {
-                "child": {
-                  "data": "world",
-                  "type": "text",
-                },
                 "key": undefined,
                 "name": "span",
                 "props": {
+                  "children": "world",
                   "className": "text-red",
                 },
-                "ref": undefined,
                 "type": "tag",
               },
             },
@@ -95,16 +91,12 @@ describe(render, () => {
                 "type": "text",
               },
               {
-                "child": {
-                  "data": "world",
-                  "type": "text",
-                },
                 "key": undefined,
                 "name": "span",
                 "props": {
+                  "children": "world",
                   "className": "text-red",
                 },
-                "ref": undefined,
                 "type": "tag",
               },
             ],
@@ -124,34 +116,23 @@ describe(render, () => {
         "listeners": Map {},
         "type": "tag",
         "vnode": {
-          "child": {
-            "children": [
-              {
-                "data": "hello",
-                "type": "text",
-              },
-              {
-                "child": {
-                  "data": "world",
-                  "type": "text",
-                },
-                "key": undefined,
-                "name": "span",
-                "props": {
-                  "className": "text-red",
-                },
-                "ref": undefined,
-                "type": "tag",
-              },
-            ],
-            "type": "fragment",
-          },
           "key": undefined,
           "name": "div",
           "props": {
+            "children": [
+              "hello",
+              {
+                "key": undefined,
+                "name": "span",
+                "props": {
+                  "children": "world",
+                  "className": "text-red",
+                },
+                "type": "tag",
+              },
+            ],
             "className": "flex items-center gap-2",
           },
-          "ref": undefined,
           "type": "tag",
         },
       }
@@ -185,16 +166,12 @@ describe(render, () => {
         "listeners": Map {},
         "type": "tag",
         "vnode": {
-          "child": {
-            "data": "reconcile",
-            "type": "text",
-          },
           "key": undefined,
           "name": "div",
           "props": {
+            "children": "reconcile",
             "className": "flex items-center gap-2",
           },
-          "ref": undefined,
           "type": "tag",
         },
       }
@@ -239,14 +216,11 @@ describe(render, () => {
                 "listeners": Map {},
                 "type": "tag",
                 "vnode": {
-                  "child": {
-                    "data": "hello",
-                    "type": "text",
-                  },
                   "key": undefined,
                   "name": "span",
-                  "props": {},
-                  "ref": undefined,
+                  "props": {
+                    "children": "hello",
+                  },
                   "type": "tag",
                 },
               },
@@ -265,14 +239,11 @@ describe(render, () => {
             "vnode": {
               "children": [
                 {
-                  "child": {
-                    "data": "hello",
-                    "type": "text",
-                  },
                   "key": undefined,
                   "name": "span",
-                  "props": {},
-                  "ref": undefined,
+                  "props": {
+                    "children": "hello",
+                  },
                   "type": "tag",
                 },
                 {
@@ -292,30 +263,21 @@ describe(render, () => {
           "listeners": Map {},
           "type": "tag",
           "vnode": {
-            "child": {
-              "children": [
-                {
-                  "child": {
-                    "data": "hello",
-                    "type": "text",
-                  },
-                  "key": undefined,
-                  "name": "span",
-                  "props": {},
-                  "ref": undefined,
-                  "type": "tag",
-                },
-                {
-                  "data": "world",
-                  "type": "text",
-                },
-              ],
-              "type": "fragment",
-            },
             "key": undefined,
             "name": "div",
-            "props": {},
-            "ref": undefined,
+            "props": {
+              "children": [
+                {
+                  "key": undefined,
+                  "name": "span",
+                  "props": {
+                    "children": "hello",
+                  },
+                  "type": "tag",
+                },
+                "world",
+              ],
+            },
             "type": "tag",
           },
         },
@@ -346,9 +308,7 @@ describe(render, () => {
         "vnode": {
           "key": undefined,
           "props": {
-            "children": {
-              "type": "empty",
-            },
+            "children": undefined,
             "value": "hello",
           },
           "render": [Function],
@@ -1629,7 +1589,9 @@ describe("custom-children", () => {
     // TODO: `createElement` shouldn't normalize `props.children` into `VNode`
     expect(vnode).toMatchInlineSnapshot(`
       {
-        "child": {
+        "key": undefined,
+        "name": "div",
+        "props": {
           "children": [
             {
               "key": "key1",
@@ -1642,21 +1604,13 @@ describe("custom-children", () => {
             {
               "key": "key2",
               "props": {
-                "children": {
-                  "data": "hello",
-                  "type": "text",
-                },
+                "children": "hello",
               },
               "render": [Function],
               "type": "custom",
             },
           ],
-          "type": "fragment",
         },
-        "key": undefined,
-        "name": "div",
-        "props": {},
-        "ref": undefined,
         "type": "tag",
       }
     `);
@@ -1667,7 +1621,7 @@ describe("custom-children", () => {
             {"children":"hello"}
           </div>
           <div>
-            {"children":{"type":"text","data":"hello"}}
+            {"children":"hello"}
           </div>
         </div>
       </main>
