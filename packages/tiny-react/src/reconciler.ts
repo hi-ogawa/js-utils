@@ -56,7 +56,7 @@ function reconcileNode(
   vnode: VNode,
   bnode: BNode,
   hparent: HNode,
-  hnextSibling: HNode | null, // hparent.insertBefore(<new node>, hnextSibling)
+  hnextSibling: HNode | null,
   effectManager: EffectManager,
   isHydrate: boolean
 ): BNode {
@@ -93,7 +93,7 @@ function reconcileNode(
         effectManager,
         isHydrate
       );
-      hparent.insertBefore(bnode.hnode, hnextSibling);
+      placeChild(hparent, bnode.hnode, hnextSibling, false);
     } else {
       queueRef = true;
       unmount(bnode);
@@ -114,7 +114,7 @@ function reconcileNode(
         listeners: new Map(),
       } satisfies BTag;
       reconcileTagProps(bnode, vnode.props, {});
-      hparent.insertBefore(bnode.hnode, hnextSibling);
+      placeChild(hparent, bnode.hnode, hnextSibling, true);
     }
     if (queueRef) {
       effectManager.refNodes.push(bnode);
@@ -126,7 +126,7 @@ function reconcileNode(
         bnode.hnode.data = vnode.data;
       }
       bnode.vnode = vnode;
-      hparent.insertBefore(bnode.hnode, hnextSibling);
+      placeChild(hparent, bnode.hnode, hnextSibling, false);
     } else {
       unmount(bnode);
       const hnode = document.createTextNode(vnode.data);
@@ -135,7 +135,7 @@ function reconcileNode(
         vnode,
         hnode,
       } satisfies BText;
-      hparent.insertBefore(bnode.hnode, hnextSibling);
+      placeChild(hparent, bnode.hnode, hnextSibling, true);
     }
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
     // TODO: learn from
@@ -285,6 +285,17 @@ function hydrateNode(
     } satisfies BCustom;
   }
   return vnode satisfies never;
+}
+
+function placeChild(
+  hparent: HNode,
+  hnode: HNode,
+  hnextSibling: HNode | null,
+  init: boolean
+) {
+  if (init || hnode.nextSibling !== hnextSibling) {
+    hparent.insertBefore(hnode, hnextSibling);
+  }
 }
 
 export function updateCustomNodeUnsupported() {
