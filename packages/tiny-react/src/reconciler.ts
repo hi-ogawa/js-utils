@@ -66,12 +66,18 @@ function reconcileNode(
     bnode = hydrateNode(vnode, hparent, hnextSibling);
   }
   if (vnode.type === NODE_TYPE_EMPTY) {
+    //
+    // empty
+    //
     if (bnode.type === NODE_TYPE_EMPTY) {
     } else {
       unmount(bnode);
       bnode = EMPTY_NODE;
     }
   } else if (vnode.type === NODE_TYPE_TAG) {
+    //
+    // tag
+    //
     let queueRef = isHydrate; // ref callback on mount or hydrate;
     if (
       bnode.type === NODE_TYPE_TAG &&
@@ -121,6 +127,9 @@ function reconcileNode(
     }
     setBNodeParent(bnode.child, bnode);
   } else if (vnode.type === NODE_TYPE_TEXT) {
+    //
+    // text
+    //
     if (bnode.type === NODE_TYPE_TEXT) {
       if (bnode.vnode.data !== vnode.data) {
         bnode.hnode.data = vnode.data;
@@ -137,6 +146,9 @@ function reconcileNode(
       hparent.insertBefore(hnode, hnextSibling);
     }
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
+    //
+    // fragment
+    //
     if (bnode.type === NODE_TYPE_FRAGMENT && bnode.vnode.key === vnode.key) {
       const [newChildren, oldChildren] = alignChildrenByKey(
         vnode.children,
@@ -187,6 +199,9 @@ function reconcileNode(
       setBNodeParent(bchild, bnode);
     }
   } else if (vnode.type === NODE_TYPE_CUSTOM) {
+    //
+    // custom
+    //
     if (
       bnode.type === NODE_TYPE_CUSTOM &&
       bnode.vnode.key === vnode.key &&
@@ -248,8 +263,14 @@ function hydrateNode(
   hnextSibling: HNode | null
 ): BNode {
   if (vnode.type === NODE_TYPE_EMPTY) {
+    //
+    // empty
+    //
     return EMPTY_NODE;
   } else if (vnode.type === NODE_TYPE_TAG) {
+    //
+    // tag
+    //
     const hnode = hnextSibling?.previousSibling ?? hparent.lastChild;
     // TODO: warning instead of hard error?
     // TODO: check props mismatch?
@@ -265,6 +286,9 @@ function hydrateNode(
       listeners: new Map(),
     } satisfies BTag;
   } else if (vnode.type === NODE_TYPE_TEXT) {
+    //
+    // text
+    //
     const hnode = hnextSibling?.previousSibling ?? hparent.lastChild;
     tinyassert(
       hnode instanceof Text,
@@ -276,6 +300,9 @@ function hydrateNode(
     );
     return { type: vnode.type, vnode, hnode } satisfies BText;
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
+    //
+    // fragment
+    //
     return {
       type: vnode.type,
       vnode,
@@ -283,6 +310,9 @@ function hydrateNode(
       hrange: undefined,
     } satisfies BFragment;
   } else if (vnode.type === NODE_TYPE_CUSTOM) {
+    //
+    // custom
+    //
     return {
       type: vnode.type,
       vnode,
