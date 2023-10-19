@@ -180,7 +180,6 @@ export type ComponentChild =
 
 export type ComponentChildren = ComponentChild | ComponentChildren[];
 
-// jsx-runtime compatible virtual node factory
 export function createVNode(
   tag: ComponentType,
   props: {},
