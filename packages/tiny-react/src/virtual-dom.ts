@@ -91,10 +91,8 @@ export type BCustom = {
   vnode: VCustom;
   parent?: BNodeParent;
   child: BNode;
-  // TOD: replace `slot` with `hrange`
-  slot?: HNode;
-  hrange?: [HNode, HNode];
   hparent?: HNode; // undefined after unmounted (this flag seems necessary to skip already scheduled re-rendering after unmount)
+  hrange?: [HNode, HNode];
   hookContext: HookContext;
 };
 
@@ -103,7 +101,6 @@ export type BFragment = {
   vnode: VFragment;
   parent?: BNodeParent;
   children: BNode[];
-  slot?: HNode;
   hrange?: [HNode, HNode];
 };
 
@@ -131,17 +128,6 @@ export function getBNodeKey(node: BNode): NodeKey | undefined {
     return node.vnode.key;
   }
   return;
-}
-
-// "slot" is the first HNode inside the BNode subtree
-export function getBNodeSlot(node: BNode): HNode | undefined {
-  if (node.type === NODE_TYPE_EMPTY) {
-    return;
-  }
-  if (node.type === NODE_TYPE_TAG || node.type === NODE_TYPE_TEXT) {
-    return node.hnode;
-  }
-  return node.slot;
 }
 
 export function getBNodeRange(node: BNode): [HNode, HNode] | undefined {

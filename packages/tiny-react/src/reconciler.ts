@@ -21,7 +21,6 @@ import {
   getBNodeKey,
   getBNodeParent,
   getBNodeRange,
-  getBNodeSlot,
   getVNodeKey,
   setBNodeParent,
 } from "./virtual-dom";
@@ -65,7 +64,6 @@ function reconcileNode(
   if (isHydrate) {
     tinyassert(bnode.type === NODE_TYPE_EMPTY);
     bnode = hydrateNode(vnode, hparent, hnextSibling);
-    hnextSibling = getBNodeSlot(bnode) ?? hnextSibling;
   }
   if (vnode.type === NODE_TYPE_EMPTY) {
     if (bnode.type === NODE_TYPE_EMPTY) {
@@ -96,7 +94,6 @@ function reconcileNode(
         isHydrate
       );
       reinsertBNodeRange(bnode.child, bnode.hnode, null);
-      // placeChild(hparent, bnode.hnode, hnextSibling, false);
     } else {
       queueRef = true;
       unmount(bnode);
@@ -118,7 +115,6 @@ function reconcileNode(
       } satisfies BTag;
       reconcileTagProps(bnode, vnode.props, {});
       hparent.insertBefore(hnode, hnextSibling);
-      // placeChild(hparent, bnode.hnode, hnextSibling, true);
     }
     if (queueRef) {
       effectManager.refNodes.push(bnode);
@@ -130,7 +126,6 @@ function reconcileNode(
         bnode.hnode.data = vnode.data;
       }
       bnode.vnode = vnode;
-      // placeChild(hparent, bnode.hnode, hnextSibling, false);
     } else {
       unmount(bnode);
       const hnode = document.createTextNode(vnode.data);
@@ -140,13 +135,8 @@ function reconcileNode(
         hnode,
       } satisfies BText;
       hparent.insertBefore(hnode, hnextSibling);
-      // placeChild(hparent, bnode.hnode, hnextSibling, true);
     }
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
-    // TODO: learn from
-    // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
-    // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
-    // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
     if (bnode.type === NODE_TYPE_FRAGMENT && bnode.vnode.key === vnode.key) {
       const [newChildren, oldChildren] = alignChildrenByKey(
         vnode.children,
@@ -164,7 +154,7 @@ function reconcileNode(
         vnode,
         children: [],
         parent: undefined,
-        slot: undefined,
+        hrange: undefined,
       } satisfies BFragment;
     }
     // unmount excess bnode.children
@@ -173,7 +163,6 @@ function reconcileNode(
       unmount(bchild);
     }
     // reconcile vnode.children
-    bnode.slot = undefined;
     bnode.hrange = undefined;
     for (let i = vnode.children.length - 1; i >= 0; i--) {
       const bchild = reconcileNode(
@@ -191,10 +180,9 @@ function reconcileNode(
         } else {
           bnode.hrange[0] = hrange[0];
         }
+        reinsertBNodeRange(bchild, hparent, hnextSibling);
+        hnextSibling = hrange[0];
       }
-      reinsertBNodeRange(bchild, hparent, hnextSibling);
-      hnextSibling = getBNodeSlot(bchild) ?? hnextSibling;
-      bnode.slot = getBNodeSlot(bchild) ?? bnode.slot;
       bnode.children[i] = bchild;
       setBNodeParent(bchild, bnode);
     }
@@ -234,13 +222,12 @@ function reconcileNode(
         child,
         hookContext,
         hparent: undefined,
+        hrange: undefined,
         parent: undefined,
-        slot: undefined,
       } satisfies BCustom;
     }
-    bnode.hparent = hparent;
     setBNodeParent(bnode.child, bnode);
-    bnode.slot = getBNodeSlot(bnode.child);
+    bnode.hparent = hparent;
     bnode.hrange = getBNodeRange(bnode.child);
     effectManager.effectNodes.push(bnode);
 
@@ -289,7 +276,12 @@ function hydrateNode(
     );
     return { type: vnode.type, vnode, hnode } satisfies BText;
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
-    return { type: vnode.type, vnode, children: [] } satisfies BFragment;
+    return {
+      type: vnode.type,
+      vnode,
+      children: [],
+      hrange: undefined,
+    } satisfies BFragment;
   } else if (vnode.type === NODE_TYPE_CUSTOM) {
     return {
       type: vnode.type,
@@ -297,41 +289,11 @@ function hydrateNode(
       child: EMPTY_NODE,
       hookContext: new HookContext(updateCustomNodeUnsupported),
       hparent: undefined,
+      hrange: undefined,
       parent: undefined,
-      slot: undefined,
     } satisfies BCustom;
   }
   return vnode satisfies never;
-}
-
-// TODO: should use it only for "mounting" case
-// function placeChild(
-//   hparent: HNode,
-//   hnode: HNode,
-//   hnextSibling: HNode | null,
-//   isMount: boolean
-// ) {
-//   if (isMount || hnode.nextSibling !== hnextSibling) {
-//     hparent.insertBefore(hnode, hnextSibling);
-//   }
-// }
-
-function reinsertHNodeRange(
-  first: HNode,
-  last: HNode,
-  hparent: HNode,
-  hnextSibling: HNode | null
-) {
-  let hnode = last;
-  while (true) {
-    hparent.insertBefore(hnode, hnextSibling);
-    if (first === hnode) {
-      break;
-    }
-    hnextSibling = hnode;
-    tinyassert(hnode.previousSibling);
-    hnode = hnode.previousSibling;
-  }
 }
 
 function reinsertBNodeRange(
@@ -341,7 +303,16 @@ function reinsertBNodeRange(
 ) {
   const hrange = getBNodeRange(bnode);
   if (hrange && hrange[1].nextSibling !== hnextSibling) {
-    reinsertHNodeRange(hrange[0], hrange[1], hparent, hnextSibling);
+    let [first, hnode] = hrange;
+    while (true) {
+      hparent.insertBefore(hnode, hnextSibling);
+      if (first === hnode) {
+        break;
+      }
+      hnextSibling = hnode;
+      tinyassert(hnode.previousSibling);
+      hnode = hnode.previousSibling;
+    }
   }
 }
 
@@ -357,7 +328,6 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     return;
   }
 
-  const oldSlot = getBNodeSlot(bnode);
   const oldRange = getBNodeRange(bnode);
 
   // traverse ancestors to find "slot"
@@ -384,12 +354,6 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     updateParentRange(bnode);
   }
 
-  // fix up ancestors slot
-  const newSlot = getBNodeSlot(bnode);
-  if (oldSlot !== newSlot) {
-    updateParentSlot(bnode);
-  }
-
   effectManager.run();
 }
 
@@ -397,25 +361,25 @@ function findNextSibling(child: BNode): HNode | undefined {
   let parent = getBNodeParent(child);
   while (parent) {
     if (parent.type === NODE_TYPE_TAG) {
-      // no slot i.e. new node will be the first child within parent tag
+      // new node will be the first child within parent tag
       return;
     }
     if (parent.type === NODE_TYPE_FRAGMENT) {
-      // TODO
-      // need faster look up within BFragment.children?
-      // though this wouldn't be so bad practically since we traverse up to only first BTag ancestor
-      let slot: HNode | undefined;
+      let hnode: HNode | undefined;
       for (let i = parent.children.length - 1; i >= 0; i--) {
         const c = parent.children[i];
         if (c === child) {
           // otherwise it didn't find previous slot within the fragment
           // so give up and go up to next parent
-          if (slot) {
-            return slot;
+          if (hnode) {
+            return hnode;
           }
           break;
         }
-        slot = getBNodeSlot(c) ?? slot;
+        const hrange = getBNodeRange(c);
+        if (hrange) {
+          hnode = hrange[0];
+        }
       }
     }
     // go up to parent also when parent.type === "custom"
@@ -423,28 +387,6 @@ function findNextSibling(child: BNode): HNode | undefined {
     parent = child.parent;
   }
   return;
-}
-
-function updateParentSlot(child: BNode) {
-  let parent = getBNodeParent(child);
-  while (parent) {
-    if (parent.type === NODE_TYPE_TAG) {
-      return;
-    }
-    if (parent.type === NODE_TYPE_CUSTOM) {
-      parent.slot = getBNodeSlot(child);
-    }
-    if (parent.type === NODE_TYPE_FRAGMENT) {
-      // TODO: could optimize something?
-      let slot: HNode | undefined;
-      for (const c of parent.children) {
-        slot = getBNodeSlot(c) ?? slot;
-      }
-      parent.slot = slot;
-    }
-    child = parent;
-    parent = child.parent;
-  }
 }
 
 function updateParentRange(child: BNode) {
