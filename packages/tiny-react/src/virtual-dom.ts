@@ -6,7 +6,7 @@ import type { HookContext } from "./hooks";
 
 export type NodeKey = string | number;
 export type Props = Record<string, unknown>;
-export type FC<P = {}> = (props: P) => VNode;
+export type FC<P = any> = (props: P) => VNode;
 
 // host node
 export type HNode = Node;
