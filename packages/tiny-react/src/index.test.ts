@@ -1613,14 +1613,22 @@ describe("ref", () => {
 });
 
 describe(memo, () => {
-  it("basic", () => {
+  it("basic", async () => {
     const mockFn = vi.fn();
 
     const Custom = memo(function Custom(props: {
       label: string;
       value: number;
     }) {
-      mockFn(props.label, props.value);
+      mockFn(`[render] ${props.label} ${props.value}`);
+
+      useEffect(() => {
+        mockFn(`[effect] ${props.label} ${props.value}`);
+        return () => {
+          mockFn(`[dispose] ${props.label} ${props.value}`);
+        };
+      }, []);
+
       return h.div({}, props.label, props.value);
     });
 
@@ -1634,6 +1642,7 @@ describe(memo, () => {
         h(Custom, { label: "y-hi", value: 0 })
       )
     );
+    await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1649,12 +1658,16 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "x-hi",
-          0,
+          "[render] x-hi 0",
         ],
         [
-          "y-hi",
-          0,
+          "[render] y-hi 0",
+        ],
+        [
+          "[effect] x-hi 0",
+        ],
+        [
+          "[effect] y-hi 0",
         ],
       ]
     `);
@@ -1667,6 +1680,7 @@ describe(memo, () => {
         h(Custom, { label: "y-hi", value: 0 })
       )
     );
+    await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1682,12 +1696,16 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "x-hi",
-          0,
+          "[render] x-hi 0",
         ],
         [
-          "y-hi",
-          0,
+          "[render] y-hi 0",
+        ],
+        [
+          "[effect] x-hi 0",
+        ],
+        [
+          "[effect] y-hi 0",
         ],
       ]
     `);
@@ -1700,6 +1718,7 @@ describe(memo, () => {
         h(Custom, { label: "y-hi", value: 0 })
       )
     );
+    await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1712,19 +1731,29 @@ describe(memo, () => {
         </div>
       </main>
     `);
+    // TODO: it shouldn't dispose
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "x-hi",
-          0,
+          "[render] x-hi 0",
         ],
         [
-          "y-hi",
-          0,
+          "[render] y-hi 0",
         ],
         [
-          "x-hello",
-          0,
+          "[effect] x-hi 0",
+        ],
+        [
+          "[effect] y-hi 0",
+        ],
+        [
+          "[dispose] x-hi 0",
+        ],
+        [
+          "[render] x-hello 0",
+        ],
+        [
+          "[effect] x-hello 0",
         ],
       ]
     `);
@@ -1737,6 +1766,7 @@ describe(memo, () => {
         h(Custom, { label: "y-hi", value: 0 })
       )
     );
+    await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
@@ -1752,20 +1782,34 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "x-hi",
-          0,
+          "[render] x-hi 0",
         ],
         [
-          "y-hi",
-          0,
+          "[render] y-hi 0",
         ],
         [
-          "x-hello",
-          0,
+          "[effect] x-hi 0",
         ],
         [
-          "x-hi",
-          0,
+          "[effect] y-hi 0",
+        ],
+        [
+          "[dispose] x-hi 0",
+        ],
+        [
+          "[render] x-hello 0",
+        ],
+        [
+          "[effect] x-hello 0",
+        ],
+        [
+          "[dispose] x-hello 0",
+        ],
+        [
+          "[render] x-hi 0",
+        ],
+        [
+          "[effect] x-hi 0",
         ],
       ]
     `);
@@ -1793,24 +1837,40 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "x-hi",
-          0,
+          "[render] x-hi 0",
         ],
         [
-          "y-hi",
-          0,
+          "[render] y-hi 0",
         ],
         [
-          "x-hello",
-          0,
+          "[effect] x-hi 0",
         ],
         [
-          "x-hi",
-          0,
+          "[effect] y-hi 0",
         ],
         [
-          "x-hi",
-          1,
+          "[dispose] x-hi 0",
+        ],
+        [
+          "[render] x-hello 0",
+        ],
+        [
+          "[effect] x-hello 0",
+        ],
+        [
+          "[dispose] x-hello 0",
+        ],
+        [
+          "[render] x-hi 0",
+        ],
+        [
+          "[effect] x-hi 0",
+        ],
+        [
+          "[dispose] x-hi 0",
+        ],
+        [
+          "[render] x-hi 1",
         ],
       ]
     `);
