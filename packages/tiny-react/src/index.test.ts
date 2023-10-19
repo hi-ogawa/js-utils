@@ -81,11 +81,7 @@ describe(render, () => {
             },
           ],
           "parent": [Circular],
-          "slot": <span
-            class="text-red"
-          >
-            world
-          </span>,
+          "slot": hello,
           "type": "fragment",
           "vnode": {
             "children": [
@@ -259,7 +255,9 @@ describe(render, () => {
               },
             ],
             "parent": [Circular],
-            "slot": world,
+            "slot": <span>
+              hello
+            </span>,
             "type": "fragment",
             "vnode": {
               "children": [
@@ -766,9 +764,9 @@ describe(updateCustomNode, () => {
       </main>
     `);
     expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
-      <span>
-        y
-      </span>
+      <div>
+        x
+      </div>
     `);
 
     update1("p");
@@ -1649,11 +1647,11 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "x-hi",
+          "y-hi",
           0,
         ],
         [
-          "y-hi",
+          "x-hi",
           0,
         ],
       ]
@@ -1682,11 +1680,11 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "x-hi",
+          "y-hi",
           0,
         ],
         [
-          "y-hi",
+          "x-hi",
           0,
         ],
       ]
@@ -1715,11 +1713,11 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "x-hi",
+          "y-hi",
           0,
         ],
         [
-          "y-hi",
+          "x-hi",
           0,
         ],
         [
@@ -1752,11 +1750,11 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "x-hi",
+          "y-hi",
           0,
         ],
         [
-          "y-hi",
+          "x-hi",
           0,
         ],
         [
@@ -1793,11 +1791,11 @@ describe(memo, () => {
     expect(mockFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          "x-hi",
+          "y-hi",
           0,
         ],
         [
-          "y-hi",
+          "x-hi",
           0,
         ],
         [

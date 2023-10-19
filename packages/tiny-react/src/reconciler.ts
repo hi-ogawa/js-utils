@@ -35,7 +35,7 @@ export function render(
     vnode,
     bnode,
     parent,
-    undefined,
+    null,
     effectManager,
     hydration
   );
@@ -56,14 +56,14 @@ function reconcileNode(
   vnode: VNode,
   bnode: BNode,
   hparent: HNode,
-  preSlot: HNode | undefined,
+  hnextSibling: HNode | null, // hparent.insertBefore(<new node>, hnextSibling)
   effectManager: EffectManager,
   isHydrate: boolean
 ): BNode {
   if (isHydrate) {
     tinyassert(bnode.type === NODE_TYPE_EMPTY);
-    bnode = hydrateNode(vnode, hparent, preSlot);
-    preSlot = getBNodeSlot(bnode) ?? preSlot;
+    bnode = hydrateNode(vnode, hparent, hnextSibling);
+    hnextSibling = getBNodeSlot(bnode) ?? hnextSibling;
   }
   if (vnode.type === NODE_TYPE_EMPTY) {
     if (bnode.type === NODE_TYPE_EMPTY) {
@@ -89,11 +89,11 @@ function reconcileNode(
         vnode.child,
         bnode.child,
         bnode.hnode,
-        undefined,
+        null,
         effectManager,
         isHydrate
       );
-      placeChild(bnode.hnode, hparent, preSlot, false);
+      hparent.insertBefore(bnode.hnode, hnextSibling);
     } else {
       queueRef = true;
       unmount(bnode);
@@ -102,7 +102,7 @@ function reconcileNode(
         vnode.child,
         EMPTY_NODE,
         hnode,
-        undefined,
+        null,
         effectManager,
         isHydrate
       );
@@ -114,7 +114,7 @@ function reconcileNode(
         listeners: new Map(),
       } satisfies BTag;
       reconcileTagProps(bnode, vnode.props, {});
-      placeChild(bnode.hnode, hparent, preSlot, true);
+      hparent.insertBefore(bnode.hnode, hnextSibling);
     }
     if (queueRef) {
       effectManager.refNodes.push(bnode);
@@ -126,7 +126,7 @@ function reconcileNode(
         bnode.hnode.data = vnode.data;
       }
       bnode.vnode = vnode;
-      placeChild(bnode.hnode, hparent, preSlot, false);
+      hparent.insertBefore(bnode.hnode, hnextSibling);
     } else {
       unmount(bnode);
       const hnode = document.createTextNode(vnode.data);
@@ -135,7 +135,7 @@ function reconcileNode(
         vnode,
         hnode,
       } satisfies BText;
-      placeChild(bnode.hnode, hparent, preSlot, true);
+      hparent.insertBefore(bnode.hnode, hnextSibling);
     }
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
     // TODO: learn from
@@ -169,16 +169,16 @@ function reconcileNode(
     }
     // reconcile vnode.children
     bnode.slot = undefined;
-    for (let i = 0; i < vnode.children.length; i++) {
+    for (let i = vnode.children.length - 1; i >= 0; i--) {
       const bchild = reconcileNode(
         vnode.children[i],
         bchildren[i] ?? EMPTY_NODE,
         hparent,
-        preSlot,
+        hnextSibling,
         effectManager,
         isHydrate
       );
-      preSlot = getBNodeSlot(bchild) ?? preSlot;
+      hnextSibling = getBNodeSlot(bchild) ?? hnextSibling;
       bnode.slot = getBNodeSlot(bchild) ?? bnode.slot;
       bnode.children[i] = bchild;
       setBNodeParent(bchild, bnode);
@@ -195,7 +195,7 @@ function reconcileNode(
         vchild,
         bnode.child,
         hparent,
-        preSlot,
+        hnextSibling,
         effectManager,
         isHydrate
       );
@@ -208,7 +208,7 @@ function reconcileNode(
         vchild,
         EMPTY_NODE,
         hparent,
-        preSlot,
+        hnextSibling,
         effectManager,
         isHydrate
       );
@@ -241,12 +241,12 @@ function reconcileNode(
 function hydrateNode(
   vnode: VNode,
   hparent: HNode,
-  preSlot: HNode | undefined
+  hnextSibling: HNode | null
 ): BNode {
   if (vnode.type === NODE_TYPE_EMPTY) {
     return EMPTY_NODE;
   } else if (vnode.type === NODE_TYPE_TAG) {
-    const hnode = getSlotTargetNode(hparent, preSlot);
+    const hnode = hnextSibling?.previousSibling ?? hparent.lastChild;
     // TODO: warning instead of hard error?
     // TODO: check props mismatch?
     tinyassert(
@@ -261,7 +261,7 @@ function hydrateNode(
       listeners: new Map(),
     } satisfies BTag;
   } else if (vnode.type === NODE_TYPE_TEXT) {
-    const hnode = getSlotTargetNode(hparent, preSlot);
+    const hnode = hnextSibling?.previousSibling ?? hparent.lastChild;
     tinyassert(
       hnode instanceof Text,
       `text hydration mismatch (actual: '${hnode?.nodeName}', expected: '#text')`
@@ -287,26 +287,6 @@ function hydrateNode(
   return vnode satisfies never;
 }
 
-// `hnode` is positioned after `preSlot` within `hparent`
-function placeChild(
-  hnode: HNode,
-  hparent: HNode,
-  preSlot: HNode | undefined,
-  init: boolean
-) {
-  const slotNext = getSlotTargetNode(hparent, preSlot);
-  if (init || !(hnode === slotNext || hnode.nextSibling === slotNext)) {
-    hparent.insertBefore(hnode, slotNext);
-  }
-}
-
-function getSlotTargetNode(
-  hparent: HNode,
-  preSlot: HNode | undefined
-): HNode | null {
-  return preSlot ? preSlot.nextSibling : hparent.firstChild;
-}
-
 export function updateCustomNodeUnsupported() {
   throw new Error("Unsupported force-update during render");
 }
@@ -322,7 +302,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
   const oldSlot = getBNodeSlot(bnode);
 
   // traverse ancestors to find "slot"
-  const preSlot = findPreviousSlot(bnode);
+  const hnextSibling = findNextSibling(bnode);
 
   // reconcile
   const effectManager = new EffectManager();
@@ -330,7 +310,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     vnode,
     bnode,
     bnode.hparent,
-    preSlot,
+    hnextSibling ?? null,
     effectManager,
     false
   );
@@ -345,7 +325,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
   effectManager.run();
 }
 
-function findPreviousSlot(child: BNode): HNode | undefined {
+function findNextSibling(child: BNode): HNode | undefined {
   let parent = getBNodeParent(child);
   while (parent) {
     if (parent.type === NODE_TYPE_TAG) {
@@ -357,7 +337,8 @@ function findPreviousSlot(child: BNode): HNode | undefined {
       // need faster look up within BFragment.children?
       // though this wouldn't be so bad practically since we traverse up to only first BTag ancestor
       let slot: HNode | undefined;
-      for (const c of parent.children) {
+      for (let i = parent.children.length - 1; i >= 0; i--) {
+        const c = parent.children[i];
         if (c === child) {
           // otherwise it didn't find previous slot within the fragment
           // so give up and go up to next parent
