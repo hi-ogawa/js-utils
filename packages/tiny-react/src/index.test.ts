@@ -695,7 +695,7 @@ describe(render, () => {
 
 describe(updateCustomNode, () => {
   it("basic", () => {
-    // check inner component re-rendering to fixup parent BNode.slot
+    // verify that inner component re-rendering will fixup parent BNode.slot
 
     let update1!: (tag: string) => void;
     let update2!: (tag: string) => void;
@@ -703,13 +703,13 @@ describe(updateCustomNode, () => {
     function Custom1() {
       const [tag, setTag] = useState("div");
       update1 = setTag;
-      return createElement(tag, {}, "x");
+      return h[tag as "div"]({}, "x");
     }
 
     function Custom2() {
       const [tag, setTag] = useState("span");
       update2 = setTag;
-      return createElement(tag, {}, "y");
+      return h[tag as "div"]({}, "y");
     }
 
     let vnode = h(Fragment, {}, h(Custom1, {}), h(Custom2, {}));
@@ -1586,7 +1586,6 @@ describe("custom-children", () => {
       createElement(Custom, { key: "key2" }, "hello")
     );
     root.render(vnode);
-    // TODO: `createElement` shouldn't normalize `props.children` into `VNode`
     expect(vnode).toMatchInlineSnapshot(`
       {
         "key": undefined,
