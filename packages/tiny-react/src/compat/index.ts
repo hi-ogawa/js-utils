@@ -1,6 +1,14 @@
+import { once } from "@hiogawa/utils";
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
-import { type BNode, EMPTY_NODE, type FC, type VNode } from "../virtual-dom";
+import {
+  type BNode,
+  EMPTY_NODE,
+  type FC,
+  NODE_TYPE_CUSTOM,
+  type VCustom,
+  type VNode,
+} from "../virtual-dom";
 
 // non comprehensive compatibility features
 
@@ -39,23 +47,43 @@ export function createRoot(container: Element) {
 }
 
 // https://react.dev/reference/react/memo
-export function memo<P extends object>(
-  fc: FC<P>,
-  propsAreEqual: (
-    prevProps: Readonly<P>,
-    nextProps: Readonly<P>
-  ) => boolean = objectShallowEqual
+export function memo<P extends {}>(
+  Fc: FC<P>,
+  isEqualProps: (prev: {}, next: {}) => boolean = objectShallowEqual
 ): FC<P> {
   function Memo(props: P) {
-    const prev = useRef<{ props: Readonly<P>; result: VNode } | undefined>(
-      undefined
-    );
-    if (!prev.current || !propsAreEqual(prev.current.props, props)) {
-      prev.current = { props, result: fc(props) };
+    // we need to make `VCustom.render` stable,
+    // but `once(Fc)` has to be invalidated on props change.
+    // after "identical vnode" optimization is implemented,
+    // it can be simplified to
+    //   {
+    //     type: NODE_TYPE_CUSTOM,
+    //     render: Fc,
+    //     props,
+    //   }
+    const [state] = useState(() => {
+      const state: {
+        render: FC;
+        current?: { vnode: VCustom; onceFc: FC };
+      } = {
+        render: (props: any) => state.current!.onceFc(props),
+      };
+      return state;
+    });
+
+    if (!state.current || !isEqualProps(state.current.vnode.props, props)) {
+      state.current = {
+        vnode: {
+          type: NODE_TYPE_CUSTOM,
+          render: state.render,
+          props,
+        },
+        onceFc: once(Fc),
+      };
     }
-    return prev.current.result;
+    return state.current.vnode;
   }
-  Object.defineProperty(Memo, "name", { value: `Memo(${fc.name})` });
+  Object.defineProperty(Memo, "name", { value: `Memo(${Fc.name})` });
   return Memo;
 }
 

@@ -1,5 +1,9 @@
-import type { NodeKey, VNode } from "../virtual-dom";
-import type { ComponentChildren, ComponentType } from "./common";
+import type {
+  ComponentChildren,
+  ComponentType,
+  NodeKey,
+  VNode,
+} from "../virtual-dom";
 
 // JSX namespace convention for type-checker
 
