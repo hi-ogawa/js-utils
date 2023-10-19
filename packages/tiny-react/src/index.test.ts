@@ -12,7 +12,7 @@ import {
 } from "./hooks";
 import { render, updateCustomNode } from "./reconciler";
 import { sleepFrame } from "./test-utils";
-import { getBNodeSlot } from "./virtual-dom";
+import { EMPTY_NODE, getBNodeSlot } from "./virtual-dom";
 
 describe(render, () => {
   it("basic", () => {
@@ -1615,6 +1615,7 @@ describe("ref", () => {
 describe(memo, () => {
   it("basic", async () => {
     const mockFn = vi.fn();
+    const mockFnSnapshot = () => mockFn.mock.calls.map(args => args[0]);
 
     const Custom = memo(function Custom(props: {
       label: string;
@@ -1655,23 +1656,16 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
       [
-        [
-          "[render] x-hi 0",
-        ],
-        [
-          "[render] y-hi 0",
-        ],
-        [
-          "[effect] x-hi 0",
-        ],
-        [
-          "[effect] y-hi 0",
-        ],
+        "[render] x-hi 0",
+        "[render] y-hi 0",
+        "[effect] x-hi 0",
+        "[effect] y-hi 0",
       ]
     `);
 
+    mockFn.mockReset();
     root.render(
       h(
         Fragment,
@@ -1693,23 +1687,9 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
-      [
-        [
-          "[render] x-hi 0",
-        ],
-        [
-          "[render] y-hi 0",
-        ],
-        [
-          "[effect] x-hi 0",
-        ],
-        [
-          "[effect] y-hi 0",
-        ],
-      ]
-    `);
+    expect(mockFnSnapshot()).toMatchInlineSnapshot('[]');
 
+    mockFn.mockReset();
     root.render(
       h(
         Fragment,
@@ -1731,26 +1711,13 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
       [
-        [
-          "[render] x-hi 0",
-        ],
-        [
-          "[render] y-hi 0",
-        ],
-        [
-          "[effect] x-hi 0",
-        ],
-        [
-          "[effect] y-hi 0",
-        ],
-        [
-          "[render] x-hello 0",
-        ],
+        "[render] x-hello 0",
       ]
     `);
 
+    mockFn.mockReset();
     root.render(
       h(
         Fragment,
@@ -1772,29 +1739,13 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
       [
-        [
-          "[render] x-hi 0",
-        ],
-        [
-          "[render] y-hi 0",
-        ],
-        [
-          "[effect] x-hi 0",
-        ],
-        [
-          "[effect] y-hi 0",
-        ],
-        [
-          "[render] x-hello 0",
-        ],
-        [
-          "[render] x-hi 0",
-        ],
+        "[render] x-hi 0",
       ]
     `);
 
+    mockFn.mockReset();
     root.render(
       h(
         Fragment,
@@ -1815,29 +1766,19 @@ describe(memo, () => {
         </div>
       </main>
     `);
-    expect(mockFn.mock.calls).toMatchInlineSnapshot(`
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
       [
-        [
-          "[render] x-hi 0",
-        ],
-        [
-          "[render] y-hi 0",
-        ],
-        [
-          "[effect] x-hi 0",
-        ],
-        [
-          "[effect] y-hi 0",
-        ],
-        [
-          "[render] x-hello 0",
-        ],
-        [
-          "[render] x-hi 0",
-        ],
-        [
-          "[render] x-hi 1",
-        ],
+        "[render] x-hi 1",
+      ]
+    `);
+
+    mockFn.mockReset();
+    root.render(EMPTY_NODE);
+    expect(parent).toMatchInlineSnapshot("<main />");
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
+      [
+        "[dispose] x-hi 0",
+        "[dispose] y-hi 0",
       ]
     `);
   });
