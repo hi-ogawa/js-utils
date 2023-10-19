@@ -2,6 +2,7 @@ import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { createRoot, memo } from "./compat";
 import { Fragment, createElement, h } from "./helper/hyperscript";
+import { jsx2 } from "./helper/jsx-runtime";
 import {
   useCallback,
   useEffect,
@@ -1608,6 +1609,68 @@ describe("ref", () => {
           "SPAN",
         ],
       ]
+    `);
+  });
+});
+
+describe("custom-children", () => {
+  it("basic", () => {
+    function Custom(props: { children: string }) {
+      return h.div({}, JSON.stringify(props));
+    }
+    const parent = document.createElement("main");
+    const root = createRoot(parent);
+    const vnode = h.div(
+      {},
+      jsx2(Custom, { children: "hello" }, "key1"),
+      createElement(Custom, { key: "key2" }, "hello")
+    );
+    root.render(vnode);
+    // TODO: `createElement` shouldn't normalize `props.children` into `VNode`
+    expect(vnode).toMatchInlineSnapshot(`
+      {
+        "child": {
+          "children": [
+            {
+              "key": "key1",
+              "props": {
+                "children": "hello",
+              },
+              "render": [Function],
+              "type": "custom",
+            },
+            {
+              "key": "key2",
+              "props": {
+                "children": {
+                  "data": "hello",
+                  "type": "text",
+                },
+              },
+              "render": [Function],
+              "type": "custom",
+            },
+          ],
+          "type": "fragment",
+        },
+        "key": undefined,
+        "name": "div",
+        "props": {},
+        "ref": undefined,
+        "type": "tag",
+      }
+    `);
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <div>
+            {"children":"hello"}
+          </div>
+          <div>
+            {"children":{"type":"text","data":"hello"}}
+          </div>
+        </div>
+      </main>
     `);
   });
 });

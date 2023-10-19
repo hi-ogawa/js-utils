@@ -42,6 +42,14 @@ export type VTag = {
   ref?: (el: HTag | null) => VNode; // core only supports callback. maybe { current: T } can be implemented in compat layer.
 };
 
+// TODO
+export interface VTagLazy {
+  type: typeof NODE_TYPE_TAG;
+  name: string;
+  key: NodeKey;
+  props: Props;
+}
+
 // text node
 export type VText = {
   type: typeof NODE_TYPE_TEXT;

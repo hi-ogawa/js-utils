@@ -1,4 +1,9 @@
-import type { NodeKey, VNode } from "../virtual-dom";
+import {
+  NODE_TYPE_CUSTOM,
+  NODE_TYPE_TAG,
+  type NodeKey,
+  type VNode,
+} from "../virtual-dom";
 import type { ComponentChildren, ComponentType } from "./common";
 import { Fragment, createElement } from "./hyperscript";
 import type { JSX } from "./jsx-namespace";
@@ -20,6 +25,30 @@ export function jsx(
   // then ref/children normalization is done when reconciled to BTag and BCustom.
   const { children, ...propsNoChildren } = props;
   return createElement(tag, { key, ...propsNoChildren }, props.children);
+}
+
+export function jsx2(
+  tag: ComponentType,
+  props: { children?: ComponentChildren },
+  key?: NodeKey
+): VNode {
+  if (typeof tag === "function") {
+    return {
+      type: NODE_TYPE_CUSTOM,
+      key,
+      props,
+      render: tag,
+    };
+  } else if (typeof tag === "string") {
+    // TODO: VTagLazy
+    return {
+      type: NODE_TYPE_TAG,
+      name: tag,
+      key,
+      props,
+    } as any;
+  }
+  return tag satisfies never;
 }
 
 export { jsx as jsxs, jsx as jsxDEV, Fragment, type JSX };
