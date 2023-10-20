@@ -9,6 +9,7 @@ import { Fragment } from "./virtual-dom";
 describe("fuzz", () => {
   it("shuffle full keys", () => {
     let setValues!: (v: number[]) => void;
+    let mountCount = 0;
 
     function Outer() {
       const [values, setValuesOuter] = useState<number[]>([]);
@@ -21,6 +22,10 @@ describe("fuzz", () => {
     }
 
     function Inner({ value }: { value: number }) {
+      useLayoutEffect(() => {
+        mountCount++;
+      }, []);
+
       return h.p({}, value);
     }
 
@@ -39,11 +44,14 @@ describe("fuzz", () => {
         expect(parent.textContent).toBe(values.join(""));
       })
     );
+
+    expect(mountCount).toMatchInlineSnapshot("5");
   });
 
   it("re-render inner", () => {
     let setValues!: (v: number[]) => void;
     const innerUpdateMap = new Map<number, () => void>();
+    let mountCount = 0;
 
     function Outer() {
       const [values, setValuesOuter] = useState<number[]>([]);
@@ -60,6 +68,7 @@ describe("fuzz", () => {
 
       useLayoutEffect(() => {
         innerUpdateMap.set(value, () => setState((prev) => !prev));
+        mountCount++;
       }, []);
 
       return h[state ? "p" : "a"]({}, value);
@@ -111,13 +120,17 @@ describe("fuzz", () => {
         }
       )
     );
+
+    expect(mountCount).toMatchInlineSnapshot("5");
   });
 
-  it.only("nested", () => {
+  it("nested", () => {
     let groups = splitByChunk(range(9), 3);
     let groupIds = groups.map((_, i) => i);
     let outerUpdate!: () => void;
     const innerUpdateMap = new Map<number, () => void>();
+
+    let mountCount = 0;
 
     function Outer() {
       outerUpdate = useForceUpdate();
@@ -129,6 +142,9 @@ describe("fuzz", () => {
 
     function Inner({ groupId }: { groupId: number }) {
       innerUpdateMap.set(groupId, useForceUpdate());
+      useLayoutEffect(() => {
+        mountCount++;
+      }, []);
       return h(
         Fragment,
         {},
@@ -173,6 +189,8 @@ describe("fuzz", () => {
         }
       )
     );
+
+    expect(mountCount).toMatchInlineSnapshot("3");
   });
 });
 
