@@ -1,7 +1,7 @@
 import { range, splitByChunk } from "@hiogawa/utils";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { createRoot } from "./compat";
+import { createRoot, memo } from "./compat";
 import { h } from "./helper/hyperscript";
 import { useLayoutEffect, useReducer, useState } from "./hooks";
 import { Fragment } from "./virtual-dom";
@@ -159,6 +159,77 @@ describe("fuzz", () => {
     groups[1].reverse();
     innerUpdateMap.get(1)!();
     expect(parent.textContent).toMatchInlineSnapshot('"678543012"');
+
+    function getExpected() {
+      return groupIds.flatMap((id) => groups[id]).join("");
+    }
+
+    fc.assert(
+      fc.property(
+        fcShuffle(groupIds),
+        fc.integer({ min: 0, max: groupIds.length - 1 }),
+        fc.integer({ min: 0, max: groupIds.length - 1 }),
+        (newGroupIds, i1, i2) => {
+          groupIds = newGroupIds;
+          outerUpdate();
+          expect(parent.textContent).toBe(getExpected());
+
+          groups[i1].reverse();
+          innerUpdateMap.get(i1)!();
+          expect(parent.textContent).toBe(getExpected());
+
+          groups[i2].reverse();
+          innerUpdateMap.get(i2)!();
+          expect(parent.textContent).toBe(getExpected());
+        }
+      )
+    );
+
+    expect(mountCount).toMatchInlineSnapshot("3");
+  });
+
+  it("memo", () => {
+    let groups = splitByChunk(range(9), 3);
+    let groupIds = groups.map((_, i) => i);
+    let outerUpdate!: () => void;
+    const innerUpdateMap = new Map<number, () => void>();
+
+    let mountCount = 0;
+
+    function Outer() {
+      outerUpdate = useForceUpdate();
+      return h(
+        Fragment,
+        {},
+        groupIds.map((groupId) => h(Inner, { key: groupId, groupId }))
+      );
+    }
+
+    function Inner0({ groupId }: { groupId: number }) {
+      innerUpdateMap.set(groupId, useForceUpdate());
+      useLayoutEffect(() => {
+        mountCount++;
+      }, []);
+      return h(
+        Fragment,
+        {},
+        groups[groupId].map((v) => h.span({ key: v }, v))
+      );
+    }
+    const Inner = memo(Inner0);
+
+    const parent = document.createElement("main");
+    const root = createRoot(parent);
+    root.render(h(Outer, {}));
+    expect(parent.textContent).toMatchInlineSnapshot('"012345678"');
+
+    groupIds.reverse();
+    outerUpdate();
+    expect(parent.textContent).toMatchInlineSnapshot('"678345012"');
+
+    groups[1].reverse();
+    innerUpdateMap.get(1)!();
+    expect(parent.textContent).toMatchInlineSnapshot('"678345012"');
 
     function getExpected() {
       return groupIds.flatMap((id) => groups[id]).join("");
