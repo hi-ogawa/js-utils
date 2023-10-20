@@ -14,7 +14,8 @@ describe("fuzz", () => {
 
     function Outer() {
       outerUpdate = useForceUpdate();
-      return h.div(
+      return h(
+        Fragment,
         {},
         values.map((value) => h(Inner, { key: value, value }))
       );
@@ -52,7 +53,8 @@ describe("fuzz", () => {
 
     function Outer() {
       outerUpdate = useForceUpdate();
-      return h.div(
+      return h(
+        Fragment,
         {},
         values.map((value) => h(Inner, { key: value, value }))
       );
@@ -77,23 +79,21 @@ describe("fuzz", () => {
     innerUpdateMap.get(0)!();
     expect(parent).toMatchInlineSnapshot(`
       <main>
-        <div>
-          <a>
-            0
-          </a>
-          <p>
-            1
-          </p>
-          <p>
-            2
-          </p>
-          <p>
-            3
-          </p>
-          <p>
-            4
-          </p>
-        </div>
+        <a>
+          0
+        </a>
+        <p>
+          1
+        </p>
+        <p>
+          2
+        </p>
+        <p>
+          3
+        </p>
+        <p>
+          4
+        </p>
       </main>
     `);
     expect(parent.textContent).toMatchInlineSnapshot('"01234"');
@@ -128,7 +128,8 @@ describe("fuzz", () => {
 
     function Outer() {
       outerUpdate = useForceUpdate();
-      return h.div(
+      return h(
+        Fragment,
         {},
         groupIds.map((groupId) => h(Inner, { key: groupId, groupId }))
       );
