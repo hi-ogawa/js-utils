@@ -51,6 +51,7 @@ export function memo<P extends {}>(
   Fc: FC<P>,
   isEqualProps: (prev: {}, next: {}) => boolean = objectShallowEqual
 ): FC<P> {
+  // TODO: broken. wait for https://github.com/hi-ogawa/js-utils/pull/173
   function Memo(props: P) {
     // we need to make `VCustom.render` stable,
     // but `once(Fc)` has to be invalidated on props change.
