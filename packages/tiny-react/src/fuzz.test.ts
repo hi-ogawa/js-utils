@@ -8,13 +8,12 @@ import { Fragment } from "./virtual-dom";
 
 describe("fuzz", () => {
   it("shuffle full keys", () => {
-    let setValues!: (v: number[]) => void;
+    let values = range(5);
     let mountCount = 0;
+    let outerUpdate!: () => void;
 
     function Outer() {
-      const [values, setValuesOuter] = useState<number[]>([]);
-      setValues = setValuesOuter;
-
+      outerUpdate = useForceUpdate();
       return h.div(
         {},
         values.map((value) => h(Inner, { key: value, value }))
@@ -32,15 +31,12 @@ describe("fuzz", () => {
     const parent = document.createElement("main");
     const root = createRoot(parent);
     root.render(h(Outer, {}));
-    expect(parent.textContent).toMatchInlineSnapshot('""');
-
-    let values = range(5);
-    setValues(values);
     expect(parent.textContent).toMatchInlineSnapshot('"01234"');
 
     fc.assert(
-      fc.property(fcShuffle(values), (values) => {
-        setValues(values);
+      fc.property(fcShuffle(values), (newValues) => {
+        values = newValues;
+        outerUpdate();
         expect(parent.textContent).toBe(values.join(""));
       })
     );
@@ -49,14 +45,13 @@ describe("fuzz", () => {
   });
 
   it("re-render inner", () => {
-    let setValues!: (v: number[]) => void;
-    const innerUpdateMap = new Map<number, () => void>();
+    let values = range(5);
     let mountCount = 0;
+    let outerUpdate!: () => void;
+    const innerUpdateMap = new Map<number, () => void>();
 
     function Outer() {
-      const [values, setValuesOuter] = useState<number[]>([]);
-      setValues = setValuesOuter;
-
+      outerUpdate = useForceUpdate();
       return h.div(
         {},
         values.map((value) => h(Inner, { key: value, value }))
@@ -65,9 +60,9 @@ describe("fuzz", () => {
 
     function Inner({ value }: { value: number }) {
       const [state, setState] = useState(true);
+      innerUpdateMap.set(value, () => setState((prev) => !prev));
 
       useLayoutEffect(() => {
-        innerUpdateMap.set(value, () => setState((prev) => !prev));
         mountCount++;
       }, []);
 
@@ -77,10 +72,8 @@ describe("fuzz", () => {
     const parent = document.createElement("main");
     const root = createRoot(parent);
     root.render(h(Outer, {}));
-    expect(parent.textContent).toMatchInlineSnapshot('""');
+    expect(parent.textContent).toMatchInlineSnapshot('"01234"');
 
-    let values = range(5);
-    setValues(values);
     innerUpdateMap.get(0)!();
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -110,8 +103,9 @@ describe("fuzz", () => {
         fcShuffle(values),
         fc.integer({ min: 0, max: values.length - 1 }),
         fc.integer({ min: 0, max: values.length - 1 }),
-        (values, i1, i2) => {
-          setValues(values);
+        (newValues, i1, i2) => {
+          values = newValues;
+          outerUpdate();
           expect(parent.textContent).toBe(values.join(""));
           innerUpdateMap.get(i1)!();
           expect(parent.textContent).toBe(values.join(""));
