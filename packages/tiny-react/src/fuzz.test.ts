@@ -1,9 +1,10 @@
-import { range } from "@hiogawa/utils";
+import { range, splitByChunk } from "@hiogawa/utils";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { createRoot } from "./compat";
 import { h } from "./helper/hyperscript";
-import { useLayoutEffect, useState } from "./hooks";
+import { useLayoutEffect, useReducer, useState } from "./hooks";
+import { Fragment } from "./virtual-dom";
 
 describe("fuzz", () => {
   it("shuffle full keys", () => {
@@ -33,16 +34,10 @@ describe("fuzz", () => {
     expect(parent.textContent).toMatchInlineSnapshot('"01234"');
 
     fc.assert(
-      fc.property(
-        fc.shuffledSubarray(values, {
-          minLength: values.length,
-          maxLength: values.length,
-        }),
-        (values) => {
-          setValues(values);
-          expect(parent.textContent).toBe(values.join(""));
-        }
-      )
+      fc.property(fcShuffle(values), (values) => {
+        setValues(values);
+        expect(parent.textContent).toBe(values.join(""));
+      })
     );
   });
 
@@ -103,19 +98,91 @@ describe("fuzz", () => {
 
     fc.assert(
       fc.property(
-        fc.shuffledSubarray(values, {
-          minLength: values.length,
-          maxLength: values.length,
-        }),
+        fcShuffle(values),
         fc.integer({ min: 0, max: values.length - 1 }),
-        (values, inner) => {
+        fc.integer({ min: 0, max: values.length - 1 }),
+        (values, i1, i2) => {
           setValues(values);
-          innerUpdateMap.get(inner)!();
+          expect(parent.textContent).toBe(values.join(""));
+          innerUpdateMap.get(i1)!();
+          expect(parent.textContent).toBe(values.join(""));
+          innerUpdateMap.get(i2)!();
           expect(parent.textContent).toBe(values.join(""));
         }
       )
     );
   });
 
-  it.skip("nested", () => {});
+  it.only("nested", () => {
+    let groups = splitByChunk(range(9), 3);
+    let groupIds = groups.map((_, i) => i);
+    let outerUpdate!: () => void;
+    const innerUpdateMap = new Map<number, () => void>();
+
+    function Outer() {
+      outerUpdate = useForceUpdate();
+      return h.div(
+        {},
+        groupIds.map((groupId) => h(Inner, { key: groupId, groupId }))
+      );
+    }
+
+    function Inner({ groupId }: { groupId: number }) {
+      innerUpdateMap.set(groupId, useForceUpdate());
+      return h(
+        Fragment,
+        {},
+        groups[groupId].map((v) => h.span({ key: v }, v))
+      );
+    }
+
+    const parent = document.createElement("main");
+    const root = createRoot(parent);
+    root.render(h(Outer, {}));
+    expect(parent.textContent).toMatchInlineSnapshot('"012345678"');
+
+    groupIds.reverse();
+    outerUpdate();
+    expect(parent.textContent).toMatchInlineSnapshot('"678345012"');
+
+    groups[1].reverse();
+    innerUpdateMap.get(1)!();
+    expect(parent.textContent).toMatchInlineSnapshot('"678543012"');
+
+    function getExpected() {
+      return groupIds.flatMap((id) => groups[id]).join("");
+    }
+
+    fc.assert(
+      fc.property(
+        fcShuffle(groupIds),
+        fc.integer({ min: 0, max: groupIds.length - 1 }),
+        fc.integer({ min: 0, max: groupIds.length - 1 }),
+        (newGroupIds, i1, i2) => {
+          groupIds = newGroupIds;
+          outerUpdate();
+          expect(parent.textContent).toBe(getExpected());
+
+          groups[i1].reverse();
+          innerUpdateMap.get(i1)!();
+          expect(parent.textContent).toBe(getExpected());
+
+          groups[i2].reverse();
+          innerUpdateMap.get(i2)!();
+          expect(parent.textContent).toBe(getExpected());
+        }
+      )
+    );
+  });
 });
+
+function fcShuffle<T>(values: T[]) {
+  return fc.shuffledSubarray(values, {
+    minLength: values.length,
+    maxLength: values.length,
+  });
+}
+
+function useForceUpdate() {
+  return useReducer<number, void>((v) => v ^ 1, 0)[1];
+}
