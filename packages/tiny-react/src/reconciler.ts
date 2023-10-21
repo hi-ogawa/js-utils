@@ -14,9 +14,9 @@ import {
   NODE_TYPE_TAG,
   NODE_TYPE_TEXT,
   type NodeKey,
-  type Props,
   type VCustom,
   type VNode,
+  type VTag,
   getBNodeKey,
   getBNodeParent,
   getBNodeSlot,
@@ -441,7 +441,11 @@ function alignChildrenByKey(
 // https://github.com/preactjs/preact/blob/08b07ccea62bfdb44b983bfe69ae73eb5e4f43c7/compat/src/render.js#L114
 // https://github.com/ryansolid/dom-expressions/blob/a2bd455055f5736bb591abe69a5f5b52568b9ea6/packages/babel-plugin-jsx-dom-expressions/src/dom/element.js#L219-L246
 // https://github.com/ryansolid/dom-expressions/blob/a2bd455055f5736bb591abe69a5f5b52568b9ea6/packages/dom-expressions/src/constants.js#L30-L39
-function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
+function reconcileTagProps(
+  bnode: BTag,
+  props: VTag["props"],
+  oldProps: VTag["props"]
+) {
   for (const k in oldProps) {
     if (!(k in props)) {
       setTagProp(bnode, k, null);
@@ -454,7 +458,7 @@ function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
   }
 }
 
-function hydrateTagProps(bnode: BTag, props: Props) {
+function hydrateTagProps(bnode: BTag, props: VTag["props"]) {
   // TODO: check props mismatch?
   for (const key in props) {
     if (key.startsWith("on")) {

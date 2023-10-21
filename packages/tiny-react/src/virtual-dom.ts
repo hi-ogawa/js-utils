@@ -5,7 +5,6 @@ import type { HookContext } from "./hooks";
 //
 
 export type NodeKey = string | number;
-export type Props = Record<string, unknown>;
 export type FC<P = {}> = (props: P) => VNode;
 
 // host node
@@ -36,7 +35,7 @@ export type VTag = {
   type: typeof NODE_TYPE_TAG;
   key?: NodeKey;
   name: string; // tagName
-  props: Props & {
+  props: Record<string, unknown> & {
     ref?: (el: HTag | null) => VNode;
     children?: ComponentChildren;
   };
