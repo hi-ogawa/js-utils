@@ -196,7 +196,7 @@ function reconcileNode(
           bnode.hrange[0] = hrange[0];
         }
         if (isMutation) {
-          reinsertBNodeRange(bchild, hparent, hnextSibling);
+          reinsertHNodeRange(hrange, hparent, hnextSibling);
         }
         hnextSibling = hrange[0];
       }
@@ -330,14 +330,13 @@ function hydrateNode(
   return vnode satisfies never;
 }
 
-function reinsertBNodeRange(
-  bnode: BNode,
+function reinsertHNodeRange(
+  hrange: [HNode, HNode],
   hparent: HNode,
   hnextSibling: HNode | null
 ) {
-  const hrange = getBNodeRange(bnode);
-  if (hrange && hrange[1].nextSibling !== hnextSibling) {
-    let [first, hnode] = hrange;
+  let [first, hnode] = hrange;
+  if (hnode.nextSibling !== hnextSibling) {
     while (true) {
       // keep `previousSibling` before `insertBefore`
       const prev = hnode.previousSibling;
