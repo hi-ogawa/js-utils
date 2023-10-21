@@ -1,19 +1,19 @@
 import { tinyassert } from "@hiogawa/utils";
 import { useEffect, useReducer, useState } from "./hooks";
 import {
+  type ComponentChildren,
   type Context,
   type ContextKey,
   type ContextMap,
   ContextStore,
-  EMPTY_NODE,
   type FC,
-  type VNode,
+  normalizeComponentChildren,
 } from "./virtual-dom";
 
 export function createContext<T>(defaultValue: T): Context<T> {
   const key: ContextKey = {};
 
-  const Provider: FC<{ value: T; children?: VNode }> = (props) => {
+  const Provider: FC<{ value: T; children?: ComponentChildren }> = (props) => {
     const [store] = useState(() => new ContextStore(props.value));
 
     // synchronize at render time
@@ -30,7 +30,8 @@ export function createContext<T>(defaultValue: T): Context<T> {
       }
     }, [props.value]);
 
-    return props.children ?? EMPTY_NODE;
+    // do same as Fragment
+    return normalizeComponentChildren(props.children);
   };
 
   const context: Context<T> = { key, Provider, defaultValue };

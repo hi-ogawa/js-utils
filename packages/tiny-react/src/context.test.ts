@@ -13,7 +13,6 @@ describe(createContext, () => {
 
     function Outer() {
       const value = useContext(context);
-      // TODO: broken h/children
       return h(
         context.Provider,
         { value: 123 },
@@ -40,7 +39,13 @@ describe(createContext, () => {
     const vnode = h(Outer, {});
     const parent = document.createElement("main");
     render(vnode, parent);
-    expect(parent).toMatchInlineSnapshot("<main />");
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        -1
+        123
+        246
+      </main>
+    `);
   });
 
   it("change", async () => {
@@ -68,10 +73,18 @@ describe(createContext, () => {
     const vnode = h(Outer, {});
     const parent = document.createElement("main");
     render(vnode, parent);
-    expect(parent).toMatchInlineSnapshot("<main />");
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <button>
+          +1
+        </button>
+        outer: 100
+        inner: 100
+      </main>
+    `);
     expect(renderCount).toMatchInlineSnapshot(`
       {
-        "Inner": 0,
+        "Inner": 1,
         "Outer": 1,
       }
     `);
@@ -137,10 +150,18 @@ describe(createContext, () => {
     const vnode = h(Outer, {});
     const parent = document.createElement("main");
     render(vnode, parent);
-    expect(parent).toMatchInlineSnapshot("<main />");
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <button>
+          +1
+        </button>
+        outer: 100
+        inner: 100
+      </main>
+    `);
     expect(renderCount).toMatchInlineSnapshot(`
       {
-        "Inner": 0,
+        "Inner": 1,
         "Outer": 1,
       }
     `);
