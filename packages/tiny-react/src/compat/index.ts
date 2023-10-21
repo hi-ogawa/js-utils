@@ -50,7 +50,6 @@ export function memo<P extends {}>(
   Fc: FC<P>,
   propsAreEqual: (prevProps: {}, nextProps: {}) => boolean = objectShallowEqual
 ): FC<P> {
-  // TODO: broken. wait for https://github.com/hi-ogawa/js-utils/pull/173
   function Memo(props: P) {
     const ref = useRef<VCustom | undefined>(undefined);
     if (!ref.current || !propsAreEqual(ref.current.props, props)) {

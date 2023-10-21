@@ -341,13 +341,15 @@ function reinsertBNodeRange(
   if (hrange && hrange[1].nextSibling !== hnextSibling) {
     let [first, hnode] = hrange;
     while (true) {
+      // keep `previousSibling` before `insertBefore`
+      const prev = hnode.previousSibling;
       hparent.insertBefore(hnode, hnextSibling);
-      if (first === hnode) {
+      if (hnode === first) {
         break;
       }
+      tinyassert(prev);
       hnextSibling = hnode;
-      tinyassert(hnode.previousSibling);
-      hnode = hnode.previousSibling;
+      hnode = prev;
     }
   }
 }

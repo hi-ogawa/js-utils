@@ -1834,4 +1834,91 @@ describe(memo, () => {
       ]
     `);
   });
+
+  it("key", async () => {
+    const mockFn = vi.fn();
+    const mockFnSnapshot = () => mockFn.mock.calls.map((args) => args[0]);
+
+    const Custom = memo(function Custom(props: { value: number }) {
+      mockFn(`[render] ${props.value}`);
+
+      useEffect(() => {
+        mockFn(`[effect] ${props.value}`);
+        return () => {
+          mockFn(`[dispose] ${props.value}`);
+        };
+      }, []);
+
+      return h(
+        Fragment,
+        {},
+        h.span({}, `x${props.value}`),
+        h.span({}, `y${props.value}`)
+      );
+    });
+
+    const parent = document.createElement("main");
+    const root = createRoot(parent);
+    root.render(
+      h(
+        Fragment,
+        {},
+        h(Custom, { key: 0, value: 0 }),
+        h(Custom, { key: 1, value: 1 })
+      )
+    );
+    await sleepFrame();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <span>
+          x0
+        </span>
+        <span>
+          y0
+        </span>
+        <span>
+          x1
+        </span>
+        <span>
+          y1
+        </span>
+      </main>
+    `);
+    expect(mockFnSnapshot()).toMatchInlineSnapshot(`
+      [
+        "[render] 1",
+        "[render] 0",
+        "[effect] 1",
+        "[effect] 0",
+      ]
+    `);
+    mockFn.mockReset();
+
+    root.render(
+      h(
+        Fragment,
+        {},
+        h(Custom, { key: 1, value: 1 }),
+        h(Custom, { key: 0, value: 0 })
+      )
+    );
+    await sleepFrame();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <span>
+          x1
+        </span>
+        <span>
+          y1
+        </span>
+        <span>
+          x0
+        </span>
+        <span>
+          y0
+        </span>
+      </main>
+    `);
+    expect(mockFnSnapshot()).toMatchInlineSnapshot("[]");
+  });
 });
