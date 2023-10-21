@@ -324,7 +324,7 @@ describe(render, () => {
             world
           </div>,
         ],
-        "parent": undefined,
+        "parent": null,
         "type": "custom",
         "vnode": {
           "key": undefined,
