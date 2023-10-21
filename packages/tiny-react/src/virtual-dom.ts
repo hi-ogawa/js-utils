@@ -209,7 +209,12 @@ export function createElement(
   { key, ...props }: { key?: NodeKey },
   ...children: ComponentChildren[]
 ): VNode {
-  // `props` might include `props.children` directly
+  // unwrap single child to skip trivial fragment.
+  // this should be "safe" by the assumption that
+  // example such as:
+  //   h("div", {}, ...["x", "y"].map(key => h("input", { key })))
+  // should be written without spreading
+  //   h("div", {}, ["x", "y"].map(key => h("input", { key })))
   if (children.length > 0) {
     props = {
       ...props,
