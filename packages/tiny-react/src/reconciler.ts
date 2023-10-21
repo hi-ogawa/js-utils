@@ -150,7 +150,9 @@ function reconcileNode(
     //
     // fragment
     //
+    let isMutation = false;
     if (bnode.type === NODE_TYPE_FRAGMENT && bnode.vnode.key === vnode.key) {
+      isMutation = true;
       const [newChildren, oldChildren] = alignChildrenByKey(
         vnode.children,
         bnode.children
@@ -193,7 +195,9 @@ function reconcileNode(
         } else {
           bnode.hrange[0] = hrange[0];
         }
-        reinsertBNodeRange(bchild, hparent, hnextSibling);
+        if (isMutation) {
+          reinsertBNodeRange(bchild, hparent, hnextSibling);
+        }
         hnextSibling = hrange[0];
       }
       bnode.children[i] = bchild;
