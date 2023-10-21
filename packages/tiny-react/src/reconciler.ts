@@ -14,9 +14,9 @@ import {
   NODE_TYPE_TAG,
   NODE_TYPE_TEXT,
   type NodeKey,
-  type Props,
   type VCustom,
   type VNode,
+  type VTag,
   getBNodeKey,
   getBNodeParent,
   getBNodeSlot,
@@ -160,8 +160,8 @@ function reconcileNode(
         type: vnode.type,
         vnode,
         children: [],
-        parent: undefined,
-        slot: undefined,
+        parent: null,
+        slot: null,
       } satisfies BFragment;
     }
     // unmount excess bnode.children
@@ -170,7 +170,7 @@ function reconcileNode(
       unmount(bchild);
     }
     // reconcile vnode.children
-    bnode.slot = undefined;
+    bnode.slot = null;
     for (let i = vnode.children.length - 1; i >= 0; i--) {
       const bchild = reconcileNode(
         vnode.children[i],
@@ -219,9 +219,9 @@ function reconcileNode(
         vnode,
         child,
         hookContext,
-        hparent: undefined,
-        parent: undefined,
-        slot: undefined,
+        hparent: null,
+        parent: null,
+        slot: null,
       } satisfies BCustom;
     }
     bnode.hparent = hparent;
@@ -274,16 +274,22 @@ function hydrateNode(
     );
     return { type: vnode.type, vnode, hnode } satisfies BText;
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
-    return { type: vnode.type, vnode, children: [] } satisfies BFragment;
+    return {
+      type: vnode.type,
+      vnode,
+      children: [],
+      parent: null,
+      slot: null,
+    } satisfies BFragment;
   } else if (vnode.type === NODE_TYPE_CUSTOM) {
     return {
       type: vnode.type,
       vnode,
       child: EMPTY_NODE,
       hookContext: new HookContext(updateCustomNodeUnsupported),
-      hparent: undefined,
-      parent: undefined,
-      slot: undefined,
+      hparent: null,
+      parent: null,
+      slot: null,
     } satisfies BCustom;
   }
   return vnode satisfies never;
@@ -381,7 +387,7 @@ function updateParentSlot(child: BNode) {
     }
     if (parent.type === NODE_TYPE_FRAGMENT) {
       // TODO: could optimize something?
-      let slot: HNode | undefined;
+      let slot: HNode | null = null;
       for (const c of parent.children) {
         slot = getBNodeSlot(c) ?? slot;
       }
@@ -433,7 +439,11 @@ function alignChildrenByKey(
 // https://github.com/preactjs/preact/blob/08b07ccea62bfdb44b983bfe69ae73eb5e4f43c7/compat/src/render.js#L114
 // https://github.com/ryansolid/dom-expressions/blob/a2bd455055f5736bb591abe69a5f5b52568b9ea6/packages/babel-plugin-jsx-dom-expressions/src/dom/element.js#L219-L246
 // https://github.com/ryansolid/dom-expressions/blob/a2bd455055f5736bb591abe69a5f5b52568b9ea6/packages/dom-expressions/src/constants.js#L30-L39
-function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
+function reconcileTagProps(
+  bnode: BTag,
+  props: VTag["props"],
+  oldProps: VTag["props"]
+) {
   for (const k in oldProps) {
     if (!(k in props)) {
       setTagProp(bnode, k, null);
@@ -446,7 +456,7 @@ function reconcileTagProps(bnode: BTag, props: Props, oldProps: Props) {
   }
 }
 
-function hydrateTagProps(bnode: BTag, props: Props) {
+function hydrateTagProps(bnode: BTag, props: VTag["props"]) {
   // TODO: check props mismatch?
   for (const key in props) {
     if (key.startsWith("on")) {
@@ -518,7 +528,7 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
   } else if (bnode.type === NODE_TYPE_CUSTOM) {
     bnode.hookContext.cleanupEffect("layout-effect");
     bnode.hookContext.cleanupEffect("effect");
-    bnode.hparent = undefined;
+    bnode.hparent = null;
     unmountNode(bnode.child, skipRemove);
   } else {
     bnode satisfies never;
