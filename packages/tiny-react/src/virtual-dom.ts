@@ -205,19 +205,19 @@ export function createVNode(
 // traditional virtual node factory with rest arguments
 export function createElement(
   tag: ComponentType,
-  { key, ...props }: { key?: NodeKey },
-  ...restChildren: ComponentChildren[]
+  { key, ...props }: { key?: NodeKey; children?: unknown },
+  ...children: ComponentChildren[]
 ): VNode {
   // unwrap single child to skip trivial fragment.
   // this should be "safe" by the assumption that
   // example such as:
-  //   h("div", {}, ...["some-varing", "id-list"].map(key => h("input", { key })))
+  //   h("div", {}, ...["x", "y"].map(key => h("input", { key })))
   // should be written without spreading
-  //   h("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
-  // this should be guaranteed when `h` is used via jsx-runtime-based transpilation.
-  const children: ComponentChildren =
-    restChildren.length <= 1 ? restChildren[0] : restChildren;
-  return createVNode(tag, { ...props, children }, key);
+  //   h("div", {}, ["x", "y"].map(key => h("input", { key })))
+  if (children.length > 0) {
+    props.children = children.length === 1 ? children[0] : children;
+  }
+  return createVNode(tag, props, key);
 }
 
 // we can probably optimize Fragment creation directly as VFragment in `createVNode`
