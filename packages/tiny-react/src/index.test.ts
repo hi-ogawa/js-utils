@@ -302,7 +302,7 @@ describe(render, () => {
             world
           </div>
         </main>,
-        "parent": undefined,
+        "parent": null,
         "slot": <div>
           <span>
             hello

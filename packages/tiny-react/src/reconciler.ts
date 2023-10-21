@@ -160,8 +160,8 @@ function reconcileNode(
         type: vnode.type,
         vnode,
         children: [],
-        parent: undefined,
-        slot: undefined,
+        parent: null,
+        slot: null,
       } satisfies BFragment;
     }
     // unmount excess bnode.children
@@ -170,7 +170,7 @@ function reconcileNode(
       unmount(bchild);
     }
     // reconcile vnode.children
-    bnode.slot = undefined;
+    bnode.slot = null;
     for (let i = 0; i < vnode.children.length; i++) {
       const bchild = reconcileNode(
         vnode.children[i],
@@ -219,9 +219,9 @@ function reconcileNode(
         vnode,
         child,
         hookContext,
-        hparent: undefined,
-        parent: undefined,
-        slot: undefined,
+        hparent: null,
+        parent: null,
+        slot: null,
       } satisfies BCustom;
     }
     bnode.hparent = hparent;
@@ -274,16 +274,22 @@ function hydrateNode(
     );
     return { type: vnode.type, vnode, hnode } satisfies BText;
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
-    return { type: vnode.type, vnode, children: [] } satisfies BFragment;
+    return {
+      type: vnode.type,
+      vnode,
+      children: [],
+      parent: null,
+      slot: null,
+    } satisfies BFragment;
   } else if (vnode.type === NODE_TYPE_CUSTOM) {
     return {
       type: vnode.type,
       vnode,
       child: EMPTY_NODE,
       hookContext: new HookContext(updateCustomNodeUnsupported),
-      hparent: undefined,
-      parent: undefined,
-      slot: undefined,
+      hparent: null,
+      parent: null,
+      slot: null,
     } satisfies BCustom;
   }
   return vnode satisfies never;
@@ -389,7 +395,7 @@ function updateParentSlot(child: BNode) {
     }
     if (parent.type === NODE_TYPE_FRAGMENT) {
       // TODO: could optimize something?
-      let slot: HNode | undefined;
+      let slot: HNode | null = null;
       for (const c of parent.children) {
         slot = getBNodeSlot(c) ?? slot;
       }
@@ -530,7 +536,7 @@ function unmountNode(bnode: BNode, skipRemove: boolean) {
   } else if (bnode.type === NODE_TYPE_CUSTOM) {
     bnode.hookContext.cleanupEffect("layout-effect");
     bnode.hookContext.cleanupEffect("effect");
-    bnode.hparent = undefined;
+    bnode.hparent = null;
     unmountNode(bnode.child, skipRemove);
   } else {
     bnode satisfies never;
