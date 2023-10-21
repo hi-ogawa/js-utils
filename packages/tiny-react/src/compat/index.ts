@@ -79,7 +79,7 @@ export function memo<P extends {}>(
           render: state.render,
           props,
         },
-        onceFc: once(Fc),
+        onceFc: once(Fc) as FC,
       };
     }
     return state.current.vnode;

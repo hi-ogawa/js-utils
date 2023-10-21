@@ -6,7 +6,7 @@ import type { HookContext } from "./hooks";
 
 export type NodeKey = string | number;
 export type Props = Record<string, unknown>;
-export type FC<P = any> = (props: P) => VNode;
+export type FC<P = {}> = (props: P) => VNode;
 
 // host node
 export type HNode = Node;
@@ -56,8 +56,8 @@ export type VText = {
 export type VCustom = {
   type: typeof NODE_TYPE_CUSTOM;
   key?: NodeKey;
-  props: Props;
-  render: (props: Props) => VNode;
+  props: {};
+  render: (props: {}) => VNode;
 };
 
 export type VFragment = {
@@ -93,18 +93,18 @@ export type BText = {
 export type BCustom = {
   type: typeof NODE_TYPE_CUSTOM;
   vnode: VCustom;
-  parent?: BNodeParent;
   child: BNode;
+  hookContext: HookContext;
+  parent?: BNodeParent;
   slot?: HNode;
   hparent?: HNode; // undefined after unmounted (this flag seems necessary to skip already scheduled re-rendering after unmount)
-  hookContext: HookContext;
 };
 
 export type BFragment = {
   type: typeof NODE_TYPE_FRAGMENT;
   vnode: VFragment;
-  parent?: BNodeParent;
   children: BNode[];
+  parent?: BNodeParent;
   slot?: HNode;
 };
 
@@ -168,7 +168,7 @@ export function setBNodeParent(node: BNode, parent: BNodeParent) {
 // jsx-runtime compatible VNode factory
 //
 
-export type ComponentType = string | FC;
+export type ComponentType = string | FC<any>;
 
 export type ComponentChild =
   | VNode
