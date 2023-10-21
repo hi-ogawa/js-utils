@@ -60,7 +60,7 @@ export class RenderContextManager {
 
   static push(key: ContextKey, instance: ContextStore<any>) {
     tinyassert(this.currentMap);
-    // copy on write
+    // copy-on-write on each render is fine?
     this.currentMap = new Map(this.currentMap);
     this.currentMap.set(key, instance);
   }
