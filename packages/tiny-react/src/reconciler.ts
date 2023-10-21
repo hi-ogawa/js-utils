@@ -154,7 +154,9 @@ function reconcileNode(
     //
     // fragment
     //
+    let isMutation = false;
     if (bnode.type === NODE_TYPE_FRAGMENT && bnode.vnode.key === vnode.key) {
+      isMutation = true;
       const [newChildren, oldChildren] = alignChildrenByKey(
         vnode.children,
         bnode.children
@@ -197,7 +199,9 @@ function reconcileNode(
         } else {
           bnode.hrange[0] = hrange[0];
         }
-        reinsertBNodeRange(bchild, hparent, hnextSibling);
+        if (isMutation) {
+          reinsertHNodeRange(hrange, hparent, hnextSibling);
+        }
         hnextSibling = hrange[0];
       }
       bnode.children[i] = bchild;
@@ -330,14 +334,13 @@ function hydrateNode(
   return vnode satisfies never;
 }
 
-function reinsertBNodeRange(
-  bnode: BNode,
+function reinsertHNodeRange(
+  hrange: [HNode, HNode],
   hparent: HNode,
   hnextSibling: HNode | null
 ) {
-  const hrange = getBNodeRange(bnode);
-  if (hrange && hrange[1].nextSibling !== hnextSibling) {
-    let [first, hnode] = hrange;
+  let [first, hnode] = hrange;
+  if (hnode.nextSibling !== hnextSibling) {
     while (true) {
       // keep `previousSibling` before `insertBefore`
       const prev = hnode.previousSibling;
@@ -376,7 +379,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     vnode,
     bnode,
     bnode.hparent,
-    hnextSibling ?? null,
+    hnextSibling,
     effectManager,
     false
   );
@@ -394,12 +397,12 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
   effectManager.run();
 }
 
-function findNextSibling(child: BNode): HNode | undefined {
+function findNextSibling(child: BNode): HNode | null {
   let parent = getBNodeParent(child);
   while (parent) {
     if (parent.type === NODE_TYPE_TAG) {
       // new node will be the first child within parent tag
-      return;
+      return null;
     }
     if (parent.type === NODE_TYPE_FRAGMENT) {
       let hnode: HNode | undefined;
@@ -423,7 +426,7 @@ function findNextSibling(child: BNode): HNode | undefined {
     child = parent;
     parent = child.parent;
   }
-  return;
+  return null;
 }
 
 function updateParentRange(child: BNode) {
