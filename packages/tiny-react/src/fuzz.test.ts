@@ -188,8 +188,7 @@ describe("fuzz", () => {
     expect(mountCount).toMatchInlineSnapshot("3");
   });
 
-  // TODO: broken. wait for https://github.com/hi-ogawa/js-utils/pull/173
-  it.skip("memo", () => {
+  it("memo", () => {
     let groups = splitByChunk(range(9), 3);
     let groupIds = groups.map((_, i) => i);
     let outerUpdate!: () => void;
