@@ -374,7 +374,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     vnode,
     bnode,
     bnode.hparent,
-    hnextSibling ?? null,
+    hnextSibling,
     effectManager,
     false
   );
@@ -392,12 +392,12 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
   effectManager.run();
 }
 
-function findNextSibling(child: BNode): HNode | undefined {
+function findNextSibling(child: BNode): HNode | null {
   let parent = getBNodeParent(child);
   while (parent) {
     if (parent.type === NODE_TYPE_TAG) {
       // new node will be the first child within parent tag
-      return;
+      return null;
     }
     if (parent.type === NODE_TYPE_FRAGMENT) {
       let hnode: HNode | undefined;
@@ -421,7 +421,7 @@ function findNextSibling(child: BNode): HNode | undefined {
     child = parent;
     parent = child.parent;
   }
-  return;
+  return null;
 }
 
 function updateParentRange(child: BNode) {
