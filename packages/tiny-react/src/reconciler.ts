@@ -8,6 +8,7 @@ import {
   type BTag,
   type BText,
   type ContextMap,
+  EMPTY_CONTEXT_MAP,
   EMPTY_NODE,
   type HNode,
   NODE_TYPE_CUSTOM,
@@ -19,7 +20,6 @@ import {
   type VCustom,
   type VNode,
   type VTag,
-  getBNodeContextMap,
   getBNodeKey,
   getBNodeParent,
   getBNodeSlot,
@@ -36,13 +36,12 @@ export function render(
   hydration: boolean = false
 ) {
   const effectManager = new EffectManager();
-  const contextMap = getBNodeContextMap(bnode) ?? new Map();
   const newBnode = reconcileNode(
     vnode,
     bnode,
     parent,
     undefined,
-    contextMap,
+    EMPTY_CONTEXT_MAP,
     effectManager,
     hydration
   );

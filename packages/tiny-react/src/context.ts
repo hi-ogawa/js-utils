@@ -60,6 +60,7 @@ export class RenderContextManager {
 
   static push(key: ContextKey, instance: ContextStore<any>) {
     tinyassert(this.currentMap);
+    // copy on write
     this.currentMap = new Map(this.currentMap);
     this.currentMap.set(key, instance);
   }

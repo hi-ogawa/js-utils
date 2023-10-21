@@ -198,13 +198,9 @@ export class ContextStore<T> {
 
 export type ContextMap = Map<ContextKey, ContextStore<any>>;
 
-export function getBNodeContextMap(node: BNode): ContextMap | undefined {
-  if (node.type === "custom") {
-    return node.contextMap;
-  }
-  return;
-}
+export const EMPTY_CONTEXT_MAP: ContextMap = new Map();
 
+//
 // jsx-runtime compatible VNode factory
 //
 
