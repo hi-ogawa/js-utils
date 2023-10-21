@@ -101,7 +101,6 @@ function reconcileNode(
         effectManager,
         isHydrate
       );
-      reinsertBNodeRange(bnode.child, bnode.hnode, null);
     } else {
       queueRef = true;
       unmount(bnode);
@@ -219,7 +218,6 @@ function reconcileNode(
         effectManager,
         isHydrate
       );
-      reinsertBNodeRange(bnode.child, hparent, hnextSibling);
       bnode.vnode = vnode;
     } else {
       unmount(bnode);
@@ -337,13 +335,15 @@ function reinsertBNodeRange(
   if (hrange && hrange[1].nextSibling !== hnextSibling) {
     let [first, hnode] = hrange;
     while (true) {
+      // keep `previousSibling` before `insertBefore`
+      const prev = hnode.previousSibling;
       hparent.insertBefore(hnode, hnextSibling);
-      if (first === hnode) {
+      if (hnode === first) {
         break;
       }
+      tinyassert(prev);
       hnextSibling = hnode;
-      tinyassert(hnode.previousSibling);
-      hnode = hnode.previousSibling;
+      hnode = prev;
     }
   }
 }
