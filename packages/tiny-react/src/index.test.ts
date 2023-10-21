@@ -311,7 +311,6 @@ describe(render, () => {
         "vnode": {
           "key": undefined,
           "props": {
-            "children": undefined,
             "value": "hello",
           },
           "render": [Function],
