@@ -105,7 +105,6 @@ function reconcileNode(
         effectManager,
         isHydrate
       );
-      reinsertBNodeRange(bnode.child, bnode.hnode, null);
     } else {
       queueRef = true;
       unmount(bnode);
@@ -223,7 +222,6 @@ function reconcileNode(
         effectManager,
         isHydrate
       );
-      reinsertBNodeRange(bnode.child, hparent, hnextSibling);
       bnode.vnode = vnode;
     } else {
       unmount(bnode);
