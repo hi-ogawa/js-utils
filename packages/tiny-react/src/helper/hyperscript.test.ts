@@ -16,6 +16,7 @@ describe("hyperscript", () => {
       h(Fragment, {}),
       undefined,
       h.span({ className: "text-red", key: 0, ref: () => {} }, "world"),
+      // no "fragment" wrapping if single child
       h.span({}, 0),
       h.span({}, 0, 1),
       h.span({}, [0]),
