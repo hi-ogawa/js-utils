@@ -206,7 +206,7 @@ export function createVNode(
 // traditional virtual node factory with rest arguments
 export function createElement(
   tag: ComponentType,
-  { key, ...props }: { key?: NodeKey },
+  { key, ...props }: { key?: NodeKey; children?: unknown },
   ...children: ComponentChildren[]
 ): VNode {
   // unwrap single child to skip trivial fragment.
@@ -216,10 +216,7 @@ export function createElement(
   // should be written without spreading
   //   h("div", {}, ["x", "y"].map(key => h("input", { key })))
   if (children.length > 0) {
-    props = {
-      ...props,
-      children: children.length === 1 ? children[0] : children,
-    };
+    props.children = children.length === 1 ? children[0] : children;
   }
   return createVNode(tag, props, key);
 }
