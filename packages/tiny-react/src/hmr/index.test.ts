@@ -5,10 +5,11 @@ import {
   createHmrRegistry,
   setupHmrVite,
 } from ".";
-import { createElement, h } from "../helper/hyperscript";
+import { h } from "../helper/hyperscript";
 import { useEffect, useState } from "../hooks";
 import { render } from "../reconciler";
 import { sleepFrame } from "../test-utils";
+import { createElement } from "../virtual-dom";
 
 describe(setupHmrVite, () => {
   it("basic", async () => {

@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/tiny-react",
-  "version": "0.0.1",
+  "version": "0.0.2-pre.3",
   "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/tiny-react",
   "repository": {
     "type": "git",
@@ -51,6 +51,7 @@
   "devDependencies": {
     "@hiogawa/tiny-refresh": "workspace:*",
     "@hiogawa/utils": "workspace:*",
+    "fast-check": "^3.12.0",
     "vite": "^4.4.11"
   },
   "peerDependencies": {

@@ -1,7 +1,12 @@
-import { createElement } from "../helper/hyperscript";
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
-import { type BNode, EMPTY_NODE, type FC, type VNode } from "../virtual-dom";
+import {
+  type BNode,
+  EMPTY_NODE,
+  type FC,
+  type VNode,
+  createVNode,
+} from "../virtual-dom";
 
 // non comprehensive compatibility features
 
@@ -41,22 +46,20 @@ export function createRoot(container: Element) {
 
 // https://react.dev/reference/react/memo
 export function memo<P extends {}>(
-  fc: FC<P>,
-  propsAreEqual: (
-    prevProps: Readonly<P>,
-    nextProps: Readonly<P>
-  ) => boolean = objectShallowEqual
+  Fc: FC<P>,
+  isEqualProps: (prev: {}, next: {}) => boolean = objectShallowEqual
 ): FC<P> {
+  // TODO: broken. wait for https://github.com/hi-ogawa/js-utils/pull/173
   function Memo(props: P) {
     const prev = useRef<{ props: Readonly<P>; result: VNode } | undefined>(
       undefined
     );
-    if (!prev.current || !propsAreEqual(prev.current.props, props)) {
-      prev.current = { props, result: createElement(fc, props) };
+    if (!prev.current || !isEqualProps(prev.current.props, props)) {
+      prev.current = { props, result: createVNode(Fc, props) };
     }
     return prev.current.result;
   }
-  Object.defineProperty(Memo, "name", { value: `Memo(${fc.name})` });
+  Object.defineProperty(Memo, "name", { value: `Memo(${Fc.name})` });
   return Memo;
 }
 

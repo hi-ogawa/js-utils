@@ -5,8 +5,7 @@ import type { HookContext } from "./hooks";
 //
 
 export type NodeKey = string | number;
-export type Props = Record<string, unknown>;
-export type FC<P = any> = (props: P) => VNode;
+export type FC<P = {}> = (props: P) => VNode;
 
 // host node
 export type HNode = Node;
@@ -27,7 +26,6 @@ export const NODE_TYPE_FRAGMENT = "fragment" as const;
 // TODO: optimize object shape?
 export type VNode = VEmpty | VTag | VText | VCustom | VFragment;
 
-// TODO: safe to optmize into singleton constant?
 export type VEmpty = {
   type: typeof NODE_TYPE_EMPTY;
 };
@@ -37,10 +35,15 @@ export type VTag = {
   type: typeof NODE_TYPE_TAG;
   key?: NodeKey;
   name: string; // tagName
-  props: Props;
-  child: VNode;
-  ref?: (el: HTag | null) => VNode; // core only supports callback. maybe { current: T } can be implemented in compat layer.
+  props: Record<string, unknown> & {
+    ref?: (el: HTag | null) => VNode;
+    children?: ComponentChildren;
+  };
 };
+
+export function isReservedTagProp(key: string) {
+  return key === "ref" || key === "children";
+}
 
 // text node
 export type VText = {
@@ -52,8 +55,8 @@ export type VText = {
 export type VCustom = {
   type: typeof NODE_TYPE_CUSTOM;
   key?: NodeKey;
-  props: Props;
-  render: (props: Props) => VNode;
+  props: {};
+  render: (props: {}) => VNode;
 };
 
 export type VFragment = {
@@ -89,22 +92,27 @@ export type BText = {
 export type BCustom = {
   type: typeof NODE_TYPE_CUSTOM;
   vnode: VCustom;
-  parent?: BNodeParent;
   child: BNode;
-  slot?: HNode;
-  hparent?: HNode; // undefined after unmounted (this flag seems necessary to skip already scheduled re-rendering after unmount)
   hookContext: HookContext;
   contextMap: ContextMap;
+  parent: BNodeParent | null;
+  slot: HNode | null;
+  hparent: HNode | null; // null after unmounted so that we can skip already scheduled re-rendering
 };
 
 export type BFragment = {
   type: typeof NODE_TYPE_FRAGMENT;
   vnode: VFragment;
-  parent?: BNodeParent;
   children: BNode[];
-  slot?: HNode;
+  parent: BNodeParent | null;
+  slot: HNode | null;
 };
 
+//
+// helpers
+//
+
+// empty node singleton
 export const EMPTY_NODE: VEmpty = {
   type: NODE_TYPE_EMPTY,
 };
@@ -132,9 +140,9 @@ export function getBNodeKey(node: BNode): NodeKey | undefined {
 }
 
 // "slot" is the last HNode inside the BNode subtree
-export function getBNodeSlot(node: BNode): HNode | undefined {
+export function getBNodeSlot(node: BNode): HNode | null {
   if (node.type === NODE_TYPE_EMPTY) {
-    return;
+    return null;
   }
   if (node.type === NODE_TYPE_TAG || node.type === NODE_TYPE_TEXT) {
     return node.hnode;
@@ -143,11 +151,11 @@ export function getBNodeSlot(node: BNode): HNode | undefined {
 }
 
 // bnode parent traversal is only for BCustom and BFragment
-export function getBNodeParent(node: BNode): BNodeParent | undefined {
+export function getBNodeParent(node: BNode): BNodeParent | null {
   if (node.type === NODE_TYPE_CUSTOM || node.type === NODE_TYPE_FRAGMENT) {
     return node.parent;
   }
-  return;
+  return null;
 }
 
 export function setBNodeParent(node: BNode, parent: BNodeParent) {
@@ -195,4 +203,96 @@ export function getBNodeContextMap(node: BNode): ContextMap | undefined {
     return node.contextMap;
   }
   return;
+}
+
+// jsx-runtime compatible VNode factory
+//
+
+export type ComponentType = string | FC<any>;
+
+export type ComponentChild =
+  | VNode
+  | string
+  | number
+  | null
+  | undefined
+  | boolean;
+
+export type ComponentChildren = ComponentChild | ComponentChildren[];
+
+export function createVNode(
+  tag: ComponentType,
+  props: {},
+  key?: NodeKey
+): VNode {
+  if (typeof tag === "string") {
+    return {
+      type: NODE_TYPE_TAG,
+      name: tag,
+      key,
+      props,
+    } satisfies VTag;
+  }
+  if (typeof tag === "function") {
+    return {
+      type: NODE_TYPE_CUSTOM,
+      render: tag,
+      key,
+      props,
+    } satisfies VCustom;
+  }
+  return tag satisfies never;
+}
+
+// traditional virtual node factory with rest arguments
+export function createElement(
+  tag: ComponentType,
+  { key, ...props }: { key?: NodeKey },
+  ...restChildren: ComponentChildren[]
+): VNode {
+  // unwrap single child to skip trivial fragment.
+  // this should be "safe" by the assumption that
+  // example such as:
+  //   h("div", {}, ...["some-varing", "id-list"].map(key => h("input", { key })))
+  // should be written without spreading
+  //   h("div", {}, ["some-varing", "id-list"].map(key => h("input", { key })))
+  // this should be guaranteed when `h` is used via jsx-runtime-based transpilation.
+  const children: ComponentChildren =
+    restChildren.length <= 1 ? restChildren[0] : restChildren;
+  return createVNode(tag, { ...props, children }, key);
+}
+
+// we can probably optimize Fragment creation directly as VFragment in `createVNode`
+// but for now we wrap as VCustom, which also helps testing the robustness of architecture
+export function Fragment(props: { children?: ComponentChildren }): VNode {
+  return normalizeComponentChildren(props.children);
+}
+
+export function normalizeComponentChildren(
+  children?: ComponentChildren
+): VNode {
+  if (Array.isArray(children)) {
+    return {
+      type: NODE_TYPE_FRAGMENT,
+      children: children.map((c) => normalizeComponentChildren(c)),
+    };
+  }
+  return normalizeComponentChild(children);
+}
+
+function normalizeComponentChild(child: ComponentChild): VNode {
+  if (
+    child === null ||
+    typeof child === "undefined" ||
+    typeof child === "boolean"
+  ) {
+    return EMPTY_NODE;
+  }
+  if (typeof child === "string" || typeof child === "number") {
+    return {
+      type: NODE_TYPE_TEXT,
+      data: String(child),
+    };
+  }
+  return child;
 }
