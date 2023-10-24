@@ -25,6 +25,13 @@ export function HmrChild(props: { name: string; counter: number }) {
       <span>
         parent + {props.name} = {add} = {props.counter + state + add}
       </span>
+      <div>(edit parent 123)</div>
+      {false && <HmrInternal />}
     </div>
   );
+}
+
+// testing file internal change
+function HmrInternal() {
+  return <div>(child internal)</div>;
 }
