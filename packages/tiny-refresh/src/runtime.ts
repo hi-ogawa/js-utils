@@ -75,30 +75,21 @@ export function createHmrComponent(
   const { createElement, useEffect, useState } = registry.runtime;
 
   const WrapperFc: ReactTypes.FC = (props) => {
-    // const [latest, setLatest] = useState(() => current);
-
-    // TODO: useReducer
     const [_state, setState] = useState(true);
 
     useEffect(() => {
       // expose "force update" to registry
       const forceUpdate = () => setState((prev) => !prev);
-      // current.listeners.add(setLatest);
       current.listeners.add(forceUpdate);
       return () => {
         current.listeners.add(forceUpdate);
-        // current.listeners.delete(setLatest);
       };
     }, []);
 
-    const latest2 = registry.componentMap.get(name);
-    if (!latest2) {
+    const latest = registry.componentMap.get(name);
+    if (!latest) {
       return `!!! [tiny-refresh] missing '${name}' !!!`;
     }
-
-    return latest2.options.remount
-      ? createElement(latest2.component, props)
-      : createElement(UnsafeWrapperFc, { component: latest2.component, props });
 
     //
     // approach 1.
@@ -118,9 +109,9 @@ export function createHmrComponent(
     //   For now, however, we allow this mode via explicit "// @hmr-unsafe" comment.
     //
 
-    // return latest.options.remount
-    //   ? createElement(latest.component, props)
-    //   : createElement(UnsafeWrapperFc, { latest, props });
+    return latest.options.remount
+      ? createElement(latest.component, props)
+      : createElement(UnsafeWrapperFc, { component: latest.component, props });
   };
 
   const UnsafeWrapperFc: ReactTypes.FC = ({
