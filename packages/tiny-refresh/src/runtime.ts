@@ -83,7 +83,7 @@ export function createHmrComponent(
       const forceUpdate = () => setState((prev) => !prev);
       current.listeners.add(forceUpdate);
       return () => {
-        current.listeners.add(forceUpdate);
+        current.listeners.delete(forceUpdate);
       };
     }, []);
 
