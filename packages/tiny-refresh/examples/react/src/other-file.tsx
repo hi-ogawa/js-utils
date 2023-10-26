@@ -28,7 +28,6 @@ export function InnerOther(props: { value: number }) {
 }
 
 export function InnerShowHide() {
-  const message = "hey";
-  console.log("[render] InnerShowHide", message);
+  const message = "hello";
   return <div>{message}</div>;
 }

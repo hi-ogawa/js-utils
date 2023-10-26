@@ -75,15 +75,30 @@ export function createHmrComponent(
   const { createElement, useEffect, useState } = registry.runtime;
 
   const WrapperFc: ReactTypes.FC = (props) => {
-    const [latest, setLatest] = useState(() => current);
+    // const [latest, setLatest] = useState(() => current);
+
+    // TODO: useReducer
+    const [_state, setState] = useState(true);
 
     useEffect(() => {
-      // expose setter to force update
-      current.listeners.add(setLatest);
+      // expose "force update" to registry
+      const forceUpdate = () => setState((prev) => !prev);
+      // current.listeners.add(setLatest);
+      current.listeners.add(forceUpdate);
       return () => {
-        current.listeners.delete(setLatest);
+        current.listeners.add(forceUpdate);
+        // current.listeners.delete(setLatest);
       };
     }, []);
+
+    const latest2 = registry.componentMap.get(name);
+    if (!latest2) {
+      return `!!! [tiny-refresh] missing '${name}' !!!`;
+    }
+
+    return latest2.options.remount
+      ? createElement(latest2.component, props)
+      : createElement(UnsafeWrapperFc, { component: latest2.component, props });
 
     //
     // approach 1.
@@ -103,19 +118,19 @@ export function createHmrComponent(
     //   For now, however, we allow this mode via explicit "// @hmr-unsafe" comment.
     //
 
-    return latest.options.remount
-      ? createElement(latest.component, props)
-      : createElement(UnsafeWrapperFc, { latest, props });
+    // return latest.options.remount
+    //   ? createElement(latest.component, props)
+    //   : createElement(UnsafeWrapperFc, { latest, props });
   };
 
   const UnsafeWrapperFc: ReactTypes.FC = ({
-    latest,
+    component,
     props,
   }: {
-    latest: HmrComponentData;
+    component: ReactTypes.FC;
     props: any;
   }) => {
-    return latest.component(props);
+    return component(props);
   };
 
   // patch Function.name for react error stacktrace
@@ -132,30 +147,40 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     ...currentReg.componentMap.keys(),
     ...latestReg.componentMap.keys(),
   ]);
+
+  // pass over "current" for next patchRegistry
+  const latestComponentMap = latestReg.componentMap;
+  latestReg.componentMap = currentReg.componentMap;
+
   for (const key of keys) {
     const current = currentReg.componentMap.get(key);
-    const latest = latestReg.componentMap.get(key);
+    const latest = latestComponentMap.get(key);
     if (!current || !latest) {
       return false;
     }
-
-    // copy over some states from current component
-    latest.listeners = current.listeners;
 
     // Skip re-rendering if function code is exactly same.
     // Note that this can cause "false-negative", for example,
     // when a constant defined in the same file has changed
     // and such constant is used by the component.
-    if (current.component.toString() === latest.component.toString()) {
+    const skip = current.component.toString() === latest.component.toString();
+
+    // sync "current"
+    current.component = latest.component;
+    current.options = latest.options;
+
+    if (skip) {
       continue;
     }
+
+    // TODO: debounce re-rendering
     if (latestReg.debug) {
       // cf. "[vite] hot updated" log https://github.com/vitejs/vite/pull/8855
       console.debug(
         `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount}, listeners.size = ${latest.listeners.size})`
       );
     }
-    for (const setState of latest.listeners) {
+    for (const setState of current.listeners) {
       setState(latest);
     }
   }
