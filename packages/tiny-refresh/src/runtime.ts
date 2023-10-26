@@ -65,6 +65,7 @@ export function createHmrComponent(
   Fc: ReactTypes.FC,
   options: HmrComponentOptions
 ) {
+  // `patchRegistry` will mutate this `current` to synchronize latest data
   const current: HmrComponentData = {
     component: Fc,
     listeners: new Set(),
@@ -86,11 +87,6 @@ export function createHmrComponent(
       };
     }, []);
 
-    const latest = registry.componentMap.get(name);
-    if (!latest) {
-      return `!!! [tiny-refresh] missing '${name}' !!!`;
-    }
-
     //
     // approach 1.
     //
@@ -109,9 +105,9 @@ export function createHmrComponent(
     //   For now, however, we allow this mode via explicit "// @hmr-unsafe" comment.
     //
 
-    return latest.options.remount
-      ? createElement(latest.component, props)
-      : createElement(UnsafeWrapperFc, { component: latest.component, props });
+    return current.options.remount
+      ? createElement(current.component, props)
+      : createElement(UnsafeWrapperFc, { component: current.component, props });
   };
 
   const UnsafeWrapperFc: ReactTypes.FC = ({
@@ -168,7 +164,7 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (latestReg.debug) {
       // cf. "[vite] hot updated" log https://github.com/vitejs/vite/pull/8855
       console.debug(
-        `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount}, listeners.size = ${latest.listeners.size})`
+        `[tiny-refresh] refresh '${key}' (remount = ${current.options.remount}, listeners.size = ${current.listeners.size})`
       );
     }
     for (const setState of current.listeners) {
