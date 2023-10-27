@@ -84,10 +84,8 @@ export function createHmrComponent(
       }
       // expose "force update" to registry
       const forceUpdate = () => setState((prev) => !prev);
-      // current.listeners.add(forceUpdate);
       current.listeners.add(forceUpdate);
       return () => {
-        // current.listeners.delete(forceUpdate);
         current.listeners.delete(forceUpdate);
       };
     }, []);
@@ -117,19 +115,19 @@ export function createHmrComponent(
     return current.options.remount
       ? createElement(current.component, props)
       : createElement(UnsafeWrapperFc, {
-          component: current.component,
+          current,
           props,
         });
   };
 
   const UnsafeWrapperFc: ReactTypes.FC = ({
-    component,
+    current,
     props,
   }: {
-    component: ReactTypes.FC;
+    current: HmrComponentData;
     props: any;
   }) => {
-    return component(props);
+    return current.component(props);
   };
 
   // patch Function.name for react error stacktrace
