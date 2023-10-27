@@ -76,6 +76,8 @@ export function createHmrComponent(
   const WrapperFc: ReactTypes.FC = (props) => {
     const current = registry.componentMap.get(name);
 
+    // TODO: replace with
+    //   const forceUpdate = useReducer(prev => !prev, true)[1];
     const [_state, setState] = useState(true);
 
     useEffect(() => {
