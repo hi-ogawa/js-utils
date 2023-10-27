@@ -34,8 +34,11 @@ interface HmrRegistry {
     useState: ReactTypes.useState;
     useEffect: ReactTypes.useEffect;
   };
-  debug?: boolean; // to hide log for testing
   componentMap: Map<string, HmrComponentData>;
+  debug?: boolean; // to hide log for testing
+  // each HmrRegistry references initial registry (except initial itself)
+  // since all following changes are reflected to the initial registry.
+  initial?: HmrRegistry;
 }
 
 interface HmrComponentData {
@@ -74,7 +77,7 @@ export function createHmrComponent(
   const { createElement, useEffect, useState } = registry.runtime;
 
   const WrapperFc: ReactTypes.FC = (props) => {
-    const current = registry.componentMap.get(name);
+    const current = (registry.initial ?? registry).componentMap.get(name);
 
     // TODO: replace with
     //   const forceUpdate = useReducer(prev => !prev, true)[1];
@@ -147,18 +150,14 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     ...latestReg.componentMap.keys(),
   ]);
 
-  // TODO(refactor): probably we could simplify by separating "collecting" registry (for each run) and "shared" registry (the one from initial module)?
-
-  // holds latest component collected during this update
-  const latestComponentMap = latestReg.componentMap;
-
-  // share single initial componentMap between all registry
-  latestReg.componentMap = currentReg.componentMap;
+  // pass reference to initial registry
+  const initialReg = currentReg.initial ?? currentReg;
+  latestReg.initial = initialReg;
 
   for (const key of keys) {
-    const current = currentReg.componentMap.get(key);
-    const latest = latestComponentMap.get(key);
-    if (!current || !latest) {
+    const initial = initialReg.componentMap.get(key);
+    const latest = latestReg.componentMap.get(key);
+    if (!initial || !latest) {
       return false;
     }
 
@@ -167,11 +166,11 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     // when a constant defined in the same file has changed
     // and such constant is used by the component.
     // TODO: instead of completely skipping, we could still render with "unsafe" mode since no change in component implies there's no hook change.
-    const skip = current.component.toString() === latest.component.toString();
+    const skip = initial.component.toString() === latest.component.toString();
 
-    // sync "current"
-    current.component = latest.component;
-    current.options = latest.options;
+    // sync "latest" to "initial"
+    initial.component = latest.component;
+    initial.options = latest.options;
 
     if (skip) {
       continue;
@@ -181,10 +180,10 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     if (latestReg.debug) {
       // cf. "[vite] hot updated" log https://github.com/vitejs/vite/pull/8855
       console.debug(
-        `[tiny-refresh] refresh '${key}' (remount = ${current.options.remount}, listeners.size = ${current.listeners.size})`
+        `[tiny-refresh] refresh '${key}' (remount = ${initial.options.remount}, listeners.size = ${initial.listeners.size})`
       );
     }
-    for (const setState of current.listeners) {
+    for (const setState of initial.listeners) {
       setState();
     }
   }
