@@ -36,7 +36,7 @@ interface HmrRegistry {
   };
   componentMap: Map<string, HmrComponentData>;
   debug?: boolean; // to hide log for testing
-  // each HmrRegistry references initial registry (except initial itself)
+  // each HmrRegistry references initial registry (except initial module itself)
   // since all following changes are reflected to the initial registry.
   initial?: HmrRegistry;
 }
@@ -210,7 +210,7 @@ export function setupHmrWebpack(hot: WebpackHot, registry: HmrRegistry) {
   // perspective flips for webpack since `hot.data` is passed by old module.
   const lastRegistry = hot.data && hot.data[REGISTRY_KEY];
   if (lastRegistry) {
-    const patchSuccess = lastRegistry && patchRegistry(lastRegistry, registry);
+    const patchSuccess = patchRegistry(lastRegistry, registry);
     if (!patchSuccess) {
       hot.invalidate();
     }
