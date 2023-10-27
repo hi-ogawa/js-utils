@@ -46,7 +46,8 @@ export function Outer() {
       <div className="border-t"></div>
       <div id="inner4">
         <div className="flex gap-1">
-          show if "outer % 2 = 0" : {state % 2 === 0 && <InnerShowHide />}
+          show if "outer % 2 = 0" :{" "}
+          <div id="inner4-message">{state % 2 === 0 && <InnerShowHide />}</div>
         </div>
       </div>
     </div>
