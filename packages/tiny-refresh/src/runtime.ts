@@ -38,7 +38,7 @@ interface HmrRegistry {
   componentMap: Map<string, HmrComponentData>;
   debug?: boolean; // to hide log for testing
   // each HmrRegistry references initial registry (except initial module itself)
-  // since all following changes are reflected to the initial registry.
+  // as we keep all following changes reflected to the initial registry.
   initial?: HmrRegistry;
 }
 
@@ -78,8 +78,7 @@ export function createHmrComponent(
   const { createElement, useEffect, useReducer } = registry.runtime;
 
   const WrapperFc: ReactTypes.FC = (props) => {
-    // "ground-truth" is tracked in initial registry
-    const current = (registry.initial ?? registry).componentMap.get(name);
+    const data = (registry.initial ?? registry).componentMap.get(name);
 
     const forceUpdate = useReducer<boolean, void>(
       (prev: boolean) => !prev,
@@ -87,17 +86,17 @@ export function createHmrComponent(
     )[1];
 
     useEffect(() => {
-      if (!current) {
+      if (!data) {
         return;
       }
       // expose "force update" to registry
-      current.listeners.add(forceUpdate);
+      data.listeners.add(forceUpdate);
       return () => {
-        current.listeners.delete(forceUpdate);
+        data.listeners.delete(forceUpdate);
       };
     }, []);
 
-    if (!current) {
+    if (!data) {
       return `!!! [tiny-refresh] missing '${name}' !!!`;
     }
 
@@ -119,22 +118,22 @@ export function createHmrComponent(
     //   For now, however, we allow this mode via explicit "// @hmr-unsafe" comment.
     //
 
-    return current.options.remount
-      ? createElement(current.component, props)
+    return data.options.remount
+      ? createElement(data.component, props)
       : createElement(UnsafeWrapperFc, {
-          current,
+          data,
           props,
         });
   };
 
   const UnsafeWrapperFc: ReactTypes.FC = ({
-    current,
+    data,
     props,
   }: {
-    current: HmrComponentData;
+    data: HmrComponentData;
     props: any;
   }) => {
-    return current.component(props);
+    return data.component(props);
   };
 
   // patch Function.name for react error stacktrace
