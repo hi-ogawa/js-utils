@@ -40,7 +40,7 @@ interface HmrRegistry {
 
 interface HmrComponentData {
   component: ReactTypes.FC;
-  listeners: Set<(latest: HmrComponentData) => void>;
+  listeners: Set<() => void>;
   options: HmrComponentOptions;
 }
 
@@ -65,27 +65,36 @@ export function createHmrComponent(
   Fc: ReactTypes.FC,
   options: HmrComponentOptions
 ) {
-  // `patchRegistry` will mutate this `current` to synchronize latest data
-  const current: HmrComponentData = {
+  registry.componentMap.set(name, {
     component: Fc,
     listeners: new Set(),
     options,
-  };
-  registry.componentMap.set(name, current);
+  });
 
   const { createElement, useEffect, useState } = registry.runtime;
 
   const WrapperFc: ReactTypes.FC = (props) => {
+    const current = registry.componentMap.get(name);
+
     const [_state, setState] = useState(true);
 
     useEffect(() => {
+      if (!current) {
+        return;
+      }
       // expose "force update" to registry
       const forceUpdate = () => setState((prev) => !prev);
+      // current.listeners.add(forceUpdate);
       current.listeners.add(forceUpdate);
       return () => {
+        // current.listeners.delete(forceUpdate);
         current.listeners.delete(forceUpdate);
       };
     }, []);
+
+    if (!current) {
+      return `!!! [tiny-refresh] missing '${name}' !!!`;
+    }
 
     //
     // approach 1.
@@ -107,7 +116,10 @@ export function createHmrComponent(
 
     return current.options.remount
       ? createElement(current.component, props)
-      : createElement(UnsafeWrapperFc, { component: current.component, props });
+      : createElement(UnsafeWrapperFc, {
+          component: current.component,
+          props,
+        });
   };
 
   const UnsafeWrapperFc: ReactTypes.FC = ({
@@ -135,8 +147,12 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     ...latestReg.componentMap.keys(),
   ]);
 
-  // pass over "current" for next patchRegistry
+  // TODO(refactor): probably we could simplify by separating "collecting" registry (for each run) and "shared" registry (the one from initial module)?
+
+  // holds latest component collected during this update
   const latestComponentMap = latestReg.componentMap;
+
+  // share single initial componentMap between all registry
   latestReg.componentMap = currentReg.componentMap;
 
   for (const key of keys) {
@@ -150,6 +166,7 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     // Note that this can cause "false-negative", for example,
     // when a constant defined in the same file has changed
     // and such constant is used by the component.
+    // TODO: instead of completely skipping, we could still render with "unsafe" mode since no change in component implies there's no hook change.
     const skip = current.component.toString() === latest.component.toString();
 
     // sync "current"
@@ -168,7 +185,7 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
       );
     }
     for (const setState of current.listeners) {
-      setState(latest);
+      setState();
     }
   }
   return true;
