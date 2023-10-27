@@ -35,7 +35,7 @@ function CompNooo() {
       import * as $$refresh from \\"@hiogawa/tiny-refresh\\";
       const $$registry = $$refresh.createHmrRegistry({
         createElement: $$runtime.createElement,
-        useState: $$runtime.useState,
+        useReducer: $$runtime.useReducer,
         useEffect: $$runtime.useEffect,
       }, false);
 
@@ -126,7 +126,7 @@ const UPPER = 1;
       import * as $$refresh from \\"@hiogawa/tiny-refresh\\";
       const $$registry = $$refresh.createHmrRegistry({
         createElement: $$runtime.createElement,
-        useState: $$runtime.useState,
+        useReducer: $$runtime.useReducer,
         useEffect: $$runtime.useEffect,
       }, false);
 

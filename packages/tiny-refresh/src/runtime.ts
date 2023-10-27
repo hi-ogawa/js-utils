@@ -2,9 +2,10 @@
 namespace ReactTypes {
   export type FC = (props: any) => unknown;
   export type createElement = (...args: any[]) => unknown;
-  export type useState = <T>(
-    init: T | (() => T)
-  ) => [T, (next: T | ((prev: T) => T)) => void];
+  export type useReducer = <S, A>(
+    reducer: (prevState: S, action: A) => S,
+    initialState: S
+  ) => [S, (action: A) => void];
   export type useEffect = (effect: () => void, deps?: unknown[]) => void;
 }
 
@@ -31,7 +32,7 @@ interface HotData {
 interface HmrRegistry {
   runtime: {
     createElement: ReactTypes.createElement;
-    useState: ReactTypes.useState;
+    useReducer: ReactTypes.useReducer;
     useEffect: ReactTypes.useEffect;
   };
   componentMap: Map<string, HmrComponentData>;
@@ -74,21 +75,22 @@ export function createHmrComponent(
     options,
   });
 
-  const { createElement, useEffect, useState } = registry.runtime;
+  const { createElement, useEffect, useReducer } = registry.runtime;
 
   const WrapperFc: ReactTypes.FC = (props) => {
+    // "ground-truth" is tracked in initial registry
     const current = (registry.initial ?? registry).componentMap.get(name);
 
-    // TODO: replace with
-    //   const forceUpdate = useReducer(prev => !prev, true)[1];
-    const [_state, setState] = useState(true);
+    const forceUpdate = useReducer<boolean, void>(
+      (prev: boolean) => !prev,
+      true
+    )[1];
 
     useEffect(() => {
       if (!current) {
         return;
       }
       // expose "force update" to registry
-      const forceUpdate = () => setState((prev) => !prev);
       current.listeners.add(forceUpdate);
       return () => {
         current.listeners.delete(forceUpdate);
