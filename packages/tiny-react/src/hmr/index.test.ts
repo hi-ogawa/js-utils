@@ -6,7 +6,7 @@ import {
   setupHmrVite,
 } from ".";
 import { h } from "../helper/hyperscript";
-import { useEffect, useState } from "../hooks";
+import { useEffect, useReducer } from "../hooks";
 import { render } from "../reconciler";
 import { sleepFrame } from "../test-utils";
 import { createElement } from "../virtual-dom";
@@ -37,7 +37,7 @@ describe(setupHmrVite, () => {
     {
       const registry = createHmrRegistry({
         createElement,
-        useState,
+        useReducer,
         useEffect,
       });
 
@@ -86,7 +86,7 @@ describe(setupHmrVite, () => {
     {
       const registry = createHmrRegistry({
         createElement,
-        useState,
+        useReducer,
         useEffect,
       });
 
@@ -131,7 +131,7 @@ describe(setupHmrVite, () => {
     {
       const registry = createHmrRegistry({
         createElement,
-        useState,
+        useReducer,
         useEffect,
       });
 
