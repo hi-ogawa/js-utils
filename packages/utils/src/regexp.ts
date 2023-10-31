@@ -1,7 +1,7 @@
 import { tinyassert } from "./tinyassert";
 
 /**
- * Simple combination of `String.raw` and `RegExp`
+ * Composition of `String.raw` and `RegExp`
  * @example
  * regExpRaw`/username/${/\w+/}/profile`
  */
