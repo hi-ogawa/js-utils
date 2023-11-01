@@ -583,6 +583,22 @@ describe(regExpRaw, () => {
     `);
     expect("/username/he y/profile".match(re)).toMatchInlineSnapshot("null");
   });
+
+  it("string", () => {
+    const re = regExpRaw`/username/${"\\w+"}/profile`;
+    expect(re).toMatchInlineSnapshot(
+      "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
+    );
+    expect(re.source).toMatchInlineSnapshot(
+      '"\\\\/username\\\\/\\\\w+\\\\/profile"'
+    );
+    expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
+      [
+        "/username/hey/profile",
+      ]
+    `);
+    expect("/username/he y/profile".match(re)).toMatchInlineSnapshot("null");
+  });
 });
 
 describe(escapeRegExp, () => {
