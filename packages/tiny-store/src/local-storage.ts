@@ -6,7 +6,7 @@ import {
   tinyStoreTransform,
 } from "./core";
 
-// ssr fallbacks to `defaultValue` which can cause hydration mismatch
+// ssr fallbacks to `defaultValue` which could cause hydration mismatch
 export function createTinyStoreWithStorage<T>(
   key: string,
   defaultValue: T,
@@ -77,5 +77,6 @@ class TinyStoreLocalStorageAdapter implements TinyStoreAdapter<string | null> {
     }
     tinyassert(this._unlisten);
     this._unlisten();
+    this._unlisten = undefined;
   }
 }
