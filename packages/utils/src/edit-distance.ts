@@ -34,8 +34,8 @@ export function solveEditDistance<T>(
 
   for (const i of range(n)) {
     for (const j of range(m)) {
-      const next1 = dp[i][j][0] + costFn(xs[i], ys[i]);
-      const next2 = dp[i + 1][j][0] + costFn(undefined, ys[i]);
+      const next1 = dp[i][j][0] + costFn(xs[i], ys[j]);
+      const next2 = dp[i + 1][j][0] + costFn(undefined, ys[j]);
       const next3 = dp[i][j + 1][0] + costFn(xs[i], undefined);
       const next = Math.min(next1, next2, next3);
       dp[i + 1][j + 1][0] = next;

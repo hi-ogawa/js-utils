@@ -38,17 +38,17 @@ describe(solveEditDistance, () => {
       {
         "path": [
           {
-            "delta": 1,
+            "delta": 0,
             "i": 2,
             "j": 3,
-            "op": 1,
-            "total": 2,
+            "op": 0,
+            "total": 1,
           },
           {
             "delta": 1,
-            "i": 2,
+            "i": 1,
             "j": 2,
-            "op": 0,
+            "op": 1,
             "total": 1,
           },
           {
@@ -59,7 +59,7 @@ describe(solveEditDistance, () => {
             "total": 0,
           },
         ],
-        "total": 2,
+        "total": 1,
       }
     `);
   });
@@ -69,17 +69,17 @@ describe(solveEditDistance, () => {
       {
         "path": [
           {
-            "delta": 1,
+            "delta": 0,
             "i": 3,
             "j": 2,
-            "op": 2,
-            "total": 2,
+            "op": 0,
+            "total": 1,
           },
           {
             "delta": 1,
             "i": 2,
-            "j": 2,
-            "op": 0,
+            "j": 1,
+            "op": 2,
             "total": 1,
           },
           {
@@ -90,7 +90,7 @@ describe(solveEditDistance, () => {
             "total": 0,
           },
         ],
-        "total": 2,
+        "total": 1,
       }
     `);
   });
