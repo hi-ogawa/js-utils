@@ -5,7 +5,7 @@ const ops = {
   replace: 0,
   insert: 1,
   remove: 2,
-} as const;
+};
 
 export function solveEditDistance<T>(
   xs: T[],
@@ -14,45 +14,61 @@ export function solveEditDistance<T>(
 ) {
   const n = xs.length;
   const m = ys.length;
-  const dp = range(n + 1).map(() => range(m + 1).map(() => [0, ops.none]));
+
+  // dp[i][j] = [(total cost), (last op), (last delta)]
+  const dp = range(n + 1).map(() => range(m + 1).map(() => [0, ops.none, -1]));
 
   for (const i of range(n)) {
-    dp[i + 1][0][0] = dp[i][0][0] + costFn(xs[i], undefined);
+    const delta = costFn(xs[i], undefined);
+    dp[i + 1][0][0] = dp[i][0][0] + delta;
     dp[i + 1][0][1] = ops.remove;
+    dp[i + 1][0][2] = delta;
   }
 
   for (const j of range(m)) {
-    dp[0][j + 1][0] = dp[0][j][0] + costFn(undefined, ys[j]);
+    const delta = costFn(undefined, ys[j]);
+    dp[0][j + 1][0] = dp[0][j][0] + delta;
     dp[0][j + 1][1] = ops.insert;
+    dp[0][j + 1][2] = delta;
   }
 
   for (const i of range(n)) {
     for (const j of range(m)) {
-      const replace = dp[i][j][0] + costFn(xs[i], ys[i]);
-      const insert = dp[i + 1][j][0] + costFn(undefined, ys[i]);
-      const remove = dp[i][j + 1][0] + costFn(xs[i], undefined);
-      const next = Math.min(replace, insert, remove);
+      const next1 = dp[i][j][0] + costFn(xs[i], ys[i]);
+      const next2 = dp[i + 1][j][0] + costFn(undefined, ys[i]);
+      const next3 = dp[i][j + 1][0] + costFn(xs[i], undefined);
+      const next = Math.min(next1, next2, next3);
       dp[i + 1][j + 1][0] = next;
-      dp[i + 1][j + 1][1] =
-        next === replace
-          ? ops.replace
-          : next === insert
-          ? ops.insert
-          : ops.remove;
+      if (next === next1) {
+        dp[i + 1][j + 1][1] = ops.replace;
+        dp[i + 1][j + 1][2] = next - dp[i][j][0];
+      }
+      if (next === next2) {
+        dp[i + 1][j + 1][1] = ops.insert;
+        dp[i + 1][j + 1][2] = next - dp[i + 1][j][0];
+      }
+      if (next === next3) {
+        dp[i + 1][j + 1][1] = ops.remove;
+        dp[i + 1][j + 1][2] = next - dp[i][j + 1][0];
+      }
     }
   }
 
-  console.log(dp);
-
-  const cost = dp[n][m][0];
+  const total = dp[n][m][0];
 
   // backtrack
-  const path: any[] = [];
+  const path: {
+    i: number;
+    j: number;
+    op: number;
+    delta: number;
+    total: number;
+  }[] = [];
   let i = n;
   let j = m;
   while (i > 0 || j > 0) {
-    const [cost, op] = dp[i][j];
-    path.push({ i, j, cost, op });
+    const [total, op, delta] = dp[i][j];
+    path.push({ i, j, total, delta, op });
     if (op === ops.replace) {
       i--;
       j--;
@@ -63,7 +79,7 @@ export function solveEditDistance<T>(
     }
   }
 
-  return { cost, path };
+  return { total, path };
 }
 
 function defaultCostFn(x: unknown, y: unknown) {
