@@ -203,7 +203,6 @@ async function resolveImportSourceExperimental(
       name: relativePath,
     };
   } catch (e) {
-    // TODO: cli option to list resolution error
     return {
       type: "unknown",
       name: source,
