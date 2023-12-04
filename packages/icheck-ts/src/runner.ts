@@ -1,5 +1,6 @@
 import fs from "node:fs";
-import path from "node:path";
+import { isBuiltin } from "node:module";
+import path, { relative } from "node:path";
 import process from "node:process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
@@ -181,33 +182,48 @@ export async function runner(
 // use `import.meta.resolve` to resolve import source
 // so that users can use custom loader (e.g. tsx) to support what they need.
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#importmetaresolvespecifier
+// TODO: performance-wise this would be probably slower?
 async function resolveImportSourceExperimental(
   containingFile: string,
   source: string,
   baseDir: string,
   resolve: Exclude<ImportMeta["resolve"], undefined>
 ): Promise<ImportSource> {
-  const parentUrl = pathToFileURL(path.join(baseDir, containingFile));
-  try {
-    const sourceUrl = await resolve(source, parentUrl);
-    const sourcePath = fileURLToPath(sourceUrl);
-    const relativePath = path.relative(baseDir, sourcePath);
-    if (path.isAbsolute(relativePath)) {
-      return {
-        type: "external",
-        name: source,
-      };
-    }
+  if (isBuiltin(source)) {
     return {
-      type: "internal",
-      name: relativePath,
+      type: "external",
+      name: source,
     };
-  } catch (e) {
+  }
+  const parentUrl = pathToFileURL(path.join(baseDir, containingFile));
+  // TODO: standardized as "sync" but still "async" in old nodejs
+  // TODO: also what standardized doesn't throw when not found. https://github.com/nodejs/node/pull/49038
+  //       Do we still need to do fs.existsSync to check?
+  const resolved = await wrapErrorAsync(async () => resolve(source, parentUrl));
+  if (!resolved.ok) {
     return {
       type: "unknown",
       name: source,
     };
   }
+  const sourcePath = fileURLToPath(resolved.value);
+  if (!fs.existsSync(sourcePath)) {
+    return {
+      type: "unknown",
+      name: source,
+    };
+  }
+  const relativePath = path.relative(baseDir, sourcePath);
+  if (relativePath.startsWith("..")) {
+    return {
+      type: "external",
+      name: source,
+    };
+  }
+  return {
+    type: "internal",
+    name: relativePath,
+  };
 }
 
 // cf.
