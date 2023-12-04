@@ -169,6 +169,10 @@ export async function runner(
   };
 }
 
+// TODO: can we use `require.resolve`?
+// then users can add cusotm resolution e.g. by "--loader tsx/esm"?
+// https://github.com/privatenumber/tsx/blob/d616d653bf8e715a3e439055c7354ebd89ab143f/src/esm/loaders.ts#L136
+
 // cf.
 // https://nodejs.org/api/esm.html#import-specifiers
 // https://nodejs.org/api/modules.html#all-together
@@ -225,6 +229,10 @@ export async function resolveImportSource(
         name: source,
       };
 }
+
+//
+// circular import
+//
 
 type ImportEdge = [importer: string, edge: ImportTarget];
 
