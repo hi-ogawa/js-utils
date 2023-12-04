@@ -8,6 +8,7 @@ import {
 import { parseImportExport } from "./parser";
 import {
   type ExportUsage,
+  type ImportTarget,
   findCircularImport,
   formatCircularImportError,
   runner,
@@ -29,8 +30,14 @@ const command = new TinyCliCommand(
       ignore: arg.string("RegExp pattern to ignore export names", {
         optional: true,
       }),
+      ignoreUnresolved: arg.string(
+        "RegExp pattern to ignore unresolved import",
+        {
+          optional: true,
+        }
+      ),
       noCheckCircular: arg.boolean("Disable checking circular import"),
-      noCheckUnresolve: arg.boolean("Disable checking unresolved import"),
+      noCheckUnresolved: arg.boolean("Disable checking unresolved import"),
     },
   },
   async ({ args }) => {
@@ -60,6 +67,11 @@ const command = new TinyCliCommand(
       );
     }
 
+    // unused exports error
+    const unusedExports = [...result.exportUsages]
+      .map(([k, vs]) => [k, vs.filter((v) => !isUsedExport(v))] as const)
+      .filter(([_k, vs]) => vs.length > 0);
+
     // parse error
     if (result.errors.size > 0) {
       console.log(colors.red("** Parse errors **"));
@@ -69,28 +81,33 @@ const command = new TinyCliCommand(
       process.exitCode = 1;
     }
 
-    // unknown imports
-    const unknownImports = [...result.importRelations]
+    // unresolved imports
+    const ignoreUnresolvedRegExp =
+      args.ignoreUnresolved && new RegExp(args.ignoreUnresolved);
+
+    let unresolvedImports = [...result.importRelations]
       .map(
         ([file, targets]) =>
-          [file, targets.filter((t) => t.source.type === "unknown")] as const
+          [file, targets.filter((e) => isUnresolveImport(e))] as const
       )
       .filter(([_file, targets]) => targets.length > 0);
 
-    if (!args.noCheckUnresolve && unknownImports.length > 0) {
+    function isUnresolveImport(e: ImportTarget) {
+      return (
+        e.source.type === "unknown" &&
+        !(ignoreUnresolvedRegExp && e.source.name.match(ignoreUnresolvedRegExp))
+      );
+    }
+
+    if (!args.noCheckUnresolved && unresolvedImports.length > 0) {
       console.log(colors.red("** Unresolved imports **"));
-      for (const [file, targets] of unknownImports) {
+      for (const [file, targets] of unresolvedImports) {
         for (const e of uniqBy(targets, (target) => target.source)) {
           console.log(`${file}:${e.node.position[0]} - ${e.source.name}`);
         }
       }
       process.exitCode = 1;
     }
-
-    // unused exports error
-    const unusedExports = [...result.exportUsages]
-      .map(([k, vs]) => [k, vs.filter((v) => !isUsedExport(v))] as const)
-      .filter(([_k, vs]) => vs.length > 0);
 
     if (unusedExports.length > 0) {
       console.log(colors.red("** Unused exports **"));

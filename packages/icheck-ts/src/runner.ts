@@ -11,7 +11,7 @@ import {
 } from "@hiogawa/utils";
 import { type ParseOutput, type ParsedBase, parseImportExport } from "./parser";
 
-interface ImportTarget {
+export interface ImportTarget {
   source: ImportSource;
   usage: ImportUsage;
   node: ParsedBase;
