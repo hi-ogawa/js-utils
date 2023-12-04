@@ -30,7 +30,7 @@ const command = new TinyCliCommand(
         optional: true,
       }),
       noCheckCircular: arg.boolean("Disable checking circular import"),
-      noCheckUnresolve: arg.boolean("Disable checking unresolved import")
+      noCheckUnresolve: arg.boolean("Disable checking unresolved import"),
     },
   },
   async ({ args }) => {
@@ -55,10 +55,6 @@ const command = new TinyCliCommand(
       );
     }
 
-    const unusedExports = [...result.exportUsages]
-      .map(([k, vs]) => [k, vs.filter((v) => !isUsedExport(v))] as const)
-      .filter(([_k, vs]) => vs.length > 0);
-
     // parse error
     if (result.errors.size > 0) {
       console.log(colors.red("** Parse errors **"));
@@ -68,7 +64,7 @@ const command = new TinyCliCommand(
       process.exitCode = 1;
     }
 
-    // unknown resolved imports
+    // unknown imports
     const unknownImports = [...result.importRelations]
       .map(
         ([file, targets]) =>
@@ -87,6 +83,10 @@ const command = new TinyCliCommand(
     }
 
     // unused exports error
+    const unusedExports = [...result.exportUsages]
+      .map(([k, vs]) => [k, vs.filter((v) => !isUsedExport(v))] as const)
+      .filter(([_k, vs]) => vs.length > 0);
+
     if (unusedExports.length > 0) {
       console.log(colors.red("** Unused exports **"));
       for (const [file, entries] of unusedExports) {
