@@ -40,7 +40,12 @@ const command = new TinyCliCommand(
       file: args.cacheLocation,
     });
     await cacheOp?.load();
-    const result = await runner(args.files, { parse });
+    const result = await runner(args.files, {
+      parse,
+      experimental: process.execArgv.includes(
+        "--experimental-import-meta-resolve"
+      ),
+    });
     await cacheOp?.save();
 
     // apply extra unused rules

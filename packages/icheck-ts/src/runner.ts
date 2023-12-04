@@ -52,7 +52,10 @@ export type ImportRelations = DefaultMap<string, ImportTarget[]>;
 // 3. check unused exports
 export async function runner(
   inputFiles: string[],
-  options?: { parse?: typeof parseImportExport }
+  options?: {
+    parse?: typeof parseImportExport;
+    experimental?: boolean;
+  }
 ) {
   // normalize relative path to match with `resolveImportSource` (e.g. "./x.ts" => "x.ts")
   inputFiles = inputFiles.map((f) => path.normalize(f));
@@ -93,14 +96,12 @@ export async function runner(
       for (const el of e.bindings) {
         usages.push({ type: "named", name: el.nameBefore ?? el.name });
       }
-      const source = await resolveImportSourceExperimental(
-        file,
-        e.source,
-        // TODO: baseDir as cli option
-        process.cwd(),
-        import.meta.resolve!
-      );
-      // const source = await resolveImportSource(file, e.source);
+      let source: ImportSource;
+      if (options?.experimental) {
+        source = await resolveImportSourceExperimental(file, e.source);
+      } else {
+        source = await resolveImportSource(file, e.source);
+      }
       const node: ParsedBase = {
         position: e.position,
         comment: e.comment,
@@ -185,10 +186,12 @@ export async function runner(
 // TODO: performance-wise this would be probably slower?
 async function resolveImportSourceExperimental(
   containingFile: string,
-  source: string,
-  baseDir: string,
-  resolve: Exclude<ImportMeta["resolve"], undefined>
+  source: string
 ): Promise<ImportSource> {
+  tinyassert(import.meta.resolve);
+  const resolve = import.meta.resolve;
+  const baseDir = process.cwd(); // TODO: baseDir as cli option
+
   if (isBuiltin(source)) {
     return {
       type: "external",
