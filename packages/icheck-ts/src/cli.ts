@@ -1,6 +1,6 @@
 import process from "node:process";
 import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
-import { colors, groupBy, sortBy } from "@hiogawa/utils";
+import { colors, groupBy, sortBy, uniqBy } from "@hiogawa/utils";
 import {
   name as packageName,
   version as packageVersion,
@@ -30,6 +30,7 @@ const command = new TinyCliCommand(
         optional: true,
       }),
       noCheckCircular: arg.boolean("Disable checking circular import"),
+      noCheckUnresolve: arg.boolean("Disable checking unresolved import")
     },
   },
   async ({ args }) => {
@@ -63,6 +64,24 @@ const command = new TinyCliCommand(
       console.log(colors.red("** Parse errors **"));
       for (const [file, error] of result.errors) {
         console.log(file, error);
+      }
+      process.exitCode = 1;
+    }
+
+    // unknown resolved imports
+    const unknownImports = [...result.importRelations]
+      .map(
+        ([file, targets]) =>
+          [file, targets.filter((t) => t.source.type === "unknown")] as const
+      )
+      .filter(([_file, targets]) => targets.length > 0);
+
+    if (!args.noCheckUnresolve && unknownImports.length > 0) {
+      console.log(colors.red("** Unresolved imports **"));
+      for (const [file, targets] of unknownImports) {
+        for (const e of uniqBy(targets, (target) => target.source)) {
+          console.log(`${file}:${e.node.position[0]} - ${e.source.name}`);
+        }
       }
       process.exitCode = 1;
     }

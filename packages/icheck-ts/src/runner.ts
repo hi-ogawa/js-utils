@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import * as process from "node:process";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DefaultMap,
   assertUnreachable,
@@ -90,7 +92,14 @@ export async function runner(
       for (const el of e.bindings) {
         usages.push({ type: "named", name: el.nameBefore ?? el.name });
       }
-      const source = await resolveImportSource(file, e.source);
+      const source = await resolveImportSourceExperimental(
+        file,
+        e.source,
+        // TODO: baseDir as cli option
+        process.cwd(),
+        import.meta.resolve!
+      );
+      // const source = await resolveImportSource(file, e.source);
       const node: ParsedBase = {
         position: e.position,
         comment: e.comment,
@@ -169,9 +178,38 @@ export async function runner(
   };
 }
 
-// TODO: can we use `require.resolve`?
-// then users can add cusotm resolution e.g. by "--loader tsx/esm"?
-// https://github.com/privatenumber/tsx/blob/d616d653bf8e715a3e439055c7354ebd89ab143f/src/esm/loaders.ts#L136
+// use `import.meta.resolve` to resolve import source
+// so that users can use custom loader (e.g. tsx) to support what they need.
+// https://nodejs.org/docs/latest-v18.x/api/esm.html#importmetaresolvespecifier
+async function resolveImportSourceExperimental(
+  containingFile: string,
+  source: string,
+  baseDir: string,
+  resolve: Exclude<ImportMeta["resolve"], undefined>
+): Promise<ImportSource> {
+  const parentUrl = pathToFileURL(path.join(baseDir, containingFile));
+  try {
+    const sourceUrl = await resolve(source, parentUrl);
+    const sourcePath = fileURLToPath(sourceUrl);
+    const relativePath = path.relative(baseDir, sourcePath);
+    if (path.isAbsolute(relativePath)) {
+      return {
+        type: "external",
+        name: source,
+      };
+    }
+    return {
+      type: "internal",
+      name: relativePath,
+    };
+  } catch (e) {
+    // TODO: cli option to list resolution error
+    return {
+      type: "unknown",
+      name: source,
+    };
+  }
+}
 
 // cf.
 // https://nodejs.org/api/esm.html#import-specifiers
