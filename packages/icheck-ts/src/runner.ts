@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { isBuiltin } from "node:module";
-import path, { relative } from "node:path";
+import path from "node:path";
 import process from "node:process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
