@@ -69,11 +69,11 @@ describe("base64", () => {
   it("error", () => {
     expect(() =>
       fromBase64(new Uint8Array([0]))
-    ).toThrowErrorMatchingInlineSnapshot('"invalid length"');
+    ).toThrowErrorMatchingInlineSnapshot(`[Error: invalid length]`);
 
     expect(() =>
       fromBase64(new Uint8Array([0, 0, 0, 0]))
-    ).toThrowErrorMatchingInlineSnapshot('"invalid data"');
+    ).toThrowErrorMatchingInlineSnapshot(`[Error: invalid data]`);
   });
 
   it("roundtrip-fuzz-small", () => {

@@ -267,7 +267,7 @@ describe(HashKeyDefaultMap, () => {
         "defaultFn": [Function],
         "keyFn": [Function],
         "map": Map {
-          "{\\"mod2\\":0,\\"mod3\\":0}" => [
+          "{"mod2":0,"mod3":0}" => [
             {
               "mod2": 0,
               "mod3": 0,
@@ -277,7 +277,7 @@ describe(HashKeyDefaultMap, () => {
               6,
             ],
           ],
-          "{\\"mod2\\":1,\\"mod3\\":1}" => [
+          "{"mod2":1,"mod3":1}" => [
             {
               "mod2": 1,
               "mod3": 1,
@@ -287,7 +287,7 @@ describe(HashKeyDefaultMap, () => {
               7,
             ],
           ],
-          "{\\"mod2\\":0,\\"mod3\\":2}" => [
+          "{"mod2":0,"mod3":2}" => [
             {
               "mod2": 0,
               "mod3": 2,
@@ -297,7 +297,7 @@ describe(HashKeyDefaultMap, () => {
               8,
             ],
           ],
-          "{\\"mod2\\":1,\\"mod3\\":0}" => [
+          "{"mod2":1,"mod3":0}" => [
             {
               "mod2": 1,
               "mod3": 0,
@@ -307,7 +307,7 @@ describe(HashKeyDefaultMap, () => {
               9,
             ],
           ],
-          "{\\"mod2\\":0,\\"mod3\\":1}" => [
+          "{"mod2":0,"mod3":1}" => [
             {
               "mod2": 0,
               "mod3": 1,
@@ -316,7 +316,7 @@ describe(HashKeyDefaultMap, () => {
               4,
             ],
           ],
-          "{\\"mod2\\":1,\\"mod3\\":2}" => [
+          "{"mod2":1,"mod3":2}" => [
             {
               "mod2": 1,
               "mod3": 2,
@@ -574,7 +574,7 @@ describe(regExpRaw, () => {
       "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
     );
     expect(re.source).toMatchInlineSnapshot(
-      '"\\\\/username\\\\/\\\\w+\\\\/profile"'
+      `"\\/username\\/\\w+\\/profile"`
     );
     expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
       [
@@ -590,7 +590,7 @@ describe(regExpRaw, () => {
       "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
     );
     expect(re.source).toMatchInlineSnapshot(
-      '"\\\\/username\\\\/\\\\w+\\\\/profile"'
+      `"\\/username\\/\\w+\\/profile"`
     );
     expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
       [
@@ -605,7 +605,7 @@ describe(escapeRegExp, () => {
   it("basic", () => {
     const re = escapeRegExp("/remix/$id/hello.ts");
     expect(re).toMatchInlineSnapshot(
-      '"\\\\/remix\\\\/\\\\$id\\\\/hello\\\\.ts"'
+      `"\\/remix\\/\\$id\\/hello\\.ts"`
     );
     expect("/remix/$id/hello.ts".match(re)).toMatchInlineSnapshot(`
       [
