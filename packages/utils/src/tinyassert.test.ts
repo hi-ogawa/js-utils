@@ -50,7 +50,9 @@ describe(tinyassert, () => {
   });
 
   it("error without message", () => {
-    expect(() => tinyassert(false)).toThrowErrorMatchingInlineSnapshot(`[Error]`);
+    expect(() => tinyassert(false)).toThrowErrorMatchingInlineSnapshot(
+      `[Error]`
+    );
   });
 
   it("error with message", () => {

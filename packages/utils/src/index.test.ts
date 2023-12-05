@@ -573,9 +573,7 @@ describe(regExpRaw, () => {
     expect(re).toMatchInlineSnapshot(
       "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
     );
-    expect(re.source).toMatchInlineSnapshot(
-      `"\\/username\\/\\w+\\/profile"`
-    );
+    expect(re.source).toMatchInlineSnapshot(`"\\/username\\/\\w+\\/profile"`);
     expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
       [
         "/username/hey/profile",
@@ -589,9 +587,7 @@ describe(regExpRaw, () => {
     expect(re).toMatchInlineSnapshot(
       "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
     );
-    expect(re.source).toMatchInlineSnapshot(
-      `"\\/username\\/\\w+\\/profile"`
-    );
+    expect(re.source).toMatchInlineSnapshot(`"\\/username\\/\\w+\\/profile"`);
     expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
       [
         "/username/hey/profile",
@@ -604,9 +600,7 @@ describe(regExpRaw, () => {
 describe(escapeRegExp, () => {
   it("basic", () => {
     const re = escapeRegExp("/remix/$id/hello.ts");
-    expect(re).toMatchInlineSnapshot(
-      `"\\/remix\\/\\$id\\/hello\\.ts"`
-    );
+    expect(re).toMatchInlineSnapshot(`"\\/remix\\/\\$id\\/hello\\.ts"`);
     expect("/remix/$id/hello.ts".match(re)).toMatchInlineSnapshot(`
       [
         "/remix/$id/hello.ts",

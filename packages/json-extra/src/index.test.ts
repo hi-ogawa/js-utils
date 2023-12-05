@@ -1,4 +1,4 @@
-import { tinyassert } from "@hiogawa/utils";
+import { tinyassert, wrapError } from "@hiogawa/utils";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { ZodError, z } from "zod";
@@ -563,12 +563,18 @@ describe(createJsonExtra, () => {
       ]
     `);
 
-    expect(() => jsonExtra.stringify(original, null, 2))
-      .toThrowErrorMatchingInlineSnapshot(`
-        [TypeError: Converting circular structure to JSON
-            --> starting at object with constructor 'Array'
-            --- index 0 closes the circle]
-      `);
+    expect(wrapError(() => jsonExtra.stringify(original, null, 2)))
+      .toMatchInlineSnapshot(`
+      {
+        "ok": false,
+        "value": [TypeError: Converting circular structure to JSON
+          --> starting at object with constructor 'Array'
+          --- index 0 closes the circle],
+      }
+    `);
+
+    // TODO: multiline error message doesn't work with "toThrowErrorMatchingInlineSnapshot"?
+    expect(() => jsonExtra.stringify(original, null, 2)).toThrow();
   });
 
   describe("undefined", () => {
