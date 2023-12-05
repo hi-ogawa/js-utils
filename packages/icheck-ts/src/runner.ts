@@ -201,24 +201,20 @@ async function resolveImportSourceExperimental(
   // TODO: standardized as "sync" but still "async" in old nodejs
   // TODO: also what standardized doesn't throw when not found. https://github.com/nodejs/node/pull/49038
   //       Do we still need to do fs.existsSync to check?
-  const parentUrl = pathToFileURL(
-    path.join(baseDir, containingFile)
-  ).toString();
-  const resolved = await wrapErrorAsync(async () => resolve(source, parentUrl));
+  const parentUrl = pathToFileURL(path.join(baseDir, containingFile));
+  const resolved = await wrapErrorAsync(async () => {
+    const sourceUrl = await resolve(source, parentUrl.toString());
+    const sourcePath = fileURLToPath(sourceUrl);
+    tinyassert(fs.existsSync(sourcePath));
+    return sourcePath;
+  });
   if (!resolved.ok) {
     return {
       type: "unknown",
       name: source,
     };
   }
-  const sourcePath = fileURLToPath(resolved.value);
-  if (!fs.existsSync(sourcePath)) {
-    return {
-      type: "unknown",
-      name: source,
-    };
-  }
-  const relativePath = path.relative(baseDir, sourcePath);
+  const relativePath = path.relative(baseDir, resolved.value);
   if (relativePath.startsWith("..")) {
     return {
       type: "external",
