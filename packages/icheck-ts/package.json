@@ -31,6 +31,6 @@
     "typescript": "*"
   },
   "volta": {
-    "node": "18.19.0"
+    "extends": "../../package.json"
   }
 }
