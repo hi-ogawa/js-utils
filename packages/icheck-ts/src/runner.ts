@@ -198,10 +198,12 @@ async function resolveImportSourceExperimental(
       name: source,
     };
   }
-  const parentUrl = pathToFileURL(path.join(baseDir, containingFile));
   // TODO: standardized as "sync" but still "async" in old nodejs
   // TODO: also what standardized doesn't throw when not found. https://github.com/nodejs/node/pull/49038
   //       Do we still need to do fs.existsSync to check?
+  const parentUrl = pathToFileURL(
+    path.join(baseDir, containingFile)
+  ).toString();
   const resolved = await wrapErrorAsync(async () => resolve(source, parentUrl));
   if (!resolved.ok) {
     return {
