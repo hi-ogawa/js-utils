@@ -563,18 +563,12 @@ describe(createJsonExtra, () => {
       ]
     `);
 
-    expect(wrapError(() => jsonExtra.stringify(original, null, 2)))
-      .toMatchInlineSnapshot(`
-      {
-        "ok": false,
-        "value": [TypeError: Converting circular structure to JSON
-          --> starting at object with constructor 'Array'
-          --- index 0 closes the circle],
-      }
-    `);
-
-    // TODO: multiline error message doesn't work with "toThrowErrorMatchingInlineSnapshot"?
-    expect(() => jsonExtra.stringify(original, null, 2)).toThrow();
+    expect(() => jsonExtra.stringify(original, null, 2))
+      .toThrowErrorMatchingInlineSnapshot(`
+        [TypeError: Converting circular structure to JSON
+            --> starting at object with constructor 'Array'
+            --- index 0 closes the circle]
+      `);
   });
 
   describe("undefined", () => {
