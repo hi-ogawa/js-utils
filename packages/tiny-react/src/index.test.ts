@@ -83,11 +83,7 @@ describe(render, () => {
             },
           ],
           "parent": [Circular],
-          "slot": <span
-            class="text-red"
-          >
-            world
-          </span>,
+          "slot": hello,
           "type": "fragment",
           "vnode": {
             "children": [
@@ -239,7 +235,9 @@ describe(render, () => {
               },
             ],
             "parent": [Circular],
-            "slot": world,
+            "slot": <span>
+              hello
+            </span>,
             "type": "fragment",
             "vnode": {
               "children": [
@@ -731,9 +729,9 @@ describe(updateCustomNode, () => {
       </main>
     `);
     expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
-      <span>
-        y
-      </span>
+      <div>
+        x
+      </div>
     `);
 
     update1("p");
@@ -1678,10 +1676,10 @@ describe(memo, () => {
     `);
     expect(mockFnSnapshot()).toMatchInlineSnapshot(`
       [
-        "[render] x-hi 0",
         "[render] y-hi 0",
-        "[effect] x-hi 0",
+        "[render] x-hi 0",
         "[effect] y-hi 0",
+        "[effect] x-hi 0",
       ]
     `);
 
