@@ -1,4 +1,24 @@
-// TODO: how is it different from this? https://github.com/remix-run/remix/blob/1d3d86eaceb7784c56d34d963310ecbcb8c9637a/packages/remix-dev/channel.ts#L1-L2
+// inspired by
+//   ManualPromise https://github.com/microsoft/playwright/blob/10dda30c7f417a92f782e21368fbb211a679838a/packages/playwright-core/src/utils/manualPromise.ts#L31-L38
+//   createDefer https://github.com/vitest-dev/vitest/blob/9c552b6f8decb78677b20e870eb430184e0b78ea/packages/utils/src/helpers.ts#L155
+//   channel https://github.com/remix-run/remix/blob/9a845b6576fbaf112161f6f97295f6dbb44d913f/packages/remix-dev/channel.ts#L1-L2
+interface ManualPromise<T> extends PromiseLike<T> {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (value: unknown) => void;
+}
+
+export function createManualPromise<T>(): ManualPromise<T> {
+  let resolve!: ManualPromise<T>["resolve"];
+  let reject!: ManualPromise<T>["reject"];
+  const promise = new Promise<T>((resolve_, reject_) => {
+    resolve = resolve_;
+    reject = reject_;
+  });
+  return { promise, resolve, reject, then: promise.then.bind(promise) };
+}
+
+/** @deprecated use createManualPromise instead */
 export function newPromiseWithResolvers<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
   let reject!: (value: unknown) => void;
