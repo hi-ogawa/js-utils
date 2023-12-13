@@ -94,6 +94,7 @@ export type BCustom = {
   vnode: VCustom;
   child: BNode;
   hookContext: HookContext;
+  contextMap: ContextMap;
   parent: BNodeParent | null;
   slot: HNode | null;
   hparent: HNode | null; // null after unmounted so that we can skip already scheduled re-rendering
@@ -162,6 +163,42 @@ export function setBNodeParent(node: BNode, parent: BNodeParent) {
     node.parent = parent;
   }
 }
+
+//
+// context
+//
+
+export type ContextKey = {}; // key for ContextMap
+
+export interface Context<T> {
+  key: ContextKey;
+  Provider: FC<{ value: T; children?: VNode }>;
+  defaultValue: T;
+}
+
+export class ContextStore<T> {
+  public initial = true;
+  private listeners = new Set<() => void>();
+
+  constructor(public value: T) {}
+
+  subscribe(listener: () => void) {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  notify() {
+    for (const listener of this.listeners) {
+      listener();
+    }
+  }
+}
+
+export type ContextMap = Map<ContextKey, ContextStore<any>>;
+
+export const EMPTY_CONTEXT_MAP: ContextMap = new Map();
 
 //
 // jsx-runtime compatible VNode factory

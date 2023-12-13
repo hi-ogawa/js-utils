@@ -162,6 +162,7 @@ const useEffectInner = /* @__PURE__ */ defineHook((ctx) => ctx.useEffect);
 
 //
 // hooks implemented based on core hooks
+// (TODO: move to compat/hooks?)
 //
 
 export function useLayoutEffect(effect: EffectFn, deps?: unknown[]) {

@@ -1,4 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
+import { RenderContextManager } from "./context";
 import { HookContext } from "./hooks";
 import {
   type BCustom,
@@ -6,6 +7,8 @@ import {
   type BNode,
   type BTag,
   type BText,
+  type ContextMap,
+  EMPTY_CONTEXT_MAP,
   EMPTY_NODE,
   type HNode,
   NODE_TYPE_CUSTOM,
@@ -38,6 +41,7 @@ export function render(
     bnode,
     parent,
     undefined,
+    EMPTY_CONTEXT_MAP,
     effectManager,
     hydration
   );
@@ -59,12 +63,13 @@ function reconcileNode(
   bnode: BNode,
   hparent: HNode,
   preSlot: HNode | undefined,
+  contextMap: ContextMap,
   effectManager: EffectManager,
   isHydrate: boolean
 ): BNode {
   if (isHydrate) {
     tinyassert(bnode.type === NODE_TYPE_EMPTY);
-    bnode = hydrateNode(vnode, hparent, preSlot);
+    bnode = hydrateNode(vnode, hparent, preSlot, contextMap);
     preSlot = getBNodeSlot(bnode) ?? preSlot;
   }
   if (vnode.type === NODE_TYPE_EMPTY) {
@@ -92,6 +97,7 @@ function reconcileNode(
         bnode.child,
         bnode.hnode,
         undefined,
+        contextMap,
         effectManager,
         isHydrate
       );
@@ -105,6 +111,7 @@ function reconcileNode(
         EMPTY_NODE,
         hnode,
         undefined,
+        contextMap,
         effectManager,
         isHydrate
       );
@@ -177,6 +184,7 @@ function reconcileNode(
         bchildren[i] ?? EMPTY_NODE,
         hparent,
         preSlot,
+        contextMap,
         effectManager,
         isHydrate
       );
@@ -192,25 +200,32 @@ function reconcileNode(
       bnode.vnode.render === vnode.render
     ) {
       bnode.hookContext.notify = updateCustomNodeUnsupported;
-      const vchild = bnode.hookContext.wrap(() => vnode.render(vnode.props));
+      const [vchild, childContextMap] = bnode.hookContext.wrap(() =>
+        RenderContextManager.wrap(contextMap, () => vnode.render(vnode.props))
+      );
       bnode.child = reconcileNode(
         vchild,
         bnode.child,
         hparent,
         preSlot,
+        childContextMap,
         effectManager,
         isHydrate
       );
       bnode.vnode = vnode;
+      bnode.contextMap = contextMap;
     } else {
       unmount(bnode);
       const hookContext = new HookContext(updateCustomNodeUnsupported);
-      const vchild = hookContext.wrap(() => vnode.render(vnode.props));
+      const [vchild, childContextMap] = hookContext.wrap(() =>
+        RenderContextManager.wrap(contextMap, () => vnode.render(vnode.props))
+      );
       const child = reconcileNode(
         vchild,
         EMPTY_NODE,
         hparent,
         preSlot,
+        childContextMap,
         effectManager,
         isHydrate
       );
@@ -219,6 +234,7 @@ function reconcileNode(
         vnode,
         child,
         hookContext,
+        contextMap,
         hparent: null,
         parent: null,
         slot: null,
@@ -243,7 +259,8 @@ function reconcileNode(
 function hydrateNode(
   vnode: VNode,
   hparent: HNode,
-  preSlot: HNode | undefined
+  preSlot: HNode | undefined,
+  contextMap: ContextMap
 ): BNode {
   if (vnode.type === NODE_TYPE_EMPTY) {
     return EMPTY_NODE;
@@ -287,6 +304,7 @@ function hydrateNode(
       vnode,
       child: EMPTY_NODE,
       hookContext: new HookContext(updateCustomNodeUnsupported),
+      contextMap,
       hparent: null,
       parent: null,
       slot: null,
@@ -339,6 +357,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     bnode,
     bnode.hparent,
     preSlot,
+    bnode.contextMap,
     effectManager,
     false
   );

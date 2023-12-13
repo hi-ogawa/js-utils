@@ -1,13 +1,11 @@
-import { once } from "@hiogawa/utils";
 import { useEffect, useRef, useState } from "../hooks";
 import { render } from "../reconciler";
 import {
   type BNode,
   EMPTY_NODE,
   type FC,
-  NODE_TYPE_CUSTOM,
-  type VCustom,
   type VNode,
+  createVNode,
 } from "../virtual-dom";
 
 // non comprehensive compatibility features
@@ -53,36 +51,13 @@ export function memo<P extends {}>(
 ): FC<P> {
   // TODO: broken. wait for https://github.com/hi-ogawa/js-utils/pull/173
   function Memo(props: P) {
-    // we need to make `VCustom.render` stable,
-    // but `once(Fc)` has to be invalidated on props change.
-    // after "identical vnode" optimization is implemented,
-    // it can be simplified to
-    //   {
-    //     type: NODE_TYPE_CUSTOM,
-    //     render: Fc,
-    //     props,
-    //   }
-    const [state] = useState(() => {
-      const state: {
-        render: FC;
-        current?: { vnode: VCustom; onceFc: FC };
-      } = {
-        render: (props: any) => state.current!.onceFc(props),
-      };
-      return state;
-    });
-
-    if (!state.current || !isEqualProps(state.current.vnode.props, props)) {
-      state.current = {
-        vnode: {
-          type: NODE_TYPE_CUSTOM,
-          render: state.render,
-          props,
-        },
-        onceFc: once(Fc) as FC,
-      };
+    const prev = useRef<{ props: Readonly<P>; result: VNode } | undefined>(
+      undefined
+    );
+    if (!prev.current || !isEqualProps(prev.current.props, props)) {
+      prev.current = { props, result: createVNode(Fc, props) };
     }
-    return state.current.vnode;
+    return prev.current.result;
   }
   Object.defineProperty(Memo, "name", { value: `Memo(${Fc.name})` });
   return Memo;
