@@ -346,6 +346,12 @@ importers:
         specifier: ^4.4.11
         version: 4.4.11(@types/node@20.8.6)
 
+  packages/tiny-di:
+    devDependencies:
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+
   packages/tiny-rpc:
     devDependencies:
       '@brillout/json-serializer':

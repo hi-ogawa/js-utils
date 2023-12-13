@@ -17,6 +17,9 @@
       "path": "packages/sort-package-json"
     },
     {
+      "path": "packages/tiny-di"
+    },
+    {
       "path": "packages/theme-script"
     },
     {
