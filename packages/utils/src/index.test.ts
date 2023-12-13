@@ -11,7 +11,7 @@ import {
   typedBoolean,
 } from "./misc";
 import { mapOption, none } from "./option";
-import { newPromiseWithResolvers } from "./promise";
+import { createManualPromise } from "./promise";
 import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
 import {
   Err,
@@ -509,10 +509,10 @@ describe(none, () => {
   });
 });
 
-describe(newPromiseWithResolvers, () => {
+describe(createManualPromise, () => {
   it("resolve", async () => {
-    const { promise, resolve } = newPromiseWithResolvers<number>();
-    resolve(123);
+    const promise = createManualPromise<number>();
+    promise.resolve(123);
     const result = await wrapErrorAsync(() => promise);
     expect(result).toMatchInlineSnapshot(`
       {
@@ -523,8 +523,8 @@ describe(newPromiseWithResolvers, () => {
   });
 
   it("reject", async () => {
-    const { promise, reject } = newPromiseWithResolvers<number>();
-    reject(123);
+    const promise = createManualPromise<number>();
+    promise.reject(123);
     const result = await wrapErrorAsync(() => promise);
     expect(result).toMatchInlineSnapshot(`
       {
