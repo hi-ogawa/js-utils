@@ -22,8 +22,8 @@ export function vitePluginTinyRefresh(options?: {
     apply(config, env) {
       return env.command === "serve" && !config.build?.ssr;
     },
-    transform(code, id, _options) {
-      if (filter(id)) {
+    transform(code, id, transformOptions) {
+      if (!transformOptions?.ssr && filter(id)) {
         return hmrTransform(code, {
           bundler: "vite",
           runtime: options?.runtime ?? "react",
