@@ -314,7 +314,7 @@ function objectMapEntries<T extends object, K2 extends PropertyKey, V2>(
 export function objectMapValues<T extends object, V>(
   o: T,
   f: (v: T[keyof T], k: keyof T) => V
-): Record<keyof T, V> {
+): { [k in keyof T]: V } {
   return objectMapEntries(o, ([k, v]) => [k, f(v, k)]);
 }
 
