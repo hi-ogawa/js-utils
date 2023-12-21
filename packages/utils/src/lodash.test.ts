@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  expectTypeOf,
+  it,
+  vi,
+} from "vitest";
 import { LruCache } from "./cache";
 import {
   capitalize,
@@ -458,11 +466,11 @@ describe(`${objectMapValues.name}/${objectMapKeys.name}`, () => {
     };
     {
       const result = objectMapValues(o, (v, k) => (v ? k.repeat(v) : "bad-v"));
-      result satisfies {
+      expectTypeOf(result).toEqualTypeOf<{
         x: string;
         y?: string;
         z?: string;
-      };
+      }>();
       expect(result).toMatchInlineSnapshot(`
         {
           "x": "xxx",
