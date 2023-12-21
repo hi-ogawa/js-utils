@@ -305,7 +305,7 @@ describe(objectPick, () => {
         "x": 0,
       }
     `);
-    expectTypeOf(result).toEqualTypeOf<{ x: number }>();
+    expectTypeOf(result).toEqualTypeOf<{ x: 0 }>();
   });
 });
 
