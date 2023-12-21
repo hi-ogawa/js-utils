@@ -26,6 +26,7 @@ describe(zArg, () => {
           fix: boolean;
           mode: number;
         }>();
+        return args;
       }
     );
 
