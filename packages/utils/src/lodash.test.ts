@@ -468,9 +468,8 @@ describe(`${objectMapValues.name}/${objectMapKeys.name}`, () => {
       const result = objectMapValues(o, (v, k) => (v ? k.repeat(v) : "bad-v"));
       expectTypeOf(result).toEqualTypeOf<{
         x: string;
-        // TODO: these should be optional
-        y: string;
-        z: string;
+        y?: string;
+        z?: string;
       }>();
       expect(result).toMatchInlineSnapshot(`
         {
