@@ -23,11 +23,13 @@ describe(TinyCli, () => {
           port: arg.number("dev server port", { default: 5172 }),
         },
       },
-      ({ args }) =>
+      ({ args }) => {
         expectTypeOf(args).toEqualTypeOf<{
           host: string;
           port: number;
-        }>()
+        }>();
+        return args;
+      }
     );
 
     cli.defineCommand(
