@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  expectTypeOf,
+  it,
+  vi,
+} from "vitest";
 import { LruCache } from "./cache";
 import {
   capitalize,
@@ -277,12 +285,13 @@ describe(objectPick, () => {
       x: 0,
       y: 1,
     } as const;
-    const result = objectPick(o, ["x"]) satisfies { x: 0 };
+    const result = objectPick(o, ["x"]);
     expect(result).toMatchInlineSnapshot(`
       {
         "x": 0,
       }
     `);
+    expectTypeOf(result).toEqualTypeOf<{ readonly x: 0 }>();
   });
 
   it("record", () => {
@@ -290,12 +299,13 @@ describe(objectPick, () => {
       x: 0,
       y: 1,
     };
-    const result = objectPick(o, ["x"]) satisfies { x: number };
+    const result = objectPick(o, ["x"]);
     expect(result).toMatchInlineSnapshot(`
       {
         "x": 0,
       }
     `);
+    expectTypeOf(result).toEqualTypeOf<{ x: number }>();
   });
 });
 
