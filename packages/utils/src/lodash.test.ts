@@ -466,11 +466,12 @@ describe(`${objectMapValues.name}/${objectMapKeys.name}`, () => {
     };
     {
       const result = objectMapValues(o, (v, k) => (v ? k.repeat(v) : "bad-v"));
-      result satisfies {
+      expectTypeOf(result).toEqualTypeOf<{
         x: string;
-        y?: string;
-        z?: string;
-      };
+        // TODO: these should be optional
+        y: string;
+        z: string;
+      }>();
       expect(result).toMatchInlineSnapshot(`
         {
           "x": "xxx",
@@ -480,7 +481,7 @@ describe(`${objectMapValues.name}/${objectMapKeys.name}`, () => {
     }
     {
       const result = objectMapKeys(o, (v, k) => (v ? k.repeat(v) : "bad-k"));
-      result satisfies Partial<Record<string, number>>;
+      expectTypeOf(result).toEqualTypeOf<Record<string, number | undefined>>();
       expect(result).toMatchInlineSnapshot(`
         {
           "bad-k": undefined,
@@ -516,8 +517,8 @@ describe(isNil, () => {
   it("typing-1", () => {
     const ls = [0, true, false, null, undefined] as const;
 
-    ls.filter(isNil) satisfies (null | undefined)[];
-    ls.filter(isNotNil) satisfies (0 | true | false)[];
+    expectTypeOf(ls.filter(isNil)).toEqualTypeOf<(null | undefined)[]>();
+    expectTypeOf(ls.filter(isNotNil)).toEqualTypeOf<(0 | true | false)[]>();
 
     expect(ls.filter(isNil)).toMatchInlineSnapshot(`
       [
@@ -533,15 +534,15 @@ describe(isNil, () => {
     expect(isNil(x)).toMatchInlineSnapshot("true");
 
     if (isNil(x)) {
-      x satisfies undefined;
+      expectTypeOf(x).toBeUndefined();
     } else {
-      x satisfies number;
+      expectTypeOf(x).toBeNumber();
     }
 
     if (isNotNil(x)) {
-      x satisfies number;
+      expectTypeOf(x).toBeNumber();
     } else {
-      x satisfies undefined;
+      expectTypeOf(x).toBeUndefined();
     }
   });
 });
