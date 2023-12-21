@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { z } from "zod";
 import { TinyCliCommand } from "./cli";
 import { zArg } from "./zod";
@@ -20,12 +20,13 @@ describe(zArg, () => {
           mode: z.coerce.number().default(123).describe("some setting"),
         },
       },
-      ({ args }) =>
-        args satisfies {
+      ({ args }) => {
+        expectTypeOf(args).toEqualTypeOf<{
           files: string[];
           fix: boolean;
           mode: number;
-        }
+        }>();
+      }
     );
 
     expect(cli.help()).toMatchInlineSnapshot(`

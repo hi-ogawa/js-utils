@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import { z } from "zod";
 import { TinyCli, TinyCliCommand } from "./cli";
 import { arg } from "./presets";
@@ -24,10 +24,10 @@ describe(TinyCli, () => {
         },
       },
       ({ args }) =>
-        args satisfies {
+        expectTypeOf(args).toEqualTypeOf<{
           host: string;
           port: number;
-        }
+        }>()
     );
 
     cli.defineCommand(

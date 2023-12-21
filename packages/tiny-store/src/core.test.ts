@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import { createTinyStore, tinyStoreSelect, tinyStoreTransform } from "./core";
 
 describe(createTinyStore, () => {
@@ -114,10 +114,10 @@ describe(tinyStoreSelect, () => {
       },
     });
     const store2 = tinyStoreSelect(store1, (v) => v.name);
-    store2.set satisfies null;
+    expectTypeOf(store2.set).toBeNull();
 
     const store3 = tinyStoreSelect(store2, (v) => v.first);
-    store3.set satisfies null;
+    expectTypeOf(store3.set).toBeNull();
 
     const snapshots = [store2.get()];
     expect(snapshots.at(-1)).toMatchInlineSnapshot(`
