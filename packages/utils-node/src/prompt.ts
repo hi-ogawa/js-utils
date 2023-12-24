@@ -1,6 +1,7 @@
 import readline from "node:readline";
+import { promisify } from "node:util";
 import { createManualPromise } from "@hiogawa/utils";
-import { CSI, cursorTo } from "./prompt-utils";
+import { CSI, computeHeight } from "./prompt-utils";
 
 // cf. https://github.com/google/zx/blob/956dcc3bbdd349ac4c41f8db51add4efa2f58456/src/goods.ts#L83
 export async function promptQuestion(query: string): Promise<string> {
@@ -27,38 +28,36 @@ export async function promptAutocomplete(config: {
   message: string;
   loadOptions: (input: string) => Promise<string[]>;
 }): Promise<AutocompleteResult> {
+  const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<AutocompleteResult>();
   let input = "";
-  let output = "";
 
-  async function write(s: string) {
-    const manual = createManualPromise<void>();
-    process.stdout.write(s, (err) =>
-      err ? manual.reject(err) : manual.resolve()
-    );
-    await manual;
-  }
-
-  // TODO: async handler race condition
-  async function render() {
+  async function render(renderOptions?: { done?: boolean }) {
     const options = await config.loadOptions(input);
 
-    // TODO: pagination based on process.stdout.rows?
     const part1 = config.message + " > " + input;
+    if (renderOptions?.done) {
+      await write(part1);
+      return;
+    }
+
+    // TODO: pagination based on process.stdout.rows?
     const part2 = options
       .slice(0, 20)
       .map((v) => `    ${v}\n`)
       .join("");
+    const content = [part1, "\n", part2].join("");
 
-    // simple clear full screen
-    output = [`${CSI}2J`, cursorTo(0, 0), part1, "\n", part2].join("");
-    await write(output);
-
-    // TODO: keep track of last output and clear only previously rendered lines
-    // (this is what prompts, clack, etc.. does)
-    // process.stdout.columns;
+    // 1. clean screen below
+    // 2. write content
+    // 3. reset cursor position
+    const height = computeHeight(content, process.stdout.columns);
+    await write(
+      [`${CSI}0J`, content, `${CSI}${height - 1}A`, `${CSI}1G`].join("")
+    );
   }
 
+  // TODO: async handler race condition
   const dispose = setupKeypressHandler(async (str: string, key: KeyInfo) => {
     // TODO: more special keys
     // https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/util/action.js#L18-L26
@@ -75,18 +74,17 @@ export async function promptAutocomplete(config: {
     } else {
       input += str;
     }
-    render();
+    await render();
   });
 
   try {
-    // await write(`${CSI}?25l`); // hide cursor
-    render();
+    await write(`${CSI}?25l`); // hide cursor
+    await render();
     return await manual.promise;
   } finally {
-    // TODO: render final result
-    // render()
+    await render({ done: true });
     await write(`${CSI}0J`); // clean below
-    // await write(`${CSI}?25h`); // show cursor
+    await write(`${CSI}?25h`); // show cursor
     dispose();
   }
 }
