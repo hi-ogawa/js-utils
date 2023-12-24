@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { type RequestHandler } from "@hattip/compose";
 import { tinyassert } from "@hiogawa/utils";
+import { expectTypeOf } from "vitest";
 import { z } from "zod";
 import { validateFn } from "../validation";
 
@@ -51,7 +52,7 @@ export function defineTestRpcRoutes() {
     // define with zod validation + input type inference
     incrementCounter: validateFn(z.object({ delta: z.number().default(1) }))(
       (input) => {
-        input satisfies { delta: number };
+        expectTypeOf(input).toEqualTypeOf<{ delta: number }>();
         counter += input.delta;
         return counter;
       }
