@@ -39,6 +39,8 @@ export async function promptAutocomplete(config: {
     await manual;
   }
 
+  let first = true;
+
   // TODO: async handler race condition
   async function render() {
     const options = await config.loadOptions(input);
@@ -50,16 +52,16 @@ export async function promptAutocomplete(config: {
       .map((v) => `    ${v}\n`)
       .join("");
 
-    // simple full screen reset
-    output = [
-      `${CSI}2J`,
-      cursorTo(0, 0),
-      part1,
-      `${CSI}s`,
-      "\n",
-      part2,
-      `${CSI}u`,
-    ].join("");
+    // simple clear full screen
+    // output = [`${CSI}2J`, cursorTo(0, 0), part1, "\n", part2].join("");
+    // await write(output);
+
+    // restore last position and clear only lines below
+    if (!first) {
+      await write(`${ESC}8`);
+    }
+    await write(`${ESC}7`);
+    output = [`${CSI}0J`, cursorTo(0), part1, "\n", part2].join("");
     await write(output);
 
     // clean only single line
@@ -70,7 +72,10 @@ export async function promptAutocomplete(config: {
     // await write(output);
 
     // TODO: keep track of last output and clear only previously rendered lines
+    // (this is what prompts, clack, etc.. does)
     // process.stdout.columns;
+
+    first = false;
   }
 
   const dispose = setupKeypressHandler(async (str: string, key: KeyInfo) => {
@@ -93,10 +98,14 @@ export async function promptAutocomplete(config: {
   });
 
   try {
+    await write(`${CSI}?25l`); // hide cursor
     render();
     return await manual.promise;
   } finally {
-    await write(`${CSI}0J`);
+    // TODO: render final result
+    // render()
+    await write(`${CSI}0J`); // clean below
+    await write(`${CSI}?25h`); // show cursor
     dispose();
   }
 }
