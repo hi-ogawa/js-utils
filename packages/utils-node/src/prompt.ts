@@ -1,7 +1,13 @@
 import readline from "node:readline";
 import { promisify } from "node:util";
 import { createManualPromise } from "@hiogawa/utils";
-import { CSI, computeHeight } from "./prompt-utils";
+import {
+  CSI,
+  type KeyInfo,
+  computeHeight,
+  getSpecialKey,
+  setupKeypressHandler,
+} from "./prompt-utils";
 
 // cf. https://github.com/google/zx/blob/956dcc3bbdd349ac4c41f8db51add4efa2f58456/src/goods.ts#L83
 export async function promptQuestion(query: string): Promise<string> {
@@ -30,6 +36,7 @@ export async function promptAutocomplete(config: {
 }): Promise<AutocompleteResult> {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<AutocompleteResult>();
+
   let input = "";
 
   async function render(renderOptions?: { done?: boolean }) {
@@ -58,21 +65,28 @@ export async function promptAutocomplete(config: {
   }
 
   // TODO: async handler race condition
-  async function keypressHandler(str: string, key: KeyInfo) {
-    // TODO: more special keys
-    // https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/util/action.js#L18-L26
-    if (key.name === "escape" || (key.ctrl && key.name === "c")) {
-      manual.resolve({ input, value: "", ok: false });
-      return;
-    }
-    if (key.name === "return" || key.name === "enter") {
-      manual.resolve({ input, value: input, ok: true });
-      return;
-    }
-    if (key.name === "backspace") {
-      input = input.slice(0, -1);
-    } else {
-      input += str;
+  async function keypressHandler(str: string | undefined, key: KeyInfo) {
+    switch (getSpecialKey(str, key)) {
+      case "abort":
+      case "escape": {
+        manual.resolve({ input, value: "", ok: false });
+        return;
+      }
+      case "enter":
+      case "return": {
+        manual.resolve({ input, value: input, ok: true });
+        return;
+      }
+      case "backspace": {
+        input = input.slice(0, -1);
+        break;
+      }
+      default: {
+        if (typeof str === "undefined") {
+          return;
+        }
+        input += str;
+      }
     }
     await render();
   }
@@ -95,39 +109,4 @@ interface AutocompleteResult {
   input: string;
   value: string;
   ok: boolean;
-}
-
-//
-// keypress event utils
-//
-
-interface KeyInfo {
-  sequence: string;
-  name: string;
-  ctrl: boolean;
-  meta: boolean;
-  shift: boolean;
-}
-
-function setupKeypressHandler(handler: (str: string, key: KeyInfo) => void) {
-  // setup
-  const stdin = process.stdin;
-  const rl = readline.createInterface({
-    input: stdin,
-  });
-  readline.emitKeypressEvents(stdin, rl);
-  let previousRawMode = stdin.isRaw;
-  if (stdin.isTTY) {
-    stdin.setRawMode(true);
-  }
-  stdin.on("keypress", handler);
-
-  // teardown
-  return () => {
-    stdin.off("keypress", handler);
-    if (stdin.isTTY) {
-      stdin.setRawMode(previousRawMode);
-    }
-    rl.close();
-  };
 }
