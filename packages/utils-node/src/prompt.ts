@@ -58,7 +58,7 @@ export async function promptAutocomplete(config: {
   }
 
   // TODO: async handler race condition
-  const dispose = setupKeypressHandler(async (str: string, key: KeyInfo) => {
+  async function keypressHandler(str: string, key: KeyInfo) {
     // TODO: more special keys
     // https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/util/action.js#L18-L26
     if (key.name === "escape" || (key.ctrl && key.name === "c")) {
@@ -75,17 +75,19 @@ export async function promptAutocomplete(config: {
       input += str;
     }
     await render();
-  });
+  }
 
+  let dispose: (() => void) | undefined;
   try {
     await write(`${CSI}?25l`); // hide cursor
     await render();
+    dispose = setupKeypressHandler(keypressHandler);
     return await manual.promise;
   } finally {
+    dispose?.();
     await render({ done: true });
     await write(`${CSI}0J`); // clean below
     await write(`${CSI}?25h`); // show cursor
-    dispose();
   }
 }
 
