@@ -1,4 +1,5 @@
 import readline from "node:readline";
+import { createManualPromise } from "@hiogawa/utils";
 
 // cf. https://github.com/google/zx/blob/956dcc3bbdd349ac4c41f8db51add4efa2f58456/src/goods.ts#L83
 export async function promptQuestion(query: string): Promise<string> {
@@ -12,9 +13,9 @@ export async function promptQuestion(query: string): Promise<string> {
     process.kill(process.pid, "SIGINT");
   });
   try {
-    return await new Promise((resolve) => {
-      rl.question(query, (v) => resolve(v));
-    });
+    const manual = createManualPromise<string>();
+    rl.question(query, (v) => manual.resolve(v));
+    return manual.promise;
   } finally {
     rl.close();
   }
