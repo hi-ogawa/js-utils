@@ -1,6 +1,6 @@
 import readline from "node:readline";
 import { createManualPromise } from "@hiogawa/utils";
-import { CSI, ESC, cursorTo } from "./prompt-utils";
+import { CSI, cursorTo } from "./prompt-utils";
 
 // cf. https://github.com/google/zx/blob/956dcc3bbdd349ac4c41f8db51add4efa2f58456/src/goods.ts#L83
 export async function promptQuestion(query: string): Promise<string> {
@@ -39,8 +39,6 @@ export async function promptAutocomplete(config: {
     await manual;
   }
 
-  let first = true;
-
   // TODO: async handler race condition
   async function render() {
     const options = await config.loadOptions(input);
@@ -53,36 +51,12 @@ export async function promptAutocomplete(config: {
       .join("");
 
     // simple clear full screen
-    // output = [`${CSI}2J`, cursorTo(0, 0), part1, "\n", part2].join("");
-    // await write(output);
-
-    // restore last position and clear only lines below
-    if (!first) {
-      // ESC;
-      // await write(`${ESC}8`);
-      // await write(`${CSI}s`);
-    }
-    // ESC;
-
-    await write(`${ESC}7`);
-    // await write(`${CSI}s`);
-    output = [`${CSI}0J`, cursorTo(0), part1, "\n", part2].join("");
+    output = [`${CSI}2J`, cursorTo(0, 0), part1, "\n", part2].join("");
     await write(output);
-    // await write(`${CSI}u`);
-    await write(`${ESC}8`);
-
-    // clean only single line
-    // (TODO: this doesn't work when prompt becomes more than one line)
-    // output = [`${CSI}0J`, `${CSI}2K`, cursorTo(0), part1, `${ESC}7`].join("");
-    // await write(output);
-    // output = ["\n", part2, `${ESC}8`].join("");
-    // await write(output);
 
     // TODO: keep track of last output and clear only previously rendered lines
     // (this is what prompts, clack, etc.. does)
     // process.stdout.columns;
-
-    first = false;
   }
 
   const dispose = setupKeypressHandler(async (str: string, key: KeyInfo) => {
@@ -105,10 +79,6 @@ export async function promptAutocomplete(config: {
   });
 
   try {
-    // await write(`${CSI}1J`);
-    await write(`${CSI}2J`);
-    // await write(`${CSI}2S`);
-
     // await write(`${CSI}?25l`); // hide cursor
     render();
     return await manual.promise;
