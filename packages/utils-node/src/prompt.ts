@@ -1,9 +1,6 @@
 import readline from "node:readline";
 import { createManualPromise } from "@hiogawa/utils";
-import {
-  cursorTo,
-  kClearLine,
-} from "./prompt-utils";
+import { cursorTo, kClearLine } from "./prompt-utils";
 
 // cf. https://github.com/google/zx/blob/956dcc3bbdd349ac4c41f8db51add4efa2f58456/src/goods.ts#L83
 export async function promptQuestion(query: string): Promise<string> {
@@ -52,7 +49,7 @@ export async function promptAutocomplete(config: {
   }
 
   const dispose = setupKeypressHandler(async (str: string, key: KeyInfo) => {
-    // TODO: move command
+    // TODO: more special keys
     // https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/util/action.js#L18-L26
     if (key.name === "escape" || (key.ctrl && key.name === "c")) {
       manual.resolve({ input, value: "", ok: false });
