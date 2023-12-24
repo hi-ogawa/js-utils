@@ -48,7 +48,7 @@ export async function promptAutocomplete(config: {
     // TODO: pagination based on process.stdout.rows?
     const part1 = config.message + " > " + input;
     const part2 = options
-      .slice(0, 10)
+      .slice(0, 20)
       .map((v) => `    ${v}\n`)
       .join("");
 
@@ -58,11 +58,18 @@ export async function promptAutocomplete(config: {
 
     // restore last position and clear only lines below
     if (!first) {
-      await write(`${ESC}8`);
+      // ESC;
+      // await write(`${ESC}8`);
+      // await write(`${CSI}s`);
     }
+    // ESC;
+
     await write(`${ESC}7`);
+    // await write(`${CSI}s`);
     output = [`${CSI}0J`, cursorTo(0), part1, "\n", part2].join("");
     await write(output);
+    // await write(`${CSI}u`);
+    await write(`${ESC}8`);
 
     // clean only single line
     // (TODO: this doesn't work when prompt becomes more than one line)
@@ -98,14 +105,18 @@ export async function promptAutocomplete(config: {
   });
 
   try {
-    await write(`${CSI}?25l`); // hide cursor
+    // await write(`${CSI}1J`);
+    await write(`${CSI}2J`);
+    // await write(`${CSI}2S`);
+
+    // await write(`${CSI}?25l`); // hide cursor
     render();
     return await manual.promise;
   } finally {
     // TODO: render final result
     // render()
     await write(`${CSI}0J`); // clean below
-    await write(`${CSI}?25h`); // show cursor
+    // await write(`${CSI}?25h`); // show cursor
     dispose();
   }
 }
