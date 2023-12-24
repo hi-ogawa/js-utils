@@ -15,7 +15,7 @@ export async function promptQuestion(query: string): Promise<string> {
   try {
     const manual = createManualPromise<string>();
     rl.question(query, (v) => manual.resolve(v));
-    return manual.promise;
+    return await manual.promise;
   } finally {
     rl.close();
   }
