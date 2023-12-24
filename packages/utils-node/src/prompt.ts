@@ -1,6 +1,6 @@
 import readline from "node:readline";
 import { createManualPromise } from "@hiogawa/utils";
-import { cursorTo, kClearLine } from "./prompt-utils";
+import { CSI, ESC, cursorTo } from "./prompt-utils";
 
 // cf. https://github.com/google/zx/blob/956dcc3bbdd349ac4c41f8db51add4efa2f58456/src/goods.ts#L83
 export async function promptQuestion(query: string): Promise<string> {
@@ -31,21 +31,46 @@ export async function promptAutocomplete(config: {
   let input = "";
   let output = "";
 
+  async function write(s: string) {
+    const manual = createManualPromise<void>();
+    process.stdout.write(s, (err) =>
+      err ? manual.reject(err) : manual.resolve()
+    );
+    await manual;
+  }
+
+  // TODO: async handler race condition
   async function render() {
     const options = await config.loadOptions(input);
-    // TODO: clear last output
-    // TODO: move cursor
+
+    // TODO: pagination based on process.stdout.rows?
+    const part1 = config.message + " > " + input;
+    const part2 = options
+      .slice(0, 10)
+      .map((v) => `    ${v}\n`)
+      .join("");
+
+    // simple full screen reset
     output = [
-      kClearLine,
-      cursorTo(0),
-      config.message + " > " + input,
+      `${CSI}2J`,
+      cursorTo(0, 0),
+      part1,
+      `${CSI}s`,
       "\n",
-      options
-        .slice(0, 10)
-        .map((v) => `    ${v}\n`)
-        .join(""),
+      part2,
+      `${CSI}u`,
     ].join("");
-    process.stdout.write(output);
+    await write(output);
+
+    // clean only single line
+    // (TODO: this doesn't work when prompt becomes more than one line)
+    // output = [`${CSI}0J`, `${CSI}2K`, cursorTo(0), part1, `${ESC}7`].join("");
+    // await write(output);
+    // output = ["\n", part2, `${ESC}8`].join("");
+    // await write(output);
+
+    // TODO: keep track of last output and clear only previously rendered lines
+    // process.stdout.columns;
   }
 
   const dispose = setupKeypressHandler(async (str: string, key: KeyInfo) => {
@@ -71,6 +96,7 @@ export async function promptAutocomplete(config: {
     render();
     return await manual.promise;
   } finally {
+    await write(`${CSI}0J`);
     dispose();
   }
 }

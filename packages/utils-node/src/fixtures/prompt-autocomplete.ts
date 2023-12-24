@@ -10,7 +10,7 @@ demo
 
 async function main() {
   const result = await promptAutocomplete({
-    message: "select node builtin module?",
+    message: "Q. select node builtin module?",
     loadOptions: async (input) => {
       return builtinModules.filter(v => v.includes(input));
     }
