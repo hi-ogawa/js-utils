@@ -1,10 +1,10 @@
-import { Buffer } from "node:buffer";
 import {
   type ChildProcess,
   type SpawnOptions,
   spawn as childProcessSpawn,
 } from "node:child_process";
 import process from "node:process";
+import { createManualPromise } from "@hiogawa/utils";
 
 // too simple but maybe useful enough version of
 // https://github.com/google/zx
@@ -24,7 +24,7 @@ type NewOptions = SpawnOptions & { _?: Partial<HelperOptions> };
 
 export function $new(options: NewOptions = {}) {
   // currently there's no special quoting or escaping so it's equivalent to normal string literal template.
-  // for now, limit to `string | number` since that's the same usage.
+  // for now, limit to `string | number` since that feels a reasonable usage.
   function $(strings: TemplateStringsArray, ...params: (string | number)[]) {
     // process options
     const spawnOptions: SpawnOptions = {
@@ -79,57 +79,46 @@ class SpawnPromiseLike implements PromiseLike<string> {
   ) {
     const child = helperOptions.spawn(this.command, this.options);
     this.child = child;
-    this.promise = new Promise<string>((resolve, reject) => {
-      child.stdout?.on("data", (raw: unknown) => {
-        processOutput(raw, (v) => (this.stdout += v), reject);
-      });
 
-      child.stderr?.on("data", (raw: unknown) => {
-        processOutput(raw, (v) => (this.stderr += v), reject);
-      });
+    const manual = createManualPromise<string>();
+    this.promise = manual.promise;
 
-      child.on("close", (code) => {
-        if (code === 0) {
-          let stdout = this.stdout;
-          if (!this.helperOptions.noTrim) {
-            stdout = stdout.trim();
-          }
-          resolve(stdout);
-        } else {
-          reject(
-            new Error(`ScriptError`, {
-              cause: {
-                command,
-                code,
-                stdout: this.stdout,
-                stderr: this.stderr,
-              },
-            })
-          );
+    child.stdout?.on("data", (raw) => {
+      this.stdout += raw.toString();
+    });
+
+    child.stderr?.on("data", (raw) => {
+      this.stderr += raw.toString();
+    });
+
+    child.on("close", (code) => {
+      if (code === 0) {
+        let stdout = this.stdout;
+        if (!this.helperOptions.noTrim) {
+          stdout = stdout.trim();
         }
-      });
+        manual.resolve(stdout);
+      } else {
+        manual.reject(
+          new Error(`ScriptError`, {
+            cause: {
+              command,
+              code,
+              stdout: this.stdout,
+              stderr: this.stderr,
+            },
+          })
+        );
+      }
+    });
 
-      child.on("error", (err) => {
-        reject(err);
-      });
+    child.on("error", (err) => {
+      manual.reject(err);
     });
   }
 
   // delegate promise api
   then: PromiseLike<string>["then"] = (...args) => this.promise.then(...args);
-}
-
-function processOutput(
-  raw: unknown,
-  onSuccess: (v: string) => void,
-  onError: (v: unknown) => void
-) {
-  if (typeof raw === "string") {
-    return onSuccess(raw);
-  } else if (raw instanceof Buffer) {
-    return onSuccess(raw.toString());
-  }
-  onError(new Error("unknown data", { cause: raw }));
 }
 
 function formatNow() {
