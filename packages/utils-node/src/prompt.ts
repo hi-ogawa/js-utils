@@ -44,34 +44,46 @@ export async function promptAutocomplete(options: {
   let suggestions: string[] = [];
   let suggestionIndex = 0;
   let done = false;
+  let offset = 0;
   const limit = options.limit ?? Math.min(10, process.stdout.rows - 5);
   const hideCursor = options.hideCursor ?? true;
 
-  async function render() {
-    // update states
+  async function updateSuggestions() {
     suggestions = await options.suggest(input);
+    suggestionIndex = 0;
+    offset = 0;
+    value = suggestions[suggestionIndex];
+  }
+
+  function moveSelection(dir: -1 | 1) {
+    suggestionIndex += dir;
     suggestionIndex = Math.min(
       Math.max(suggestionIndex, 0),
       suggestions.length - 1
     );
     value = suggestions[suggestionIndex];
 
-    // render
+    // scroll `offset` to keep `suggestionIndex` in range
+    if (suggestionIndex < offset) {
+      offset = suggestionIndex;
+    }
+    if (offset + limit <= suggestionIndex) {
+      offset = suggestionIndex + 1 - limit;
+    }
+  }
+
+  async function render() {
     let content = options.message + input;
     if (done) {
       await write(`${CSI}0J` + content);
       return;
     }
 
-    // TODO: scroll page
-    content = [
-      content,
-      "\n",
-      suggestions
-        .slice(0, limit)
-        .map((v, i) => `  ${i === suggestionIndex ? "*" : " "} ${v}\n`)
-        .join(""),
-    ].join("");
+    content += "\n";
+    content += suggestions
+      .slice(offset, offset + limit)
+      .map((v, i) => `  ${i + offset === suggestionIndex ? "*" : " "} ${v}\n`)
+      .join("");
 
     // TODO: vscode's terminal have funky behavior when content height exceeds terminal height?
     // TODO: IME (e.g Japanese input) cursor is currently not considered.
@@ -99,16 +111,16 @@ export async function promptAutocomplete(options: {
         return;
       }
       case "up": {
-        suggestionIndex -= 1;
+        moveSelection(-1);
         break;
       }
       case "down": {
-        suggestionIndex += 1;
+        moveSelection(1);
         break;
       }
       case "backspace": {
         input = input.slice(0, -1);
-        suggestionIndex = 0;
+        await updateSuggestions();
         break;
       }
       default: {
@@ -116,7 +128,7 @@ export async function promptAutocomplete(options: {
           return;
         }
         input += str;
-        suggestionIndex = 0;
+        await updateSuggestions();
       }
     }
     await render();
@@ -127,6 +139,7 @@ export async function promptAutocomplete(options: {
     if (hideCursor) {
       await write(`${CSI}?25l`); // hide cursor
     }
+    await updateSuggestions();
     await render();
     dispose = setupKeypressHandler(keypressHandler);
     await manual.promise;
