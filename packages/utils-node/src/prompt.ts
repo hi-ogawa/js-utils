@@ -63,13 +63,13 @@ export async function promptAutocomplete(options: {
       return;
     }
 
-    // TODO: highlight `suggestionIndex`
+    // TODO: scroll page
     content = [
       content,
       "\n",
       suggestions
         .slice(0, limit)
-        .map((v) => `    ${v}\n`)
+        .map((v, i) => `  ${i === suggestionIndex ? "*" : " "} ${v}\n`)
         .join(""),
     ].join("");
 
