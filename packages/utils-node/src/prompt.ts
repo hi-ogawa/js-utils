@@ -30,32 +30,44 @@ export async function promptQuestion(query: string): Promise<string> {
 }
 
 // cf. https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/elements/autocomplete.js#L97-L108
-export async function promptAutocomplete(config: {
+export async function promptAutocomplete(options: {
   message: string;
-  loadOptions: (input: string) => Promise<string[]>;
+  suggest: (input: string) => string[] | Promise<string[]>;
 }) {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<void>();
 
   let input = "";
   let value: string | undefined;
+  let suggestions: string[] = [];
+  let suggestionIndex = 0;
   let done = false;
 
   async function render() {
-    const options = await config.loadOptions(input);
+    // update states
+    suggestions = await options.suggest(input);
+    suggestionIndex = Math.min(
+      Math.max(suggestionIndex, 0),
+      suggestions.length - 1
+    );
+    value = suggestions[suggestionIndex];
 
-    const part1 = config.message + input;
+    // render
+    let content = options.message + input;
     if (done) {
-      await write(part1);
+      await write(`${CSI}0J` + content);
       return;
     }
 
-    // TODO: pagination based on process.stdout.rows?
-    const part2 = options
-      .slice(0, 20)
-      .map((v) => `    ${v}\n`)
-      .join("");
-    const content = [part1, "\n", part2].join("");
+    content = [
+      content,
+      "\n",
+      // TODO: pagination based on process.stdout.rows?
+      suggestions
+        .slice(0, 10)
+        .map((v) => `    ${v}\n`)
+        .join(""),
+    ].join("");
 
     // 1. clean screen below
     // 2. write content
@@ -78,13 +90,21 @@ export async function promptAutocomplete(config: {
       }
       case "enter":
       case "return": {
-        value = input;
         done = true;
         manual.resolve();
         return;
       }
+      case "up": {
+        suggestionIndex -= 1;
+        break;
+      }
+      case "down": {
+        suggestionIndex += 1;
+        break;
+      }
       case "backspace": {
         input = input.slice(0, -1);
+        suggestionIndex = 0;
         break;
       }
       default: {
@@ -92,6 +112,7 @@ export async function promptAutocomplete(config: {
           return;
         }
         input += str;
+        suggestionIndex = 0;
       }
     }
     await render();
@@ -99,15 +120,14 @@ export async function promptAutocomplete(config: {
 
   let dispose: (() => void) | undefined;
   try {
-    await write(`${CSI}?25l`); // hide cursor
+    // await write(`${CSI}?25l`); // hide cursor
     await render();
     dispose = setupKeypressHandler(keypressHandler);
     await manual.promise;
     return { input, value };
   } finally {
     dispose?.();
-    await write(`${CSI}0J`); // clean below
     await render();
-    await write(`${CSI}?25h`); // show cursor
+    // await write(`${CSI}?25h`); // show cursor
   }
 }

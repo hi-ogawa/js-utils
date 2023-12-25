@@ -11,7 +11,7 @@ demo
 async function main() {
   const result = await promptAutocomplete({
     message: "Q. select node builtin module > ",
-    loadOptions: async (input) => {
+    suggest: (input) => {
       return builtinModules.filter(v => v.includes(input));
     }
   });
