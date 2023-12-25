@@ -116,22 +116,16 @@ export type PromptEvent =
       data: PromptEventMap["input"];
     };
 
+// TODO: rename to setupReadlineKeypress
 export function subscribePromptEvent(handler: (e: PromptEvent) => void) {
   // cf.
   // https://github.com/natemoo-re/clack/blob/90f8e3d762e96fde614fdf8da0529866649fafe2/packages/core/src/prompts/prompt.ts#L93
   // https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/elements/prompt.js#L22-L23
 
-  // check readline state on dummy output callback
+  // setup dummy output stream to keep track of readline.line/cursor
   const writeable = new Writable({
     highWaterMark: 0,
     write: (_chunk, _encoding, callback) => {
-      handler({
-        type: "input",
-        data: {
-          input: rl.line,
-          cursor: rl.cursor,
-        },
-      });
       callback();
     },
   });
@@ -160,15 +154,16 @@ export function subscribePromptEvent(handler: (e: PromptEvent) => void) {
   }
   stdin.on("keypress", onKeypress);
 
-  // teardown
-  return () => {
+  function dispose() {
     stdin.off("keypress", onKeypress);
     if (stdin.isTTY) {
       stdin.setRawMode(previousRawMode);
     }
     rl.close();
     writeable.destroy();
-  };
+  }
+
+  return { rl, dispose };
 }
 
 export function formatInputCursor({ input, cursor }: PromptEventMap["input"]) {

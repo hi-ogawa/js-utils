@@ -14,8 +14,8 @@ quick debugging of keypress event
 
 async function main() {
   const manual = createManualPromise<void>();
-  const dispose = subscribePromptEvent((e) => {
-    console.log(JSON.stringify(e));
+  const { rl, dispose } = subscribePromptEvent((e) => {
+    console.log([rl.line, rl.cursor], JSON.stringify(e));
     if (e.type === "keypress") {
       const special = getSpecialKey(e.data);
       if (e.data.input === "q" || special === "abort") {
