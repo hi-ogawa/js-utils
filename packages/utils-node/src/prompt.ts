@@ -47,7 +47,7 @@ export async function promptAutocomplete(options: {
   let done = false;
   let offset = 0;
   const stdoutRows = process.stdout.rows ?? 20;
-  const stdoutColumns = process.stdout.rows ?? 80;
+  const stdoutColumns = process.stdout.columns ?? 80;
   const limit = options.limit ?? Math.min(10, stdoutRows - 5);
   const hideCursor = options.hideCursor ?? true;
 
