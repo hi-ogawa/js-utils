@@ -74,7 +74,7 @@ describe(promptAutocomplete, () => {
     await waitForStable(proc.child.stdout);
     expect("?" + stripSnap(proc.stdout).split("?").at(-1))
       .toMatchInlineSnapshot(`
-        "? select node builtin module > promises
+        "? select node builtin module > readline/promises
         [answer] { input: 'promises', value: 'readline/promises' }
         "
       `);

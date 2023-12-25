@@ -17,7 +17,7 @@ async function main() {
     .map((p) => p.path.slice(cwd.length + 1));
 
   const choice = await promptAutocomplete({
-    message: "? Select package directory > ",
+    message: "* Select package directory > ",
     suggest: (input) => {
       return packageDirs.filter((p) => p.includes(input));
     },

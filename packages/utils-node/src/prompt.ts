@@ -78,7 +78,7 @@ export async function promptAutocomplete(options: {
 
   async function render() {
     if (done) {
-      await write(`${CSI}0J` + options.message + input + "\n");
+      await write(`${CSI}0J` + options.message + (value ?? input) + "\n");
       return;
     }
 
