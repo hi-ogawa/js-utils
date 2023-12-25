@@ -33,17 +33,19 @@ export async function promptQuestion(query: string): Promise<string> {
 export async function promptAutocomplete(config: {
   message: string;
   loadOptions: (input: string) => Promise<string[]>;
-}): Promise<AutocompleteResult> {
+}) {
   const write = promisify(process.stdout.write.bind(process.stdout));
-  const manual = createManualPromise<AutocompleteResult>();
+  const manual = createManualPromise<void>();
 
   let input = "";
+  let value: string | undefined;
+  let done = false;
 
-  async function render(renderOptions?: { done?: boolean }) {
+  async function render() {
     const options = await config.loadOptions(input);
 
     const part1 = config.message + " > " + input;
-    if (renderOptions?.done) {
+    if (done) {
       await write(part1);
       return;
     }
@@ -69,12 +71,16 @@ export async function promptAutocomplete(config: {
     switch (getSpecialKey(str, key)) {
       case "abort":
       case "escape": {
-        manual.resolve({ input, value: "", ok: false });
+        value = undefined;
+        done = true;
+        manual.resolve();
         return;
       }
       case "enter":
       case "return": {
-        manual.resolve({ input, value: input, ok: true });
+        value = input;
+        done = true;
+        manual.resolve();
         return;
       }
       case "backspace": {
@@ -96,17 +102,12 @@ export async function promptAutocomplete(config: {
     await write(`${CSI}?25l`); // hide cursor
     await render();
     dispose = setupKeypressHandler(keypressHandler);
-    return await manual.promise;
+    await manual.promise;
+    return { input, value };
   } finally {
     dispose?.();
-    await render({ done: true });
     await write(`${CSI}0J`); // clean below
+    await render();
     await write(`${CSI}?25h`); // show cursor
   }
-}
-
-interface AutocompleteResult {
-  input: string;
-  value: string;
-  ok: boolean;
 }
