@@ -46,7 +46,9 @@ export async function promptAutocomplete(options: {
   let suggestionIndex = 0;
   let done = false;
   let offset = 0;
-  const limit = options.limit ?? Math.min(10, process.stdout.rows - 5);
+  const stdoutRows = process.stdout.rows ?? 20;
+  const stdoutColumns = process.stdout.rows ?? 80;
+  const limit = options.limit ?? Math.min(10, stdoutRows - 5);
   const hideCursor = options.hideCursor ?? true;
 
   async function updateSuggestions() {
@@ -88,7 +90,7 @@ export async function promptAutocomplete(options: {
 
     // TODO: vscode's terminal has funky behavior when content height exceeds terminal height?
     // TODO: IME (e.g Japanese input) cursor is currently not considered.
-    const height = computeHeight(content, process.stdout.columns);
+    const height = computeHeight(content, stdoutColumns);
     await write(
       // clear below + content + cursor up by "height"
       `${CSI}0J` + content + `${CSI}1A`.repeat(height - 1) + `${CSI}1G`

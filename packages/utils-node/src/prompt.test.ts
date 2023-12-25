@@ -28,42 +28,53 @@ describe(promptAutocomplete, () => {
     await waitForStable(proc.child.stdout);
     expect(stripSnap(proc.stdout)).toMatchInlineSnapshot(`
       "? select node builtin module >
+        > _http_agent
+          _http_client
+          _http_common
+          _http_incoming
+          _http_outgoing
+          _http_server
+          _stream_duplex
+          _stream_passthrough
+          _stream_readable
+          _stream_transform
       "
     `);
-
-    // TODO: why suggestions not showing up?
 
     proc.child.stdin.write("promises");
     await waitForStable(proc.child.stdout);
-    expect(stripSnap(proc.stdout)).toMatchInlineSnapshot(`
-      "? select node builtin module >
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
+    expect("?" + stripSnap(proc.stdout).split("?").at(-1))
+      .toMatchInlineSnapshot(`
+      "? select node builtin module > promises
+        > dns/promises
+          fs/promises
+          readline/promises
+          stream/promises
+          timers/promises
       "
     `);
 
+    proc.child.stdin.write("\x1b[B".repeat(2));
+    await waitForStable(proc.child.stdout);
+    expect("?" + stripSnap(proc.stdout).split("?").at(-1))
+      .toMatchInlineSnapshot(`
+        "? select node builtin module > promises
+            dns/promises
+            fs/promises
+          > readline/promises
+            stream/promises
+            timers/promises
+        "
+      `);
+
     proc.child.stdin.write("\n");
     await waitForStable(proc.child.stdout);
-    expect(stripSnap(proc.stdout)).toMatchInlineSnapshot(`
-      "? select node builtin module >
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      ? select node builtin module > promises
-      [answer] { input: 'promises', value: 'dns/promises' }
-      "
-    `);
+    expect("?" + stripSnap(proc.stdout).split("?").at(-1))
+      .toMatchInlineSnapshot(`
+        "? select node builtin module > promises
+        [answer] { input: 'promises', value: 'readline/promises' }
+        "
+      `);
   });
 });
 
