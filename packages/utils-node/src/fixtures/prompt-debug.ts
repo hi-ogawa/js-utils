@@ -10,16 +10,19 @@ quick debugging of keypress event
 
 async function main() {
   const manual = createManualPromise<void>();
-  const dispose = setupKeypressHandler((str, key) => {
-    console.log(JSON.stringify({ str, key }));
-    if (str === "q" || str === "\x03") {
-      manual.resolve()
+  const dispose = setupKeypressHandler(
+    (str, key) => {
+      console.log(JSON.stringify({ str, key }));
+      if (str === "q" || str === "\x03") {
+        manual.resolve();
+      }
+    },
+    (input, cursor) => {
+      console.log({ input, cursor });
+      console.log(colors.dim("> ") + formatInputCursor(input, cursor));
     }
-  }, (input, cursor) => {
-    console.log({ input, cursor });
-    console.log(colors.dim("> ") + formatInputCursor(input, cursor));
-  });
-  console.log(":: echo keypress event ('q' to quit)")
+  );
+  console.log(":: echo keypress event ('q' to quit)");
   try {
     await manual;
   } finally {
