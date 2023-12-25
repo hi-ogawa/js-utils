@@ -73,7 +73,7 @@ const SPECIAL_KEYS = [
 export function getSpecialKey({
   input,
   key,
-}: ReadlineKeypressEvent): (typeof SPECIAL_KEYS)[number] | "abort" | undefined {
+}: ReadlineEvent): (typeof SPECIAL_KEYS)[number] | "abort" | undefined {
   // ctrl-c ctrl-z
   if (input === "\x03" || input === "\x1A") {
     return "abort";
@@ -92,14 +92,12 @@ export interface KeyInfo {
   shift: boolean;
 }
 
-export interface ReadlineKeypressEvent {
+export interface ReadlineEvent {
   input?: string;
   key: KeyInfo;
 }
 
-export function subscribePromptEvent(
-  handler: (e: ReadlineKeypressEvent) => void
-) {
+export function subscribeReadlineEvent(handler: (e: ReadlineEvent) => void) {
   // cf.
   // https://github.com/natemoo-re/clack/blob/90f8e3d762e96fde614fdf8da0529866649fafe2/packages/core/src/prompts/prompt.ts#L93
   // https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/elements/prompt.js#L22-L23

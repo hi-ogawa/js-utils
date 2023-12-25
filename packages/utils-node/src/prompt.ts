@@ -6,7 +6,7 @@ import {
   computeHeight,
   formatInputCursor,
   getSpecialKey,
-  subscribePromptEvent,
+  subscribeReadlineEvent,
 } from "./prompt-utils";
 
 // cf. https://github.com/google/zx/blob/956dcc3bbdd349ac4c41f8db51add4efa2f58456/src/goods.ts#L83
@@ -103,7 +103,7 @@ export async function promptAutocomplete(options: {
   }
 
   // TODO: async handler race condition
-  const { rl, dispose } = subscribePromptEvent(async (e) => {
+  const { rl, dispose } = subscribeReadlineEvent(async (e) => {
     switch (getSpecialKey(e)) {
       case "abort":
       case "escape": {
