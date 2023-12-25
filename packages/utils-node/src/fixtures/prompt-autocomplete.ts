@@ -1,4 +1,5 @@
 import { builtinModules } from "node:module";
+import { colors } from "@hiogawa/utils";
 import { promptAutocomplete } from "../prompt";
 
 /*
@@ -10,12 +11,10 @@ demo
 
 async function main() {
   const result = await promptAutocomplete({
-    message: "Q. select node builtin module > ",
+    message: colors.cyan("?") + " select node builtin module > ",
     suggest: (input) => {
       return builtinModules.filter(v => v.includes(input));
     },
-    limit: 30,
-    debug: true,
   });
   console.log("\n[answer]", result);
 }

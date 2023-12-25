@@ -34,7 +34,7 @@ export async function promptAutocomplete(options: {
   message: string;
   suggest: (input: string) => string[] | Promise<string[]>;
   limit?: number;
-  debug?: boolean;
+  hideCursor?: boolean;
 }) {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<void>();
@@ -44,8 +44,8 @@ export async function promptAutocomplete(options: {
   let suggestions: string[] = [];
   let suggestionIndex = 0;
   let done = false;
-  const limit = options.limit ?? 10;
-  const debug = options.debug ?? false;
+  const limit = options.limit ?? Math.min(10, process.stdout.rows - 5);
+  const hideCursor = options.hideCursor ?? true;
 
   async function render() {
     // update states
@@ -73,12 +73,12 @@ export async function promptAutocomplete(options: {
         .join(""),
     ].join("");
 
-    // 1. clean screen below
-    // 2. write content
-    // 3. reset cursor position (TODO: terminal cannot go up "height" when it exceeds termianl height)
+    // TODO: vscode's terminal have funky behavior when content height exceeds terminal height?
+    // TODO: IME (e.g Japanese input) cursor is currently not considered.
     const height = computeHeight(content, process.stdout.columns);
     await write(
-      [`${CSI}0J`, content, `${CSI}1A`.repeat(height - 1), `${CSI}1G`].join("")
+      // clear below + content + cursor up by "height"
+      `${CSI}0J` + content + `${CSI}1A`.repeat(height - 1) + `${CSI}1G`
     );
   }
 
@@ -124,7 +124,9 @@ export async function promptAutocomplete(options: {
 
   let dispose: (() => void) | undefined;
   try {
-    !debug && (await write(`${CSI}?25l`)); // hide cursor
+    if (hideCursor) {
+      await write(`${CSI}?25l`); // hide cursor
+    }
     await render();
     dispose = setupKeypressHandler(keypressHandler);
     await manual.promise;
@@ -132,6 +134,8 @@ export async function promptAutocomplete(options: {
   } finally {
     dispose?.();
     await render();
-    !debug && (await write(`${CSI}?25h`)); // show cursor
+    if (hideCursor) {
+      await write(`${CSI}?25h`); // show cursor
+    }
   }
 }
