@@ -73,10 +73,10 @@ const SPECIAL_KEYS = [
 export function getSpecialKey({
   input,
   key,
-}: {
-  input?: string;
-  key: KeyInfo;
-}): (typeof SPECIAL_KEYS)[number] | "abort" | undefined {
+}: PromptEventMap["keypress"]):
+  | (typeof SPECIAL_KEYS)[number]
+  | "abort"
+  | undefined {
   // ctrl-c ctrl-z
   if (input === "\x03" || input === "\x1A") {
     return "abort";
@@ -95,20 +95,25 @@ export interface KeyInfo {
   shift: boolean;
 }
 
+export interface PromptEventMap {
+  keypress: {
+    input?: string;
+    key: KeyInfo;
+  };
+  input: {
+    input: string;
+    cursor: number;
+  };
+}
+
 export type PromptEvent =
   | {
       type: "keypress";
-      data: {
-        input?: string;
-        key: KeyInfo;
-      };
+      data: PromptEventMap["keypress"];
     }
   | {
       type: "input";
-      data: {
-        input: string;
-        cursor: number;
-      };
+      data: PromptEventMap["input"];
     };
 
 export function subscribePromptEvent(handler: (e: PromptEvent) => void) {
@@ -166,13 +171,7 @@ export function subscribePromptEvent(handler: (e: PromptEvent) => void) {
   };
 }
 
-export function formatInputCursor({
-  input,
-  cursor,
-}: {
-  input: string;
-  cursor: number;
-}) {
+export function formatInputCursor({ input, cursor }: PromptEventMap["input"]) {
   if (cursor >= input.length) {
     input += " ".repeat(input.length - cursor + 1);
   }
