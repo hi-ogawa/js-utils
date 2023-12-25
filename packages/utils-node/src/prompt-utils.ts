@@ -7,6 +7,16 @@ import { colors, includesGuard } from "@hiogawa/utils";
 // https://github.com/terkelg/sisteransi/blob/e219f8672540dde6e92a19e48a3567ef2548d620/src/index.js
 export const CSI = "\x1b[";
 
+// CSI (num) (char)
+// CSI (num) ; (num) (char)
+// CSI ? (num) (char)
+export const CSI_RE = /\x1b\[\??\d*;?\d*[A-Za-z]/g;
+
+// poor-man's strip ansi code
+export function stripAnsi(s: string) {
+  return s.replaceAll(CSI_RE, "");
+}
+
 // cf. https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/util/clear.js#L5-L6
 export function computeHeight(s: string, width: number) {
   // strip CSI
@@ -86,6 +96,7 @@ export interface KeyInfo {
 // https://github.com/natemoo-re/clack/blob/90f8e3d762e96fde614fdf8da0529866649fafe2/packages/core/src/prompts/prompt.ts#L93
 // https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/elements/prompt.js#L22-L23
 // TODO: rename to setupReadlineHandler
+// TODO: refactor to event emitter style API?
 export function setupKeypressHandler(
   handler: (str: string | undefined, key: KeyInfo) => void,
   inputHandler?: (input: string, cursor: number) => void

@@ -86,7 +86,7 @@ export async function promptAutocomplete(options: {
       .map((v, i) => `  ${i + offset === suggestionIndex ? ">" : " "} ${v}\n`)
       .join("");
 
-    // TODO: vscode's terminal have funky behavior when content height exceeds terminal height?
+    // TODO: vscode's terminal has funky behavior when content height exceeds terminal height?
     // TODO: IME (e.g Japanese input) cursor is currently not considered.
     const height = computeHeight(content, process.stdout.columns);
     await write(
