@@ -13,7 +13,9 @@ async function main() {
     message: "Q. select node builtin module > ",
     suggest: (input) => {
       return builtinModules.filter(v => v.includes(input));
-    }
+    },
+    limit: 30,
+    debug: true,
   });
   console.log("\n[answer]", result);
 }

@@ -33,6 +33,8 @@ export async function promptQuestion(query: string): Promise<string> {
 export async function promptAutocomplete(options: {
   message: string;
   suggest: (input: string) => string[] | Promise<string[]>;
+  limit?: number;
+  debug?: boolean;
 }) {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<void>();
@@ -42,6 +44,8 @@ export async function promptAutocomplete(options: {
   let suggestions: string[] = [];
   let suggestionIndex = 0;
   let done = false;
+  const limit = options.limit ?? 10;
+  const debug = options.debug ?? false;
 
   async function render() {
     // update states
@@ -59,22 +63,22 @@ export async function promptAutocomplete(options: {
       return;
     }
 
+    // TODO: highlight `suggestionIndex`
     content = [
       content,
       "\n",
-      // TODO: pagination based on process.stdout.rows?
       suggestions
-        .slice(0, 10)
+        .slice(0, limit)
         .map((v) => `    ${v}\n`)
         .join(""),
     ].join("");
 
     // 1. clean screen below
     // 2. write content
-    // 3. reset cursor position
+    // 3. reset cursor position (TODO: terminal cannot go up "height" when it exceeds termianl height)
     const height = computeHeight(content, process.stdout.columns);
     await write(
-      [`${CSI}0J`, content, `${CSI}${height - 1}A`, `${CSI}1G`].join("")
+      [`${CSI}0J`, content, `${CSI}1A`.repeat(height - 1), `${CSI}1G`].join("")
     );
   }
 
@@ -120,7 +124,7 @@ export async function promptAutocomplete(options: {
 
   let dispose: (() => void) | undefined;
   try {
-    // await write(`${CSI}?25l`); // hide cursor
+    !debug && (await write(`${CSI}?25l`)); // hide cursor
     await render();
     dispose = setupKeypressHandler(keypressHandler);
     await manual.promise;
@@ -128,6 +132,6 @@ export async function promptAutocomplete(options: {
   } finally {
     dispose?.();
     await render();
-    // await write(`${CSI}?25h`); // show cursor
+    !debug && (await write(`${CSI}?25h`)); // show cursor
   }
 }
