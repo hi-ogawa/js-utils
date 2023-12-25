@@ -3,7 +3,6 @@ import { promisify } from "node:util";
 import { createManualPromise } from "@hiogawa/utils";
 import {
   CSI,
-  type PromptEvent,
   computeHeight,
   formatInputCursor,
   getSpecialKey,
@@ -82,7 +81,7 @@ export async function promptAutocomplete(options: {
       return;
     }
 
-    let content = options.message + formatInputCursor({ input, cursor });
+    let content = options.message + formatInputCursor({ line: input, cursor });
     content += "\n";
     content += suggestions
       .slice(offset, offset + limit)
@@ -104,54 +103,40 @@ export async function promptAutocomplete(options: {
   }
 
   // TODO: async handler race condition
-  async function onPromptEvent(e: PromptEvent) {
-    // if (e.type === "input") {
-    //   // skip same event which happens on "enter"
-    //   if (input === e.data.input && cursor === e.data.cursor) {
-    //     return;
-    //   }
-    //   input = e.data.input;
-    //   cursor = e.data.cursor;
-    //   await updateSuggestions();
-    //   await render();
-    // }
-    if (e.type === "keypress") {
-      switch (getSpecialKey(e.data)) {
-        case "abort":
-        case "escape": {
-          value = undefined;
-          done = true;
-          manual.resolve();
-          return;
-        }
-        case "enter":
-        case "return": {
-          done = true;
-          manual.resolve();
-          return;
-        }
-        case "up": {
-          moveSelection(-1);
-          await render();
-          return;
-        }
-        case "down": {
-          moveSelection(1);
-          await render();
-          return;
-        }
+  const { rl, dispose } = subscribePromptEvent(async (e) => {
+    switch (getSpecialKey(e)) {
+      case "abort":
+      case "escape": {
+        value = undefined;
+        done = true;
+        manual.resolve();
+        return;
       }
-      if (input !== rl.line || cursor !== rl.cursor) {
-        input = rl.line;
-        cursor = rl.cursor;
-        await updateSuggestions();
+      case "enter":
+      case "return": {
+        done = true;
+        manual.resolve();
+        return;
+      }
+      case "up": {
+        moveSelection(-1);
         await render();
+        return;
+      }
+      case "down": {
+        moveSelection(1);
+        await render();
+        return;
       }
     }
-  }
+    if (input !== rl.line || cursor !== rl.cursor) {
+      input = rl.line;
+      cursor = rl.cursor;
+      await updateSuggestions();
+      await render();
+    }
+  });
 
-  // let dispose: (() => void) | undefined;
-  const { rl, dispose } = subscribePromptEvent(onPromptEvent);
   try {
     if (hideCursor) {
       await write(`${CSI}?25l`); // hide cursor
