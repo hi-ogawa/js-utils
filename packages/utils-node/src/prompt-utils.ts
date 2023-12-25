@@ -105,7 +105,7 @@ export function subscribePromptEvent(
   // https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/elements/prompt.js#L22-L23
 
   // setup dummy output stream to keep track of readline.line/cursor
-  const writeable = new Writable({
+  const writable = new Writable({
     highWaterMark: 0,
     write: (_chunk, _encoding, callback) => {
       callback();
@@ -115,7 +115,7 @@ export function subscribePromptEvent(
   const stdin = process.stdin;
   const rl = readline.createInterface({
     input: stdin,
-    output: writeable,
+    output: writable,
     terminal: true,
   });
   readline.emitKeypressEvents(stdin, rl);
@@ -139,7 +139,7 @@ export function subscribePromptEvent(
       stdin.setRawMode(previousRawMode);
     }
     rl.close();
-    writeable.destroy();
+    writable.destroy();
   }
 
   return { rl, dispose };
