@@ -1,5 +1,6 @@
 import readline from "node:readline";
-import { includesGuard } from "@hiogawa/utils";
+import { Writable } from "node:stream";
+import { colors, includesGuard } from "@hiogawa/utils";
 
 // https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_(Control_Sequence_Introducer)_sequences
 // https://github.com/nodejs/node/blob/a717fa211194b735cdfc1044c7351c6cf96b8783/lib/internal/readline/utils.js
@@ -81,13 +82,28 @@ export interface KeyInfo {
   shift: boolean;
 }
 
+// cf.
+// https://github.com/natemoo-re/clack/blob/90f8e3d762e96fde614fdf8da0529866649fafe2/packages/core/src/prompts/prompt.ts#L93
+// https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/elements/prompt.js#L22-L23
+// TODO: rename to setupReadlineHandler
 export function setupKeypressHandler(
-  handler: (str: string | undefined, key: KeyInfo) => void
+  handler: (str: string | undefined, key: KeyInfo) => void,
+  inputHandler?: (input: string, cursor: number) => void
 ) {
-  // setup
+  // check readline state on dummy output callback
+  const writeable = new Writable({
+    highWaterMark: 0,
+    write(_chunk, _encoding, callback) {
+      inputHandler?.(rl.line, rl.cursor);
+      callback();
+    },
+  });
+
   const stdin = process.stdin;
   const rl = readline.createInterface({
     input: stdin,
+    output: writeable,
+    terminal: true,
   });
   readline.emitKeypressEvents(stdin, rl);
   let previousRawMode = stdin.isRaw;
@@ -103,5 +119,16 @@ export function setupKeypressHandler(
       stdin.setRawMode(previousRawMode);
     }
     rl.close();
+    writeable.destroy();
   };
+}
+
+export function formatInputCursor(input: string, cursor: number) {
+  if (cursor >= input.length) {
+    input += " ".repeat(input.length - cursor + 1);
+  }
+  const p1 = input.slice(0, cursor);
+  const p2 = input.slice(cursor, cursor + 1);
+  const p3 = input.slice(cursor + 1);
+  return p1 + colors.inverse(p2) + p3;
 }

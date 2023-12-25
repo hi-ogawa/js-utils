@@ -5,6 +5,7 @@ import {
   CSI,
   type KeyInfo,
   computeHeight,
+  formatInputCursor,
   getSpecialKey,
   setupKeypressHandler,
 } from "./prompt-utils";
@@ -39,6 +40,7 @@ export async function promptAutocomplete(options: {
   const manual = createManualPromise<void>();
 
   let input = "";
+  let cursor = 0;
   let value: string | undefined;
   let suggestions: string[] = [];
   let suggestionIndex = 0;
@@ -72,16 +74,16 @@ export async function promptAutocomplete(options: {
   }
 
   async function render() {
-    let content = options.message + input;
     if (done) {
-      await write(`${CSI}0J` + content);
+      await write(`${CSI}0J` + options.message + input);
       return;
     }
 
+    let content = options.message + formatInputCursor(input, cursor);
     content += "\n";
     content += suggestions
       .slice(offset, offset + limit)
-      .map((v, i) => `  ${i + offset === suggestionIndex ? "*" : " "} ${v}\n`)
+      .map((v, i) => `  ${i + offset === suggestionIndex ? ">" : " "} ${v}\n`)
       .join("");
 
     // TODO: vscode's terminal have funky behavior when content height exceeds terminal height?
@@ -101,35 +103,35 @@ export async function promptAutocomplete(options: {
         value = undefined;
         done = true;
         manual.resolve();
-        return;
+        break;
       }
       case "enter":
       case "return": {
         done = true;
         manual.resolve();
-        return;
+        break;
       }
       case "up": {
         moveSelection(-1);
+        await render();
         break;
       }
       case "down": {
         moveSelection(1);
+        await render();
         break;
-      }
-      case "backspace": {
-        input = input.slice(0, -1);
-        await updateSuggestions();
-        break;
-      }
-      default: {
-        if (typeof str === "undefined") {
-          return;
-        }
-        input += str;
-        await updateSuggestions();
       }
     }
+  }
+
+  async function inputHandler(input_: string, cursor_: number) {
+    // skip same event which happens on "enter"
+    if (input === input_ && cursor === cursor_) {
+      return;
+    }
+    input = input_;
+    cursor = cursor_;
+    await updateSuggestions();
     await render();
   }
 
@@ -140,7 +142,7 @@ export async function promptAutocomplete(options: {
     }
     await updateSuggestions();
     await render();
-    dispose = setupKeypressHandler(keypressHandler);
+    dispose = setupKeypressHandler(keypressHandler, inputHandler);
     await manual.promise;
     return { input, value };
   } finally {
