@@ -38,6 +38,7 @@ describe(promptAutocomplete, () => {
           _stream_passthrough
           _stream_readable
           _stream_transform
+        [1/66]
       "
     `);
 
@@ -45,14 +46,15 @@ describe(promptAutocomplete, () => {
     await waitForStable(proc.child.stdout);
     expect("?" + stripSnap(proc.stdout).split("?").at(-1))
       .toMatchInlineSnapshot(`
-      "? select node builtin module > promises
-        > dns/promises
-          fs/promises
-          readline/promises
-          stream/promises
-          timers/promises
-      "
-    `);
+        "? select node builtin module > promises
+          > dns/promises
+            fs/promises
+            readline/promises
+            stream/promises
+            timers/promises
+          [1/5]
+        "
+      `);
 
     proc.child.stdin.write("\x1b[B".repeat(2));
     await waitForStable(proc.child.stdout);
@@ -64,6 +66,7 @@ describe(promptAutocomplete, () => {
           > readline/promises
             stream/promises
             timers/promises
+          [3/5]
         "
       `);
 

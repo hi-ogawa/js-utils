@@ -35,6 +35,7 @@ export async function promptAutocomplete(options: {
   suggest: (input: string) => string[] | Promise<string[]>;
   limit?: number;
   hideCursor?: boolean; // convenient for debugging
+  hideCount?: boolean;
 }) {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<void>();
@@ -77,7 +78,7 @@ export async function promptAutocomplete(options: {
 
   async function render() {
     if (done) {
-      await write(`${CSI}0J` + options.message + input);
+      await write(`${CSI}0J` + options.message + input + "\n");
       return;
     }
 
@@ -87,6 +88,9 @@ export async function promptAutocomplete(options: {
       .slice(offset, offset + limit)
       .map((v, i) => `  ${i + offset === suggestionIndex ? ">" : " "} ${v}\n`)
       .join("");
+    if (!options.hideCount) {
+      content += `  [${suggestionIndex + 1}/${suggestions.length}]\n`;
+    }
 
     // TODO: vscode's terminal has funky behavior when content height exceeds terminal height?
     // TODO: IME (e.g Japanese input) cursor is currently not considered.

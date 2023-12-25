@@ -15,7 +15,7 @@ async function main() {
       return builtinModules.filter(v => v.includes(input));
     },
   });
-  console.log("\n[answer]", result);
+  console.log("[answer]", result);
 }
 
 main();
