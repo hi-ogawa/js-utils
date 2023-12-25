@@ -34,7 +34,7 @@ export async function promptAutocomplete(options: {
   message: string;
   suggest: (input: string) => string[] | Promise<string[]>;
   limit?: number;
-  hideCursor?: boolean;
+  hideCursor?: boolean; // convenient for debugging
 }) {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<void>();
