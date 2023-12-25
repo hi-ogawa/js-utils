@@ -59,10 +59,13 @@ const SPECIAL_KEYS = [
   "paste-end",
 ] as const;
 
-export function getSpecialKey(str: string | undefined, key: KeyInfo) {
+export function getSpecialKey(
+  str: string | undefined,
+  key: KeyInfo
+): (typeof SPECIAL_KEYS)[number] | "abort" | undefined {
   // ctrl-c ctrl-z
   if (str === "\x03" || str === "\x1A") {
-    return "abort" as const;
+    return "abort";
   }
   if (includesGuard(SPECIAL_KEYS, key.name)) {
     return key.name;

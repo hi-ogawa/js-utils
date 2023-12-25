@@ -44,7 +44,7 @@ export async function promptAutocomplete(config: {
   async function render() {
     const options = await config.loadOptions(input);
 
-    const part1 = config.message + " > " + input;
+    const part1 = config.message + input;
     if (done) {
       await write(part1);
       return;
