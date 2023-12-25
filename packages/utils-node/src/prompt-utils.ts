@@ -20,7 +20,7 @@ export function stripAnsi(s: string) {
 // cf. https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/util/clear.js#L5-L6
 export function computeHeight(s: string, width: number) {
   // strip CSI
-  s = stripAnsi(s)
+  s = stripAnsi(s);
 
   // check line wrap
   const wraps = s
