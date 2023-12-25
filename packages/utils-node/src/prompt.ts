@@ -3,11 +3,10 @@ import { promisify } from "node:util";
 import { createManualPromise } from "@hiogawa/utils";
 import {
   CSI,
-  type PromptEvent,
   computeHeight,
   formatInputCursor,
   getSpecialKey,
-  subscribePromptEvent,
+  subscribeReadlineEvent,
 } from "./prompt-utils";
 
 // cf. https://github.com/google/zx/blob/956dcc3bbdd349ac4c41f8db51add4efa2f58456/src/goods.ts#L83
@@ -82,14 +81,16 @@ export async function promptAutocomplete(options: {
       return;
     }
 
-    let content = options.message + formatInputCursor({ input, cursor });
+    let content = options.message + formatInputCursor({ line: input, cursor });
     content += "\n";
     content += suggestions
       .slice(offset, offset + limit)
       .map((v, i) => `  ${i + offset === suggestionIndex ? ">" : " "} ${v}\n`)
       .join("");
     if (!options.hideCount) {
-      content += `  [${suggestionIndex + 1}/${suggestions.length}]\n`;
+      const total = suggestions.length;
+      const current = Math.min(suggestionIndex + 1, total);
+      content += `  [${current}/${total}]\n`;
     }
 
     // TODO: vscode's terminal has funky behavior when content height exceeds terminal height?
@@ -102,54 +103,46 @@ export async function promptAutocomplete(options: {
   }
 
   // TODO: async handler race condition
-  async function onPromptEvent(e: PromptEvent) {
-    if (e.type === "input") {
-      // skip same event which happens on "enter"
-      if (input === e.data.input && cursor === e.data.cursor) {
+  const { rl, dispose } = subscribeReadlineEvent(async (e) => {
+    switch (getSpecialKey(e)) {
+      case "abort":
+      case "escape": {
+        value = undefined;
+        done = true;
+        manual.resolve();
         return;
       }
-      input = e.data.input;
-      cursor = e.data.cursor;
+      case "enter":
+      case "return": {
+        done = true;
+        manual.resolve();
+        return;
+      }
+      case "up": {
+        moveSelection(-1);
+        await render();
+        return;
+      }
+      case "down": {
+        moveSelection(1);
+        await render();
+        return;
+      }
+    }
+    if (input !== rl.line || cursor !== rl.cursor) {
+      input = rl.line;
+      cursor = rl.cursor;
       await updateSuggestions();
       await render();
     }
-    if (e.type === "keypress") {
-      switch (getSpecialKey(e.data)) {
-        case "abort":
-        case "escape": {
-          value = undefined;
-          done = true;
-          manual.resolve();
-          break;
-        }
-        case "enter":
-        case "return": {
-          done = true;
-          manual.resolve();
-          break;
-        }
-        case "up": {
-          moveSelection(-1);
-          await render();
-          break;
-        }
-        case "down": {
-          moveSelection(1);
-          await render();
-          break;
-        }
-      }
-    }
-  }
+  });
 
-  let dispose: (() => void) | undefined;
   try {
     if (hideCursor) {
       await write(`${CSI}?25l`); // hide cursor
     }
     await updateSuggestions();
     await render();
-    dispose = subscribePromptEvent(onPromptEvent);
     await manual.promise;
     return { input, value };
   } finally {

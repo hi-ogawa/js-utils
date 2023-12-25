@@ -73,10 +73,7 @@ const SPECIAL_KEYS = [
 export function getSpecialKey({
   input,
   key,
-}: PromptEventMap["keypress"]):
-  | (typeof SPECIAL_KEYS)[number]
-  | "abort"
-  | undefined {
+}: ReadlineEvent): (typeof SPECIAL_KEYS)[number] | "abort" | undefined {
   // ctrl-c ctrl-z
   if (input === "\x03" || input === "\x1A") {
     return "abort";
@@ -95,43 +92,20 @@ export interface KeyInfo {
   shift: boolean;
 }
 
-export interface PromptEventMap {
-  keypress: {
-    input?: string;
-    key: KeyInfo;
-  };
-  input: {
-    input: string;
-    cursor: number;
-  };
+export interface ReadlineEvent {
+  input?: string;
+  key: KeyInfo;
 }
 
-export type PromptEvent =
-  | {
-      type: "keypress";
-      data: PromptEventMap["keypress"];
-    }
-  | {
-      type: "input";
-      data: PromptEventMap["input"];
-    };
-
-export function subscribePromptEvent(handler: (e: PromptEvent) => void) {
+export function subscribeReadlineEvent(handler: (e: ReadlineEvent) => void) {
   // cf.
   // https://github.com/natemoo-re/clack/blob/90f8e3d762e96fde614fdf8da0529866649fafe2/packages/core/src/prompts/prompt.ts#L93
   // https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/elements/prompt.js#L22-L23
 
-  // check readline state on dummy output callback
-  const writeable = new Writable({
+  // setup dummy output stream to keep track of readline.line/cursor
+  const writable = new Writable({
     highWaterMark: 0,
     write: (_chunk, _encoding, callback) => {
-      handler({
-        type: "input",
-        data: {
-          input: rl.line,
-          cursor: rl.cursor,
-        },
-      });
       callback();
     },
   });
@@ -139,7 +113,7 @@ export function subscribePromptEvent(handler: (e: PromptEvent) => void) {
   const stdin = process.stdin;
   const rl = readline.createInterface({
     input: stdin,
-    output: writeable,
+    output: writable,
     terminal: true,
   });
   readline.emitKeypressEvents(stdin, rl);
@@ -151,32 +125,36 @@ export function subscribePromptEvent(handler: (e: PromptEvent) => void) {
 
   function onKeypress(input: string | undefined, key: KeyInfo) {
     handler({
-      type: "keypress",
-      data: {
-        input,
-        key,
-      },
+      input,
+      key,
     });
   }
   stdin.on("keypress", onKeypress);
 
-  // teardown
-  return () => {
+  function dispose() {
     stdin.off("keypress", onKeypress);
     if (stdin.isTTY) {
       stdin.setRawMode(previousRawMode);
     }
     rl.close();
-    writeable.destroy();
-  };
+    writable.destroy();
+  }
+
+  return { rl, dispose };
 }
 
-export function formatInputCursor({ input, cursor }: PromptEventMap["input"]) {
-  if (cursor >= input.length) {
-    input += " ".repeat(input.length - cursor + 1);
+export function formatInputCursor({
+  line,
+  cursor,
+}: {
+  line: string;
+  cursor: number;
+}) {
+  if (cursor >= line.length) {
+    line += " ".repeat(line.length - cursor + 1);
   }
-  const p1 = input.slice(0, cursor);
-  const p2 = input.slice(cursor, cursor + 1);
-  const p3 = input.slice(cursor + 1);
+  const p1 = line.slice(0, cursor);
+  const p2 = line.slice(cursor, cursor + 1);
+  const p3 = line.slice(cursor + 1);
   return p1 + colors.inverse(p2) + p3;
 }
