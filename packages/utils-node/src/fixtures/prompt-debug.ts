@@ -1,5 +1,9 @@
 import { colors, createManualPromise } from "@hiogawa/utils";
-import { formatInputCursor, setupKeypressHandler } from "../prompt-utils";
+import {
+  formatInputCursor,
+  getSpecialKey,
+  subscribePromptEvent,
+} from "../prompt-utils";
 
 /*
 
@@ -10,18 +14,19 @@ quick debugging of keypress event
 
 async function main() {
   const manual = createManualPromise<void>();
-  const dispose = setupKeypressHandler(
-    (str, key) => {
-      console.log(JSON.stringify({ str, key }));
-      if (str === "q" || str === "\x03") {
+  const dispose = subscribePromptEvent((e) => {
+    console.log(JSON.stringify(e));
+    if (e.type === "keypress") {
+      const special = getSpecialKey(e.data);
+      if (e.data.input === "q" || special === "abort") {
         manual.resolve();
       }
-    },
-    (input, cursor) => {
-      console.log({ input, cursor });
-      console.log(colors.dim("> ") + formatInputCursor(input, cursor));
     }
-  );
+    if (e.type === "input") {
+      console.log(e.data);
+      console.log(colors.dim("> ") + formatInputCursor(e.data));
+    }
+  });
   console.log(":: echo keypress event ('q' to quit)");
   try {
     await manual;

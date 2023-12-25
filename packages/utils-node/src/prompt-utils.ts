@@ -10,7 +10,7 @@ export const CSI = "\x1b[";
 // CSI (num) (char)
 // CSI (num) ; (num) (char)
 // CSI ? (num) (char)
-export const CSI_RE = /\x1b\[\??\d*;?\d*[A-Za-z]/g;
+const CSI_RE = /\x1b\[\??\d*;?\d*[A-Za-z]/g;
 
 // poor-man's strip ansi code
 export function stripAnsi(s: string) {
@@ -70,12 +70,15 @@ const SPECIAL_KEYS = [
   "paste-end",
 ] as const;
 
-export function getSpecialKey(
-  str: string | undefined,
-  key: KeyInfo
-): (typeof SPECIAL_KEYS)[number] | "abort" | undefined {
+export function getSpecialKey({
+  input,
+  key,
+}: {
+  input?: string;
+  key: KeyInfo;
+}): (typeof SPECIAL_KEYS)[number] | "abort" | undefined {
   // ctrl-c ctrl-z
-  if (str === "\x03" || str === "\x1A") {
+  if (input === "\x03" || input === "\x1A") {
     return "abort";
   }
   if (includesGuard(SPECIAL_KEYS, key.name)) {
@@ -92,20 +95,38 @@ export interface KeyInfo {
   shift: boolean;
 }
 
-// cf.
-// https://github.com/natemoo-re/clack/blob/90f8e3d762e96fde614fdf8da0529866649fafe2/packages/core/src/prompts/prompt.ts#L93
-// https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/elements/prompt.js#L22-L23
-// TODO: rename to setupReadlineHandler
-// TODO: refactor to event emitter style API?
-export function setupKeypressHandler(
-  handler: (str: string | undefined, key: KeyInfo) => void,
-  inputHandler?: (input: string, cursor: number) => void
-) {
+export type PromptEvent =
+  | {
+      type: "keypress";
+      data: {
+        input?: string;
+        key: KeyInfo;
+      };
+    }
+  | {
+      type: "input";
+      data: {
+        input: string;
+        cursor: number;
+      };
+    };
+
+export function subscribePromptEvent(handler: (e: PromptEvent) => void) {
+  // cf.
+  // https://github.com/natemoo-re/clack/blob/90f8e3d762e96fde614fdf8da0529866649fafe2/packages/core/src/prompts/prompt.ts#L93
+  // https://github.com/terkelg/prompts/blob/735603af7c7990ac9efcfba6146967a7dbb15f50/lib/elements/prompt.js#L22-L23
+
   // check readline state on dummy output callback
   const writeable = new Writable({
     highWaterMark: 0,
-    write(_chunk, _encoding, callback) {
-      inputHandler?.(rl.line, rl.cursor);
+    write: (_chunk, _encoding, callback) => {
+      handler({
+        type: "input",
+        data: {
+          input: rl.line,
+          cursor: rl.cursor,
+        },
+      });
       callback();
     },
   });
@@ -117,15 +138,26 @@ export function setupKeypressHandler(
     terminal: true,
   });
   readline.emitKeypressEvents(stdin, rl);
+
   let previousRawMode = stdin.isRaw;
   if (stdin.isTTY) {
     stdin.setRawMode(true);
   }
-  stdin.on("keypress", handler);
+
+  function onKeypress(input: string | undefined, key: KeyInfo) {
+    handler({
+      type: "keypress",
+      data: {
+        input,
+        key,
+      },
+    });
+  }
+  stdin.on("keypress", onKeypress);
 
   // teardown
   return () => {
-    stdin.off("keypress", handler);
+    stdin.off("keypress", onKeypress);
     if (stdin.isTTY) {
       stdin.setRawMode(previousRawMode);
     }
@@ -134,7 +166,13 @@ export function setupKeypressHandler(
   };
 }
 
-export function formatInputCursor(input: string, cursor: number) {
+export function formatInputCursor({
+  input,
+  cursor,
+}: {
+  input: string;
+  cursor: number;
+}) {
   if (cursor >= input.length) {
     input += " ".repeat(input.length - cursor + 1);
   }

@@ -3,11 +3,11 @@ import { promisify } from "node:util";
 import { createManualPromise } from "@hiogawa/utils";
 import {
   CSI,
-  type KeyInfo,
+  type PromptEvent,
   computeHeight,
   formatInputCursor,
   getSpecialKey,
-  setupKeypressHandler,
+  subscribePromptEvent,
 } from "./prompt-utils";
 
 // cf. https://github.com/google/zx/blob/956dcc3bbdd349ac4c41f8db51add4efa2f58456/src/goods.ts#L83
@@ -82,7 +82,7 @@ export async function promptAutocomplete(options: {
       return;
     }
 
-    let content = options.message + formatInputCursor(input, cursor);
+    let content = options.message + formatInputCursor({ input, cursor });
     content += "\n";
     content += suggestions
       .slice(offset, offset + limit)
@@ -102,43 +102,44 @@ export async function promptAutocomplete(options: {
   }
 
   // TODO: async handler race condition
-  async function keypressHandler(str: string | undefined, key: KeyInfo) {
-    switch (getSpecialKey(str, key)) {
-      case "abort":
-      case "escape": {
-        value = undefined;
-        done = true;
-        manual.resolve();
-        break;
+  async function onPromptEvent(e: PromptEvent) {
+    if (e.type === "input") {
+      // skip same event which happens on "enter"
+      if (input === e.data.input && cursor === e.data.cursor) {
+        return;
       }
-      case "enter":
-      case "return": {
-        done = true;
-        manual.resolve();
-        break;
-      }
-      case "up": {
-        moveSelection(-1);
-        await render();
-        break;
-      }
-      case "down": {
-        moveSelection(1);
-        await render();
-        break;
+      input = e.data.input;
+      cursor = e.data.cursor;
+      await updateSuggestions();
+      await render();
+    }
+    if (e.type === "keypress") {
+      switch (getSpecialKey(e.data)) {
+        case "abort":
+        case "escape": {
+          value = undefined;
+          done = true;
+          manual.resolve();
+          break;
+        }
+        case "enter":
+        case "return": {
+          done = true;
+          manual.resolve();
+          break;
+        }
+        case "up": {
+          moveSelection(-1);
+          await render();
+          break;
+        }
+        case "down": {
+          moveSelection(1);
+          await render();
+          break;
+        }
       }
     }
-  }
-
-  async function inputHandler(input_: string, cursor_: number) {
-    // skip same event which happens on "enter"
-    if (input === input_ && cursor === cursor_) {
-      return;
-    }
-    input = input_;
-    cursor = cursor_;
-    await updateSuggestions();
-    await render();
   }
 
   let dispose: (() => void) | undefined;
@@ -148,7 +149,7 @@ export async function promptAutocomplete(options: {
     }
     await updateSuggestions();
     await render();
-    dispose = setupKeypressHandler(keypressHandler, inputHandler);
+    dispose = subscribePromptEvent(onPromptEvent);
     await manual.promise;
     return { input, value };
   } finally {
