@@ -44,6 +44,7 @@ export async function promptAutocomplete(options: {
   let suggestions: string[] = [];
   let suggestionIndex = 0;
   let done = false;
+  let lastContent: string | undefined;
   const limit = options.limit ?? 10;
   const debug = options.debug ?? false;
 
@@ -55,6 +56,16 @@ export async function promptAutocomplete(options: {
       suggestions.length - 1
     );
     value = suggestions[suggestionIndex];
+
+    // clear last render
+    // (TODO: this approach doesn't clear properly either when terminal height is smaller than content. this happens with `prompts` package too)
+    if (lastContent) {
+      const height = computeHeight(lastContent, process.stdout.columns);
+      await write(
+        (`${CSI}2K` + `${CSI}1A`).repeat(height - 1) + `${CSI}2K` + `${CSI}1G`
+      );
+      lastContent = undefined;
+    }
 
     // render
     let content = options.message + input;
@@ -73,13 +84,8 @@ export async function promptAutocomplete(options: {
         .join(""),
     ].join("");
 
-    // 1. clean screen below
-    // 2. write content
-    // 3. reset cursor position (TODO: terminal cannot go up "height" when it exceeds termianl height)
-    const height = computeHeight(content, process.stdout.columns);
-    await write(
-      [`${CSI}0J`, content, `${CSI}1A`.repeat(height - 1), `${CSI}1G`].join("")
-    );
+    await write(content);
+    lastContent = content;
   }
 
   // TODO: async handler race condition
