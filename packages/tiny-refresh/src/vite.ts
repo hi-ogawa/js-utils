@@ -22,6 +22,13 @@ export function vitePluginTinyRefresh(options?: {
     apply(config, env) {
       return env.command === "serve" && !config.build?.ssr;
     },
+    config(_config, _env) {
+      return {
+        esbuild: {
+          jsxDev: false,
+        },
+      };
+    },
     transform(code, id, transformOptions) {
       if (!transformOptions?.ssr && filter(id)) {
         return hmrTransform(code, {
