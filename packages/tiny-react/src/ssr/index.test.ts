@@ -2,6 +2,7 @@ import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
 import { h } from "../helper/hyperscript";
 import { hydrate } from "../reconciler";
+import { createVNode } from "../virtual-dom";
 import { renderToString } from "./render";
 
 describe(hydrate, () => {
@@ -154,5 +155,44 @@ describe(hydrate, () => {
         ],
       ]
     `);
+  });
+
+  it.only("empty", () => {
+    // https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&corejs=3.21&spec=false&loose=false&code_lz=DwEwlgbgfA3gRHAvsA9OaBuAUKSUCG8ARkqulBkA&debug=false&forceAllTransforms=false&modules=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=env%2Creact%2Cstage-2&prettier=false&targets=&version=7.23.6&externalPlugins=&assumptions=%7B%7D
+    // <div>{""}</div>
+    const vnode = createVNode("div", { children: "" });
+    const vnodeSsr = renderToString(vnode);
+    expect(vnodeSsr).toMatchInlineSnapshot(`"<div></div>"`);
+
+    const parent = document.createElement("main");
+    parent.innerHTML = vnodeSsr;
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div />
+      </main>
+    `);
+
+    hydrate(vnode, parent);
+    expect(parent).toMatchInlineSnapshot();
+  });
+
+  it.only("text concat", () => {
+    // <div>a{"b"}</div>
+    const vnode = createVNode("div", { children: ["a", "b"] });
+    const vnodeSsr = renderToString(vnode);
+    expect(vnodeSsr).toMatchInlineSnapshot(`"<div>ab</div>"`);
+
+    const parent = document.createElement("main");
+    parent.innerHTML = vnodeSsr;
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          ab
+        </div>
+      </main>
+    `);
+
+    hydrate(vnode, parent);
+    expect(parent).toMatchInlineSnapshot();
   });
 });
