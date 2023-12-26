@@ -77,17 +77,16 @@ export async function promptAutocomplete(options: {
     }
   }
 
-  async function render() {
+  function renderImpl() {
     if (done) {
-      const content =
+      return (
         colors.green("◇") +
         " " +
         options.message +
         colors.dim(" › ") +
         (value ?? input) +
-        "\n";
-      await write(view.formatNext(content, stdoutColumns));
-      return;
+        "\n"
+      );
     }
 
     let content =
@@ -114,7 +113,11 @@ export async function promptAutocomplete(options: {
       const current = Math.min(suggestionIndex + 1, total);
       content += colors.dim(`  [${current}/${total}]\n`);
     }
-    await write(view.formatNext(content, stdoutColumns));
+    return content;
+  }
+
+  async function render() {
+    await write(view.formatNext(renderImpl(), stdoutColumns));
   }
 
   // TODO: async handler race condition
