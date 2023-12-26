@@ -173,10 +173,10 @@ describe(hydrate, () => {
     `);
 
     hydrate(vnode, parent);
-    expect(parent).toMatchInlineSnapshot(`
+    expect(markTrailingSpace(parent)).toMatchInlineSnapshot(`
       <main>
         <div>
-          
+         ∅
         </div>
       </main>
     `);
@@ -190,19 +190,19 @@ describe(hydrate, () => {
 
     const parent = document.createElement("main");
     parent.innerHTML = vnodeSsr;
-    expect(parent).toMatchInlineSnapshot(`
+    expect(markTrailingSpace(parent)).toMatchInlineSnapshot(`
       <main>
         <div>
-           
+          ∅
         </div>
       </main>
     `);
 
     hydrate(vnode, parent);
-    expect(parent).toMatchInlineSnapshot(`
+    expect(markTrailingSpace(parent)).toMatchInlineSnapshot(`
       <main>
         <div>
-           
+          ∅
         </div>
       </main>
     `);
@@ -234,4 +234,22 @@ describe(hydrate, () => {
       </main>
     `);
   });
+});
+
+// replace trailing whitespace with "∅" so that IDE won't strip it
+function markTrailingSpace(value: unknown) {
+  return {
+    [Symbol.for("∅")]: true,
+    value,
+  };
+}
+
+expect.addSnapshotSerializer({
+  test(val: unknown) {
+    return typeof val === "object" && !!val && Symbol.for("∅") in val;
+  },
+  serialize(val, config, indentation, depth, refs, printer) {
+    const s = printer(val.value, config, indentation, depth, refs);
+    return s.replaceAll(/ $/gm, "∅");
+  },
 });
