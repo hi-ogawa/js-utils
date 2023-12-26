@@ -34,7 +34,7 @@ export async function promptAutocomplete(options: {
   message: string;
   suggest: (input: string) => string[] | Promise<string[]>;
   limit?: number;
-  hideCursor?: boolean; // convenient for debugging
+  debugCursor?: boolean;
 }) {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<void>();
@@ -47,8 +47,8 @@ export async function promptAutocomplete(options: {
   let suggestionIndex = 0;
   let done = false;
   let offset = 0;
+  // TODO: listen "resize" event?
   const limit = options.limit ?? Math.min(10, (process.stdout.rows ?? 20) - 5);
-  const hideCursor = options.hideCursor ?? true;
 
   async function updateSuggestions() {
     suggestions = await options.suggest(input);
@@ -152,7 +152,7 @@ export async function promptAutocomplete(options: {
   });
 
   try {
-    if (hideCursor) {
+    if (!options.debugCursor) {
       await write(`${CSI}?25l`); // hide cursor
     }
     await updateSuggestions();
@@ -162,7 +162,7 @@ export async function promptAutocomplete(options: {
   } finally {
     dispose?.();
     await render();
-    if (hideCursor) {
+    if (!options.debugCursor) {
       await write(`${CSI}?25h`); // show cursor
     }
   }
