@@ -79,20 +79,19 @@ export async function promptAutocomplete(options: {
   function renderImpl() {
     if (done) {
       return (
-        colors.green("◇") +
+        (value ? "o" : "x") +
         " " +
         options.message +
-        colors.dim(" › ") +
+        colors.dim(" > ") +
         (value ?? input) +
         "\n"
       );
     }
 
     let content =
-      colors.cyan("◆") +
-      " " +
-      colors.bold(options.message) +
-      colors.dim(" › ") +
+      "* " +
+      options.message +
+      colors.dim(" > ") +
       formatInputCursor({ line: input, cursor });
 
     content += "\n";
@@ -101,9 +100,7 @@ export async function promptAutocomplete(options: {
       .map(
         (v, i) =>
           "  " +
-          (i + offset === suggestionIndex
-            ? `${colors.green("●")} ${v}`
-            : `${colors.dim("○")} ${colors.dim(v)}`) +
+          (i + offset === suggestionIndex ? `> ${v}` : `  ${colors.dim(v)}`) +
           "\n"
       )
       .join("");

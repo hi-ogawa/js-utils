@@ -27,54 +27,55 @@ describe(promptAutocomplete, () => {
 
     await waitForStable(proc.child.stdout);
     expect(cleanOutput(proc.stdout)).toMatchInlineSnapshot(`
-      "◆ Select node builtin module ›
-        ● _http_agent
-        ○ _http_client
-        ○ _http_common
-        ○ _http_incoming
-        ○ _http_outgoing
-        ○ _http_server
-        ○ _stream_duplex
-        ○ _stream_passthrough
-        ○ _stream_readable
-        ○ _stream_transform
+      "* Select node builtin module >
+        > _http_agent
+          _http_client
+          _http_common
+          _http_incoming
+          _http_outgoing
+          _http_server
+          _stream_duplex
+          _stream_passthrough
+          _stream_readable
+          _stream_transform
         [1/66]
       "
     `);
 
+    const marker = "Select node builtin module";
     proc.child.stdin.write("promises");
     await waitForStable(proc.child.stdout);
-    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), "›"))
+    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), marker))
       .toMatchInlineSnapshot(`
-        "◆ Select node builtin module › promises
-          ● dns/promises
-          ○ fs/promises
-          ○ readline/promises
-          ○ stream/promises
-          ○ timers/promises
+        "* Select node builtin module > promises
+          > dns/promises
+            fs/promises
+            readline/promises
+            stream/promises
+            timers/promises
           [1/5]
         "
       `);
 
     proc.child.stdin.write("\x1b[B".repeat(2));
     await waitForStable(proc.child.stdout);
-    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), "›"))
+    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), marker))
       .toMatchInlineSnapshot(`
-        "◆ Select node builtin module › promises
-          ○ dns/promises
-          ○ fs/promises
-          ● readline/promises
-          ○ stream/promises
-          ○ timers/promises
+        "* Select node builtin module > promises
+            dns/promises
+            fs/promises
+          > readline/promises
+            stream/promises
+            timers/promises
           [3/5]
         "
       `);
 
     proc.child.stdin.write("\n");
     await waitForStable(proc.child.stdout);
-    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), "›"))
+    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), marker))
       .toMatchInlineSnapshot(`
-        "◇ Select node builtin module › readline/promises
+        "o Select node builtin module > readline/promises
         [answer] { input: 'promises', value: 'readline/promises' }
         "
       `);
