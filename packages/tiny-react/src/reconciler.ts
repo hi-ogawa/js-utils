@@ -240,6 +240,7 @@ function reconcileNode(
   return bnode;
 }
 
+// TODO: check excess nodes during SSR?
 function hydrateNode(
   vnode: VNode,
   hparent: HNode,
