@@ -264,6 +264,10 @@ function hydrateNode(
     } satisfies BTag;
   } else if (vnode.type === NODE_TYPE_TEXT) {
     const hnode = getSlotTargetNode(hparent, preSlot);
+    // no text node for empty text during SSR
+    if (hnode === null && vnode.data === "") {
+      return EMPTY_NODE;
+    }
     tinyassert(
       hnode instanceof Text,
       `text hydration mismatch (actual: '${hnode?.nodeName}', expected: '#text')`
