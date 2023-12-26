@@ -46,7 +46,7 @@
     "build": "tsup",
     "test": "vitest",
     "lint": "icheck-ts $(find src -name '*.ts')",
-    "prepack": "rm -rf dist && pnpm build",
+    "prepack": "rm -rf dist && pnpm --filter @hiogawa/tiny-react... build",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
