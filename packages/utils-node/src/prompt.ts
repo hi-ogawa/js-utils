@@ -29,7 +29,6 @@ export async function promptQuestion(query: string): Promise<string> {
   }
 }
 
-// TODO: custom render
 export async function promptAutocomplete(options: {
   message: string;
   suggest: (input: string) => string[] | Promise<string[]>;
@@ -75,6 +74,7 @@ export async function promptAutocomplete(options: {
     }
   }
 
+  // TODO: custom pure render function based on states?
   function renderImpl() {
     if (done) {
       return (
