@@ -1,6 +1,6 @@
 import readline from "node:readline";
 import { promisify } from "node:util";
-import { createManualPromise } from "@hiogawa/utils";
+import { colors, createManualPromise } from "@hiogawa/utils";
 import {
   CSI,
   ViewFormatter,
@@ -29,6 +29,7 @@ export async function promptQuestion(query: string): Promise<string> {
   }
 }
 
+// TODO: custom render
 export async function promptAutocomplete(options: {
   message: string;
   suggest: (input: string) => string[] | Promise<string[]>;
@@ -78,21 +79,40 @@ export async function promptAutocomplete(options: {
 
   async function render() {
     if (done) {
-      const content = options.message + (value ?? input) + "\n";
+      const content =
+        colors.green("◇") +
+        " " +
+        options.message +
+        colors.dim(" › ") +
+        (value ?? input) +
+        "\n";
       await write(view.formatNext(content, stdoutColumns));
       return;
     }
 
-    let content = options.message + formatInputCursor({ line: input, cursor });
+    let content =
+      colors.cyan("◆") +
+      " " +
+      colors.bold(options.message) +
+      colors.dim(" › ") +
+      formatInputCursor({ line: input, cursor });
+
     content += "\n";
     content += suggestions
       .slice(offset, offset + limit)
-      .map((v, i) => `  ${i + offset === suggestionIndex ? ">" : " "} ${v}\n`)
+      .map(
+        (v, i) =>
+          "  " +
+          (i + offset === suggestionIndex
+            ? `${colors.green("●")} ${v}`
+            : `${colors.dim("○")} ${colors.dim(v)}`) +
+          "\n"
+      )
       .join("");
     if (!options.hideCount) {
       const total = suggestions.length;
       const current = Math.min(suggestionIndex + 1, total);
-      content += `  [${current}/${total}]\n`;
+      content += colors.dim(`  [${current}/${total}]\n`);
     }
     await write(view.formatNext(content, stdoutColumns));
   }
