@@ -38,8 +38,9 @@ export async function promptAutocomplete(options: {
 }) {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<void>();
-  const screenManager = new ScreenManager();
+  let lastRender = "";
 
+  // states
   let input = "";
   let cursor = 0;
   let value: string | undefined;
@@ -111,7 +112,10 @@ export async function promptAutocomplete(options: {
   }
 
   async function render() {
-    await screenManager.render(renderImpl());
+    const nextRender = renderImpl();
+    const clearLastRender = clearContent(lastRender, process.stdout.columns);
+    lastRender = nextRender;
+    await write(clearLastRender + nextRender);
   }
 
   // TODO: async handler race condition
@@ -165,16 +169,6 @@ export async function promptAutocomplete(options: {
     if (!options.debugCursor) {
       await write(`${CSI}?25h`); // show cursor
     }
-  }
-}
-
-class ScreenManager {
-  private last = "";
-
-  async render(content: string) {
-    const clearLast = clearContent(this.last, process.stdout.columns);
-    this.last = content;
-    process.stdout.write(clearLast + content);
   }
 }
 
