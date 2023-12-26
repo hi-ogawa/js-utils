@@ -26,8 +26,8 @@ describe(promptAutocomplete, () => {
     tinyassert(proc.child.stdout);
 
     await waitForStable(proc.child.stdout);
-    expect(stripSnap(proc.stdout)).toMatchInlineSnapshot(`
-      "? select node builtin module >
+    expect(cleanOutput(proc.stdout)).toMatchInlineSnapshot(`
+      "* Select node builtin module >
         > _http_agent
           _http_client
           _http_common
@@ -42,11 +42,12 @@ describe(promptAutocomplete, () => {
       "
     `);
 
+    const marker = "Select node builtin module";
     proc.child.stdin.write("promises");
     await waitForStable(proc.child.stdout);
-    expect("?" + stripSnap(proc.stdout).split("?").at(-1))
+    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), marker))
       .toMatchInlineSnapshot(`
-        "? select node builtin module > promises
+        "* Select node builtin module > promises
           > dns/promises
             fs/promises
             readline/promises
@@ -58,9 +59,9 @@ describe(promptAutocomplete, () => {
 
     proc.child.stdin.write("\x1b[B".repeat(2));
     await waitForStable(proc.child.stdout);
-    expect("?" + stripSnap(proc.stdout).split("?").at(-1))
+    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), marker))
       .toMatchInlineSnapshot(`
-        "? select node builtin module > promises
+        "* Select node builtin module > promises
             dns/promises
             fs/promises
           > readline/promises
@@ -72,9 +73,9 @@ describe(promptAutocomplete, () => {
 
     proc.child.stdin.write("\n");
     await waitForStable(proc.child.stdout);
-    expect("?" + stripSnap(proc.stdout).split("?").at(-1))
+    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), marker))
       .toMatchInlineSnapshot(`
-        "? select node builtin module > readline/promises
+        "o Select node builtin module > readline/promises
         [answer] { input: 'promises', value: 'readline/promises' }
         "
       `);
@@ -92,8 +93,17 @@ async function waitForStable(readable: Readable, ms: number = 200) {
   }
 }
 
-function stripSnap(v: string) {
+function cleanOutput(v: string) {
   v = stripAnsi(v);
   v = v.replaceAll(/ *$/gm, ""); // strip trailing line
   return v;
+}
+
+function getLinesFromLastMarker(s: string, marker: string): string {
+  const i = s.lastIndexOf(marker);
+  if (i >= 0) {
+    const j = s.slice(0, i).lastIndexOf("\n");
+    return s.slice(j + 1);
+  }
+  return s;
 }

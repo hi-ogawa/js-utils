@@ -13,7 +13,7 @@ const builtinModules = ["_http_agent","_http_client","_http_common","_http_incom
 
 async function main() {
   const result = await promptAutocomplete({
-    message: "? select node builtin module > ",
+    message: "Select node builtin module",
     suggest: (input) => {
       return builtinModules.filter((v) => v.includes(input));
     },

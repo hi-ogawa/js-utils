@@ -1,9 +1,9 @@
 import readline from "node:readline";
 import { promisify } from "node:util";
-import { createManualPromise } from "@hiogawa/utils";
+import { colors, createManualPromise } from "@hiogawa/utils";
 import {
   CSI,
-  ViewFormatter,
+  computeHeight,
   formatInputCursor,
   getSpecialKey,
   subscribeReadlineEvent,
@@ -33,13 +33,13 @@ export async function promptAutocomplete(options: {
   message: string;
   suggest: (input: string) => string[] | Promise<string[]>;
   limit?: number;
-  hideCursor?: boolean; // convenient for debugging
-  hideCount?: boolean;
+  debugCursor?: boolean;
 }) {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<void>();
-  const view = new ViewFormatter();
+  let lastRender = "";
 
+  // states
   let input = "";
   let cursor = 0;
   let value: string | undefined;
@@ -47,10 +47,8 @@ export async function promptAutocomplete(options: {
   let suggestionIndex = 0;
   let done = false;
   let offset = 0;
-  const stdoutRows = process.stdout.rows ?? 20;
-  const stdoutColumns = process.stdout.columns ?? 80;
-  const limit = options.limit ?? Math.min(10, stdoutRows - 5);
-  const hideCursor = options.hideCursor ?? true;
+  // TODO: listen "resize" event?
+  const limit = options.limit ?? Math.min(10, (process.stdout.rows ?? 20) - 5);
 
   async function updateSuggestions() {
     suggestions = await options.suggest(input);
@@ -76,25 +74,48 @@ export async function promptAutocomplete(options: {
     }
   }
 
-  async function render() {
+  // TODO: custom pure render function based on states?
+  function renderImpl() {
     if (done) {
-      const content = options.message + (value ?? input) + "\n";
-      await write(view.formatNext(content, stdoutColumns));
-      return;
+      return (
+        (value ? "o" : "x") +
+        " " +
+        options.message +
+        colors.dim(" > ") +
+        (value ?? input) +
+        "\n"
+      );
     }
 
-    let content = options.message + formatInputCursor({ line: input, cursor });
+    let content =
+      "* " +
+      options.message +
+      colors.dim(" > ") +
+      formatInputCursor({ line: input, cursor });
+
     content += "\n";
     content += suggestions
       .slice(offset, offset + limit)
-      .map((v, i) => `  ${i + offset === suggestionIndex ? ">" : " "} ${v}\n`)
+      .map(
+        (v, i) =>
+          "  " +
+          (i + offset === suggestionIndex ? `> ${v}` : `  ${colors.dim(v)}`) +
+          "\n"
+      )
       .join("");
-    if (!options.hideCount) {
-      const total = suggestions.length;
-      const current = Math.min(suggestionIndex + 1, total);
-      content += `  [${current}/${total}]\n`;
-    }
-    await write(view.formatNext(content, stdoutColumns));
+
+    const total = suggestions.length;
+    const current = Math.min(suggestionIndex + 1, total);
+    content += colors.dim(`  [${current}/${total}]\n`);
+
+    return content;
+  }
+
+  async function render() {
+    const nextRender = renderImpl();
+    const clearLastRender = clearContent(lastRender, process.stdout.columns);
+    lastRender = nextRender;
+    await write(clearLastRender + nextRender);
   }
 
   // TODO: async handler race condition
@@ -135,7 +156,7 @@ export async function promptAutocomplete(options: {
   });
 
   try {
-    if (hideCursor) {
+    if (!options.debugCursor) {
       await write(`${CSI}?25l`); // hide cursor
     }
     await updateSuggestions();
@@ -145,8 +166,19 @@ export async function promptAutocomplete(options: {
   } finally {
     dispose?.();
     await render();
-    if (hideCursor) {
+    if (!options.debugCursor) {
       await write(`${CSI}?25h`); // show cursor
     }
   }
+}
+
+function clearContent(content: string, width: number): string {
+  // TODO: vscode's terminal has funky behavior when content height exceeds terminal height?
+  // TODO: IME (e.g Japanese input) cursor is currently not considered.
+
+  // - cursor up by `height`
+  // - cursor to left
+  // - clear below
+  const height = computeHeight(content, width);
+  return `${CSI}1A`.repeat(height - 1) + `${CSI}1G` + `${CSI}0J`;
 }
