@@ -35,7 +35,6 @@ export async function promptAutocomplete(options: {
   suggest: (input: string) => string[] | Promise<string[]>;
   limit?: number;
   hideCursor?: boolean; // convenient for debugging
-  hideCount?: boolean;
 }) {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<void>();
@@ -108,11 +107,11 @@ export async function promptAutocomplete(options: {
           "\n"
       )
       .join("");
-    if (!options.hideCount) {
-      const total = suggestions.length;
-      const current = Math.min(suggestionIndex + 1, total);
-      content += colors.dim(`  [${current}/${total}]\n`);
-    }
+
+    const total = suggestions.length;
+    const current = Math.min(suggestionIndex + 1, total);
+    content += colors.dim(`  [${current}/${total}]\n`);
+
     return content;
   }
 
