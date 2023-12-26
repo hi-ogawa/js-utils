@@ -176,7 +176,7 @@ describe(hydrate, () => {
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-
+          
         </div>
       </main>
     `);
@@ -193,7 +193,7 @@ describe(hydrate, () => {
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-
+           
         </div>
       </main>
     `);
@@ -202,13 +202,13 @@ describe(hydrate, () => {
     expect(parent).toMatchInlineSnapshot(`
       <main>
         <div>
-
+           
         </div>
       </main>
     `);
   });
 
-  it.only("text concat", () => {
+  it("text concat", () => {
     // <div>a{"b"}</div>
     const vnode = createVNode("div", { children: ["a", "b"] });
     const vnodeSsr = renderToString(vnode);
@@ -225,6 +225,13 @@ describe(hydrate, () => {
     `);
 
     hydrate(vnode, parent);
-    expect(parent).toMatchInlineSnapshot();
+    expect(parent).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          a
+          b
+        </div>
+      </main>
+    `);
   });
 });
