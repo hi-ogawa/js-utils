@@ -35,6 +35,7 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest",
+    "prepack": "pnpm build",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
