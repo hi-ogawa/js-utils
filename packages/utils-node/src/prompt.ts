@@ -3,7 +3,7 @@ import { promisify } from "node:util";
 import { createManualPromise } from "@hiogawa/utils";
 import {
   CSI,
-  computeHeight,
+  ViewFormatter,
   formatInputCursor,
   getSpecialKey,
   subscribeReadlineEvent,
@@ -38,6 +38,7 @@ export async function promptAutocomplete(options: {
 }) {
   const write = promisify(process.stdout.write.bind(process.stdout));
   const manual = createManualPromise<void>();
+  const view = new ViewFormatter();
 
   let input = "";
   let cursor = 0;
@@ -77,7 +78,8 @@ export async function promptAutocomplete(options: {
 
   async function render() {
     if (done) {
-      await write(`${CSI}0J` + options.message + (value ?? input) + "\n");
+      const content = options.message + (value ?? input) + "\n";
+      await write(view.formatNext(content, stdoutColumns));
       return;
     }
 
@@ -92,14 +94,7 @@ export async function promptAutocomplete(options: {
       const current = Math.min(suggestionIndex + 1, total);
       content += `  [${current}/${total}]\n`;
     }
-
-    // TODO: vscode's terminal has funky behavior when content height exceeds terminal height?
-    // TODO: IME (e.g Japanese input) cursor is currently not considered.
-    const height = computeHeight(content, stdoutColumns);
-    await write(
-      // clear below + content + cursor up by "height"
-      `${CSI}0J` + content + `${CSI}1A`.repeat(height - 1) + `${CSI}1G`
-    );
+    await write(view.formatNext(content, stdoutColumns));
   }
 
   // TODO: async handler race condition
@@ -130,9 +125,11 @@ export async function promptAutocomplete(options: {
       }
     }
     if (input !== rl.line || cursor !== rl.cursor) {
-      input = rl.line;
+      if (input !== rl.line) {
+        input = rl.line;
+        await updateSuggestions();
+      }
       cursor = rl.cursor;
-      await updateSuggestions();
       await render();
     }
   });

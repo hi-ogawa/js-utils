@@ -158,3 +158,24 @@ export function formatInputCursor({
   const p3 = line.slice(cursor + 1);
   return p1 + colors.inverse(p2) + p3;
 }
+
+export class ViewFormatter {
+  last = "";
+
+  formatNext(content: string, width: number): string {
+    let result = "";
+    if (this.last) {
+      // TODO: vscode's terminal has funky behavior when content height exceeds terminal height?
+      // TODO: IME (e.g Japanese input) cursor is currently not considered.
+
+      // - cursor up by `height`
+      // - cursor to left
+      // - clear below
+      const height = computeHeight(this.last, width);
+      result += `${CSI}1A`.repeat(height - 1) + `${CSI}1G`;
+    }
+    result += `${CSI}0J` + content;
+    this.last = content;
+    return result;
+  }
+}
