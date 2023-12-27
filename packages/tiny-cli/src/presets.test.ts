@@ -60,19 +60,19 @@ describe("presets", () => {
     `);
 
     expect(() => cli.parse([])).toThrowErrorMatchingInlineSnapshot(
-      '"failed to parse <positionalString>"'
+      `[Error: failed to parse <positionalString>]`
     );
 
     expect(() =>
       cli.parse(["hello", "not-a-number"])
     ).toThrowErrorMatchingInlineSnapshot(
-      '"failed to parse <positionalNumberDefault>"'
+      `[Error: failed to parse <positionalNumberDefault>]`
     );
 
     expect(() =>
       cli.parse(["hello", "123", "not-a-number"])
     ).toThrowErrorMatchingInlineSnapshot(
-      '"failed to parse <positionalNumberOptional>"'
+      `[Error: failed to parse <positionalNumberOptional>]`
     );
 
     expect(cli.parse(["hello", "123", "456", "--testString", "hey"]))
@@ -180,7 +180,9 @@ describe("presets", () => {
 
     expect(() =>
       cli.parse(["a", "b", "1", "2"])
-    ).toThrowErrorMatchingInlineSnapshot('"failed to parse <testArray...>"');
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: failed to parse <testArray...>]`
+    );
 
     expect(cli.parse(["1", "2"])).toMatchInlineSnapshot(`
       {

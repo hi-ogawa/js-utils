@@ -1,6 +1,6 @@
 import {
   type Result,
-  newPromiseWithResolvers,
+  createManualPromise,
   wrapErrorAsync,
 } from "@hiogawa/utils";
 import {
@@ -72,16 +72,16 @@ export function messagePortClientAdapter({
         id: generateId(),
         data,
       };
-      const promiseResolvers = newPromiseWithResolvers<ResponsePayload>();
+      const responsePromise = createManualPromise<ResponsePayload>();
       const unlisten = listen(port, (ev) => {
         const res = ev.data as ResponsePayload;
         if (res.id === req.id) {
-          promiseResolvers.resolve(res);
+          responsePromise.resolve(res);
           unlisten();
         }
       });
       port.postMessage(req);
-      const res = await promiseResolvers.promise;
+      const res = await responsePromise;
       if (!res.result.ok) {
         throw TinyRpcError.deserialize(res.result.value);
       }
