@@ -26,6 +26,7 @@
   "devDependencies": {
     "@hiogawa/tiny-cli": "workspace:*",
     "@hiogawa/utils": "workspace:*",
+    "@hiogawa/utils-node": "workspace:*",
     "@types/node": "^18.19.0"
   },
   "peerDependencies": {

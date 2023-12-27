@@ -81,4 +81,6 @@ npx tsx --experimental-import-meta-resolve ./src/cli.ts --useImportMetaResolve $
 node --experimental-import-meta-resolve ./bin/cli.js --useImportMetaResolve fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
 node --experimental-import-meta-resolve --loader tsx/esm ./bin/cli.js --useImportMetaResolve fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
 npx tsx --experimental-import-meta-resolve ./bin/cli.js --useImportMetaResolve fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
+
+npx tsx --experimental-import-meta-resolve ./src/cli.ts --useImportMetaResolve $(find fixtures/resolve -type f)
 ```

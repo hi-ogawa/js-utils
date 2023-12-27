@@ -1,4 +1,5 @@
 import childProcess from "node:child_process";
+import { $ } from "@hiogawa/utils-node";
 import { beforeAll, describe, expect, it } from "vitest";
 import { setupTestFixture } from "./tests/helper";
 
@@ -53,4 +54,23 @@ import { x } from "./cycle2";
       "
     `);
   });
+});
+
+describe("import.meta.resolve", () => {
+  it("tsx", async () => {
+    let files = await $`find fixtures/resolve -type f`;
+    files = files.replaceAll("\n", " ");
+    const proc = $`tsx --experimental-import-meta-resolve ./src/cli.ts --useImportMetaResolve ${files}`;
+    await expect(proc).rejects.toMatchInlineSnapshot(`[Error: ScriptError]`);
+    expect(proc.stdout).toMatchInlineSnapshot(`
+      "** Unresolved imports **
+      fixtures/resolve/f1.ts:2 - unknown-dep
+      fixtures/resolve/f1.ts:5 - ./dir1/unknown
+      fixtures/resolve/f1.ts:8 - ./unknown
+      "
+    `);
+    expect(proc.stderr).toMatchInlineSnapshot(`""`);
+  });
+
+  it.skip("TODO: test without tsx loader", async () => {});
 });
