@@ -38,6 +38,9 @@ const command = new TinyCliCommand(
       ),
       noCheckCircular: arg.boolean("Disable checking circular import"),
       noCheckUnresolved: arg.boolean("Disable checking unresolved import"),
+      useImportMetaResolve: arg.boolean(
+        "Use import.meta.resolve for module resolution"
+      ),
     },
   },
   async ({ args }) => {
@@ -49,9 +52,7 @@ const command = new TinyCliCommand(
     await cacheOp?.load();
     const result = await runner(args.files, {
       parse,
-      experimental: process.execArgv.includes(
-        "--experimental-import-meta-resolve"
-      ),
+      experimental: args.useImportMetaResolve,
     });
     await cacheOp?.save();
 

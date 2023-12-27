@@ -74,10 +74,11 @@ npx tsx ./src/cli.ts $(find fixtures/ytsub-v3/app -name '*.ts' -o -name '*.tsx')
 npx tsx ./src/cli.ts fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
 npx tsx ./src/cli.ts $(git grep -l . src)
 
-# experimental mode
-npx tsx --experimental-import-meta-resolve ./src/cli.ts fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
-npx tsx --experimental-import-meta-resolve ./src/cli.ts $(git grep -l . src)
+# import.meta.resolve mode
+npx tsx --experimental-import-meta-resolve ./src/cli.ts --useImportMetaResolve fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
+npx tsx --experimental-import-meta-resolve ./src/cli.ts --useImportMetaResolve $(git grep -l . src)
 
-node --experimental-import-meta-resolve ./bin/cli.js ./src/cli.ts fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
-node --experimental-import-meta-resolve --loader tsx/esm ./bin/cli.js fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
+node --experimental-import-meta-resolve ./bin/cli.js --useImportMetaResolve fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
+node --experimental-import-meta-resolve --loader tsx/esm ./bin/cli.js --useImportMetaResolve fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
+npx tsx --experimental-import-meta-resolve ./bin/cli.js --useImportMetaResolve fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
 ```
