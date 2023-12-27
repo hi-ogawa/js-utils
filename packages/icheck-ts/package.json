@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/icheck-ts",
-  "version": "0.0.1-pre.15",
+  "version": "0.0.1-pre.21",
   "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/icheck-ts",
   "repository": {
     "type": "git",
@@ -20,12 +20,14 @@
     "cli-dev": "tsx ./src/cli.ts",
     "test": "vitest",
     "docs": "inline-template ./README.md",
+    "prepack": "pnpm build",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
     "@hiogawa/tiny-cli": "workspace:*",
     "@hiogawa/utils": "workspace:*",
-    "@types/node": "^18"
+    "@hiogawa/utils-node": "workspace:*",
+    "@types/node": "^18.19.0"
   },
   "peerDependencies": {
     "typescript": "*"

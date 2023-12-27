@@ -69,6 +69,9 @@ fixtures/cli/cycle4.ts:2 - x
 pnpm build
 pnpm release
 
-# run agianst fixtures
-node ./bin/cli.js $(find fixtures/ytsub-v3/app -name '*.ts' -o -name '*.tsx')
+# dev
+npx tsx ./src/cli.ts $(git grep -l . src)
+npx tsx --experimental-import-meta-resolve ./src/cli.ts --useImportMetaResolve $(find fixtures/resolve -type f)
+npx node --experimental-import-meta-resolve --import tsx/esm ./bin/cli.js --useImportMetaResolve $(find fixtures/resolve -type f)
+npx node --experimental-import-meta-resolve ./bin/cli.js --useImportMetaResolve $(find fixtures/resolve -type f)
 ```

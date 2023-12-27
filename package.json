@@ -31,13 +31,13 @@
     "esbuild": "^0.18.10",
     "prettier": "^2.8.8",
     "tsup": "^7.1.0",
-    "tsx": "^3.12.7",
+    "tsx": "^4.6.2",
     "typedoc": "^0.24.8",
     "typescript": "^5.1.6",
     "vitest": "^1.0.2"
   },
   "packageManager": "pnpm@8.12.0+sha256.553e4eb0e2a2c9abcb419b3262bdc7aee8ae3c42e2301a1807d44575786160c9",
   "volta": {
-    "node": "18.16.0"
+    "node": "18.19.0"
   }
 }
