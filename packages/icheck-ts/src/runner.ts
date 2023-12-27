@@ -55,7 +55,7 @@ export async function runner(
   inputFiles: string[],
   options?: {
     parse?: typeof parseImportExport;
-    experimental?: boolean;
+    useImportMetaResolve?: boolean;
   }
 ) {
   // normalize relative path to match with `resolveImportSource` (e.g. "./x.ts" => "x.ts")
@@ -98,8 +98,8 @@ export async function runner(
         usages.push({ type: "named", name: el.nameBefore ?? el.name });
       }
       let source: ImportSource;
-      if (options?.experimental) {
-        source = resolveImportSourceExperimental(file, e.source);
+      if (options?.useImportMetaResolve) {
+        source = resolveImportSourceV2(file, e.source);
       } else {
         source = await resolveImportSource(file, e.source);
       }
@@ -185,7 +185,7 @@ export async function runner(
 // so that users can use custom loader (e.g. tsx) to support what they need.
 // this requires NodeJS v18.19.0 with --experimental-import-meta-resolve.
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#importmetaresolvespecifier
-function resolveImportSourceExperimental(
+function resolveImportSourceV2(
   containingFile: string,
   source: string
 ): ImportSource {

@@ -52,7 +52,7 @@ const command = new TinyCliCommand(
     await cacheOp?.load();
     const result = await runner(args.files, {
       parse,
-      experimental: args.useImportMetaResolve,
+      useImportMetaResolve: args.useImportMetaResolve,
     });
     await cacheOp?.save();
 
