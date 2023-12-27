@@ -7,6 +7,7 @@ import {
   DefaultMap,
   assertUnreachable,
   tinyassert,
+  wrapError,
   wrapErrorAsync,
 } from "@hiogawa/utils";
 import { type ParseOutput, type ParsedBase, parseImportExport } from "./parser";
@@ -98,7 +99,7 @@ export async function runner(
       }
       let source: ImportSource;
       if (options?.experimental) {
-        source = await resolveImportSourceExperimental(file, e.source);
+        source = resolveImportSourceExperimental(file, e.source);
       } else {
         source = await resolveImportSource(file, e.source);
       }
@@ -182,15 +183,13 @@ export async function runner(
 
 // use `import.meta.resolve` to resolve import source
 // so that users can use custom loader (e.g. tsx) to support what they need.
+// this requires NodeJS v18.19.0 with --experimental-import-meta-resolve.
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#importmetaresolvespecifier
-// TODO: performance-wise this would be probably slower?
-async function resolveImportSourceExperimental(
+function resolveImportSourceExperimental(
   containingFile: string,
   source: string
-): Promise<ImportSource> {
-  tinyassert(import.meta.resolve);
-  const resolve = import.meta.resolve;
-  const baseDir = process.cwd(); // TODO: baseDir as cli option
+): ImportSource {
+  const baseDir = process.cwd(); // TODO: baseDir as cli option?
 
   if (isBuiltin(source)) {
     return {
@@ -198,16 +197,21 @@ async function resolveImportSourceExperimental(
       name: source,
     };
   }
-  // TODO: standardized as "sync" but still "async" in old nodejs
-  // TODO: also what standardized doesn't throw when not found. https://github.com/nodejs/node/pull/49038
-  //       Do we still need to do fs.existsSync to check?
+
   const parentUrl = pathToFileURL(path.join(baseDir, containingFile));
-  const resolved = await wrapErrorAsync(async () => {
-    const sourceUrl = await resolve(source, parentUrl.toString());
+  const resolved = wrapError(() => {
+    tinyassert(import.meta.resolve);
+
+    // Standardized as "sync" but still "async" before v18.19.0.
+    const sourceUrl = import.meta.resolve(source, parentUrl.toString());
+    tinyassert(typeof sourceUrl === "string");
+
+    // standardized to not throw when not found, so we check with `fs.existsSync`.
     const sourcePath = fileURLToPath(sourceUrl);
     tinyassert(fs.existsSync(sourcePath));
     return sourcePath;
   });
+
   if (!resolved.ok) {
     return {
       type: "unknown",
