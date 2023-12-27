@@ -70,11 +70,7 @@ pnpm build
 pnpm release
 
 # dev
-npx tsx ./src/cli.ts $(find fixtures/ytsub-v3/app -name '*.ts' -o -name '*.tsx')
-npx tsx ./src/cli.ts fixtures/ytsub-v3/app/routes/index.tsx fixtures/ytsub-v3/app/utils/loader-utils.ts
 npx tsx ./src/cli.ts $(git grep -l . src)
-
-# test import.meta.resolve mode
 npx tsx --experimental-import-meta-resolve ./src/cli.ts --useImportMetaResolve $(find fixtures/resolve -type f)
 npx node --experimental-import-meta-resolve --import tsx/esm ./bin/cli.js --useImportMetaResolve $(find fixtures/resolve -type f)
 npx node --experimental-import-meta-resolve ./bin/cli.js --useImportMetaResolve $(find fixtures/resolve -type f)
