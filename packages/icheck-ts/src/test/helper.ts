@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import process from "node:process";
 
 export async function collectFiles(dir: string) {
   let files: string[] = [];
@@ -24,4 +25,12 @@ async function visitFiles(
       await visitFiles(filepath, callback);
     }
   }
+}
+
+export function useChdir(cwd: string) {
+  const cwdBefore = process.cwd();
+  process.chdir(cwd);
+  return () => {
+    process.chdir(cwdBefore);
+  };
 }
