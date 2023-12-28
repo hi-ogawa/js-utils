@@ -70,8 +70,8 @@ pnpm build
 pnpm release
 
 # dev
-npx tsx ./src/cli.ts $(git grep -l . src)
-npx tsx --experimental-import-meta-resolve ./src/cli.ts --useImportMetaResolve $(find fixtures/resolve -type f)
-npx node --experimental-import-meta-resolve --import tsx/esm ./bin/cli.js --useImportMetaResolve $(find fixtures/resolve -type f)
-npx node --experimental-import-meta-resolve ./bin/cli.js --useImportMetaResolve $(find fixtures/resolve -type f)
+pnpm cli $(find fixtures/resolve -type f)
+pnpm cli-tsx $(find fixtures/resolve -type f)
+pnpm cli-tsx-dev $(find fixtures/resolve -type f)
+pnpm cli-tsx-dev --useImportMetaResolve $(find fixtures/resolve -type f)
 ```
