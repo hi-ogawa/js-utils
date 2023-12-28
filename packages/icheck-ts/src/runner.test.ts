@@ -403,7 +403,7 @@ describe(findCircularImport, () => {
               "node": {
                 "comment": "",
                 "position": [
-                  2,
+                  1,
                   0,
                 ],
               },
@@ -425,7 +425,7 @@ describe(findCircularImport, () => {
               "node": {
                 "comment": "",
                 "position": [
-                  2,
+                  1,
                   0,
                 ],
               },
@@ -445,7 +445,7 @@ describe(findCircularImport, () => {
               "node": {
                 "comment": "",
                 "position": [
-                  2,
+                  1,
                   0,
                 ],
               },
@@ -475,7 +475,7 @@ describe(findCircularImport, () => {
               "node": {
                 "comment": "",
                 "position": [
-                  2,
+                  1,
                   0,
                 ],
               },
@@ -495,7 +495,7 @@ describe(findCircularImport, () => {
               "node": {
                 "comment": "",
                 "position": [
-                  2,
+                  1,
                   0,
                 ],
               },
@@ -515,7 +515,7 @@ describe(findCircularImport, () => {
               "node": {
                 "comment": "",
                 "position": [
-                  2,
+                  1,
                   0,
                 ],
               },
@@ -530,9 +530,9 @@ describe(findCircularImport, () => {
           ],
         ],
         "lines": [
-          "z.ts:2 - x",
-          "x.ts:2 - default",
-          "y.ts:2 - (side effect)",
+          "z.ts:1 - x",
+          "x.ts:1 - default",
+          "y.ts:1 - (side effect)",
         ],
       }
     `);
