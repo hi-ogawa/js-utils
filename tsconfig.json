@@ -11,10 +11,10 @@
       "path": "packages/json-extra"
     },
     {
-      "path": "packages/murmur3-wasm-bindgen"
+      "path": "packages/query-proxy"
     },
     {
-      "path": "packages/query-proxy"
+      "path": "packages/sort-package-json"
     },
     {
       "path": "packages/theme-script"
@@ -27,6 +27,21 @@
     },
     {
       "path": "packages/tiny-jwt"
+    },
+    {
+      "path": "packages/tiny-react"
+    },
+    {
+      "path": "packages/tiny-react/examples/basic"
+    },
+    {
+      "path": "packages/tiny-react/examples/ssr"
+    },
+    {
+      "path": "packages/tiny-refresh"
+    },
+    {
+      "path": "packages/tiny-refresh/examples/react"
     },
     {
       "path": "packages/tiny-rpc"

@@ -1,10 +1,14 @@
 {
   "name": "@hiogawa/tiny-cli",
   "version": "0.0.4-pre.1",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/tiny-cli",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/tiny-cli"
+  },
+  "license": "MIT",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -12,20 +16,12 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/tiny-cli"
-  },
-  "typedoc": {
-    "displayName": "@hiogawa/tiny-cli",
-    "readmeFile": "./README.md",
-    "entryPoint": "./src/index.ts"
-  },
   "scripts": {
     "build": "tsup",
     "test": "vitest",
@@ -34,5 +30,13 @@
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",
     "zod": "^3.21.4"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  },
+  "typedoc": {
+    "displayName": "@hiogawa/tiny-cli",
+    "readmeFile": "./README.md",
+    "entryPoint": "./src/index.ts"
   }
 }

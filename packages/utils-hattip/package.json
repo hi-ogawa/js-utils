@@ -1,10 +1,14 @@
 {
   "name": "@hiogawa/utils-hattip",
   "version": "0.0.1-pre.1",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/utils-hattip",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/utils-hattip"
+  },
+  "license": "MIT",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -12,23 +16,23 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/utils-hattip"
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "release": "pnpm publish --no-git-checks --access public"
+  },
+  "volta": {
+    "extends": "../../package.json"
   },
   "typedoc": {
     "displayName": "@hiogawa/utils-hattip",
     "readmeFile": "./README.md",
     "entryPoint": "./src/index.ts"
-  },
-  "scripts": {
-    "build": "tsup",
-    "test": "vitest",
-    "release": "pnpm publish --no-git-checks --access public"
   }
 }

@@ -8,9 +8,9 @@ import { safeFunctionCast } from "./misc";
 
 export function range(start: number, end?: number): number[] {
   if (typeof end === "undefined") {
-    return Array.from(Array(start), (_, i) => i);
+    return Array.from(Array(Math.max(start, 0)), (_, i) => i);
   }
-  return Array.from(Array(end - start), (_, i) => i + start);
+  return Array.from(Array(Math.max(end - start, 0)), (_, i) => i + start);
 }
 
 export function sortBy<T>(ls: T[], ...keyFns: ((x: T) => any)[]): T[] {
@@ -319,7 +319,7 @@ function objectMapEntries<T extends object, K2 extends PropertyKey, V2>(
 export function objectMapValues<T extends object, V>(
   o: T,
   f: (v: T[keyof T], k: keyof T) => V
-): Record<keyof T, V> {
+): { [k in keyof T]: V } {
   return objectMapEntries(o, ([k, v]) => [k, f(v, k)]);
 }
 

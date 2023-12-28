@@ -1,5 +1,5 @@
 import process from "node:process";
-import { assert, describe, expect, it } from "vitest";
+import { assert, describe, expect, expectTypeOf, it } from "vitest";
 import { tinyassert } from "./tinyassert";
 
 describe(tinyassert, () => {
@@ -17,9 +17,10 @@ describe(tinyassert, () => {
         .split("\n")
         .slice(0, 3)
         .join("\n")
+        .replaceAll(/ *$/gm, "") // trim trailing
         .replaceAll(process.cwd(), "__CWD__");
       expect(stack).toMatchInlineSnapshot(`
-        "Error: 
+        "Error:
             at boom (__CWD__/src/tinyassert.test.ts:8:7)
             at __CWD__/src/tinyassert.test.ts:11:7"
       `);
@@ -46,16 +47,18 @@ describe(tinyassert, () => {
   it("type guard", () => {
     const maybeNumber = 1 as number | null | undefined;
     tinyassert(maybeNumber);
-    maybeNumber satisfies number;
+    expectTypeOf(maybeNumber).toBeNumber();
   });
 
   it("error without message", () => {
-    expect(() => tinyassert(false)).toThrowErrorMatchingInlineSnapshot('""');
+    expect(() => tinyassert(false)).toThrowErrorMatchingInlineSnapshot(
+      `[Error]`
+    );
   });
 
   it("error with message", () => {
     expect(() => tinyassert(false, "boom")).toThrowErrorMatchingInlineSnapshot(
-      '"boom"'
+      `[Error: boom]`
     );
   });
 });

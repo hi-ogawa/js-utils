@@ -11,8 +11,11 @@ export function hashInt32(x: number): number {
 export class HashRng {
   private state: number;
 
-  constructor(seed: number) {
-    this.state = hashInt32(seed | 1);
+  /**
+   * @param seed must not be zero
+   */
+  constructor(seed: number = 1) {
+    this.state = hashInt32(seed);
   }
 
   int32(): number {
@@ -41,7 +44,7 @@ export function hashString(
 }
 
 // https://en.wikipedia.org/wiki/MurmurHash#Algorithm
-// fuzz test in packages/murmur3-wasm-bindgen/src-js/fuzz.test.ts
+// fuzz test in https://github.com/hi-ogawa/murmur3-wasm-bindgen/blob/main/src-js/fuzz.test.ts
 export function murmur3_32(key: Uint8Array, seed: number): number {
   const len = key.length;
   let h = seed;

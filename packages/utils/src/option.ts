@@ -6,3 +6,8 @@ export function mapOption<T, U>(
 ): U | undefined {
   return typeof x === "undefined" ? x : f(x as Exclude<T, undefined>);
 }
+
+/* shortcut for `undefined as T | undefined` */
+export function none<T>(): T | undefined {
+  return undefined;
+}

@@ -3,7 +3,8 @@ import path from "node:path";
 
 export async function setupTestFixture(
   base: string,
-  files: Record<string, string>
+  files: Record<string, string>,
+  opts?: { noChdir?: boolean }
 ) {
   const cwd = `./fixtures/${base}`;
   const cwdBefore = process.cwd();
@@ -17,6 +18,9 @@ export async function setupTestFixture(
     await fs.promises.writeFile(path.join(cwd, k), v);
   }
 
+  if (opts?.noChdir) {
+    return () => {};
+  }
   process.chdir(cwd);
   return () => {
     process.chdir(cwdBefore);

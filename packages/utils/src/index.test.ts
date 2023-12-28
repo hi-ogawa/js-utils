@@ -10,8 +10,8 @@ import {
   subscribeEventListenerFactory,
   typedBoolean,
 } from "./misc";
-import { mapOption } from "./option";
-import { newPromiseWithResolvers } from "./promise";
+import { mapOption, none } from "./option";
+import { createManualPromise } from "./promise";
 import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
 import {
   Err,
@@ -267,7 +267,7 @@ describe(HashKeyDefaultMap, () => {
         "defaultFn": [Function],
         "keyFn": [Function],
         "map": Map {
-          "{\\"mod2\\":0,\\"mod3\\":0}" => [
+          "{"mod2":0,"mod3":0}" => [
             {
               "mod2": 0,
               "mod3": 0,
@@ -277,7 +277,7 @@ describe(HashKeyDefaultMap, () => {
               6,
             ],
           ],
-          "{\\"mod2\\":1,\\"mod3\\":1}" => [
+          "{"mod2":1,"mod3":1}" => [
             {
               "mod2": 1,
               "mod3": 1,
@@ -287,7 +287,7 @@ describe(HashKeyDefaultMap, () => {
               7,
             ],
           ],
-          "{\\"mod2\\":0,\\"mod3\\":2}" => [
+          "{"mod2":0,"mod3":2}" => [
             {
               "mod2": 0,
               "mod3": 2,
@@ -297,7 +297,7 @@ describe(HashKeyDefaultMap, () => {
               8,
             ],
           ],
-          "{\\"mod2\\":1,\\"mod3\\":0}" => [
+          "{"mod2":1,"mod3":0}" => [
             {
               "mod2": 1,
               "mod3": 0,
@@ -307,7 +307,7 @@ describe(HashKeyDefaultMap, () => {
               9,
             ],
           ],
-          "{\\"mod2\\":0,\\"mod3\\":1}" => [
+          "{"mod2":0,"mod3":1}" => [
             {
               "mod2": 0,
               "mod3": 1,
@@ -316,7 +316,7 @@ describe(HashKeyDefaultMap, () => {
               4,
             ],
           ],
-          "{\\"mod2\\":1,\\"mod3\\":2}" => [
+          "{"mod2":1,"mod3":2}" => [
             {
               "mod2": 1,
               "mod3": 2,
@@ -491,10 +491,28 @@ describe(mapOption, () => {
   });
 });
 
-describe(newPromiseWithResolvers, () => {
+describe(none, () => {
+  it("basic", () => {
+    const v = {
+      email: "",
+      age: none<number>(),
+    } satisfies {
+      email: string;
+      age: number | undefined;
+    };
+    expect(v).toMatchInlineSnapshot(`
+      {
+        "age": undefined,
+        "email": "",
+      }
+    `);
+  });
+});
+
+describe(createManualPromise, () => {
   it("resolve", async () => {
-    const { promise, resolve } = newPromiseWithResolvers<number>();
-    resolve(123);
+    const promise = createManualPromise<number>();
+    promise.resolve(123);
     const result = await wrapErrorAsync(() => promise);
     expect(result).toMatchInlineSnapshot(`
       {
@@ -505,8 +523,8 @@ describe(newPromiseWithResolvers, () => {
   });
 
   it("reject", async () => {
-    const { promise, reject } = newPromiseWithResolvers<number>();
-    reject(123);
+    const promise = createManualPromise<number>();
+    promise.reject(123);
     const result = await wrapErrorAsync(() => promise);
     expect(result).toMatchInlineSnapshot(`
       {
@@ -555,9 +573,21 @@ describe(regExpRaw, () => {
     expect(re).toMatchInlineSnapshot(
       "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
     );
-    expect(re.source).toMatchInlineSnapshot(
-      '"\\\\/username\\\\/\\\\w+\\\\/profile"'
+    expect(re.source).toMatchInlineSnapshot(`"\\/username\\/\\w+\\/profile"`);
+    expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
+      [
+        "/username/hey/profile",
+      ]
+    `);
+    expect("/username/he y/profile".match(re)).toMatchInlineSnapshot("null");
+  });
+
+  it("string", () => {
+    const re = regExpRaw`/username/${"\\w+"}/profile`;
+    expect(re).toMatchInlineSnapshot(
+      "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
     );
+    expect(re.source).toMatchInlineSnapshot(`"\\/username\\/\\w+\\/profile"`);
     expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
       [
         "/username/hey/profile",
@@ -570,9 +600,7 @@ describe(regExpRaw, () => {
 describe(escapeRegExp, () => {
   it("basic", () => {
     const re = escapeRegExp("/remix/$id/hello.ts");
-    expect(re).toMatchInlineSnapshot(
-      '"\\\\/remix\\\\/\\\\$id\\\\/hello\\\\.ts"'
-    );
+    expect(re).toMatchInlineSnapshot(`"\\/remix\\/\\$id\\/hello\\.ts"`);
     expect("/remix/$id/hello.ts".match(re)).toMatchInlineSnapshot(`
       [
         "/remix/$id/hello.ts",
@@ -618,8 +646,17 @@ describe("colors", () => {
     ).toMatchInlineSnapshot('"[1m[7m[35m ERROR [39m[27m[22m"');
   });
 
+  it("enable", () => {
+    colors._enable(false);
+    expect(colors.red("hey")).toMatchInlineSnapshot('"hey"');
+    colors._enable(true);
+    expect(colors.red("hey")).toMatchInlineSnapshot('"[31mhey[39m"');
+  });
+
   it("all", () => {
-    const strings = Object.entries(colors).map(([k, v]) => v(k));
+    const strings: string[] = Object.entries(colors)
+      .filter(([k]) => !k.startsWith("_"))
+      .map(([k, v]: any) => v(k));
     const formated = splitByChunk(strings, 8)
       .map((vs) => vs.join(" "))
       .join("\n");

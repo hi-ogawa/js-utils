@@ -1,3 +1,4 @@
+import { subscribeEventListenerFactory, tinyassert } from "@hiogawa/utils";
 import {
   TinyStore,
   type TinyStoreAdapter,
@@ -5,7 +6,7 @@ import {
   tinyStoreTransform,
 } from "./core";
 
-// ssr fallbacks to `defaultValue` which can cause hydration mismatch
+// ssr fallbacks to `defaultValue` which could cause hydration mismatch
 export function createTinyStoreWithStorage<T>(
   key: string,
   defaultValue: T,
@@ -13,13 +14,13 @@ export function createTinyStoreWithStorage<T>(
   stringify = JSON.stringify
 ): TinyStoreApi<T> {
   return tinyStoreTransform<string | null, T>(
-    new TinyStore(new TinyScoreLocalStorageAdapter(key)),
+    new TinyStore(new TinyStoreLocalStorageAdapter(key)),
     (s: string | null): T => (s === null ? defaultValue : parse(s)),
     (t: T): string | null => stringify(t)
   );
 }
 
-class TinyScoreLocalStorageAdapter implements TinyStoreAdapter<string | null> {
+class TinyStoreLocalStorageAdapter implements TinyStoreAdapter<string | null> {
   constructor(private key: string) {}
 
   get() {
@@ -37,20 +38,45 @@ class TinyScoreLocalStorageAdapter implements TinyStoreAdapter<string | null> {
     }
   }
 
-  // TODO: this will register event listener for each observer of each store, which might be excessive.
+  private listeners = new Set<() => void>();
+
   subscribe = (listener: () => void) => {
     if (typeof window === "undefined") {
       return () => {};
     }
-    const handler = (e: StorageEvent) => {
-      // key is null when localStorage.clear
-      if (e.key === this.key || e.key === null) {
-        listener();
-      }
-    };
-    window.addEventListener("storage", handler);
+    this.listenInternal();
+    this.listeners.add(listener);
     return () => {
-      window.removeEventListener("storage", handler);
+      this.listeners.delete(listener);
+      this.unlistenInternal();
     };
   };
+
+  // register actual event listener only once per store
+  private _unlisten?: () => void;
+
+  private listenInternal() {
+    if (this.listeners.size > 0) {
+      return;
+    }
+    tinyassert(!this._unlisten);
+    this._unlisten = subscribeEventListenerFactory<WindowEventMap>(window)(
+      "storage",
+      (e) => {
+        // key is null when localStorage.clear
+        if (e.key === this.key || e.key === null) {
+          this.listeners.forEach((f) => f());
+        }
+      }
+    );
+  }
+
+  private unlistenInternal() {
+    if (this.listeners.size > 0) {
+      return;
+    }
+    tinyassert(this._unlisten);
+    this._unlisten();
+    this._unlisten = undefined;
+  }
 }

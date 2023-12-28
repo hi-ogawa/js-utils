@@ -1,0 +1,28 @@
+{
+  "name": "tiny-react-examples-basic",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm run /^dev:/",
+    "dev:vite": "vite --no-clearScreen",
+    "dev:tsc": "tsc --watch --preserveWatchOutput",
+    "build": "pnpm run --seq /^build:/",
+    "build:vite": "vite build",
+    "build:tsc": "tsc",
+    "build:vercel": "bash misc/vercel/build.sh",
+    "test-e2e": "playwright test",
+    "release": "vercel deploy --prebuilt .",
+    "release-production": "vercel deploy --prebuilt . --prod"
+  },
+  "devDependencies": {
+    "@hiogawa/theme-script": "workspace:*",
+    "@hiogawa/tiny-react": "workspace:*",
+    "@hiogawa/unocss-preset-antd": "2.2.1-pre.7",
+    "@hiogawa/utils": "workspace:*",
+    "@iconify-json/ri": "^1.1.10",
+    "unocss": "^0.56.5",
+    "vite": "^4.4.11"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

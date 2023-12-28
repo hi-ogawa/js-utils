@@ -1,10 +1,14 @@
 {
   "name": "@hiogawa/theme-script",
   "version": "0.0.4-pre.3",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/theme-script",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/theme-script"
+  },
+  "license": "MIT",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -17,23 +21,20 @@
       "types": "./dist/vite.d.ts"
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist/index.*",
     "dist/vite.*"
   ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/theme-script"
-  },
   "scripts": {
     "build": "BUILD_STEP=0 tsup && BUILD_STEP=1 tsup",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
     "@types/node": "^18",
-    "vite": "^4.4.6"
+    "vite": "^4.4.11"
   },
   "peerDependencies": {
     "vite": "*"
@@ -42,5 +43,8 @@
     "vite": {
       "optional": true
     }
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

@@ -1,0 +1,69 @@
+{
+  "name": "@hiogawa/tiny-react",
+  "version": "0.0.2-pre.9",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/tiny-react",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/tiny-react"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./jsx-runtime": {
+      "import": "./dist/helper/jsx-runtime.js",
+      "require": "./dist/helper/jsx-runtime.cjs",
+      "types": "./dist/helper/jsx-runtime.d.ts"
+    },
+    "./jsx-dev-runtime": {
+      "import": "./dist/helper/jsx-runtime.js",
+      "require": "./dist/helper/jsx-runtime.cjs",
+      "types": "./dist/helper/jsx-runtime.d.ts"
+    },
+    "./hmr": {
+      "import": "./dist/hmr/index.js",
+      "require": "./dist/hmr/index.cjs",
+      "types": "./dist/hmr/index.d.ts"
+    },
+    "./dist/plugins/vite": {
+      "import": "./dist/plugins/vite.js",
+      "require": "./dist/plugins/vite.cjs",
+      "types": "./dist/plugins/vite.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "lint": "icheck-ts $(find src -name '*.ts')",
+    "prepack": "rm -rf dist && pnpm --filter @hiogawa/tiny-react... build",
+    "release": "pnpm publish --no-git-checks --access public"
+  },
+  "devDependencies": {
+    "@hiogawa/tiny-refresh": "workspace:*",
+    "@hiogawa/utils": "workspace:*",
+    "fast-check": "^3.12.0",
+    "vite": "^4.4.11"
+  },
+  "peerDependencies": {
+    "vite": "*"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}
