@@ -1,5 +1,4 @@
 # TODO: commit actual files instead of generating via `setupTestFixture`
-cli
 findCircularImport
 resolveImportSource
 runner
