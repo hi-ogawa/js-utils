@@ -20,7 +20,7 @@
     "@changesets/cli": "^2.26.2",
     "@hiogawa/icheck-ts": "workspace:*",
     "@hiogawa/inline-template": "workspace:*",
-    "@hiogawa/isort-ts": "1.1.1",
+    "@hiogawa/isort-ts": "^1.1.2-pre.1",
     "@hiogawa/sort-package-json": "workspace:*",
     "@hiogawa/utils": "workspace:*",
     "@hiogawa/utils-node": "workspace:*",

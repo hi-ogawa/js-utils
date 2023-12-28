@@ -18,8 +18,8 @@ importers:
         specifier: workspace:*
         version: link:packages/inline-template
       '@hiogawa/isort-ts':
-        specifier: 1.1.1
-        version: 1.1.1(prettier@2.8.8)(typescript@5.1.6)
+        specifier: ^1.1.2-pre.1
+        version: 1.1.2-pre.1(prettier@2.8.8)(typescript@5.1.6)
       '@hiogawa/sort-package-json':
         specifier: workspace:*
         version: link:packages/sort-package-json
@@ -1341,8 +1341,8 @@ packages:
       node-fetch-native: 1.4.0
     dev: true
 
-  /@hiogawa/isort-ts@1.1.1(prettier@2.8.8)(typescript@5.1.6):
-    resolution: {integrity: sha512-nllXA6mxTE79eIQgyAWhrRTCOe73T7+TWv0EdxainODdJp8xyQhdtWWKqdfa7fvHKJzwokQP9NlFts8kci5r2Q==}
+  /@hiogawa/isort-ts@1.1.2-pre.1(prettier@2.8.8)(typescript@5.1.6):
+    resolution: {integrity: sha512-0RK2pUEeO8ILFCBPxPOidcjA8r9lj/5dM7NQ6PkYPPAriJ3dr10Yu4kK6R1Fef2keeoh+Su81MHgv1QZ4F6e9A==}
     hasBin: true
     peerDependencies:
       prettier: '*'
