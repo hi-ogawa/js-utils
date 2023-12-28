@@ -9,10 +9,10 @@ simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative.
 
 ```txt
 $ icheck-ts --help
-{%shell node ./bin/cli.js --help %}
+{%shell pnpm -s cli --help %}
 
 $ icheck-ts fixtures/cli/*.ts
-{%shell node ./bin/cli.js fixtures/cli/*.ts %}
+{%shell pnpm -s cli fixtures/cli/*.ts %}
 ```
 
 %template-input-end:help%
@@ -22,7 +22,7 @@ $ icheck-ts fixtures/cli/*.ts
 
 ```txt
 $ icheck-ts --help
-icheck-ts/0.0.1-pre.15
+icheck-ts/0.0.1-pre.21
 
 Usage:
   $ icheck-ts [options] <files...>
@@ -33,19 +33,22 @@ Positional arguments:
   files    Files to check exports
 
 Options:
-  --cache                Enable caching
-  --cacheLocation=...    Cache directory location
-  --cacheSize=...        LRU cache size
-  --ignore=...           RegExp pattern to ignore export names
-  --noCheckCircular      Disable checking circular import
+  --cache                   Enable caching
+  --cacheLocation=...       Cache directory location
+  --cacheSize=...           LRU cache size
+  --ignore=...              RegExp pattern to ignore export names
+  --ignoreUnresolved=...    RegExp pattern to ignore unresolved import
+  --noCheckCircular         Disable checking circular import
+  --noCheckUnresolved       Disable checking unresolved import
+  --useImportMetaResolve    Use import.meta.resolve for module resolution
 
 $ icheck-ts fixtures/cli/*.ts
 ** Unused exports **
-fixtures/cli/x2.ts:3 - b
+fixtures/cli/x2.ts:2 - b
 ** Circular imports **
-fixtures/cli/cycle4.ts:2 - x
- -> fixtures/cli/cycle2.ts:2 - (side effect)
-     -> fixtures/cli/cycle3.ts:2 - *
+fixtures/cli/cycle4.ts:1 - x
+ -> fixtures/cli/cycle2.ts:1 - (side effect)
+     -> fixtures/cli/cycle3.ts:1 - *
 ```
 
 <!-- %template-output-end:help% -->
@@ -70,8 +73,8 @@ pnpm build
 pnpm release
 
 # dev
-npx tsx ./src/cli.ts $(git grep -l . src)
-npx tsx --experimental-import-meta-resolve ./src/cli.ts --useImportMetaResolve $(find fixtures/resolve -type f)
-npx node --experimental-import-meta-resolve --import tsx/esm ./bin/cli.js --useImportMetaResolve $(find fixtures/resolve -type f)
-npx node --experimental-import-meta-resolve ./bin/cli.js --useImportMetaResolve $(find fixtures/resolve -type f)
+pnpm cli $(find fixtures/resolve -type f)
+pnpm cli-tsx $(find fixtures/resolve -type f)
+pnpm cli-tsx-dev $(find fixtures/resolve -type f)
+pnpm cli-tsx-dev --useImportMetaResolve $(find fixtures/resolve -type f)
 ```

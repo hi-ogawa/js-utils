@@ -3,5 +3,4 @@ dist
 pnpm-lock.yaml
 pkg
 target
-packages/icheck-ts/fixtures
 .vercel
