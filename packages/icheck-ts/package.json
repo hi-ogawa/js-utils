@@ -20,8 +20,8 @@
     "cli-tsx": "node --experimental-import-meta-resolve --import tsx/esm ./bin/cli.js",
     "cli-tsx-dev": "node --experimental-import-meta-resolve --import tsx/esm ./src/cli.ts",
     "test": "vitest",
-    "docs": "inline-template ./README.md",
-    "prepack": "pnpm build",
+    "template": "inline-template ./README.md",
+    "prepack": "pnpm build && pnpm template",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {

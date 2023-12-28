@@ -22,7 +22,7 @@ $ icheck-ts fixtures/cli/*.ts
 
 ```txt
 $ icheck-ts --help
-icheck-ts/0.0.1-pre.15
+icheck-ts/0.0.1-pre.21
 
 Usage:
   $ icheck-ts [options] <files...>
@@ -33,19 +33,22 @@ Positional arguments:
   files    Files to check exports
 
 Options:
-  --cache                Enable caching
-  --cacheLocation=...    Cache directory location
-  --cacheSize=...        LRU cache size
-  --ignore=...           RegExp pattern to ignore export names
-  --noCheckCircular      Disable checking circular import
+  --cache                   Enable caching
+  --cacheLocation=...       Cache directory location
+  --cacheSize=...           LRU cache size
+  --ignore=...              RegExp pattern to ignore export names
+  --ignoreUnresolved=...    RegExp pattern to ignore unresolved import
+  --noCheckCircular         Disable checking circular import
+  --noCheckUnresolved       Disable checking unresolved import
+  --useImportMetaResolve    Use import.meta.resolve for module resolution
 
 $ icheck-ts fixtures/cli/*.ts
 ** Unused exports **
-fixtures/cli/x2.ts:3 - b
+fixtures/cli/x2.ts:2 - b
 ** Circular imports **
-fixtures/cli/cycle4.ts:2 - x
- -> fixtures/cli/cycle2.ts:2 - (side effect)
-     -> fixtures/cli/cycle3.ts:2 - *
+fixtures/cli/cycle4.ts:1 - x
+ -> fixtures/cli/cycle2.ts:1 - (side effect)
+     -> fixtures/cli/cycle3.ts:1 - *
 ```
 
 <!-- %template-output-end:help% -->
