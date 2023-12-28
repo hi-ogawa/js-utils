@@ -9,10 +9,10 @@ simpler [ts-prune](https://github.com/nadeesha/ts-prune) alternative.
 
 ```txt
 $ icheck-ts --help
-{%shell node ./bin/cli.js --help %}
+{%shell pnpm -s cli --help %}
 
 $ icheck-ts fixtures/cli/*.ts
-{%shell node ./bin/cli.js fixtures/cli/*.ts %}
+{%shell pnpm -s cli fixtures/cli/*.ts %}
 ```
 
 %template-input-end:help%
