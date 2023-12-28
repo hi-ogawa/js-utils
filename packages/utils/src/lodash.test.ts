@@ -35,6 +35,7 @@ import {
   pickBy,
   range,
   sortBy,
+  sortByArray,
   splitByChunk,
   uniqBy,
   zip,
@@ -262,6 +263,28 @@ describe(sortBy, () => {
         1,
         5,
         2,
+      ]
+    `);
+  });
+});
+
+describe(sortByArray, () => {
+  it("basic", () => {
+    const ls = ["ab", "aB", "a_b", "a_B"];
+    expect([...ls].sort()).toMatchInlineSnapshot(`
+      [
+        "aB",
+        "a_B",
+        "a_b",
+        "ab",
+      ]
+    `);
+    expect(sortByArray(ls, (s) => s.split("_"))).toMatchInlineSnapshot(`
+      [
+        "a_B",
+        "a_b",
+        "aB",
+        "ab",
       ]
     `);
   });

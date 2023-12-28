@@ -17,6 +17,11 @@ export function sortBy<T>(ls: T[], ...keyFns: ((x: T) => any)[]): T[] {
   return sortByMap(ls, (x) => keyFns.map((f) => f(x)), arrayCompareFn);
 }
 
+// for example, this can be used to sort strings with separators
+export function sortByArray<T, U>(ls: T[], keysFn: (v: T) => U[]) {
+  return sortByMap(ls, keysFn, arrayCompareFn);
+}
+
 // aka. lodash's chunk
 export function splitByChunk<T>(ls: readonly T[], size: number): T[][] {
   // guard nonsense cases, which could end up infinite loop below
@@ -356,12 +361,13 @@ function anyCompareFn(x: any, y: any): number {
   return x < y ? -1 : x > y ? 1 : 0;
 }
 
-function arrayCompareFn(xs: any[], ys: any[]): number {
-  for (let i = 0; i < xs.length; i++) {
+function arrayCompareFn(xs: unknown[], ys: unknown[]): number {
+  const length = Math.min(xs.length, ys.length);
+  for (let i = 0; i < length; i++) {
     const result = anyCompareFn(xs[i], ys[i]);
     if (result !== 0) {
       return result;
     }
   }
-  return 0;
+  return anyCompareFn(xs.length, ys.length);
 }
