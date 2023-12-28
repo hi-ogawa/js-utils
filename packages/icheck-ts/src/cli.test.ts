@@ -13,11 +13,11 @@ describe("cli", () => {
     await expect(proc).rejects.toMatchInlineSnapshot(`[Error: ScriptError]`);
     expect(proc.stdout).toMatchInlineSnapshot(`
       "** Unused exports **
-      fixtures/cli/x2.ts:3 - b
+      fixtures/cli/x2.ts:2 - b
       ** Circular imports **
-      fixtures/cli/cycle2.ts:2 - (side effect)
-       -> fixtures/cli/cycle3.ts:2 - *
-           -> fixtures/cli/cycle4.ts:2 - x
+      fixtures/cli/cycle2.ts:1 - (side effect)
+       -> fixtures/cli/cycle3.ts:1 - *
+           -> fixtures/cli/cycle4.ts:1 - x
       "
     `);
     expect(proc.stderr).toMatchInlineSnapshot(`""`);
