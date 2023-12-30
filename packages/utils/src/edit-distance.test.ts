@@ -24,7 +24,8 @@ function testDiffString(x: string, y: string) {
     }
     lines[2] += delta > 0 ? String(delta) : " ";
   }
-  const diff = "\n" + lines.map((l) => l.trim() + "\n").join("");
+  // strip trailing spaces
+  const diff = "\n" + lines.join("\n").replaceAll(/ *$/gm, "") + "\n";
 
   return { total, steps, diff };
 }
@@ -36,7 +37,7 @@ describe(solveEditDistance, () => {
         "diff": "
       abc
       axc
-      1
+       1
       ",
         "steps": [
           {
@@ -72,7 +73,7 @@ describe(solveEditDistance, () => {
         "diff": "
       a c
       abc
-      1
+       1
       ",
         "steps": [
           {
@@ -108,7 +109,7 @@ describe(solveEditDistance, () => {
         "diff": "
       abc
       a c
-      1
+       1
       ",
         "steps": [
           {
@@ -210,7 +211,7 @@ describe(solveEditDistance, () => {
         "diff": "
       abcdefg i klmn
       ab defghijklxn
-      1    1 1  1
+        1    1 1  1
       ",
         "steps": [
           {
