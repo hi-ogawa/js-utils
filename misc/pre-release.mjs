@@ -1,6 +1,6 @@
 import process from "node:process";
 import { tinyassert, colors, formatError } from "@hiogawa/utils";
-import { $, promptQuestion } from "@hiogawa/utils-node";
+import { $, promptQuestion, promptAutocomplete } from "@hiogawa/utils-node";
 import fs from "node:fs";
 
 // usage:
@@ -10,9 +10,27 @@ $._.verbose = true;
 const $$ = $.new({ stdio: "inherit" });
 
 async function main() {
-  const packageDir = process.argv[2];
-  tinyassert(packageDir, "missing 'packageDir'");
-  const packageJsonPath = `${packageDir}/package.json`;
+  const cwd = process.cwd();
+  const pnpmLs = await $`pnpm ls --filter '*' --depth -1 --json`;
+  const packageDirs = JSON.parse(pnpmLs)
+    .filter((p) => !p.private)
+    .map((p) => p.path.slice(cwd.length + 1));
+
+  const choice = await promptAutocomplete({
+    message: "Select package directory",
+    suggest: (input) => {
+      return packageDirs.filter((p) => p.includes(input));
+    },
+  });
+  if (!choice.value) {
+    process.exitCode = 1;
+    return;
+  }
+  const packageJsonPath = `${choice.value}/package.json`;
+  tinyassert(
+    fs.existsSync(packageJsonPath),
+    "invalid package: " + packageJsonPath
+  );
 
   // require no diff to start
   const gitStatus = await $`git status --porcelain`;

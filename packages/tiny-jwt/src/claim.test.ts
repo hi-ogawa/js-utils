@@ -52,6 +52,6 @@ describe("token expiration", () => {
     vi.setSystemTime(20 * 60 * 1000);
     expect(() =>
       checkExpirationTime(verified.header)
-    ).toThrowErrorMatchingInlineSnapshot('"token expired"');
+    ).toThrowErrorMatchingInlineSnapshot(`[Error: token expired]`);
   });
 });

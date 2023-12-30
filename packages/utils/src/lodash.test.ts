@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  expectTypeOf,
+  it,
+  vi,
+} from "vitest";
 import { LruCache } from "./cache";
 import {
   capitalize,
@@ -27,6 +35,7 @@ import {
   pickBy,
   range,
   sortBy,
+  sortByArray,
   splitByChunk,
   uniqBy,
   zip,
@@ -259,6 +268,28 @@ describe(sortBy, () => {
   });
 });
 
+describe(sortByArray, () => {
+  it("basic", () => {
+    const ls = ["ab", "aB", "a_b", "a_B"];
+    expect([...ls].sort()).toMatchInlineSnapshot(`
+      [
+        "aB",
+        "a_B",
+        "a_b",
+        "ab",
+      ]
+    `);
+    expect(sortByArray(ls, (s) => s.split("_"))).toMatchInlineSnapshot(`
+      [
+        "a_B",
+        "a_b",
+        "aB",
+        "ab",
+      ]
+    `);
+  });
+});
+
 describe(uniqBy, () => {
   it("basic", () => {
     expect(uniqBy(range(8), (x) => x % 3)).toMatchInlineSnapshot(`
@@ -277,12 +308,13 @@ describe(objectPick, () => {
       x: 0,
       y: 1,
     } as const;
-    const result = objectPick(o, ["x"]) satisfies { x: 0 };
+    const result = objectPick(o, ["x"]);
     expect(result).toMatchInlineSnapshot(`
       {
         "x": 0,
       }
     `);
+    expectTypeOf(result).toEqualTypeOf<{ readonly x: 0 }>();
   });
 
   it("record", () => {
@@ -290,12 +322,13 @@ describe(objectPick, () => {
       x: 0,
       y: 1,
     };
-    const result = objectPick(o, ["x"]) satisfies { x: number };
+    const result = objectPick(o, ["x"]);
     expect(result).toMatchInlineSnapshot(`
       {
         "x": 0,
       }
     `);
+    expectTypeOf(result).toEqualTypeOf<{ x: number }>();
   });
 });
 
@@ -305,12 +338,13 @@ describe(objectOmit, () => {
       x: 0,
       y: 1,
     } as const;
-    const result = objectOmit(o, ["x"]) satisfies { y: 1 };
+    const result = objectOmit(o, ["x"]);
     expect(result).toMatchInlineSnapshot(`
       {
         "y": 1,
       }
     `);
+    expectTypeOf(result).toEqualTypeOf<{ readonly y: 1 }>();
   });
 
   it("record", () => {
@@ -318,10 +352,7 @@ describe(objectOmit, () => {
       x: 0,
       y: 1,
     };
-    const result = objectOmit(o, ["x"]) satisfies Omit<
-      Record<string, number>,
-      "x"
-    >;
+    const result = objectOmit(o, ["x"]);
     expect(result).toMatchInlineSnapshot(`
       {
         "y": 1,
@@ -376,13 +407,14 @@ describe(objectKeys, () => {
       x: 0,
       y: 1,
     };
-    const result = objectKeys(o) satisfies ("x" | "y")[];
+    const result = objectKeys(o);
     expect(result).toMatchInlineSnapshot(`
       [
         "x",
         "y",
       ]
     `);
+    expectTypeOf(result).toEqualTypeOf<("x" | "y")[]>();
   });
 });
 
@@ -393,8 +425,7 @@ describe(`${objectEntries.name}/${objectFromEntries.name}`, () => {
       y: 1,
     };
     const entries = objectEntries(o);
-    entries satisfies ["x" | "y", number][];
-    entries satisfies (["x", number] | ["y", number])[];
+    expectTypeOf(entries).toEqualTypeOf<(["x", number] | ["y", number])[]>();
     expect(entries).toMatchInlineSnapshot(`
       [
         [
@@ -408,7 +439,7 @@ describe(`${objectEntries.name}/${objectFromEntries.name}`, () => {
       ]
     `);
     const o2 = objectFromEntries(entries);
-    o2 satisfies Record<"x" | "y", number>;
+    expectTypeOf(o2).toEqualTypeOf<Record<"x" | "y", number>>();
     expect(o2).toMatchInlineSnapshot(`
       {
         "x": 0,
@@ -426,7 +457,7 @@ describe(`${objectMapValues.name}/${objectMapKeys.name}`, () => {
     };
     {
       const result = objectMapValues(o, (v, k) => k.repeat(v));
-      result satisfies Record<"x" | "y", string>;
+      expectTypeOf(result).toEqualTypeOf<Record<"x" | "y", string>>();
       expect(result).toMatchInlineSnapshot(`
         {
           "x": "x",
@@ -436,7 +467,7 @@ describe(`${objectMapValues.name}/${objectMapKeys.name}`, () => {
     }
     {
       const result = objectMapKeys(o, (v) => (v === 1 ? "w" : "z"));
-      result satisfies Record<"z" | "w", number>;
+      expectTypeOf(result).toEqualTypeOf<Record<"z" | "w", number>>();
       expect(result).toMatchInlineSnapshot(`
         {
           "w": 1,
@@ -458,11 +489,11 @@ describe(`${objectMapValues.name}/${objectMapKeys.name}`, () => {
     };
     {
       const result = objectMapValues(o, (v, k) => (v ? k.repeat(v) : "bad-v"));
-      result satisfies {
+      expectTypeOf(result).toEqualTypeOf<{
         x: string;
         y?: string;
         z?: string;
-      };
+      }>();
       expect(result).toMatchInlineSnapshot(`
         {
           "x": "xxx",
@@ -472,7 +503,7 @@ describe(`${objectMapValues.name}/${objectMapKeys.name}`, () => {
     }
     {
       const result = objectMapKeys(o, (v, k) => (v ? k.repeat(v) : "bad-k"));
-      result satisfies Partial<Record<string, number>>;
+      expectTypeOf(result).toEqualTypeOf<Record<string, number | undefined>>();
       expect(result).toMatchInlineSnapshot(`
         {
           "bad-k": undefined,
@@ -508,8 +539,8 @@ describe(isNil, () => {
   it("typing-1", () => {
     const ls = [0, true, false, null, undefined] as const;
 
-    ls.filter(isNil) satisfies (null | undefined)[];
-    ls.filter(isNotNil) satisfies (0 | true | false)[];
+    expectTypeOf(ls.filter(isNil)).toEqualTypeOf<(null | undefined)[]>();
+    expectTypeOf(ls.filter(isNotNil)).toEqualTypeOf<(0 | true | false)[]>();
 
     expect(ls.filter(isNil)).toMatchInlineSnapshot(`
       [
@@ -525,15 +556,15 @@ describe(isNil, () => {
     expect(isNil(x)).toMatchInlineSnapshot("true");
 
     if (isNil(x)) {
-      x satisfies undefined;
+      expectTypeOf(x).toBeUndefined();
     } else {
-      x satisfies number;
+      expectTypeOf(x).toBeNumber();
     }
 
     if (isNotNil(x)) {
-      x satisfies number;
+      expectTypeOf(x).toBeNumber();
     } else {
-      x satisfies undefined;
+      expectTypeOf(x).toBeUndefined();
     }
   });
 });

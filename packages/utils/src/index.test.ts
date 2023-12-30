@@ -11,7 +11,7 @@ import {
   typedBoolean,
 } from "./misc";
 import { mapOption, none } from "./option";
-import { newPromiseWithResolvers } from "./promise";
+import { createManualPromise } from "./promise";
 import { escapeRegExp, mapRegExp, regExpRaw } from "./regexp";
 import {
   Err,
@@ -267,7 +267,7 @@ describe(HashKeyDefaultMap, () => {
         "defaultFn": [Function],
         "keyFn": [Function],
         "map": Map {
-          "{\\"mod2\\":0,\\"mod3\\":0}" => [
+          "{"mod2":0,"mod3":0}" => [
             {
               "mod2": 0,
               "mod3": 0,
@@ -277,7 +277,7 @@ describe(HashKeyDefaultMap, () => {
               6,
             ],
           ],
-          "{\\"mod2\\":1,\\"mod3\\":1}" => [
+          "{"mod2":1,"mod3":1}" => [
             {
               "mod2": 1,
               "mod3": 1,
@@ -287,7 +287,7 @@ describe(HashKeyDefaultMap, () => {
               7,
             ],
           ],
-          "{\\"mod2\\":0,\\"mod3\\":2}" => [
+          "{"mod2":0,"mod3":2}" => [
             {
               "mod2": 0,
               "mod3": 2,
@@ -297,7 +297,7 @@ describe(HashKeyDefaultMap, () => {
               8,
             ],
           ],
-          "{\\"mod2\\":1,\\"mod3\\":0}" => [
+          "{"mod2":1,"mod3":0}" => [
             {
               "mod2": 1,
               "mod3": 0,
@@ -307,7 +307,7 @@ describe(HashKeyDefaultMap, () => {
               9,
             ],
           ],
-          "{\\"mod2\\":0,\\"mod3\\":1}" => [
+          "{"mod2":0,"mod3":1}" => [
             {
               "mod2": 0,
               "mod3": 1,
@@ -316,7 +316,7 @@ describe(HashKeyDefaultMap, () => {
               4,
             ],
           ],
-          "{\\"mod2\\":1,\\"mod3\\":2}" => [
+          "{"mod2":1,"mod3":2}" => [
             {
               "mod2": 1,
               "mod3": 2,
@@ -509,10 +509,10 @@ describe(none, () => {
   });
 });
 
-describe(newPromiseWithResolvers, () => {
+describe(createManualPromise, () => {
   it("resolve", async () => {
-    const { promise, resolve } = newPromiseWithResolvers<number>();
-    resolve(123);
+    const promise = createManualPromise<number>();
+    promise.resolve(123);
     const result = await wrapErrorAsync(() => promise);
     expect(result).toMatchInlineSnapshot(`
       {
@@ -523,8 +523,8 @@ describe(newPromiseWithResolvers, () => {
   });
 
   it("reject", async () => {
-    const { promise, reject } = newPromiseWithResolvers<number>();
-    reject(123);
+    const promise = createManualPromise<number>();
+    promise.reject(123);
     const result = await wrapErrorAsync(() => promise);
     expect(result).toMatchInlineSnapshot(`
       {
@@ -573,9 +573,7 @@ describe(regExpRaw, () => {
     expect(re).toMatchInlineSnapshot(
       "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
     );
-    expect(re.source).toMatchInlineSnapshot(
-      '"\\\\/username\\\\/\\\\w+\\\\/profile"'
-    );
+    expect(re.source).toMatchInlineSnapshot(`"\\/username\\/\\w+\\/profile"`);
     expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
       [
         "/username/hey/profile",
@@ -589,9 +587,7 @@ describe(regExpRaw, () => {
     expect(re).toMatchInlineSnapshot(
       "/\\\\/username\\\\/\\\\w\\+\\\\/profile/"
     );
-    expect(re.source).toMatchInlineSnapshot(
-      '"\\\\/username\\\\/\\\\w+\\\\/profile"'
-    );
+    expect(re.source).toMatchInlineSnapshot(`"\\/username\\/\\w+\\/profile"`);
     expect("/username/hey/profile".match(re)).toMatchInlineSnapshot(`
       [
         "/username/hey/profile",
@@ -604,9 +600,7 @@ describe(regExpRaw, () => {
 describe(escapeRegExp, () => {
   it("basic", () => {
     const re = escapeRegExp("/remix/$id/hello.ts");
-    expect(re).toMatchInlineSnapshot(
-      '"\\\\/remix\\\\/\\\\$id\\\\/hello\\\\.ts"'
-    );
+    expect(re).toMatchInlineSnapshot(`"\\/remix\\/\\$id\\/hello\\.ts"`);
     expect("/remix/$id/hello.ts".match(re)).toMatchInlineSnapshot(`
       [
         "/remix/$id/hello.ts",

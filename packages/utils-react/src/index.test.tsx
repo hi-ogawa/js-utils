@@ -256,7 +256,7 @@ describe(useMergeRefs, () => {
         "inner-mut:mut:[object HTMLElement]",
         "inner-mut:forwarded:[object Object]",
         "inner-fun:mut:[object HTMLElement]",
-        "inner-fun:forwarded:(el) => fn(\\"outer-fun\\", el)",
+        "inner-fun:forwarded:(el) => fn("outer-fun", el)",
         "outer-mut:[object HTMLElement]",
       ]
     `);
@@ -283,7 +283,7 @@ describe(useMergeRefs, () => {
         "inner-mut:mut:[object HTMLElement]",
         "inner-mut:forwarded:[object Object]",
         "inner-fun:mut:[object HTMLElement]",
-        "inner-fun:forwarded:(el) => fn(\\"outer-fun\\", el)",
+        "inner-fun:forwarded:(el) => fn("outer-fun", el)",
       ]
     `);
   });

@@ -1,14 +1,18 @@
 import fs from "node:fs";
+import { isBuiltin } from "node:module";
 import path from "node:path";
+import process from "node:process";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DefaultMap,
   assertUnreachable,
   tinyassert,
+  wrapError,
   wrapErrorAsync,
 } from "@hiogawa/utils";
 import { type ParseOutput, type ParsedBase, parseImportExport } from "./parser";
 
-interface ImportTarget {
+export interface ImportTarget {
   source: ImportSource;
   usage: ImportUsage;
   node: ParsedBase;
@@ -49,7 +53,10 @@ export type ImportRelations = DefaultMap<string, ImportTarget[]>;
 // 3. check unused exports
 export async function runner(
   inputFiles: string[],
-  options?: { parse?: typeof parseImportExport }
+  options?: {
+    parse?: typeof parseImportExport;
+    useImportMetaResolve?: boolean;
+  }
 ) {
   // normalize relative path to match with `resolveImportSource` (e.g. "./x.ts" => "x.ts")
   inputFiles = inputFiles.map((f) => path.normalize(f));
@@ -90,7 +97,12 @@ export async function runner(
       for (const el of e.bindings) {
         usages.push({ type: "named", name: el.nameBefore ?? el.name });
       }
-      const source = await resolveImportSource(file, e.source);
+      let source: ImportSource;
+      if (options?.useImportMetaResolve) {
+        source = resolveImportSourceV2(file, e.source);
+      } else {
+        source = await resolveImportSource(file, e.source);
+      }
       const node: ParsedBase = {
         position: e.position,
         comment: e.comment,
@@ -169,6 +181,56 @@ export async function runner(
   };
 }
 
+// use `import.meta.resolve` to resolve import source
+// so that users can use custom loader (e.g. tsx) to support what they need.
+// this requires NodeJS v18.19.0 with --experimental-import-meta-resolve.
+// https://nodejs.org/docs/latest-v18.x/api/esm.html#importmetaresolvespecifier
+function resolveImportSourceV2(
+  containingFile: string,
+  source: string
+): ImportSource {
+  const baseDir = process.cwd(); // TODO: baseDir as cli option?
+
+  if (isBuiltin(source)) {
+    return {
+      type: "external",
+      name: source,
+    };
+  }
+
+  const parentUrl = pathToFileURL(path.join(baseDir, containingFile));
+  const resolved = wrapError(() => {
+    tinyassert(import.meta.resolve);
+
+    // Standardized as "sync" but still "async" before v18.19.0.
+    const sourceUrl = import.meta.resolve(source, parentUrl.toString());
+    tinyassert(typeof sourceUrl === "string");
+
+    // standardized to not throw when not found, so we check with `fs.existsSync`.
+    const sourcePath = fileURLToPath(sourceUrl);
+    tinyassert(fs.existsSync(sourcePath));
+    return sourcePath;
+  });
+
+  if (!resolved.ok) {
+    return {
+      type: "unknown",
+      name: source,
+    };
+  }
+  const relativePath = path.relative(baseDir, resolved.value);
+  if (relativePath.startsWith("..")) {
+    return {
+      type: "external",
+      name: source,
+    };
+  }
+  return {
+    type: "internal",
+    name: relativePath,
+  };
+}
+
 // cf.
 // https://nodejs.org/api/esm.html#import-specifiers
 // https://nodejs.org/api/modules.html#all-together
@@ -225,6 +287,10 @@ export async function resolveImportSource(
         name: source,
       };
 }
+
+//
+// circular import
+//
 
 type ImportEdge = [importer: string, edge: ImportTarget];
 

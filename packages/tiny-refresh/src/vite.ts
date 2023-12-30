@@ -19,11 +19,18 @@ export function vitePluginTinyRefresh(options?: {
     // we need to enforce "pre" to see `// @hmr` comments.
     // however this means that transform has to handle raw source code e.g. typescript and jsx.
     enforce: "pre",
-    apply(_config, env) {
-      return env.command === "serve" && !env.ssrBuild;
+    apply(config, env) {
+      return env.command === "serve" && !config.build?.ssr;
     },
-    transform(code, id, _options) {
-      if (filter(id)) {
+    config(_config, _env) {
+      return {
+        esbuild: {
+          jsxDev: false,
+        },
+      };
+    },
+    transform(code, id, transformOptions) {
+      if (!transformOptions?.ssr && filter(id)) {
         return hmrTransform(code, {
           bundler: "vite",
           runtime: options?.runtime ?? "react",

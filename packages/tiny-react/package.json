@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/tiny-react",
-  "version": "0.0.2-pre.3",
+  "version": "0.0.2-pre.9",
   "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/tiny-react",
   "repository": {
     "type": "git",
@@ -46,6 +46,7 @@
     "build": "tsup",
     "test": "vitest",
     "lint": "icheck-ts $(find src -name '*.ts')",
+    "prepack": "rm -rf dist && pnpm --filter @hiogawa/tiny-react... build",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {

@@ -3,5 +3,4 @@ dist
 pnpm-lock.yaml
 pkg
 target
-fixtures
 .vercel
