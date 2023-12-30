@@ -85,3 +85,5 @@ export function solveEditDistance<T>(
 function defaultCostFn(x: unknown, y: unknown) {
   return x === y ? 0 : 1;
 }
+
+function formatEditDistance() {}
