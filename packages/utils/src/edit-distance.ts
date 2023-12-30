@@ -64,6 +64,7 @@ export function solveEditDistance<T>(
     delta: number;
     total: number;
   }[] = [];
+  const padded: [(T | undefined)[], (T | undefined)[]] = [[], []];
   let i = n;
   let j = m;
   while (i > 0 || j > 0) {
@@ -72,18 +73,25 @@ export function solveEditDistance<T>(
     if (op === ops.replace) {
       i--;
       j--;
+      padded[0].push(xs[i]);
+      padded[1].push(ys[j]);
     } else if (op === ops.insert) {
       j--;
+      padded[0].push(undefined);
+      padded[1].push(ys[j]);
     } else if (op === ops.remove) {
       i--;
+      padded[0].push(xs[i]);
+      padded[1].push(undefined);
     }
   }
+  path.reverse();
+  padded[0].reverse();
+  padded[1].reverse();
 
-  return { total, path };
+  return { total, path, padded };
 }
 
 function defaultCostFn(x: unknown, y: unknown) {
   return x === y ? 0 : 1;
 }
-
-function formatEditDistance() {}
