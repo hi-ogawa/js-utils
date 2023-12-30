@@ -1,11 +1,15 @@
 import { range } from "./lodash";
 
-const ops = {
+export const EDIT_OP = {
   none: -1,
   replace: 0,
   insert: 1,
   remove: 2,
 };
+
+function defaultCostFn(x: unknown, y: unknown) {
+  return x === y ? 0 : 1;
+}
 
 export function solveEditDistance<T>(
   xs: T[],
@@ -16,19 +20,21 @@ export function solveEditDistance<T>(
   const m = ys.length;
 
   // dp[i][j] = [(total cost), (last op), (last delta)]
-  const dp = range(n + 1).map(() => range(m + 1).map(() => [0, ops.none, -1]));
+  const dp = range(n + 1).map(() =>
+    range(m + 1).map(() => [0, EDIT_OP.none, -1])
+  );
 
   for (const i of range(n)) {
     const delta = costFn(xs[i], undefined);
     dp[i + 1][0][0] = dp[i][0][0] + delta;
-    dp[i + 1][0][1] = ops.remove;
+    dp[i + 1][0][1] = EDIT_OP.remove;
     dp[i + 1][0][2] = delta;
   }
 
   for (const j of range(m)) {
     const delta = costFn(undefined, ys[j]);
     dp[0][j + 1][0] = dp[0][j][0] + delta;
-    dp[0][j + 1][1] = ops.insert;
+    dp[0][j + 1][1] = EDIT_OP.insert;
     dp[0][j + 1][2] = delta;
   }
 
@@ -40,15 +46,15 @@ export function solveEditDistance<T>(
       const next = Math.min(next1, next2, next3);
       dp[i + 1][j + 1][0] = next;
       if (next === next1) {
-        dp[i + 1][j + 1][1] = ops.replace;
+        dp[i + 1][j + 1][1] = EDIT_OP.replace;
         dp[i + 1][j + 1][2] = next - dp[i][j][0];
       }
       if (next === next2) {
-        dp[i + 1][j + 1][1] = ops.insert;
+        dp[i + 1][j + 1][1] = EDIT_OP.insert;
         dp[i + 1][j + 1][2] = next - dp[i + 1][j][0];
       }
       if (next === next3) {
-        dp[i + 1][j + 1][1] = ops.remove;
+        dp[i + 1][j + 1][1] = EDIT_OP.remove;
         dp[i + 1][j + 1][2] = next - dp[i][j + 1][0];
       }
     }
@@ -57,41 +63,29 @@ export function solveEditDistance<T>(
   const total = dp[n][m][0];
 
   // backtrack
-  const path: {
+  type EditStep = {
     i: number;
     j: number;
     op: number;
     delta: number;
     total: number;
-  }[] = [];
-  const padded: [(T | undefined)[], (T | undefined)[]] = [[], []];
+  };
+  const steps: EditStep[] = [];
   let i = n;
   let j = m;
   while (i > 0 || j > 0) {
     const [total, op, delta] = dp[i][j];
-    path.push({ i, j, total, delta, op });
-    if (op === ops.replace) {
+    steps.push({ i, j, total, op, delta });
+    if (op === EDIT_OP.replace) {
       i--;
       j--;
-      padded[0].push(xs[i]);
-      padded[1].push(ys[j]);
-    } else if (op === ops.insert) {
+    } else if (op === EDIT_OP.insert) {
       j--;
-      padded[0].push(undefined);
-      padded[1].push(ys[j]);
-    } else if (op === ops.remove) {
+    } else if (op === EDIT_OP.remove) {
       i--;
-      padded[0].push(xs[i]);
-      padded[1].push(undefined);
     }
   }
-  path.reverse();
-  padded[0].reverse();
-  padded[1].reverse();
+  steps.reverse();
 
-  return { total, path, padded };
-}
-
-function defaultCostFn(x: unknown, y: unknown) {
-  return x === y ? 0 : 1;
+  return { total, steps };
 }

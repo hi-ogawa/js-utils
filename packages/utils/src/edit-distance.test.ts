@@ -1,23 +1,44 @@
 import { describe, expect, it } from "vitest";
-import { solveEditDistance } from "./edit-distance";
+import { EDIT_OP, solveEditDistance } from "./edit-distance";
+
+function testDiffString(x: string, y: string) {
+  const xs = [...x];
+  const ys = [...y];
+  const { total, steps } = solveEditDistance(xs, ys);
+
+  // format diff
+  const lines = ["", "", ""];
+  for (const step of steps) {
+    let { i, j, delta, op } = step;
+    i -= 1;
+    j -= 1;
+    if (op === EDIT_OP.replace) {
+      lines[0] += xs[i];
+      lines[1] += ys[j];
+    } else if (op === EDIT_OP.insert) {
+      lines[0] += " ";
+      lines[1] += ys[j];
+    } else if (op === EDIT_OP.remove) {
+      lines[0] += xs[i];
+      lines[1] += " ";
+    }
+    lines[2] += delta > 0 ? String(delta) : " ";
+  }
+  const diff = "\n" + lines.map((l) => l.trim() + "\n").join("");
+
+  return { total, steps, diff };
+}
 
 describe(solveEditDistance, () => {
   it("replace", () => {
-    expect(solveEditDistance([..."abc"], [..."axc"])).toMatchInlineSnapshot(`
+    expect(testDiffString("abc", "axc")).toMatchInlineSnapshot(`
       {
-        "padded": [
-          [
-            "a",
-            "b",
-            "c",
-          ],
-          [
-            "a",
-            "x",
-            "c",
-          ],
-        ],
-        "path": [
+        "diff": "
+      abc
+      axc
+      1
+      ",
+        "steps": [
           {
             "delta": 0,
             "i": 1,
@@ -46,21 +67,14 @@ describe(solveEditDistance, () => {
   });
 
   it("insert", () => {
-    expect(solveEditDistance([..."ac"], [..."abc"])).toMatchInlineSnapshot(`
+    expect(testDiffString("ac", "abc")).toMatchInlineSnapshot(`
       {
-        "padded": [
-          [
-            "a",
-            undefined,
-            "c",
-          ],
-          [
-            "a",
-            "b",
-            "c",
-          ],
-        ],
-        "path": [
+        "diff": "
+      a c
+      abc
+      1
+      ",
+        "steps": [
           {
             "delta": 0,
             "i": 1,
@@ -89,21 +103,14 @@ describe(solveEditDistance, () => {
   });
 
   it("remove", () => {
-    expect(solveEditDistance([..."abc"], [..."ac"])).toMatchInlineSnapshot(`
+    expect(testDiffString("abc", "ac")).toMatchInlineSnapshot(`
       {
-        "padded": [
-          [
-            "a",
-            "b",
-            "c",
-          ],
-          [
-            "a",
-            undefined,
-            "c",
-          ],
-        ],
-        "path": [
+        "diff": "
+      abc
+      a c
+      1
+      ",
+        "steps": [
           {
             "delta": 0,
             "i": 1,
@@ -132,125 +139,80 @@ describe(solveEditDistance, () => {
   });
 
   it("case", () => {
-    expect(solveEditDistance([..."kitten"], [..."sitting"]))
-      .toMatchInlineSnapshot(`
-        {
-          "padded": [
-            [
-              "k",
-              "i",
-              "t",
-              "t",
-              "e",
-              "n",
-              undefined,
-            ],
-            [
-              "s",
-              "i",
-              "t",
-              "t",
-              "i",
-              "n",
-              "g",
-            ],
-          ],
-          "path": [
-            {
-              "delta": 1,
-              "i": 1,
-              "j": 1,
-              "op": 0,
-              "total": 1,
-            },
-            {
-              "delta": 0,
-              "i": 2,
-              "j": 2,
-              "op": 0,
-              "total": 1,
-            },
-            {
-              "delta": 0,
-              "i": 3,
-              "j": 3,
-              "op": 0,
-              "total": 1,
-            },
-            {
-              "delta": 0,
-              "i": 4,
-              "j": 4,
-              "op": 0,
-              "total": 1,
-            },
-            {
-              "delta": 1,
-              "i": 5,
-              "j": 5,
-              "op": 0,
-              "total": 2,
-            },
-            {
-              "delta": 0,
-              "i": 6,
-              "j": 6,
-              "op": 0,
-              "total": 2,
-            },
-            {
-              "delta": 1,
-              "i": 6,
-              "j": 7,
-              "op": 1,
-              "total": 3,
-            },
-          ],
-          "total": 3,
-        }
-      `);
+    expect(testDiffString("kitten", "sitting")).toMatchInlineSnapshot(`
+      {
+        "diff": "
+      kitten
+      sitting
+      1   1 1
+      ",
+        "steps": [
+          {
+            "delta": 1,
+            "i": 1,
+            "j": 1,
+            "op": 0,
+            "total": 1,
+          },
+          {
+            "delta": 0,
+            "i": 2,
+            "j": 2,
+            "op": 0,
+            "total": 1,
+          },
+          {
+            "delta": 0,
+            "i": 3,
+            "j": 3,
+            "op": 0,
+            "total": 1,
+          },
+          {
+            "delta": 0,
+            "i": 4,
+            "j": 4,
+            "op": 0,
+            "total": 1,
+          },
+          {
+            "delta": 1,
+            "i": 5,
+            "j": 5,
+            "op": 0,
+            "total": 2,
+          },
+          {
+            "delta": 0,
+            "i": 6,
+            "j": 6,
+            "op": 0,
+            "total": 2,
+          },
+          {
+            "delta": 1,
+            "i": 6,
+            "j": 7,
+            "op": 1,
+            "total": 3,
+          },
+        ],
+        "total": 3,
+      }
+    `);
   });
 
   it("basic", () => {
     const s1 = "a b c d e f g   i   k l m n".replaceAll(" ", "");
     const s2 = "a b   d e f g h i j k l x n".replaceAll(" ", "");
-    expect(solveEditDistance([...s1], [...s2])).toMatchInlineSnapshot(`
+    expect(testDiffString(s1, s2)).toMatchInlineSnapshot(`
       {
-        "padded": [
-          [
-            "a",
-            "b",
-            "c",
-            "d",
-            "e",
-            "f",
-            "g",
-            undefined,
-            "i",
-            undefined,
-            "k",
-            "l",
-            "m",
-            "n",
-          ],
-          [
-            "a",
-            "b",
-            undefined,
-            "d",
-            "e",
-            "f",
-            "g",
-            "h",
-            "i",
-            "j",
-            "k",
-            "l",
-            "x",
-            "n",
-          ],
-        ],
-        "path": [
+        "diff": "
+      abcdefg i klmn
+      ab defghijklxn
+      1    1 1  1
+      ",
+        "steps": [
           {
             "delta": 0,
             "i": 1,
