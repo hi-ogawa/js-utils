@@ -66,10 +66,10 @@ function readVlqBase64(
     }
   }
   // sign at least significant bit
-  if (y & 1) {
-    y = (1 << 31) | -(y >> 1);
-  } else {
-    y = y >> 1;
+  const negative = y & 1;
+  y >>>= 1;
+  if (negative) {
+    y = (1 << 31) | -y;
   }
   return [i, y];
 }
