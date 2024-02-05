@@ -31,9 +31,6 @@ describe(encodeMappings, () => {
 
 describe("fuzz", () => {
   it.todo("decodeMappings(encodeMappings(...))", () => {
-    const decoded: DecodedMappings = [];
-    expect(decodeMappings(encodeMappings(decoded))).toEqual(decoded);
-
     const fcSegment = fc.array(fc.integer({ min: 0, max: 1 << 30 }), {
       minLength: 4,
       maxLength: 4,
