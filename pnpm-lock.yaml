@@ -427,7 +427,11 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0
 
-  packages/utils: {}
+  packages/utils:
+    devDependencies:
+      fast-check:
+        specifier: ^3.12.0
+        version: 3.12.0
 
   packages/utils-hattip: {}
 

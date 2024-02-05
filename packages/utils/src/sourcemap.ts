@@ -1,10 +1,13 @@
 // https://github.com/tc39/source-map-spec/blob/fbcf32ff81752a59dc659ba4e65a76f9a5b9d06b/source-map-rev3.md
 
+import { range, splitByChunk } from "./lodash";
+
 type DecodedSegment =
   | [number]
   | [number, number, number, number]
   | [number, number, number, number, number];
-type DecodedMappings = DecodedSegment[][];
+
+export type DecodedMappings = DecodedSegment[][];
 
 export function decodeMappings(mappings: string): DecodedMappings {
   const groups = mappings
@@ -108,7 +111,7 @@ function writeVlqBase64(y: number): string {
       throw new Error("invalid vlq over 32 bits");
     }
     let x = y & CONT_MASK;
-    y >>= 5;
+    y >>>= 5;
     const cont = y !== 0;
     if (cont) {
       x |= CONT_BIT;
@@ -120,4 +123,15 @@ function writeVlqBase64(y: number): string {
   }
 
   return result;
+}
+
+export function debug32(x: number) {
+  return splitByChunk(
+    range(32)
+      .reverse()
+      .map((i) => (x >> i) & 1),
+    8
+  )
+    .map((chunk) => chunk.join(""))
+    .join("_");
 }
