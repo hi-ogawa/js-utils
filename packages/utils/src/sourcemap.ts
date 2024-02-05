@@ -36,6 +36,26 @@ export function decodeMappings(mappings: string): DecodedMappings {
   return result;
 }
 
+export function encodeMappings(decoded: DecodedMappings): string {
+  let mappings = "";
+
+  const fields: DecodedSegment = [0, 0, 0, 0, 0];
+
+  decoded.forEach((decodedSegments, i) => {
+    if (i > 0) mappings += ";";
+    fields[0] = 0;
+    decodedSegments.forEach((decodedSegment, i) => {
+      if (i > 0) mappings += ",";
+      decodedSegment.forEach((v, i) => {
+        mappings += writeVlqBase64(v - fields[i]);
+        fields[i] = v;
+      });
+    });
+  });
+
+  return mappings;
+}
+
 const ENCODE64 = Array.from(
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
   (c) => c.charCodeAt(0)
@@ -53,15 +73,14 @@ function readVlqBase64(
   data: string,
   i: number
 ): [iNext: number, decoded: number] {
-  let x: number;
   let y = 0;
   for (let j = 0; ; j++) {
     if (j > 6) {
       throw new Error("invalid vlq over 32 bits");
     }
-    x = DECODE64[data.charCodeAt(i++)];
-    y = (x & CONT_MASK) << (j * 5);
-    if (!(x & CONT_BIT)) {
+    const x = DECODE64[data.charCodeAt(i++)];
+    y |= (x & CONT_MASK) << (j * 5);
+    if ((x & CONT_BIT) === 0) {
       break;
     }
   }
@@ -72,4 +91,33 @@ function readVlqBase64(
     y = (1 << 31) | -y;
   }
   return [i, y];
+}
+
+function writeVlqBase64(y: number): string {
+  let result = "";
+
+  const negative = y < 0;
+  y = negative ? -y : y;
+  y <<= 1;
+  if (negative) {
+    y |= 1;
+  }
+
+  for (let j = 0; ; j++) {
+    if (j > 6) {
+      throw new Error("invalid vlq over 32 bits");
+    }
+    let x = y & CONT_MASK;
+    y >>= 5;
+    const cont = y !== 0;
+    if (cont) {
+      x |= CONT_BIT;
+    }
+    result += String.fromCharCode(ENCODE64[x]);
+    if (!cont) {
+      break;
+    }
+  }
+
+  return result;
 }

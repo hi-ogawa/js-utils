@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeMappings } from "./sourcemap";
+import { decodeMappings, encodeMappings } from "./sourcemap";
 
 describe(decodeMappings, () => {
   it("basic", () => {
@@ -57,67 +57,67 @@ describe(decodeMappings, () => {
             0,
           ],
           [
-            32,
+            39,
             0,
             0,
             1,
           ],
           [
-            42,
+            49,
             0,
             0,
             13,
           ],
           [
-            47,
+            54,
             0,
             0,
             18,
           ],
           [
-            53,
+            60,
             0,
             0,
             26,
           ],
           [
-            67,
+            74,
             0,
             0,
             40,
           ],
           [
-            72,
+            79,
             0,
             0,
             47,
           ],
           [
-            79,
+            86,
             0,
             0,
             54,
           ],
           [
-            85,
+            92,
             0,
             0,
             62,
           ],
           [
-            91,
+            98,
             0,
             0,
             68,
           ],
           [
-            96,
+            103,
             0,
             0,
             75,
           ],
           [
-            102,
+            109,
             0,
             0,
             80,
@@ -128,19 +128,19 @@ describe(decodeMappings, () => {
             0,
             1,
             0,
-            160,
+            0,
           ],
           [
             9,
             1,
             0,
-            169,
+            9,
           ],
           [
             16,
             1,
             0,
-            176,
+            16,
           ],
         ],
         [
@@ -148,13 +148,13 @@ describe(decodeMappings, () => {
             0,
             1,
             1,
-            162,
+            2,
           ],
           [
-            32,
+            33,
             1,
             1,
-            178,
+            18,
           ],
         ],
         [
@@ -162,25 +162,25 @@ describe(decodeMappings, () => {
             0,
             1,
             2,
-            194,
+            2,
           ],
           [
             10,
             1,
             2,
-            202,
+            10,
           ],
           [
             14,
             1,
             2,
-            206,
+            14,
           ],
           [
             21,
             1,
             2,
-            213,
+            21,
           ],
         ],
         [
@@ -188,7 +188,7 @@ describe(decodeMappings, () => {
             0,
             1,
             3,
-            229,
+            0,
           ],
         ],
         [
@@ -196,17 +196,25 @@ describe(decodeMappings, () => {
             0,
             1,
             4,
-            229,
+            0,
           ],
           [
             5,
             1,
             4,
-            234,
+            5,
           ],
         ],
         [],
       ]
     `);
+  });
+});
+
+describe(encodeMappings, () => {
+  it("basic", () => {
+    const mappings =
+      "AAAA,uCAAC,UAAY,KAAK,MAAQ,cAAc,KAAO,OAAO,MAAQ,MAAM,KAAO,MAAK;ACAhF,SAAS,OAAO;AACd,iCAAgB;AAChB,UAAQ,IAAI,OAAO;AACrB;AACA,KAAK;";
+    expect(encodeMappings(decodeMappings(mappings))).toEqual(mappings);
   });
 });
