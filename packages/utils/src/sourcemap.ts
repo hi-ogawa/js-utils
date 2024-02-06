@@ -125,7 +125,9 @@ function writeVlqBase64(y: number): string {
   return result;
 }
 
-export function debug32(x: number) {
+// allow unused
+debug32
+function debug32(x: number) {
   return splitByChunk(
     range(32)
       .reverse()
