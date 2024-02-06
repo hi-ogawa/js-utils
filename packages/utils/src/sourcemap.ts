@@ -10,6 +10,13 @@ type DecodedSegment =
 export type DecodedMappings = DecodedSegment[][];
 
 export function decodeMappings(mappings: string): DecodedMappings {
+  // normalization for `decode(encode(x)) = x` round trip
+  if (!mappings) {
+    return [];
+  }
+  if (mappings.endsWith(";")) {
+    mappings = mappings.slice(0, -1);
+  }
   const groups = mappings
     .split(";")
     .map((line) => (line ? line.split(",") : []));
@@ -44,8 +51,7 @@ export function encodeMappings(decoded: DecodedMappings): string {
 
   const fields: DecodedSegment = [0, 0, 0, 0, 0];
 
-  decoded.forEach((decodedSegments, i) => {
-    if (i > 0) mappings += ";";
+  decoded.forEach((decodedSegments) => {
     fields[0] = 0;
     decodedSegments.forEach((decodedSegment, i) => {
       if (i > 0) mappings += ",";
@@ -54,6 +60,7 @@ export function encodeMappings(decoded: DecodedMappings): string {
         fields[i] = v;
       });
     });
+    mappings += ";";
   });
 
   return mappings;

@@ -18,14 +18,9 @@ describe(decodeMappings, () => {
   }
 
   it("basic", () => {
-    expect(decodeMappings("")).toMatchInlineSnapshot(`
-      [
-        [],
-      ]
-    `);
+    expect(decodeMappings("")).toMatchInlineSnapshot(`[]`);
     expect(decodeMappings(";")).toMatchInlineSnapshot(`
       [
-        [],
         [],
       ]
     `);
@@ -33,17 +28,15 @@ describe(decodeMappings, () => {
       [
         [],
         [],
-        [],
       ]
     `);
     expect(formatDecoded(decodeMappings("A,AAAB;;ABCDE;")))
       .toMatchInlineSnapshot(`
-      "
-      0|0,0,0,-2147483648,
-      ,
-      0,-2147483648,1,-2147483649,2,
-      "
-    `);
+        "
+        0|0,0,0,-2147483648,
+        ,
+        0,-2147483648,1,-2147483649,2"
+      `);
     expect(
       formatDecoded(
         decodeMappings(
@@ -57,8 +50,7 @@ describe(decodeMappings, () => {
       0,1,1,2|33,1,1,18,
       0,1,2,2|10,1,2,10|14,1,2,14|21,1,2,21,
       0,1,3,0,
-      0,1,4,0|5,1,4,5,
-      "
+      0,1,4,0|5,1,4,5"
     `);
   });
 });
@@ -72,23 +64,16 @@ describe(encodeMappings, () => {
 
   it("edge cases", () => {
     expect(encodeMappings([])).toMatchInlineSnapshot(`""`);
-    expect(encodeMappings([[]])).toMatchInlineSnapshot(`""`);
-    expect(encodeMappings([[], []])).toMatchInlineSnapshot(`";"`);
-    expect(decodeMappings("")).toMatchInlineSnapshot(`
-      [
-        [],
-      ]
-    `);
+    expect(encodeMappings([[]])).toMatchInlineSnapshot(`";"`);
+    expect(encodeMappings([[], []])).toMatchInlineSnapshot(`";;"`);
+    expect(decodeMappings("")).toMatchInlineSnapshot(`[]`);
     expect(decodeMappings(";")).toMatchInlineSnapshot(`
       [
         [],
-        [],
       ]
     `);
-    expect(encodeMappings([[[1 << 30]]])).toMatchInlineSnapshot(`"ggggggC"`);
+    expect(encodeMappings([[[1 << 30]]])).toMatchInlineSnapshot(`"ggggggC;"`);
     expect(decodeMappings("ggggggC")).toEqual([[[1 << 30]]]);
-
-    expect(decodeMappings(encodeMappings([]))).toMatchInlineSnapshot([[]]);
   });
 });
 
@@ -99,9 +84,7 @@ describe("fuzz", () => {
       maxLength: 4,
     }) as fc.Arbitrary<[number, number, number, number]>;
 
-    // only empty array doesn't round-trip
-    //   [] --(encode)--> "" --(decode)--> [[]]
-    const fcMappings = fc.array(fc.array(fcSegment), { minLength: 1 });
+    const fcMappings = fc.array(fc.array(fcSegment));
 
     fc.assert(
       fc.property(fcMappings, (mappings) => {
