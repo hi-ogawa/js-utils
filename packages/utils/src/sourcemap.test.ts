@@ -4,6 +4,7 @@ import {
   type DecodedMappings,
   decodeMappings,
   encodeMappings,
+  formatBin,
 } from "./sourcemap";
 
 describe(decodeMappings, () => {
@@ -94,6 +95,17 @@ describe("fuzz", () => {
       fc.property(fcMappings, (mappings) => {
         expect(decodeMappings(encodeMappings(mappings))).toEqual(mappings);
       })
+    );
+  });
+});
+
+describe(formatBin, () => {
+  it("basic", () => {
+    expect(formatBin(1 << 31)).toMatchInlineSnapshot(
+      `"10000000_00000000_00000000_00000000"`
+    );
+    expect(formatBin(-1)).toMatchInlineSnapshot(
+      `"11111111_11111111_11111111_11111111"`
     );
   });
 });

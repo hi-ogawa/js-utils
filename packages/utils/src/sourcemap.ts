@@ -125,14 +125,12 @@ function writeVlqBase64(y: number): string {
   return result;
 }
 
-// allow unused
-debug32
-function debug32(x: number) {
+export function formatBin(x: number, size: number = 32, chunkSize: number = 8) {
   return splitByChunk(
-    range(32)
+    range(size)
       .reverse()
       .map((i) => (x >> i) & 1),
-    8
+    chunkSize
   )
     .map((chunk) => chunk.join(""))
     .join("_");
