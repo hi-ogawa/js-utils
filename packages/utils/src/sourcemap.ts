@@ -59,7 +59,7 @@ export function decodeMappings(mappings: string): DecodedMappings {
       const segment = [] as any as DecodedSegment;
       let j = 0;
       for (; i < endSegment; j++) {
-        i = readAndAddVlqBase64(mappings, i, fields, j);
+        i = scanAndAddVlq(mappings, i, fields, j);
         segment.push(fields[j]);
       }
       if (!(j === 1 || j === 4 || j === 5)) {
@@ -91,7 +91,7 @@ export function encodeMappings(decoded: DecodedMappings): string {
     decodedSegments.forEach((decodedSegment, i) => {
       if (i > 0) mappings += ",";
       decodedSegment.forEach((v, i) => {
-        mappings += writeVlqBase64(v - fields[i]);
+        mappings += formatVlq(v - fields[i]);
         fields[i] = v;
       });
     });
@@ -138,7 +138,7 @@ function readVlqBase64(
   return [i, y];
 }
 
-function readAndAddVlqBase64(
+function scanAndAddVlq(
   data: string,
   i: number,
   outArray: number[],
@@ -165,7 +165,7 @@ function readAndAddVlqBase64(
   return i;
 }
 
-function writeVlqBase64(y: number): string {
+function formatVlq(y: number): string {
   let result = "";
 
   const negative = y < 0;
