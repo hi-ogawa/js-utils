@@ -15,11 +15,11 @@ export function decodeMappings(mappings: string): DecodedMappings {
   const fields: DecodedSegment = [0, 0, 0, 0, 0];
 
   for (let i = 0; i < mappings.length; i++) {
-    const endGroup = indexOf(mappings, ";", i);
+    const endGroup = findOrEnd(mappings, ";", i);
     const group: DecodedSegment[] = [];
     fields[0] = 0;
     while (i < endGroup) {
-      const endSegment = Math.min(indexOf(mappings, ",", i), endGroup);
+      const endSegment = Math.min(findOrEnd(mappings, ",", i), endGroup);
       const segment = [] as any as DecodedSegment;
       let j = 0;
       for (; i < endSegment; j++) {
@@ -40,7 +40,7 @@ export function decodeMappings(mappings: string): DecodedMappings {
   return result;
 }
 
-function indexOf(data: string, search: string, position: number) {
+function findOrEnd(data: string, search: string, position: number) {
   const i = data.indexOf(search, position);
   return i === -1 ? data.length : i;
 }
@@ -125,6 +125,7 @@ function formatVlq(y: number): string {
   return result;
 }
 
+// for debugging
 export function formatBin(x: number, size: number = 32, chunkSize: number = 8) {
   return splitByChunk(
     range(size)
