@@ -9,43 +9,6 @@ type DecodedSegment =
 
 export type DecodedMappings = DecodedSegment[][];
 
-export function decodeMappingsV1(mappings: string): DecodedMappings {
-  // normalization for `decode(encode(x)) = x` round trip
-  if (!mappings) {
-    return [];
-  }
-  if (mappings.endsWith(";")) {
-    mappings = mappings.slice(0, -1);
-  }
-  const groups = mappings
-    .split(";")
-    .map((line) => (line ? line.split(",") : []));
-
-  const result: DecodedMappings = [];
-  const fields: DecodedSegment = [0, 0, 0, 0, 0];
-
-  for (const group of groups) {
-    fields[0] = 0;
-    const decodedSegments: DecodedSegment[] = [];
-    for (const segment of group) {
-      let v: number;
-      let j = 0;
-      const decodedSegment: DecodedSegment = [] as any;
-      for (let i = 0; i < segment.length; j++) {
-        [i, v] = readVlqBase64(segment, i);
-        fields[j] += v;
-        decodedSegment.push(fields[j]);
-      }
-      if (!(j === 1 || j === 4 || j === 5)) {
-        throw new Error(`invalid number of fields '${j}'`);
-      }
-      decodedSegments.push(decodedSegment);
-    }
-    result.push(decodedSegments);
-  }
-  return result;
-}
-
 export function decodeMappings(mappings: string): DecodedMappings {
   const result: DecodedMappings = [];
   const fields: DecodedSegment = [0, 0, 0, 0, 0];
@@ -113,30 +76,6 @@ const DECODE64 = ENCODE64.reduce((acc, v, i) => {
 
 const CONT_BIT = 1 << 5;
 const CONT_MASK = CONT_BIT - 1;
-
-function readVlqBase64(
-  data: string,
-  i: number
-): [iNext: number, decoded: number] {
-  let y = 0;
-  for (let j = 0; ; j++) {
-    if (j > 6) {
-      throw new Error("invalid vlq over 32 bits");
-    }
-    const x = DECODE64[data.charCodeAt(i++)];
-    y |= (x & CONT_MASK) << (j * 5);
-    if ((x & CONT_BIT) === 0) {
-      break;
-    }
-  }
-  // sign at least significant bit
-  const negative = y & 1;
-  y >>>= 1;
-  if (negative) {
-    y = (1 << 31) | -y;
-  }
-  return [i, y];
-}
 
 function scanAndAddVlq(
   data: string,
