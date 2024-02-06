@@ -11,8 +11,8 @@ export type DecodedMappings = DecodedSegment[][];
 
 export function decodeMappings(mappings: string): DecodedMappings {
   const groups = mappings
-    ? mappings.split(";").map((line) => (line ? line.split(",") : []))
-    : [];
+    .split(";")
+    .map((line) => (line ? line.split(",") : []));
 
   const result: DecodedMappings = [];
   const fields: DecodedSegment = [0, 0, 0, 0, 0];

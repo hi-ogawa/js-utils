@@ -18,7 +18,11 @@ describe(decodeMappings, () => {
   }
 
   it("basic", () => {
-    expect(decodeMappings("")).toMatchInlineSnapshot(`[]`);
+    expect(decodeMappings("")).toMatchInlineSnapshot(`
+      [
+        [],
+      ]
+    `);
     expect(decodeMappings(";")).toMatchInlineSnapshot(`
       [
         [],
@@ -70,7 +74,11 @@ describe(encodeMappings, () => {
     expect(encodeMappings([])).toMatchInlineSnapshot(`""`);
     expect(encodeMappings([[]])).toMatchInlineSnapshot(`""`);
     expect(encodeMappings([[], []])).toMatchInlineSnapshot(`";"`);
-    expect(decodeMappings("")).toMatchInlineSnapshot(`[]`);
+    expect(decodeMappings("")).toMatchInlineSnapshot(`
+      [
+        [],
+      ]
+    `);
     expect(decodeMappings(";")).toMatchInlineSnapshot(`
       [
         [],
@@ -79,17 +87,21 @@ describe(encodeMappings, () => {
     `);
     expect(encodeMappings([[[1 << 30]]])).toMatchInlineSnapshot(`"ggggggC"`);
     expect(decodeMappings("ggggggC")).toEqual([[[1 << 30]]]);
+
+    expect(decodeMappings(encodeMappings([]))).toMatchInlineSnapshot([[]]);
   });
 });
 
 describe("fuzz", () => {
-  it.todo("decodeMappings(encodeMappings(...))", () => {
+  it("decodeMappings(encodeMappings(...))", () => {
     const fcSegment = fc.array(fc.integer({ min: 0, max: 1 << 30 }), {
       minLength: 4,
       maxLength: 4,
     }) as fc.Arbitrary<[number, number, number, number]>;
 
-    const fcMappings = fc.array(fc.array(fcSegment));
+    // only empty array doesn't round-trip
+    //   [] --(encode)--> "" --(decode)--> [[]]
+    const fcMappings = fc.array(fc.array(fcSegment), { minLength: 1 });
 
     fc.assert(
       fc.property(fcMappings, (mappings) => {
