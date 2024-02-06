@@ -6,46 +6,6 @@ import {
   encodeMappings,
 } from "./sourcemap";
 
-describe(encodeMappings, () => {
-  it("basic", () => {
-    const mappings =
-      "AAAA,uCAAC,UAAY,KAAK,MAAQ,cAAc,KAAO,OAAO,MAAQ,MAAM,KAAO,MAAK;ACAhF,SAAS,OAAO;AACd,iCAAgB;AAChB,UAAQ,IAAI,OAAO;AACrB;AACA,KAAK;";
-    expect(encodeMappings(decodeMappings(mappings))).toEqual(mappings);
-  });
-
-  it("edge", () => {
-    expect(encodeMappings([])).toMatchInlineSnapshot(`""`);
-    expect(encodeMappings([[]])).toMatchInlineSnapshot(`""`);
-    expect(encodeMappings([[], []])).toMatchInlineSnapshot(`";"`);
-    expect(decodeMappings("")).toMatchInlineSnapshot(`[]`);
-    expect(decodeMappings(";")).toMatchInlineSnapshot(`
-      [
-        [],
-        [],
-      ]
-    `);
-    expect(encodeMappings([[[1 << 30]]])).toMatchInlineSnapshot(`"ggggggC"`);
-    expect(decodeMappings("ggggggC")).toEqual([[[1 << 30]]]);
-  });
-});
-
-describe("fuzz", () => {
-  it.todo("decodeMappings(encodeMappings(...))", () => {
-    const fcSegment = fc.array(fc.integer({ min: 0, max: 1 << 30 }), {
-      minLength: 4,
-      maxLength: 4,
-    }) as fc.Arbitrary<[number, number, number, number]>;
-
-    const fcMappings = fc.array(fc.array(fcSegment));
-
-    fc.assert(
-      fc.property(fcMappings, (mappings) => {
-        expect(decodeMappings(encodeMappings(mappings))).toEqual(mappings);
-      })
-    );
-  });
-});
-
 describe(decodeMappings, () => {
   function formatDecoded(decoded: DecodedMappings) {
     return decoded
@@ -95,5 +55,45 @@ describe(decodeMappings, () => {
       0,1,4,0|5,1,4,5,
       "
     `);
+  });
+});
+
+describe(encodeMappings, () => {
+  it("basic", () => {
+    const mappings =
+      "AAAA,uCAAC,UAAY,KAAK,MAAQ,cAAc,KAAO,OAAO,MAAQ,MAAM,KAAO,MAAK;ACAhF,SAAS,OAAO;AACd,iCAAgB;AAChB,UAAQ,IAAI,OAAO;AACrB;AACA,KAAK;";
+    expect(encodeMappings(decodeMappings(mappings))).toEqual(mappings);
+  });
+
+  it("edge cases", () => {
+    expect(encodeMappings([])).toMatchInlineSnapshot(`""`);
+    expect(encodeMappings([[]])).toMatchInlineSnapshot(`""`);
+    expect(encodeMappings([[], []])).toMatchInlineSnapshot(`";"`);
+    expect(decodeMappings("")).toMatchInlineSnapshot(`[]`);
+    expect(decodeMappings(";")).toMatchInlineSnapshot(`
+      [
+        [],
+        [],
+      ]
+    `);
+    expect(encodeMappings([[[1 << 30]]])).toMatchInlineSnapshot(`"ggggggC"`);
+    expect(decodeMappings("ggggggC")).toEqual([[[1 << 30]]]);
+  });
+});
+
+describe("fuzz", () => {
+  it.todo("decodeMappings(encodeMappings(...))", () => {
+    const fcSegment = fc.array(fc.integer({ min: 0, max: 1 << 30 }), {
+      minLength: 4,
+      maxLength: 4,
+    }) as fc.Arbitrary<[number, number, number, number]>;
+
+    const fcMappings = fc.array(fc.array(fcSegment));
+
+    fc.assert(
+      fc.property(fcMappings, (mappings) => {
+        expect(decodeMappings(encodeMappings(mappings))).toEqual(mappings);
+      })
+    );
   });
 });
