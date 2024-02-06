@@ -96,11 +96,7 @@ function scanAndAddVlq(
     }
   }
   // sign at least significant bit
-  const negative = y & 1;
-  y >>>= 1;
-  if (negative) {
-    y = (1 << 31) | -y;
-  }
+  y = y & 1 ? (1 << 31) | -(y >>> 1) : y >>> 1;
   outArray[outIndex] += y;
   return i;
 }
@@ -108,12 +104,7 @@ function scanAndAddVlq(
 function formatVlq(y: number): string {
   let result = "";
 
-  const negative = y < 0;
-  y = negative ? -y : y;
-  y <<= 1;
-  if (negative) {
-    y |= 1;
-  }
+  y = y < 0 ? (-y << 1) | 1 : y << 1;
 
   for (let j = 0; ; j++) {
     if (j > 6) {
