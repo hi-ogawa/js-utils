@@ -34,6 +34,7 @@ export function decodeMappings(mappings: string): DecodedMappings {
         i++;
       }
     }
+    // TODO: sort by fields[1] to have increasing column (e.g. soucemap tracing with binrary search)
     result.push(group);
   }
 
