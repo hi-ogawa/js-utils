@@ -59,9 +59,7 @@ export function decodeMappings(mappings: string): DecodedMappings {
       const segment = [] as any as DecodedSegment;
       let j = 0;
       for (; i < endSegment; j++) {
-        let v: number;
-        [i, v] = readVlqBase64(mappings, i);
-        fields[j] += v;
+        i = readAndAddVlqBase64(mappings, i, fields, j);
         segment.push(fields[j]);
       }
       if (!(j === 1 || j === 4 || j === 5)) {
@@ -138,6 +136,33 @@ function readVlqBase64(
     y = (1 << 31) | -y;
   }
   return [i, y];
+}
+
+function readAndAddVlqBase64(
+  data: string,
+  i: number,
+  outArray: number[],
+  outIndex: number
+): number {
+  let y = 0;
+  for (let j = 0; ; j++) {
+    if (j > 6) {
+      throw new Error("invalid vlq over 32 bits");
+    }
+    const x = DECODE64[data.charCodeAt(i++)];
+    y |= (x & CONT_MASK) << (j * 5);
+    if ((x & CONT_BIT) === 0) {
+      break;
+    }
+  }
+  // sign at least significant bit
+  const negative = y & 1;
+  y >>>= 1;
+  if (negative) {
+    y = (1 << 31) | -y;
+  }
+  outArray[outIndex] += y;
+  return i;
 }
 
 function writeVlqBase64(y: number): string {
