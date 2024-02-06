@@ -9,7 +9,7 @@ type DecodedSegment =
 
 export type DecodedMappings = DecodedSegment[][];
 
-export function decodeMappings(mappings: string): DecodedMappings {
+export function decodeMappingsV1(mappings: string): DecodedMappings {
   // normalization for `decode(encode(x)) = x` round trip
   if (!mappings) {
     return [];
@@ -44,6 +44,43 @@ export function decodeMappings(mappings: string): DecodedMappings {
     result.push(decodedSegments);
   }
   return result;
+}
+
+export function decodeMappings(mappings: string): DecodedMappings {
+  const result: DecodedMappings = [];
+  const fields: DecodedSegment = [0, 0, 0, 0, 0];
+
+  for (let i = 0; i < mappings.length; i++) {
+    const endGroup = indexOf(mappings, ";", i);
+    const group: DecodedSegment[] = [];
+    fields[0] = 0;
+    while (i < endGroup) {
+      const endSegment = Math.min(indexOf(mappings, ",", i), endGroup);
+      const segment = [] as any as DecodedSegment;
+      let j = 0;
+      for (; i < endSegment; j++) {
+        let v: number;
+        [i, v] = readVlqBase64(mappings, i);
+        fields[j] += v;
+        segment.push(fields[j]);
+      }
+      if (!(j === 1 || j === 4 || j === 5)) {
+        throw new Error(`invalid number of fields '${j}'`);
+      }
+      group.push(segment);
+      if (i < endGroup) {
+        i++;
+      }
+    }
+    result.push(group);
+  }
+
+  return result;
+}
+
+function indexOf(data: string, search: string, position: number) {
+  const i = data.indexOf(search, position);
+  return i === -1 ? data.length : i;
 }
 
 export function encodeMappings(decoded: DecodedMappings): string {
