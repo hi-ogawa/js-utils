@@ -74,6 +74,11 @@ describe(encodeMappings, () => {
     `);
     expect(encodeMappings([[[1 << 30]]])).toMatchInlineSnapshot(`"ggggggC;"`);
     expect(decodeMappings("ggggggC")).toEqual([[[1 << 30]]]);
+
+    // doesn't round trip since encoding ensures ";"
+    expect(encodeMappings(decodeMappings("AAAA"))).toMatchInlineSnapshot(
+      `"AAAA;"`
+    );
   });
 });
 
