@@ -1,4 +1,5 @@
 // https://github.com/tc39/source-map-spec/blob/fbcf32ff81752a59dc659ba4e65a76f9a5b9d06b/source-map-rev3.md
+// https://github.com/jridgewell/sourcemap-codec/blob/f3d95b857d24fc3f1692dec4d1ed724fe12488a3/src/sourcemap-codec.ts
 
 import { range, splitByChunk } from "./lodash";
 
