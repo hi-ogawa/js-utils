@@ -2,7 +2,7 @@ import { tinyassert } from "@hiogawa/utils";
 import type { TinyRpcMessagePort } from "./adapter-message-port";
 
 export interface TinyRpcMessagePortNode {
-  postMessage(data: unknown): void;
+  postMessage(data: unknown, transferList?: ReadonlyArray<unknown>): void;
   on(type: "message", handler: NodeMessageHandler): void;
   off(type: "message", handler: NodeMessageHandler): void;
 }
@@ -15,8 +15,8 @@ export function messagePortNodeCompat(
   const map = new WeakMap();
 
   return {
-    postMessage(data) {
-      port.postMessage(data);
+    postMessage(data, options) {
+      port.postMessage(data, options?.transfer);
     },
 
     addEventListener(type, handler) {
