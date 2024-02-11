@@ -4,7 +4,7 @@ import {
   type TinyRpcMessagePort,
   messagePortClientAdapter,
   messagePortServerAdapter,
-  wrapTransfer,
+  messagePortWrapTransfer,
 } from "./adapter-message-port";
 import type { TinyRpcMessagePortNode } from "./adapter-message-port-node";
 import { TinyRpcError, exposeTinyRpc, proxyTinyRpc } from "./core";
@@ -105,7 +105,7 @@ describe("adapter-message-port", () => {
       testResponse: (enable: boolean) => {
         const data = new Uint8Array([100]);
         if (enable) {
-          return wrapTransfer(data, [data.buffer]);
+          return messagePortWrapTransfer(data, [data.buffer]);
         }
         return data;
       },
@@ -127,7 +127,7 @@ describe("adapter-message-port", () => {
       const data = new Uint8Array([100]);
       expect(data.byteLength).toMatchInlineSnapshot(`1`);
       expect(
-        await client.testRequest(wrapTransfer(data, [data.buffer]))
+        await client.testRequest(messagePortWrapTransfer(data, [data.buffer]))
       ).toMatchInlineSnapshot(`100`);
       expect(data.byteLength).toMatchInlineSnapshot(`0`);
     }

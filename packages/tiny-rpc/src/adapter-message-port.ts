@@ -142,7 +142,10 @@ class WrapepdTransfer {
   constructor(public inner: [unknown, unknown[]]) {}
 }
 
-export function wrapTransfer<T>(value: T, transferables: unknown[]): T {
+export function messagePortWrapTransfer<T>(
+  value: T,
+  transferables: unknown[]
+): T {
   return new WrapepdTransfer([value, transferables]) as any;
 }
 
