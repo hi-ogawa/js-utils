@@ -15,7 +15,9 @@ export function messagePortNodeCompat(
   const map = new WeakMap();
 
   return {
-    postMessage(data) {
+    postMessage(data, options) {
+      // TODO
+      options?.transfer;
       port.postMessage(data);
     },
 

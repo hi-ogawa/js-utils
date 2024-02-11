@@ -4,6 +4,7 @@ import {
   type TinyRpcMessagePort,
   messagePortClientAdapter,
   messagePortServerAdapter,
+  wrapTransfer,
 } from "./adapter-message-port";
 import type { TinyRpcMessagePortNode } from "./adapter-message-port-node";
 import { TinyRpcError, exposeTinyRpc, proxyTinyRpc } from "./core";
@@ -89,6 +90,67 @@ describe("adapter-message-port", () => {
       expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
       return true;
     });
+  });
+
+  it("transferable", async () => {
+    const channel = new MessageChannel();
+
+    //
+    // server
+    //
+    const routes = {
+      testRequest: (data: Uint8Array) => {
+        return data[0];
+      },
+      testResponse: (enable: boolean) => {
+        const data = new Uint8Array([100]);
+        if (enable) {
+          return wrapTransfer(data, [data.buffer]);
+        }
+        return data;
+      },
+    };
+    exposeTinyRpc({
+      routes,
+      adapter: messagePortServerAdapter({ port: channel.port1 }),
+    });
+
+    //
+    // client
+    //
+    const client = proxyTinyRpc<typeof routes>({
+      adapter: messagePortClientAdapter({ port: channel.port2 }),
+    });
+
+    // send ArrayBuffer
+    {
+      const data = new Uint8Array([100]);
+      expect(data.byteLength).toMatchInlineSnapshot(`1`);
+      expect(
+        await client.testRequest(wrapTransfer(data, [data.buffer]))
+      ).toMatchInlineSnapshot(`100`);
+      expect(data.byteLength).toMatchInlineSnapshot(`0`);
+    }
+
+    // can send without transfer
+    {
+      const data = new Uint8Array([100]);
+      expect(data.byteLength).toMatchInlineSnapshot(`1`);
+      expect(await client.testRequest(data)).toMatchInlineSnapshot(`100`);
+      expect(data.byteLength).toMatchInlineSnapshot(`1`);
+    }
+
+    // response
+    expect(await client.testResponse(true)).toMatchInlineSnapshot(`
+      Uint8Array [
+        100,
+      ]
+    `);
+    expect(await client.testResponse(false)).toMatchInlineSnapshot(`
+      Uint8Array [
+        100,
+      ]
+    `);
   });
 
   it("web worker", () => {
