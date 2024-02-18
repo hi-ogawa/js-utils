@@ -7,10 +7,10 @@
     "build": "pnpm -r build",
     "tsc": "tsc -b packages/*/tsconfig.json packages/*/examples/*/tsconfig.json",
     "dev:tsc": "pnpm tsc --watch --preserveWatchOutput",
-    "test": "pnpm -r --seq test run",
+    "test": "pnpm -r --sequential test run",
     "sort-package-json": "sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path' | xargs -i echo {}/package.json)",
-    "lint": "pnpm run --seq /^lint:/",
-    "lint-check": "pnpm run --seq /^lint-check:/",
+    "lint": "pnpm run --sequential /^lint:/",
+    "lint-check": "pnpm run --sequential /^lint-check:/",
     "lint:isort": "pnpm lint-check:isort --fix",
     "lint-check:isort": "isort-ts --git --cache",
     "lint:prettier": "prettier --cache . --write",
@@ -36,7 +36,7 @@
     "typescript": "^5.1.6",
     "vitest": "^1.0.2"
   },
-  "packageManager": "pnpm@8.12.0+sha256.553e4eb0e2a2c9abcb419b3262bdc7aee8ae3c42e2301a1807d44575786160c9",
+  "packageManager": "pnpm@8.15.3+sha256.fc4a49bd609550a41e14d20efbce802a4b892aa4cac877322de2f0924f122991",
   "volta": {
     "node": "18.19.0"
   }
