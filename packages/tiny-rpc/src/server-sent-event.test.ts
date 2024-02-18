@@ -1,7 +1,7 @@
 import { createServer } from "@hattip/adapter-node";
 import { compose } from "@hattip/compose";
 import { createManualPromise } from "@hiogawa/utils";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import {
   TwoWaySseClient,
   TwoWaySseClientProxy,
@@ -24,7 +24,7 @@ describe(createTwoWaySseHandler, () => {
     // server
     //
     const clientProxyPromise = createManualPromise<TwoWaySseClientProxy>();
-    const { handler } = createTwoWaySseHandler({
+    const { clientMap, handler } = createTwoWaySseHandler({
       endpoint,
       onConnection(client) {
         clientProxyPromise.resolve(client);
@@ -40,15 +40,52 @@ describe(createTwoWaySseHandler, () => {
       endpoint: url + endpoint,
     });
     const clientProxy = await clientProxyPromise;
+    expect(clientMap.size).toMatchInlineSnapshot(`1`);
 
     //
-    // send message from server to client
+    // server -> client
     //
-    const resultPromise = createManualPromise<unknown>();
+    let resultPromise = createManualPromise<unknown>();
     client.addEventListener("message", (e) => {
       resultPromise.resolve(e.data);
     });
     clientProxy.postMessage("hello");
-    expect(await resultPromise).toMatchInlineSnapshot(`""hello""`);
+    expect(await resultPromise).toMatchInlineSnapshot(`"hello"`);
+
+    resultPromise = createManualPromise<unknown>();
+    clientProxy.postMessage(["world"]);
+    expect(await resultPromise).toMatchInlineSnapshot(`
+      [
+        "world",
+      ]
+    `);
+
+    //
+    // client -> server
+    //
+    resultPromise = createManualPromise<unknown>();
+    clientProxy.addEventListener("message", (e) => {
+      resultPromise.resolve(e.data);
+    });
+    client.postMessage("foo");
+    expect(await resultPromise).toMatchInlineSnapshot(`"foo"`);
+
+    resultPromise = createManualPromise<unknown>();
+    client.postMessage(["bar"]);
+    expect(await resultPromise).toMatchInlineSnapshot(`
+      [
+        "bar",
+      ]
+    `);
+
+    //
+    // close from client (TODO: doesn't work?)
+    //
+    // const closePromise = createManualPromise<void>();
+    // clientProxy.addEventListener("close", () => {
+    //   closePromise.resolve();
+    // })
+    // client.source.close();
+    // await closePromise;
   });
 });

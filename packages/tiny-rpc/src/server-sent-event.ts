@@ -58,12 +58,21 @@ export class TwoWaySseClient implements TinyRpcMessagePort {
     });
   }
 
+  private listenerMap = new WeakMap();
+
   addEventListener(type: "message", handler: MessageHandler) {
-    this.source.addEventListener(type, handler);
+    const wrapper: MessageHandler = (ev) => {
+      tinyassert(typeof ev.data === "string");
+      handler({ data: JSON.parse(ev.data) });
+    };
+    this.listenerMap.set(handler, wrapper);
+    this.source.addEventListener(type, wrapper);
   }
 
   removeEventListener(type: "message", handler: MessageHandler) {
-    this.source.removeEventListener(type, handler);
+    const wrapper = this.listenerMap.get(handler);
+    this.source.removeEventListener(type, wrapper);
+    this.listenerMap.delete(handler);
   }
 }
 
@@ -132,7 +141,7 @@ export class TwoWaySseClientProxy
       },
     });
 
-    // auto server ping
+    // auto ping from server
     const interval = setInterval(() => {
       this.controller.enqueue(`:ping\n\n`);
     }, 10_000);
@@ -150,6 +159,7 @@ export function createTwoWaySseHandler(opts: {
   endpoint: string;
   onConnection: (client: TwoWaySseClientProxy) => void;
 }) {
+  // TODO: cannot close from server? (need to access node's http.ServerResponse?)
   const clientMap = new Map<string, TwoWaySseClientProxy>();
 
   const handler: RequestHandler = async ({ request }) => {
