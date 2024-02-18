@@ -114,7 +114,7 @@ interface ResponsePayload {
   result: Result<unknown, unknown>;
 }
 
-function defaultGenerateId() {
+export function defaultGenerateId() {
   if (typeof globalThis?.crypto?.randomUUID !== "undefined") {
     return globalThis.crypto.randomUUID();
   }
