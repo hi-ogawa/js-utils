@@ -1,7 +1,7 @@
 import { createServer } from "@hattip/adapter-node";
 import { compose } from "@hattip/compose";
 import { createManualPromise } from "@hiogawa/utils";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import {
   TwoWaySseClient,
   TwoWaySseClientProxy,
