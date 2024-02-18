@@ -1,4 +1,5 @@
 import { DefaultMap, createManualPromise, tinyassert } from "@hiogawa/utils";
+import type { RequestHandler } from "./adapter-http";
 import {
   type TinyRpcMessagePort,
   defaultGenerateId,
@@ -181,8 +182,3 @@ export function createTwoWaySseHandler(opts: {
 
   return handler;
 }
-
-// compatible with hattip's RequestHandler
-type RequestHandler = (ctx: {
-  request: Request;
-}) => Promise<Response | undefined>;

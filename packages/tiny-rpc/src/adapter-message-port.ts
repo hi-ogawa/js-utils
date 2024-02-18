@@ -27,7 +27,7 @@ export interface TinyRpcMessagePort {
 }
 
 // cf. StructuredSerializeOptions
-export type postMessageOptions = {
+type postMessageOptions = {
   transfer?: unknown[];
 };
 
