@@ -8,7 +8,7 @@ import {
 // WebSocket-like two way connection interface
 // implemented on top of server sent events (SSE)
 // https://github.com/websockets/ws
-// https://developer.mozilla.org/en-US/docs/Web/API/EventSource
+// https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
 
 export class TwoWaySseClient implements TinyRpcMessagePort {
   constructor(
