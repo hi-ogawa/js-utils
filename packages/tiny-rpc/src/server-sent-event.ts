@@ -85,7 +85,7 @@ interface TwoWaySseClientProxyEventMap {
   close: {};
 }
 
-class EventListerManager<T> {
+export class TypedEventTarget<T> {
   private listeners = new DefaultMap<keyof T, Set<Function>>(() => new Set());
 
   addEventListener<K extends keyof T>(type: K, listener: (ev: T[K]) => void) {
@@ -107,7 +107,7 @@ class EventListerManager<T> {
 }
 
 export class TwoWaySseClientProxy
-  extends EventListerManager<TwoWaySseClientProxyEventMap>
+  extends TypedEventTarget<TwoWaySseClientProxyEventMap>
   implements TinyRpcMessagePort
 {
   stream: ReadableStream<string>;
@@ -122,6 +122,7 @@ export class TwoWaySseClientProxy
     this.stream = new ReadableStream<string>({
       start: (controller) => {
         this.controller = controller;
+        this.controller.enqueue(`:ping\n\n`);
       },
       cancel: () => {
         this.closed = true;
