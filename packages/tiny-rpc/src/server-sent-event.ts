@@ -9,6 +9,7 @@ import {
 // implemented on top of server sent events (SSE)
 // https://github.com/websockets/ws
 // https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
+// https://github.com/Azure/fetch-event-source
 
 export class TwoWaySseClient implements TinyRpcMessagePort {
   constructor(
@@ -113,7 +114,7 @@ export class TwoWaySseClientProxy
   controller!: ReadableStreamDefaultController<string>;
   closed = false;
 
-  constructor() {
+  constructor(opts: { onClose: () => void }) {
     super();
 
     // cf. hattip serverSentEvents
@@ -124,8 +125,9 @@ export class TwoWaySseClientProxy
       },
       cancel: () => {
         this.closed = true;
-        this.notify("close", {});
+        opts.onClose();
         clearTimeout(interval);
+        this.notify("close", {});
       },
     });
 
@@ -165,9 +167,16 @@ export function createTwoWaySseHandler(opts: {
       if (request.method === "GET") {
         tinyassert(id);
         tinyassert(!clientMap.has(id));
-        const client = new TwoWaySseClientProxy();
+
+        const client = new TwoWaySseClientProxy({
+          onClose: () => {
+            clientMap.delete(id);
+          },
+        });
         clientMap.set(id, client);
+
         opts.onConnection(client);
+
         return new Response(client.stream, {
           headers: {
             "content-type": "text/event-stream",
@@ -180,5 +189,5 @@ export function createTwoWaySseHandler(opts: {
     return;
   };
 
-  return handler;
+  return { clientMap, handler };
 }

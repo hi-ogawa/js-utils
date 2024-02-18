@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ZodError, z } from "zod";
 import { httpClientAdapter, httpServerAdapter } from "./adapter-http";
 import { TinyRpcError, exposeTinyRpc, proxyTinyRpc } from "./core";
-import { defineTestRpcRoutes } from "./tests/helper";
+import { defineTestRpcRoutes, startTestServer } from "./tests/helper";
 import { validateFn } from "./validation";
 
 describe("adapter-http", () => {
@@ -473,15 +473,3 @@ describe("adapter-http", () => {
     });
   });
 });
-
-async function startTestServer(server: ReturnType<typeof createServer>) {
-  await new Promise<void>((resolve) => server.listen(() => resolve()));
-
-  // get address
-  const address = server.address();
-  tinyassert(address);
-  tinyassert(typeof address !== "string");
-  const url = `http://localhost:${address.port}`;
-
-  return { server, url };
-}
