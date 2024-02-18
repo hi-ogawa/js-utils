@@ -28,7 +28,7 @@
     "@hiogawa/tiny-cli": "workspace:*",
     "@hiogawa/utils": "workspace:*",
     "@hiogawa/utils-node": "workspace:*",
-    "@types/node": "^18.19.0"
+    "@types/node": "^20.11.19"
   },
   "peerDependencies": {
     "typescript": "*"

@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",
-    "@types/node": "^18"
+    "@types/node": "^20.11.19"
   },
   "volta": {
     "extends": "../../package.json"

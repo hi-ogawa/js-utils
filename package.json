@@ -24,20 +24,20 @@
     "@hiogawa/sort-package-json": "workspace:*",
     "@hiogawa/utils": "workspace:*",
     "@hiogawa/utils-node": "workspace:*",
-    "@playwright/test": "^1.39.0",
+    "@playwright/test": "^1.41.2",
     "@swc/core": "^1.3.95",
-    "@tsconfig/strictest": "^2.0.1",
-    "@types/node": "^20.8.6",
-    "esbuild": "^0.18.10",
+    "@tsconfig/strictest": "^2.0.3",
+    "@types/node": "^20.11.19",
+    "esbuild": "^0.20.0",
     "prettier": "^2.8.8",
-    "tsup": "^7.1.0",
-    "tsx": "^4.6.2",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.1",
     "typedoc": "^0.24.8",
-    "typescript": "^5.1.6",
-    "vitest": "^1.0.2"
+    "typescript": "^5.3.3",
+    "vitest": "^1.3.0"
   },
   "packageManager": "pnpm@8.15.3+sha256.fc4a49bd609550a41e14d20efbce802a4b892aa4cac877322de2f0924f122991",
   "volta": {
-    "node": "18.19.0"
+    "node": "20.11.1"
   }
 }
