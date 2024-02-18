@@ -13,6 +13,7 @@ import {
 
 // TODO:
 // - dispose?
+// - handle connection error?
 
 //
 // slim down MessagePort interface
@@ -26,7 +27,7 @@ export interface TinyRpcMessagePort {
 }
 
 // cf. StructuredSerializeOptions
-type postMessageOptions = {
+export type postMessageOptions = {
   transfer?: unknown[];
 };
 
