@@ -3,7 +3,6 @@ import type {
   TinyRpcMessagePort,
 } from "../adapter-message-port";
 
-// TODO: rework adapter-message-port api, so we don't need this silly wrapper...
 export class WebSocketMessagePort implements TinyRpcMessagePort {
   constructor(public ws: WebSocket) {}
 
