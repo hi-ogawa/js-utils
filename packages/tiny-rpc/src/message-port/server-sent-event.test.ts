@@ -58,12 +58,8 @@ describe(createTwoWaySseHandler, () => {
     expect(await resultPromise).toMatchInlineSnapshot(`"hello"`);
 
     resultPromise = createManualPromise<unknown>();
-    clientProxy.postMessage(["world"]);
-    expect(await resultPromise).toMatchInlineSnapshot(`
-      [
-        "world",
-      ]
-    `);
+    clientProxy.postMessage("world");
+    expect(await resultPromise).toMatchInlineSnapshot(`"world"`);
 
     //
     // client -> server
@@ -76,12 +72,8 @@ describe(createTwoWaySseHandler, () => {
     expect(await resultPromise).toMatchInlineSnapshot(`"foo"`);
 
     resultPromise = createManualPromise<unknown>();
-    client.postMessage(["bar"]);
-    expect(await resultPromise).toMatchInlineSnapshot(`
-      [
-        "bar",
-      ]
-    `);
+    client.postMessage("bar");
+    expect(await resultPromise).toMatchInlineSnapshot(`"bar"`);
 
     //
     // close from client (TODO: doesn't work?)
@@ -125,14 +117,22 @@ describe(createTwoWaySseHandler, () => {
     const { routes } = defineTestRpcRoutes();
     exposeTinyRpc({
       routes,
-      adapter: messagePortServerAdapter({ port: client }),
+      adapter: messagePortServerAdapter({
+        port: client,
+        serialize: JSON.stringify,
+        deserialize: JSON.parse,
+      }),
     });
 
     //
     // rpc client on server
     //
     const rpcProxy = proxyTinyRpc<typeof routes>({
-      adapter: messagePortClientAdapter({ port: clientProxy }),
+      adapter: messagePortClientAdapter({
+        port: clientProxy,
+        serialize: JSON.stringify,
+        deserialize: JSON.parse,
+      }),
     });
 
     //

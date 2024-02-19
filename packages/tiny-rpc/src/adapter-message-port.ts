@@ -42,17 +42,21 @@ export function messagePortServerAdapter({
   port,
   onError,
   tag,
+  serialize = (v) => v,
+  deserialize = (v) => v,
 }: {
   port: TinyRpcMessagePort;
   onError?: (e: unknown) => void;
   tag?: string; // extra tag to resue single port for a different purpose
+  serialize?: (v: any) => any;
+  deserialize?: (v: any) => any;
 }): TinyRpcServerAdapter<() => void> {
   return {
     register: (invokeRoute) => {
       // TODO: async handler caveat
       return listen(port, async (ev) => {
         // TODO: collision check req.id on server?
-        const req = ev.data as RequestPayload;
+        const req = deserialize(ev.data) as RequestPayload;
         if (req.type !== "request" || req.tag !== tag) {
           return;
         }
@@ -72,7 +76,7 @@ export function messagePortServerAdapter({
           result,
           tag,
         };
-        port.postMessage(res, { transfer });
+        port.postMessage(serialize(res), { transfer });
       });
     },
   };
@@ -82,10 +86,14 @@ export function messagePortClientAdapter({
   port,
   generateId = defaultGenerateId,
   tag,
+  serialize = (v) => v,
+  deserialize = (v) => v,
 }: {
   port: TinyRpcMessagePort;
   generateId?: () => string;
   tag?: string; // extra tag to resue single port for a different purpose
+  serialize?: (v: any) => any;
+  deserialize?: (v: any) => any;
 }): TinyRpcClientAdapter {
   return {
     send: async (data) => {
@@ -100,13 +108,13 @@ export function messagePortClientAdapter({
       };
       const responsePromise = createManualPromise<ResponsePayload>();
       const unlisten = listen(port, (ev) => {
-        const res = ev.data as ResponsePayload;
+        const res = deserialize(ev.data) as ResponsePayload;
         if (res.id === req.id && res.tag === tag) {
           responsePromise.resolve(res);
           unlisten();
         }
       });
-      port.postMessage(req, { transfer });
+      port.postMessage(serialize(req), { transfer });
       const res = await responsePromise;
       if (!res.result.ok) {
         throw TinyRpcError.deserialize(res.result.value);

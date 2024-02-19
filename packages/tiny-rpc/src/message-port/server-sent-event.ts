@@ -46,9 +46,10 @@ export class TwoWaySseClient implements TinyRpcMessagePort {
 
   postMessage(data: unknown) {
     const inner = async () => {
+      tinyassert(typeof data === "string");
       const res = await fetch(this.endpoint + "?id=" + this.id, {
         method: "POST",
-        body: JSON.stringify(data),
+        body: data,
       });
       tinyassert(res.ok);
       const resJson = await res.json();
@@ -60,21 +61,12 @@ export class TwoWaySseClient implements TinyRpcMessagePort {
     });
   }
 
-  private listenerMap = new WeakMap();
-
   addEventListener(type: "message", handler: MessageHandler) {
-    const wrapper: MessageHandler = (ev) => {
-      tinyassert(typeof ev.data === "string");
-      handler({ data: JSON.parse(ev.data) });
-    };
-    this.listenerMap.set(handler, wrapper);
-    this.source.addEventListener(type, wrapper);
+    this.source.addEventListener(type, handler);
   }
 
   removeEventListener(type: "message", handler: MessageHandler) {
-    const wrapper = this.listenerMap.get(handler);
-    this.source.removeEventListener(type, wrapper);
-    this.listenerMap.delete(handler);
+    this.source.removeEventListener(type, handler);
   }
 }
 
@@ -119,7 +111,8 @@ export class TwoWaySseClientProxy
     if (this.closed) {
       throw new Error("[TwoWaySseClientProxy.postMessage] already closed");
     }
-    this.controller.enqueue(`data: ${JSON.stringify(data)}\n\n`);
+    tinyassert(typeof data === "string");
+    this.controller.enqueue(`data: ${data}\n\n`);
   }
 }
 
@@ -139,7 +132,7 @@ export function createTwoWaySseHandler(opts: {
         tinyassert(id);
         const client = clientMap.get(id);
         tinyassert(client);
-        client.notify("message", { data: await request.json() });
+        client.notify("message", { data: await request.text() });
         return new Response(JSON.stringify({ ok: true }));
       }
 
