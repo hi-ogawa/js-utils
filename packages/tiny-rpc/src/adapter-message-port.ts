@@ -31,7 +31,7 @@ type postMessageOptions = {
   transfer?: unknown[];
 };
 
-type MessageHandler = (ev: { data: unknown }) => void;
+export type MessageHandler = (ev: { data: unknown }) => void;
 
 //
 // adapter

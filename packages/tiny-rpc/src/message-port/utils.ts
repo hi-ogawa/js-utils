@@ -20,3 +20,14 @@ export class TypedEventTarget<T> {
     }
   }
 }
+
+export function subscribe<K extends keyof EventSourceEventMap>(
+  target: EventSource,
+  type: K,
+  listener: (ev: EventSourceEventMap[K]) => void
+) {
+  target.addEventListener(type, listener);
+  return () => {
+    target.addEventListener(type, listener);
+  };
+}

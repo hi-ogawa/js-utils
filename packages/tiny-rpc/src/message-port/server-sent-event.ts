@@ -1,10 +1,11 @@
 import { createManualPromise, tinyassert } from "@hiogawa/utils";
 import type { RequestHandler } from "../adapter-http";
 import {
+  type MessageHandler,
   type TinyRpcMessagePort,
   defaultGenerateId,
 } from "../adapter-message-port";
-import { TypedEventTarget } from "./utils";
+import { TypedEventTarget, subscribe } from "./utils";
 
 // MessagePort like two way connection
 // implemented on top of server sent events (SSE)
@@ -75,19 +76,6 @@ export class TwoWaySseClient implements TinyRpcMessagePort {
     this.source.removeEventListener(type, wrapper);
     this.listenerMap.delete(handler);
   }
-}
-
-type MessageHandler = (ev: { data: unknown }) => void;
-
-function subscribe<K extends keyof EventSourceEventMap>(
-  target: EventSource,
-  type: K,
-  listener: (ev: EventSourceEventMap[K]) => void
-) {
-  target.addEventListener(type, listener);
-  return () => {
-    target.addEventListener(type, listener);
-  };
 }
 
 interface TwoWaySseClientProxyEventMap {
