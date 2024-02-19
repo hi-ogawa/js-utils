@@ -14,7 +14,7 @@ import {
 // TODO:
 // - dispose?
 // - handle connection error?
-// - serialize/deserialize
+// - just use same API as birpc? (send/on/serialize/deserialize)
 
 //
 // slim down MessagePort interface

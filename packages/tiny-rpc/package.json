@@ -34,8 +34,10 @@
     "@hiogawa/json-extra": "workspace:*",
     "@hiogawa/utils": "workspace:*",
     "@microsoft/fetch-event-source": "^2.0.1",
+    "@types/ws": "^8.5.10",
     "eventsource": "^2.0.2",
     "superjson": "^1.13.1",
+    "ws": "^8.16.0",
     "zod": "^3.21.4"
   },
   "volta": {
