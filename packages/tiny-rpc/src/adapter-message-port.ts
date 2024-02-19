@@ -14,6 +14,7 @@ import {
 // TODO:
 // - dispose?
 // - handle connection error?
+// - serialize/deserialize
 
 //
 // slim down MessagePort interface
