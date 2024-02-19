@@ -40,9 +40,11 @@ type MessageHandler = (ev: { data: unknown }) => void;
 export function messagePortServerAdapter({
   port,
   onError,
+  tag,
 }: {
   port: TinyRpcMessagePort;
   onError?: (e: unknown) => void;
+  tag?: string; // extra tag to resue single port for a different purpose
 }): TinyRpcServerAdapter<() => void> {
   return {
     register: (invokeRoute) => {
@@ -50,6 +52,9 @@ export function messagePortServerAdapter({
       return listen(port, async (ev) => {
         // TODO: collision check req.id on server?
         const req = ev.data as RequestPayload;
+        if (req.type !== "request" || req.tag !== tag) {
+          return;
+        }
         let transfer!: unknown[];
         const result = await wrapErrorAsync(async () => {
           let ret = await invokeRoute(req.data);
@@ -61,8 +66,10 @@ export function messagePortServerAdapter({
           result.value = TinyRpcError.fromUnknown(result.value).serialize();
         }
         const res: ResponsePayload = {
+          type: "response",
           id: req.id,
           result,
+          tag,
         };
         port.postMessage(res, { transfer });
       });
@@ -73,9 +80,11 @@ export function messagePortServerAdapter({
 export function messagePortClientAdapter({
   port,
   generateId = defaultGenerateId,
+  tag,
 }: {
   port: TinyRpcMessagePort;
   generateId?: () => string;
+  tag?: string; // extra tag to resue single port for a different purpose
 }): TinyRpcClientAdapter {
   return {
     send: async (data) => {
@@ -83,13 +92,15 @@ export function messagePortClientAdapter({
       const args = unwraped.map(([arg]) => arg);
       const transfer = uniq(unwraped.flatMap(([_, t]) => t));
       const req: RequestPayload = {
+        type: "request",
+        tag,
         id: generateId(),
         data: { ...data, args },
       };
       const responsePromise = createManualPromise<ResponsePayload>();
       const unlisten = listen(port, (ev) => {
         const res = ev.data as ResponsePayload;
-        if (res.id === req.id) {
+        if (res.id === req.id && res.tag === tag) {
           responsePromise.resolve(res);
           unlisten();
         }
@@ -105,11 +116,15 @@ export function messagePortClientAdapter({
 }
 
 interface RequestPayload {
+  type: "request";
+  tag?: string;
   id: string;
   data: TinyRpcPayload;
 }
 
 interface ResponsePayload {
+  type: "response";
+  tag?: string;
   id: string;
   result: Result<unknown, unknown>;
 }
