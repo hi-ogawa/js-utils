@@ -6,8 +6,8 @@ import {
   messagePortServerAdapter,
   messagePortWrapTransfer,
 } from "./adapter-message-port";
-import type { TinyRpcMessagePortNode } from "./adapter-message-port-node";
 import { TinyRpcError, exposeTinyRpc, proxyTinyRpc } from "./core";
+import type { TinyRpcMessagePortNode } from "./message-port/nodejs";
 import { defineTestRpcRoutes } from "./tests/helper";
 
 describe("adapter-message-port", () => {

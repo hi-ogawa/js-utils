@@ -1,56 +1,25 @@
 import { createServer } from "@hattip/adapter-node";
 import { compose } from "@hattip/compose";
 import { createManualPromise, tinyassert } from "@hiogawa/utils";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   messagePortClientAdapter,
   messagePortServerAdapter,
-} from "./adapter-message-port";
-import { TinyRpcError, exposeTinyRpc, proxyTinyRpc } from "./core";
+} from "../adapter-message-port";
+import { TinyRpcError, exposeTinyRpc, proxyTinyRpc } from "../core";
+import { defineTestRpcRoutes, startTestServer } from "../tests/helper";
 import {
   TwoWaySseClient,
   TwoWaySseClientProxy,
-  TypedEventTarget,
   createTwoWaySseHandler,
 } from "./server-sent-event";
-import { defineTestRpcRoutes, startTestServer } from "./tests/helper";
 
 beforeAll(async () => {
   // polyfill EventSource on NodeJS
   // @ts-ignore
-  // const { default: EventSource } = await import("eventsource");
-  Object.assign(globalThis, { EventSource: FetchEventSource });
+  const { default: EventSource } = await import("eventsource");
+  Object.assign(globalThis, { EventSource });
 });
-
-// fetch based polyfill by https://github.com/Azure/fetch-event-source
-class FetchEventSource extends TypedEventTarget<EventSourceEventMap> {
-  public fetchPromise: Promise<void>;
-
-  constructor(public url: string) {
-    super();
-    // console.log("[FetchEventSource]", { url });
-    this.fetchPromise = fetchEventSource(url, {
-      fetch: globalThis.fetch,
-      openWhenHidden: true,
-      onopen: async (response) => {
-        // console.log("[onopen]");
-        this.notify("open", response as any);
-      },
-      onerror: (e) => {
-        // console.log("[onerror]");
-        this.notify("error", e);
-      },
-      onmessage: (ev) => {
-        // console.log("[onmessage]");
-        this.notify("message", ev as any);
-      },
-      onclose: () => {
-        // console.log("[onclose]");
-      },
-    });
-  }
-}
 
 describe(createTwoWaySseHandler, () => {
   it("basic", async () => {

@@ -1,11 +1,12 @@
-import { DefaultMap, createManualPromise, tinyassert } from "@hiogawa/utils";
-import type { RequestHandler } from "./adapter-http";
+import { createManualPromise, tinyassert } from "@hiogawa/utils";
+import type { RequestHandler } from "../adapter-http";
 import {
   type TinyRpcMessagePort,
   defaultGenerateId,
-} from "./adapter-message-port";
+} from "../adapter-message-port";
+import { TypedEventTarget } from "./utils";
 
-// WebSocket-like two way connection interface
+// MessagePort like two way connection
 // implemented on top of server sent events (SSE)
 // https://github.com/websockets/ws
 // https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
@@ -92,27 +93,6 @@ function subscribe<K extends keyof EventSourceEventMap>(
 interface TwoWaySseClientProxyEventMap {
   message: { data: unknown };
   close: {};
-}
-
-export class TypedEventTarget<T> {
-  private listeners = new DefaultMap<keyof T, Set<Function>>(() => new Set());
-
-  addEventListener<K extends keyof T>(type: K, listener: (ev: T[K]) => void) {
-    this.listeners.get(type).add(listener);
-  }
-
-  removeEventListener<K extends keyof T>(
-    type: K,
-    listener: (ev: T[K]) => void
-  ) {
-    this.listeners.get(type).delete(listener);
-  }
-
-  notify<K extends keyof T>(type: K, data: T[K]) {
-    for (const listener of this.listeners.get(type)) {
-      listener(data);
-    }
-  }
 }
 
 export class TwoWaySseClientProxy
