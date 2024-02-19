@@ -4,3 +4,4 @@ export * from "./adapter-message-port";
 export * from "./validation";
 export * from "./message-port/nodejs";
 export * from "./message-port/server-sent-event";
+export * from "./message-port/websocket";
