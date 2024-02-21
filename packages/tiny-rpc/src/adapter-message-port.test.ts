@@ -6,8 +6,8 @@ import {
   messagePortServerAdapter,
   messagePortWrapTransfer,
 } from "./adapter-message-port";
-import type { TinyRpcMessagePortNode } from "./adapter-message-port-node";
 import { TinyRpcError, exposeTinyRpc, proxyTinyRpc } from "./core";
+import type { TinyRpcMessagePortNode } from "./message-port/nodejs";
 import { defineTestRpcRoutes } from "./tests/helper";
 
 describe("adapter-message-port", () => {
@@ -151,6 +151,43 @@ describe("adapter-message-port", () => {
         100,
       ]
     `);
+  });
+
+  it("bi-direction with a single pair of ports", async () => {
+    const channel = new MessageChannel();
+
+    // example from https://github.com/antfu/birpc
+    const alice = {
+      hi: (name: string) => `Hi ${name}, I am Alice`,
+    };
+    const bob = {
+      hey: (name: string) => `Hey ${name}, I am Bob`,
+    };
+
+    // alice uses bobProxy
+    exposeTinyRpc({
+      routes: alice,
+      adapter: messagePortServerAdapter({ port: channel.port1 }),
+    });
+    const bobProxy = proxyTinyRpc<typeof bob>({
+      adapter: messagePortClientAdapter({ port: channel.port1 }),
+    });
+
+    // bob uses alisProxy
+    exposeTinyRpc({
+      routes: bob,
+      adapter: messagePortServerAdapter({ port: channel.port2 }),
+    });
+    const aliceProxy = proxyTinyRpc<typeof alice>({
+      adapter: messagePortClientAdapter({ port: channel.port2 }),
+    });
+
+    expect(await bobProxy.hey("alice")).toMatchInlineSnapshot(
+      `"Hey alice, I am Bob"`
+    );
+    expect(await aliceProxy.hi("bob")).toMatchInlineSnapshot(
+      `"Hi bob, I am Alice"`
+    );
   });
 
   it("web worker", () => {

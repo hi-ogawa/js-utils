@@ -6,7 +6,7 @@ import {
 } from "./core";
 
 // compatible with hattip's RequestHandler
-type RequestHandler = (ctx: {
+export type RequestHandler = (ctx: {
   request: Request;
 }) => Promise<Response | undefined>;
 

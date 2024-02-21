@@ -1,5 +1,5 @@
 import { tinyassert } from "@hiogawa/utils";
-import type { TinyRpcMessagePort } from "./adapter-message-port";
+import type { TinyRpcMessagePort } from "../adapter-message-port";
 
 export interface TinyRpcMessagePortNode {
   postMessage(data: unknown, transferList?: ReadonlyArray<unknown>): void;

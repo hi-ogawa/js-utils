@@ -67,3 +67,15 @@ export function defineTestRpcRoutes() {
 
   return { routes, contextProviderHandler };
 }
+
+export async function startTestServer(server: import("node:http").Server) {
+  await new Promise<void>((resolve) => server.listen(() => resolve()));
+
+  // get address
+  const address = server.address();
+  tinyassert(address);
+  tinyassert(typeof address !== "string");
+  const url = `http://localhost:${address.port}`;
+
+  return { server, url };
+}

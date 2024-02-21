@@ -13,6 +13,8 @@ import {
 
 // TODO:
 // - dispose?
+// - handle connection error?
+// - just use same API as birpc? (send/on/serialize/deserialize)
 
 //
 // slim down MessagePort interface
@@ -30,7 +32,7 @@ type postMessageOptions = {
   transfer?: unknown[];
 };
 
-type MessageHandler = (ev: { data: unknown }) => void;
+export type MessageHandler = (ev: { data: unknown }) => void;
 
 //
 // adapter
@@ -39,16 +41,25 @@ type MessageHandler = (ev: { data: unknown }) => void;
 export function messagePortServerAdapter({
   port,
   onError,
+  tag,
+  serialize = (v) => v,
+  deserialize = (v) => v,
 }: {
   port: TinyRpcMessagePort;
   onError?: (e: unknown) => void;
+  tag?: string; // extra tag to resue single port for a different purpose
+  serialize?: (v: any) => any;
+  deserialize?: (v: any) => any;
 }): TinyRpcServerAdapter<() => void> {
   return {
     register: (invokeRoute) => {
       // TODO: async handler caveat
       return listen(port, async (ev) => {
         // TODO: collision check req.id on server?
-        const req = ev.data as RequestPayload;
+        const req = deserialize(ev.data) as RequestPayload;
+        if (req.type !== "request" || req.tag !== tag) {
+          return;
+        }
         let transfer!: unknown[];
         const result = await wrapErrorAsync(async () => {
           let ret = await invokeRoute(req.data);
@@ -60,10 +71,12 @@ export function messagePortServerAdapter({
           result.value = TinyRpcError.fromUnknown(result.value).serialize();
         }
         const res: ResponsePayload = {
+          type: "response",
           id: req.id,
           result,
+          tag,
         };
-        port.postMessage(res, { transfer });
+        port.postMessage(serialize(res), { transfer });
       });
     },
   };
@@ -72,9 +85,15 @@ export function messagePortServerAdapter({
 export function messagePortClientAdapter({
   port,
   generateId = defaultGenerateId,
+  tag,
+  serialize = (v) => v,
+  deserialize = (v) => v,
 }: {
   port: TinyRpcMessagePort;
   generateId?: () => string;
+  tag?: string; // extra tag to resue single port for a different purpose
+  serialize?: (v: any) => any;
+  deserialize?: (v: any) => any;
 }): TinyRpcClientAdapter {
   return {
     send: async (data) => {
@@ -82,18 +101,20 @@ export function messagePortClientAdapter({
       const args = unwraped.map(([arg]) => arg);
       const transfer = uniq(unwraped.flatMap(([_, t]) => t));
       const req: RequestPayload = {
+        type: "request",
+        tag,
         id: generateId(),
         data: { ...data, args },
       };
       const responsePromise = createManualPromise<ResponsePayload>();
       const unlisten = listen(port, (ev) => {
-        const res = ev.data as ResponsePayload;
-        if (res.id === req.id) {
+        const res = deserialize(ev.data) as ResponsePayload;
+        if (res.id === req.id && res.tag === tag) {
           responsePromise.resolve(res);
           unlisten();
         }
       });
-      port.postMessage(req, { transfer });
+      port.postMessage(serialize(req), { transfer });
       const res = await responsePromise;
       if (!res.result.ok) {
         throw TinyRpcError.deserialize(res.result.value);
@@ -104,16 +125,20 @@ export function messagePortClientAdapter({
 }
 
 interface RequestPayload {
+  type: "request";
+  tag?: string;
   id: string;
   data: TinyRpcPayload;
 }
 
 interface ResponsePayload {
+  type: "response";
+  tag?: string;
   id: string;
   result: Result<unknown, unknown>;
 }
 
-function defaultGenerateId() {
+export function defaultGenerateId() {
   if (typeof globalThis?.crypto?.randomUUID !== "undefined") {
     return globalThis.crypto.randomUUID();
   }
