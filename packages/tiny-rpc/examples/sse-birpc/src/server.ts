@@ -16,6 +16,13 @@ export type ServerRpc = typeof serverRpc;
 
 let clientRpcProxy: BirpcReturn<ClientRpc, {}> | undefined;
 
+// watch terminal input and notify client
+const input = process.stdin;
+const rl = readline.createInterface({ input });
+rl.on("line", (line) => {
+  clientRpcProxy?.onLine(line);
+});
+
 const sseHandler = createTwoWaySseHandler({
   endpoint: "/__sse__",
   onConnection(client) {
@@ -31,25 +38,19 @@ const sseHandler = createTwoWaySseHandler({
   },
 });
 
-// watch terminal input
-const input = process.stdin;
-const rl = readline.createInterface({ input });
-rl.on("line", (line) => {
-  clientRpcProxy?.onLine(line);
-});
-
 const staticHandler = () => {
   const html = `
     <script type="module" src="/@vite/client"></script>
     <script src="/src/client.ts" type="module"></script>
     <div>
-      <button id="hi-server">Hi Server</button>
+      <h5>From client to server</h5>
+      <button id="hi-server">serverRpc.hi</button>
       <input id="hi-server-request" placeholder="request" />
       <input id="hi-server-response" placeholder="response" readonly />
     </div>
     <div>
-      <h5>type and press enter in terminal</h5>
-      <input id="terminal" readonly />
+      <h5>From server to client (type and press enter in terminal)</h5>
+      <input id="terminal" placeholder="clientRpc.onLine" readonly />
     </div>
   `;
   return new Response(html, { headers: { "content-type": "text/html" } });

@@ -23,8 +23,18 @@ const serverRpcProxy = createBirpc<ServerRpc, ClientRpc>(clientRpc, {
   deserialize: JSON.parse,
 });
 
-$("#hi-server").addEventListener("click", async () => {
+$("#hi-server").addEventListener("click", () => {
+  hiServer();
+});
+
+($("#hi-server-request") as HTMLInputElement).addEventListener("keyup", (e) => {
+  if (e.key === "Enter") {
+    hiServer();
+  }
+});
+
+async function hiServer() {
   const req = $("#hi-server-request").value || "...";
   const res = await serverRpcProxy.hi(req);
   $("#hi-server-response").value = res;
-});
+}
