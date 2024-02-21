@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite"
   },
-  "dependencies": {
+  "devDependencies": {
     "@hattip/adapter-node": "^0.0.34",
     "@hattip/compose": "^0.0.34",
     "@hiogawa/tiny-rpc": "latest",
