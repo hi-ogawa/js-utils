@@ -385,6 +385,27 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
 
+  packages/tiny-rpc/examples/sse-birpc:
+    devDependencies:
+      '@hattip/adapter-node':
+        specifier: ^0.0.34
+        version: 0.0.34
+      '@hattip/compose':
+        specifier: ^0.0.34
+        version: 0.0.34
+      '@hiogawa/tiny-rpc':
+        specifier: latest
+        version: link:../..
+      '@hiogawa/vite-plugin-ssr-middleware':
+        specifier: ^0.0.2
+        version: 0.0.2(vite@5.1.3)
+      birpc:
+        specifier: ^0.2.16
+        version: 0.2.16
+      vite:
+        specifier: ^5.1.3
+        version: 5.1.3(@types/node@20.11.19)
+
   packages/tiny-sql:
     devDependencies:
       '@hiogawa/utils':
@@ -1490,7 +1511,7 @@ packages:
     resolution: {integrity: sha512-zD0BemBQ4iqwKyX0jNu7YTSZtG4zH7sOB3XIBa5FkxRHZEjEc1dtKHsQpWhNqZW9+h5c8TWS9EiTMstqbtL2SQ==}
     dependencies:
       '@hattip/core': 0.0.34
-      node-fetch-native: 1.4.0
+      node-fetch-native: 1.6.2
     dev: true
 
   /@hiogawa/isort-ts@1.1.2-pre.1(prettier@2.8.8)(typescript@5.3.3):
@@ -2606,6 +2627,10 @@ packages:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
     dependencies:
       file-uri-to-path: 1.0.0
+    dev: true
+
+  /birpc@0.2.16:
+    resolution: {integrity: sha512-OtdZMBUZK0iZmWwD9aQXmtdUXtOHXz676T+cAX4lStFO3u5pQoKjMJtFfQzNzlzRC6ZHPRBvtFB6ATllNl7YKg==}
     dev: true
 
   /bl@4.1.0:
@@ -4519,10 +4544,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       semver: 7.6.0
-    dev: true
-
-  /node-fetch-native@1.4.0:
-    resolution: {integrity: sha512-F5kfEj95kX8tkDhUCYdV8dg3/8Olx/94zB8+ZNthFs6Bz31UpUi8Xh40TN3thLwXgrwXry1pEg9lJ++tLWTcqA==}
     dev: true
 
   /node-fetch-native@1.6.2:
