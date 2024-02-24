@@ -11,12 +11,11 @@ export function stringifyStream(input: unknown): ReadableStream<string> {
   const stream = new ReadableStream<string>({
     start(controller) {
       // synchronsly serialize to non-promise skelton
-      let i = 0;
       const promises: Promise<unknown>[] = [];
       const skelton = JSON.stringify(input, function (_k, v) {
         if (v instanceof Promise) {
           promises.push(v);
-          return ["!Promise", i++]; // TODO: conflict-free encoding
+          return "!__promise__"; // TODO: conflict-free encoding
         }
         return v;
       });
@@ -24,7 +23,7 @@ export function stringifyStream(input: unknown): ReadableStream<string> {
       // write skelton at first line
       controller.enqueue(skelton + "\n");
 
-      // handles promise as it resolves
+      // send promise as it resolves
       promises.forEach((promise, i) => {
         promise.then(
           (data) => {
@@ -62,10 +61,10 @@ export async function parseStream(
   tinyassert(!result.done);
   const skelton = result.value;
 
-  // fill in promises
+  // fill in manual promises
   const promises: ReturnType<typeof createManualPromise>[] = [];
   const output = JSON.parse(skelton, function (_k, v) {
-    if (Array.isArray(v) && v[0] === "!Promise") {
+    if (typeof v === "string" && v === "!__promise__") {
       const manual = createManualPromise();
       promises.push(manual);
       return manual.promise;
