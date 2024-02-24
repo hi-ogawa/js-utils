@@ -86,6 +86,8 @@ export async function parseStream(
         throw new Error("unreachable");
       }
     }
+    // TODO: dispose stream?
+    reader.releaseLock();
   })();
 
   return [output, done];
