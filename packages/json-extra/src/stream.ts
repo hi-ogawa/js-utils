@@ -51,7 +51,7 @@ export function stringifyStream(input: unknown): ReadableStream<string> {
 
 export async function parseStream(
   stream: ReadableStream<string>
-): Promise<unknown> {
+): Promise<[unknown, Promise<void>]> {
   // read line by line
   stream = stream.pipeThrough(splitLineTransform());
 
@@ -63,7 +63,7 @@ export async function parseStream(
 
   // fill in manual promises
   const promises: ReturnType<typeof createManualPromise>[] = [];
-  const output = JSON.parse(skelton, function (_k, v) {
+  const output: unknown = JSON.parse(skelton, function (_k, v) {
     if (typeof v === "string" && v === "!__promise__") {
       const manual = createManualPromise();
       promises.push(manual);
@@ -73,8 +73,7 @@ export async function parseStream(
   });
 
   // resolve promises as it receives
-  // TODO: handle read error? unhandled rejection?
-  (async () => {
+  const done = (async () => {
     for (let _ of range(promises.length)) {
       const result = await reader.read();
       tinyassert(!result.done);
@@ -87,11 +86,9 @@ export async function parseStream(
         throw new Error("unreachable");
       }
     }
-    const result = await reader.read();
-    tinyassert(result.done);
   })();
 
-  return output;
+  return [output, done];
 }
 
 function splitLineTransform() {

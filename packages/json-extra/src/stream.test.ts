@@ -3,10 +3,12 @@ import { parseStream, stringifyStream } from "./stream";
 
 describe("stream", () => {
   it("basic", async () => {
-    const input = [Promise.resolve(0), { hello: Promise.reject("foo") }];
-    const stream = stringifyStream(input);
-    const output: any = await parseStream(stream);
-    expect(output).toMatchInlineSnapshot(`
+    const stream = stringifyStream([
+      Promise.resolve(0),
+      { hello: Promise.reject("foo") },
+    ]);
+    const [data, done] = await parseStream(stream);
+    expect(data).toMatchInlineSnapshot(`
       [
         Promise {},
         {
@@ -14,7 +16,8 @@ describe("stream", () => {
         },
       ]
     `);
-    await expect(output[0]).resolves.toMatchInlineSnapshot(`0`);
-    await expect(output[1].hello).rejects.toMatchInlineSnapshot(`"foo"`);
+    await expect((data as any)[0]).resolves.toMatchInlineSnapshot(`0`);
+    await expect((data as any)[1].hello).rejects.toMatchInlineSnapshot(`"foo"`);
+    await done;
   });
 });
