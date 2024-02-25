@@ -56,7 +56,7 @@ function applyReplacer(data: unknown, replacer: Replacer) {
       typeof v.toJSON === "function"
         ? v.toJSON()
         : v;
-    v = replacer.apply({ "": v }, ["", vToJson]);
+    v = replacer.apply([v], [0, vToJson]);
     if (v && typeof v === "object") {
       v = Array.isArray(v) ? [...v] : { ...v };
       // `Object.entries` to loop only "enumerable" properties to align with `JSON.stringify`.
@@ -97,7 +97,7 @@ function getExtensions(options: Options): Record<string, Extension<any>> {
 // custom encoding/decoding via replacer/reviver
 //
 
-type Replacer = (this: unknown, k: string, vToJson: unknown) => unknown;
+type Replacer = (this: unknown, k: keyof any, vToJson: unknown) => unknown;
 type Reviver = (k: string, v: unknown) => unknown;
 
 function createReplacer(extensions: Record<string, Extension<any>>): Replacer {
