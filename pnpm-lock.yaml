@@ -112,6 +112,18 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
 
+  packages/json-extra/examples/stream:
+    devDependencies:
+      '@hiogawa/utils':
+        specifier: latest
+        version: 1.6.1-pre.10.test
+      '@hiogawa/vite-plugin-ssr-middleware':
+        specifier: ^0.0.2
+        version: 0.0.2(vite@5.1.3)
+      vite:
+        specifier: ^5.1.3
+        version: 5.1.3(@types/node@20.11.19)
+
   packages/query-proxy:
     devDependencies:
       '@hiogawa/utils':
@@ -1546,6 +1558,10 @@ packages:
       unocss: '*'
     dependencies:
       unocss: 0.58.5(postcss@8.4.35)(vite@5.1.3)
+    dev: true
+
+  /@hiogawa/utils@1.6.1-pre.10.test:
+    resolution: {integrity: sha512-MIH760z6eZkZgeHWGeQBOQ6cBchln49yzr/H5+DWtzU9XEu1sXBY+vCXcvoYAzz/OPqbnDJpYbCNMAQ+WJu8xw==}
     dev: true
 
   /@hiogawa/vite-import-dev-server@0.0.1(vite@5.1.3):

@@ -1,0 +1,13 @@
+{
+  "name": "@hiogawa/json-extra-examples-stream",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "@hiogawa/utils": "latest",
+    "@hiogawa/vite-plugin-ssr-middleware": "^0.0.2",
+    "vite": "^5.1.3"
+  }
+}
