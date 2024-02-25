@@ -10,8 +10,9 @@ interface Options {
 }
 
 export function createJsonExtra(options: Options) {
-  const replacer = createReplacer(options);
-  const reviver = createReviver(options);
+  const extensions = getExtensions(options);
+  const replacer = createReplacer(extensions);
+  const reviver = createReviver(extensions);
 
   // any <-> string
   function stringify(v: any, _unused?: unknown, space?: number) {
@@ -21,7 +22,7 @@ export function createJsonExtra(options: Options) {
     return JSON.parse(s, reviver);
   }
 
-  // by applying reviver manually, it avoids dropping `undefined` property.
+  // by applying reviver manually, we can avoid dropping `undefined` property.
   // cf. https://github.com/brillout/json-serializer/blob/133fc9b1f73c4e29a8374b8eb5efa461a72949cc/src/parse.ts#L6
   function parseReviveUndefined(s: string) {
     return applyReviver(JSON.parse(s), reviver);
@@ -46,10 +47,7 @@ export function createJsonExtra(options: Options) {
   };
 }
 
-function applyReplacer(
-  data: unknown,
-  replacer: ReturnType<typeof createReplacer>
-) {
+function applyReplacer(data: unknown, replacer: Replacer) {
   function recurse(v: unknown) {
     const vToJson =
       v &&
@@ -72,10 +70,7 @@ function applyReplacer(
   return recurse(data);
 }
 
-function applyReviver(
-  data: unknown,
-  reviver: ReturnType<typeof createReviver>
-) {
+function applyReviver(data: unknown, reviver: Reviver) {
   function recurse(v: unknown) {
     if (v && typeof v === "object") {
       v = Array.isArray(v) ? [...v] : { ...v };
@@ -102,10 +97,11 @@ function getExtensions(options: Options): Record<string, Extension<any>> {
 // custom encoding/decoding via replacer/reviver
 //
 
-function createReplacer(options: Options) {
-  const extensions = getExtensions(options);
+type Replacer = (this: unknown, k: string, vToJson: unknown) => unknown;
+type Reviver = (k: string, v: unknown) => unknown;
 
-  return function (this: unknown, k: string, vToJson: unknown) {
+function createReplacer(extensions: Record<string, Extension<any>>): Replacer {
+  return function (k, vToJson) {
     // vToJson === v.toJSON() when `toJSON` is defined (e.g. Date)
     const v = (this as any)[k];
 
@@ -128,10 +124,8 @@ function createReplacer(options: Options) {
   };
 }
 
-function createReviver(options: Options) {
-  const extensions = getExtensions(options);
-
-  return (_k: string, v: unknown) => {
+function createReviver(extensions: Record<string, Extension<any>>): Reviver {
+  return (_k, v) => {
     // unescape collision
     if (
       Array.isArray(v) &&
