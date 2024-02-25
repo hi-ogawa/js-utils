@@ -41,6 +41,10 @@ export function stringifyStream(input: unknown): ReadableStream<string> {
           }
         );
       });
+
+      Promise.allSettled(promises).then(() => {
+        controller.close();
+      });
     },
     cancel() {
       cancelled = true;
@@ -86,7 +90,8 @@ export async function parseStream(
         throw new Error("unreachable");
       }
     }
-    // TODO: dispose stream?
+    const result = await reader.read();
+    tinyassert(result.done);
     reader.releaseLock();
   })();
 
