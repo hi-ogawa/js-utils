@@ -142,11 +142,15 @@ function createReviver(options: Options) {
       return v.slice(1);
     }
 
-    if (Array.isArray(v) && v.length === 2 && typeof v[0] === "string") {
-      for (const [tag, tx] of Object.entries(extensions)) {
-        if (v[0].startsWith(`!${tag}`)) {
-          return tx.reviver(v[1]);
-        }
+    if (
+      Array.isArray(v) &&
+      v.length === 2 &&
+      typeof v[0] === "string" &&
+      v[0][0] === "!"
+    ) {
+      const tx = extensions[v[0].slice(1)];
+      if (tx) {
+        return tx.reviver(v[1]);
       }
     }
     return v;
