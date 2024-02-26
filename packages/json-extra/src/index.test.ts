@@ -195,7 +195,7 @@ describe(createJsonExtra, () => {
     `);
     expect(revived).toEqual(original);
 
-    const revivedUndefined = jsonExtra.parseReviveUndefined(stringified);
+    const revivedUndefined = jsonExtra._parse2(stringified);
     expect(revivedUndefined).toMatchInlineSnapshot(`
       [
         null,
@@ -1051,7 +1051,7 @@ function testStringifyAndParse(
 ) {
   const stringified = jsonExtra.stringify(original, null, 2);
   const revived = jsonExtra.parse(stringified);
-  const revivedUndefined = jsonExtra.parseReviveUndefined(stringified);
+  const revivedUndefined = jsonExtra._parse2(stringified);
   return { original, stringified, revived, revivedUndefined };
 }
 

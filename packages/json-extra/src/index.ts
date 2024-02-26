@@ -24,8 +24,8 @@ export function createJsonExtra(options: Options) {
 
   // by applying reviver manually, we can avoid dropping `undefined` property.
   // cf. https://github.com/brillout/json-serializer/blob/133fc9b1f73c4e29a8374b8eb5efa461a72949cc/src/parse.ts#L6
-  function parseReviveUndefined(s: string): any {
-    return applyReviver(JSON.parse(s), reviver);
+  function _parse2(s: string): any {
+    return deserialize(JSON.parse(s));
   }
 
   // any <-> any (frameworks usually accept/provide only already parsed json object e.g. loader data in remix)
@@ -39,7 +39,7 @@ export function createJsonExtra(options: Options) {
   return {
     stringify,
     parse,
-    parseReviveUndefined,
+    _parse2,
     serialize,
     deserialize,
     replacer,
