@@ -243,5 +243,3 @@ const builtins = {
     },
   }),
 };
-
-export * from "./stream";
