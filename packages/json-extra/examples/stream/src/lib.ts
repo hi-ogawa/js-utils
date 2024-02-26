@@ -1,11 +1,5 @@
 import { createManualPromise, range, tinyassert } from "@hiogawa/utils";
 
-// minimal defer implementation to get used to the idea
-// TODO: study prior art
-// - react-router/remix loader defer
-// - https://github.com/jacob-ebey/turbo-stream
-// - https://github.com/lxsmnsyc/seroval
-
 export function stringifyStream(input: unknown): ReadableStream<string> {
   let cancelled = false;
   const stream = new ReadableStream<string>({
