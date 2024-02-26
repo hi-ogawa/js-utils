@@ -5,6 +5,8 @@ import { createManualPromise, range, tinyassert } from "@hiogawa/utils";
 // - https://github.com/jacob-ebey/turbo-stream
 // - https://github.com/lxsmnsyc/seroval
 
+// TODO: integrate custom encoding in index.ts
+
 export function stringifyStream(input: unknown): ReadableStream<string> {
   let cancelled = false;
   const stream = new ReadableStream<string>({
@@ -54,7 +56,7 @@ export function stringifyStream(input: unknown): ReadableStream<string> {
 
 export async function parseStream(
   stream: ReadableStream<string>
-): Promise<[unknown, Promise<void>]> {
+): Promise<[unknown, Promise<void>, Promise<unknown>[]]> {
   // read line by line
   stream = stream.pipeThrough(splitLineTransform());
 
@@ -94,7 +96,10 @@ export async function parseStream(
     reader.releaseLock();
   })();
 
-  return [output, done];
+  // return raw promises
+  const rawPromises = promises.map((p) => p.promise);
+
+  return [output, done, rawPromises];
 }
 
 function splitLineTransform() {

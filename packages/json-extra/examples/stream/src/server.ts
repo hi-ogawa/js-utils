@@ -1,7 +1,7 @@
 import type { IncomingMessage, OutgoingMessage } from "node:http";
 import nodeStream from "node:stream";
+import { stringifyStream } from "@hiogawa/json-extra";
 import { sleep } from "@hiogawa/utils";
-import { stringifyStream } from "./lib";
 
 export default function handler(
   req: IncomingMessage,

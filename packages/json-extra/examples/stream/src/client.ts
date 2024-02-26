@@ -1,5 +1,5 @@
+import { parseStream } from "@hiogawa/json-extra";
 import { tinyassert } from "@hiogawa/utils";
-import { parseStream } from "./lib";
 
 const $ = document.querySelector.bind(document);
 

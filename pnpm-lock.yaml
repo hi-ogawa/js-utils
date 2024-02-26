@@ -114,6 +114,9 @@ importers:
 
   packages/json-extra/examples/stream:
     devDependencies:
+      '@hiogawa/json-extra':
+        specifier: latest
+        version: link:../..
       '@hiogawa/utils':
         specifier: latest
         version: 1.6.1-pre.10.test
