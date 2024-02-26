@@ -1,8 +1,5 @@
 // TODO
-// - handle non recursive reference
-// - handle cyclic reference
-//   - need two pass?
-// - handle custom replacer/reviver
+// - support custom replacer/revivor plugin
 
 export function replaceReference(data: unknown) {
   const refs = new Map<unknown, number>();
@@ -10,7 +7,7 @@ export function replaceReference(data: unknown) {
   function recurse(v: unknown) {
     // return reference placeholder
     if (refs.has(v)) {
-      return ["!", refs.get(v)]; // TODO: conflict-free encoding
+      return ["!", refs.get(v)];
     }
 
     // track reference
