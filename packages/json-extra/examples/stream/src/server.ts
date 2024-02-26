@@ -10,10 +10,11 @@ export default function handler(
 ) {
   if (req.url === "/api") {
     const stream = stringifyStream([
-      sleep(2000).then(() => "a"),
-      sleep(1000).then(() => "b"),
-      sleep(4000).then(() => "c"),
-      sleep(3000).then(() => "d"),
+      "fast1",
+      sleep(1000).then(() => "a"),
+      { slow: sleep(3000).then(() => "c") },
+      { foo: "fast2" },
+      { deep: [sleep(2000).then(() => "b")] },
     ]);
     res.setHeader("content-type", "text/plain");
     nodeStream.Readable.fromWeb(stream as any).pipe(res);
@@ -31,6 +32,9 @@ const HTML_TEMPLATE = `
 <script src="/src/client.ts" type="module"></script>
 <div>
   <button id="api">Fetch Stream</button>
-  <pre id="output"></pre>
+  <h5>output json:</h5>
+  <pre id="output-json"></pre>
+  <h5>output raw:</h5>
+  <pre id="output-raw"></pre>
 </div>
 `;

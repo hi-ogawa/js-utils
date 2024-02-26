@@ -9,8 +9,21 @@ $("#api").addEventListener("click", async () => {
   tinyassert(res.body);
   const stream = res.body.pipeThrough(new TextDecoderStream());
 
+  // copy stream to display raw data
+  const [stream1, stream2] = stream.tee();
+
+  let raw = "";
+  stream2.pipeTo(
+    new WritableStream({
+      write(chunk) {
+        raw += chunk;
+        $("#output-raw").textContent = raw;
+      },
+    })
+  );
+
   // parse and update as it resolves
-  const [output, done, promises] = await parseStream(stream);
+  const [output, done, promises] = await parseStream(stream1);
 
   // monkey patch toJSON
   for (const promise of promises) {
@@ -33,7 +46,7 @@ $("#api").addEventListener("click", async () => {
   render();
 
   function render() {
-    $("#output").textContent = JSON.stringify(output, null, 2);
+    $("#output-json").textContent = JSON.stringify(output, null, 2);
   }
 
   await done;
