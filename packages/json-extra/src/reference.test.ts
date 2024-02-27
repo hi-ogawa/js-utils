@@ -1,8 +1,22 @@
+import { tinyassert } from "@hiogawa/utils";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { createJsonExtra2 } from "./reference";
+import { ZodError, z } from "zod";
+import { createJsonExtra2, definePlugin } from "./reference";
 
+// instantiate default one for tests
 const jsonExtra = createJsonExtra2({ builtins: true });
+
+function runJsonExtra(
+  jsonExtra: ReturnType<typeof createJsonExtra2>,
+  input: unknown
+) {
+  const stringified = jsonExtra.stringify(input, null, 2);
+  const parsed = jsonExtra.parse(stringified);
+  const serialized = jsonExtra.serialize(input);
+  const deserialized = jsonExtra.deserialize(serialized);
+  return { input, stringified, parsed, serialized, deserialized };
+}
 
 describe("reference", () => {
   it("basic", () => {
@@ -637,8 +651,6 @@ describe("fuzzing", () => {
     );
   });
 
-  // new Map([["",new Set(["! ",null])]])
-
   it("anything", () => {
     fc.assert(
       fc.property(
@@ -658,5 +670,160 @@ describe("fuzzing", () => {
         }
       )
     );
+  });
+});
+
+describe("old tests", () => {
+  it("basic", () => {
+    const input = [
+      // standard json value
+      null,
+      true,
+      123,
+      "string",
+      ["array"],
+      { k: "v" },
+      // special constants
+      undefined,
+      Infinity,
+      -Infinity,
+      NaN,
+      0,
+      -0,
+      // extra types
+      new Date("2023-08-17"),
+      1234n,
+      /^\d+/gms,
+      // extra containers
+      new Map<any, any>([
+        [0, new Date(0)],
+        [1n, new Set([/a/g])],
+      ]),
+      new Set<any>([0, new Date(0), new Map([[1n, /a/g]])]),
+      // escape
+      ["!NaN", "collision"],
+    ];
+    const result = runJsonExtra(jsonExtra, input);
+    expect(result.stringified).toMatchSnapshot();
+    expect(result.parsed).toEqual(input);
+  });
+
+  it("custom type", () => {
+    const jsonExtra = createJsonExtra2({
+      plugins: {
+        ZodError: definePlugin<ZodError>({
+          type: "simple",
+          is: (v): v is ZodError => v instanceof ZodError,
+          replace: (v) => v.issues,
+          revive: (s) => new ZodError(s as any),
+        }),
+      },
+    });
+
+    const error = z.object({ int: z.number().int() }).safeParse({ int: 1.23 });
+    tinyassert(!error.success);
+
+    const input = {
+      ok: false,
+      value: error.error,
+    };
+    const result = runJsonExtra(jsonExtra, input);
+    expect(result.serialized).toMatchInlineSnapshot(`
+      {
+        "ok": false,
+        "value": [
+          "!ZodError",
+          [
+            {
+              "code": "invalid_type",
+              "expected": "integer",
+              "message": "Expected integer, received float",
+              "path": [
+                "int",
+              ],
+              "received": "float",
+            },
+          ],
+        ],
+      }
+    `);
+    expect(result.deserialized).toEqual(input);
+  });
+
+  it("selected builtins", () => {
+    const jsonExtra = createJsonExtra2({ builtins: ["undefined", "Date"] });
+    const input = [undefined, new Date("2023-08-17"), NaN, new Set([0, 1])];
+    const result = runJsonExtra(jsonExtra, input);
+    expect(result.stringified).toMatchInlineSnapshot(`
+      "[
+        [
+          "!undefined",
+          0
+        ],
+        [
+          "!Date",
+          "2023-08-17T00:00:00.000Z"
+        ],
+        null,
+        {}
+      ]"
+    `);
+    expect(result.parsed).toMatchInlineSnapshot(`
+      [
+        undefined,
+        2023-08-17T00:00:00.000Z,
+        null,
+        {},
+      ]
+    `);
+  });
+
+  it("escape collision", () => {
+    const input = {
+      collision2: ["!", 1n],
+      collision3: ["!", ["!", 0]],
+      collision4: ["!", ["!", 1n, "!"]],
+      collision5: [[], ["!"], ["!", 0], ["!", 0, 0], ["!", 0, 0, 0]],
+    };
+    const result = runJsonExtra(jsonExtra, input);
+    expect(result.serialized).toMatchSnapshot();
+    expect(result.deserialized).toEqual(input);
+  });
+
+  it("edge cases", () => {
+    // edge cases which don't roundtrip
+    // - function
+    // - custom class
+    // - custom toJSON
+
+    class X {
+      name = "hello";
+    }
+
+    class Y {
+      toJSON() {
+        return "foo";
+      }
+    }
+
+    const input = [
+      Symbol("unique"),
+      Symbol.for("named"),
+      new X(),
+      new Y(),
+      {
+        toJSON: () => "zzz",
+      },
+      {
+        toJSON: "www",
+      },
+      {
+        toJSON: () => () => "uuu",
+      },
+      () => {},
+    ];
+
+    const result = runJsonExtra(jsonExtra, input);
+    expect(result).toMatchSnapshot();
   });
 });
