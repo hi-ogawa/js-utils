@@ -1,9 +1,10 @@
 import { objectPick, tinyassert } from "@hiogawa/utils";
 
-// TODO: ability to disable reference preservation?
 interface JsonExtraConfig {
   builtins?: true | BuiltinPlugin[];
   plugins?: Record<string, Plugin<any>>;
+  // TODO: ability to disable reference preservation?
+  // reference?: boolean;
 }
 
 export function createJsonExtra2(config: JsonExtraConfig = {}) {
@@ -16,36 +17,19 @@ export function createJsonExtra2(config: JsonExtraConfig = {}) {
     ...config.plugins,
   };
 
-  // any <-> string
-  function stringify(v: any, _unused?: unknown, space?: number) {
-    return JSON.stringify(serialize(v), null, space);
-  }
-
-  function parse(s: string) {
-    return deserialize(JSON.parse(s));
-  }
-
-  // any <-> any
-  function serialize(v: any): any {
-    return replaceReference(v, plugins);
-  }
-
-  function deserialize(v: any): any {
-    return reviveReference(v, plugins);
-  }
-
   return {
-    stringify,
-    parse,
-    serialize,
-    deserialize,
+    // any <-> any
+    serialize: (v: any): any => serialize(v, plugins),
+    deserialize: (v: any): any => deserialize(v, plugins),
+    // any <-> string
+    stringify: (...args: Parameters<typeof JSON.stringify>) =>
+      JSON.stringify(serialize(args[0], plugins), args[1], args[2]),
+    parse: (...args: Parameters<typeof JSON.parse>) =>
+      deserialize(JSON.parse(...args), plugins),
   };
 }
 
-function replaceReference(
-  data: unknown,
-  plugins: Record<string, Plugin<any>> = builtinPlugins
-) {
+function serialize(data: unknown, plugins: Record<string, Plugin<any>>) {
   const refs = new Map<unknown, number>();
 
   function recurse(v: unknown) {
@@ -95,10 +79,7 @@ function replaceReference(
   return recurse(data);
 }
 
-function reviveReference(
-  data: unknown,
-  plugins: Record<string, Plugin<any>> = builtinPlugins
-) {
+function deserialize(data: unknown, plugins: Record<string, Plugin<any>>) {
   const refs: unknown[] = [];
 
   function recurse(v: unknown) {
