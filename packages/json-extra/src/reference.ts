@@ -18,7 +18,12 @@ export function replaceReference(data: unknown) {
     }
 
     // escape custom encoding collision
-    if (Array.isArray(v) && v.length >= 2 && v[0] === "!") {
+    if (
+      Array.isArray(v) &&
+      v.length >= 2 &&
+      typeof v[0] === "string" &&
+      v[0][0] === "!"
+    ) {
       v = ["!", ...v];
     }
 
@@ -61,11 +66,16 @@ export function reviveReference(data: unknown) {
     // TODO: refactor messy branches...
 
     // unescape custom encoding collision
-    if (Array.isArray(v) && v.length >= 3 && v[0] === "!") {
+    if (
+      Array.isArray(v) &&
+      v.length >= 3 &&
+      typeof v[0] === "string" &&
+      v[0][0] === "!"
+    ) {
       v = v.slice(1);
       refs.push(v);
     } else if (
-      // custom revivor to obtain ref before recurse
+      // custom reviver to obtain ref before recurse
       Array.isArray(v) &&
       v.length === 2 &&
       typeof v[0] === "string" &&
@@ -90,7 +100,7 @@ export function reviveReference(data: unknown) {
       }
     }
 
-    // custom revivor after recurse
+    // custom reviver after recurse
     if (plugin) {
       v = plugin.reviver(v, ref);
     }
