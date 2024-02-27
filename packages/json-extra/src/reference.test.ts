@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createJsonExtra2 } from "./reference";
+import fc from "fast-check";
 
 const jsonExtra = createJsonExtra2({ builtins: true });
 
@@ -573,5 +574,94 @@ describe("reference", () => {
     expect(u).toEqual(v);
     expect(u[0]).toBe(u[1][0]);
     expect(u[0]).toBe([...u[0]][1]);
+  });
+
+  it("edge cases 1", () => {
+    const v = new Set(["!", null])
+    const serialized = jsonExtra.serialize(v);
+    const u = jsonExtra.deserialize(serialized);
+    expect(serialized).toMatchInlineSnapshot(`
+      [
+        "!Set",
+        [
+          "!",
+          "!",
+          null,
+        ],
+      ]
+    `);
+    expect(u).toMatchInlineSnapshot(`
+      Set {
+        "!",
+        null,
+      }
+    `);
+    expect(u).toEqual(v);
+  })
+
+  // TODO
+  it.fails("edge cases 2", () => {
+    const v = new Set(["!x", null])
+    const serialized = jsonExtra.serialize(v);
+    const u = jsonExtra.deserialize(serialized);
+    expect(serialized).toMatchInlineSnapshot(`
+      [
+        "!Set",
+        [
+          "!",
+          "!x",
+          null,
+        ],
+      ]
+    `);
+    expect(u).toMatchInlineSnapshot(`
+      Set {
+        "!",
+        "!x",
+        null,
+      }
+    `);
+    expect(u).toEqual(v);
+  })
+
+});
+
+describe("fuzzing", () => {
+  const jsonExtra = createJsonExtra2({ builtins: true });
+
+  it("jsonValue", () => {
+    fc.assert(
+      fc.property(fc.jsonValue(), (data) => {
+        const stringified = jsonExtra.stringify(data);
+        const parsed = jsonExtra.parse(stringified);
+        const serialized = jsonExtra.serialize(data);
+        const deserialized = jsonExtra.deserialize(serialized);
+        expect(parsed).toEqual(data);
+        expect(deserialized).toEqual(data);
+      }),
+    );
+  });
+
+  // new Map([["",new Set(["! ",null])]])
+
+  it("anything", () => {
+    fc.assert(
+      fc.property(
+        fc.anything({
+          withBigInt: true,
+          withDate: true,
+          withMap: true,
+          withSet: true,
+        }),
+        (data) => {
+          const stringified = jsonExtra.stringify(data);
+          const parsed = jsonExtra.parse(stringified);
+          const serialized = jsonExtra.serialize(data);
+          const deserialized = jsonExtra.deserialize(serialized);
+          expect(parsed).toEqual(data);
+          expect(deserialized).toEqual(data);
+        }
+      ),
+    );
   });
 });
