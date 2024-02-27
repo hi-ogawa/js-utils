@@ -92,6 +92,7 @@ function deserialize(data: unknown, plugins: Record<string, Plugin<any>>) {
     }
 
     // custom reviver
+    // ["!<tag>", <inner>]
     if (
       Array.isArray(v) &&
       v.length === 2 &&
