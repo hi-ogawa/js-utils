@@ -33,7 +33,7 @@ export function replaceReference(data: unknown) {
       const plugin = plugins[tag];
       if (plugin.is(v)) {
         v = [`!${tag}`, plugin.replace(v)];
-        if (plugin.type === "simple") {
+        if (plugin.type !== "container") {
           return v;
         }
         break;
@@ -90,7 +90,7 @@ export function reviveReference(data: unknown) {
       if (ref && typeof ref === "object") {
         refs.push(ref);
       }
-      if (plugin.type === "simple") {
+      if (plugin.type !== "container") {
         return ref;
       }
       reviveContainer = plugin.reviveContainer;
@@ -179,10 +179,46 @@ export const builtinPlugins = {
       return new Date(v);
     },
   }),
+  BigInt: definePlugin<bigint>({
+    type: "simple",
+    is: (v) => typeof v === "bigint",
+    replace: (v) => v.toString(),
+    revive: (v) => {
+      tinyassert(typeof v === "string");
+      return BigInt(v);
+    },
+  }),
+  RegExp: definePlugin<RegExp>({
+    type: "simple",
+    is: (v) => v instanceof RegExp,
+    replace: (v) => [v.source, v.flags],
+    revive: (v) => {
+      tinyassert(
+        Array.isArray(v) &&
+          v.length === 2 &&
+          v.every((s) => typeof s === "string")
+      );
+      const [source, flags] = v;
+      return new RegExp(source, flags);
+    },
+  }),
 
   //
   // containers
   //
+  Map: definePlugin<Map<unknown, unknown>>({
+    type: "container",
+    is: (v) => v instanceof Map,
+    replace: (v) => Array.from(v),
+    revive: () => new Map(),
+    reviveContainer: (v, ref) => {
+      tinyassert(Array.isArray(v));
+      for (const e of v) {
+        ref.set(e[0], e[1]);
+      }
+      return ref;
+    },
+  }),
   Set: definePlugin<Set<unknown>>({
     type: "container",
     is: (v) => v instanceof Set,

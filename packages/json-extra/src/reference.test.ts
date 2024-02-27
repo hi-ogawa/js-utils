@@ -323,7 +323,9 @@ describe("reference", () => {
 
   it("custom single", () => {
     const v1 = new Date("2000-01-01T00:00:00Z");
-    const v = [v1, [v1], { foo: v1 }];
+    const v2 = /^\d+/gms;
+    const v3 = [v1, v2];
+    const v = [v1, [v1], { foo: [v1, v2] }, v2, v3, v3];
     const replaced = replaceReference(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
@@ -339,10 +341,37 @@ describe("reference", () => {
         ],
         {
           "foo": [
+            [
+              "!",
+              1,
+            ],
+            [
+              "!RegExp",
+              [
+                "^\\d+",
+                "gms",
+              ],
+            ],
+          ],
+        },
+        [
+          "!",
+          5,
+        ],
+        [
+          [
             "!",
             1,
           ],
-        },
+          [
+            "!",
+            5,
+          ],
+        ],
+        [
+          "!",
+          6,
+        ],
       ]
     `);
     const u = reviveReference(replaced) as any;
@@ -353,13 +382,26 @@ describe("reference", () => {
           2000-01-01T00:00:00.000Z,
         ],
         {
-          "foo": 2000-01-01T00:00:00.000Z,
+          "foo": [
+            2000-01-01T00:00:00.000Z,
+            /\\^\\\\d\\+/gms,
+          ],
         },
+        /\\^\\\\d\\+/gms,
+        [
+          2000-01-01T00:00:00.000Z,
+          /\\^\\\\d\\+/gms,
+        ],
+        [
+          2000-01-01T00:00:00.000Z,
+          /\\^\\\\d\\+/gms,
+        ],
       ]
     `);
     expect(u).toEqual(v);
     expect(u[0]).toBe(u[1][0]);
-    expect(u[0]).toBe(u[2].foo);
+    expect(u[0]).toBe(u[2].foo[0]);
+    expect(u[3]).toBe(u[2].foo[1]);
   });
 
   it("custom constant", () => {
