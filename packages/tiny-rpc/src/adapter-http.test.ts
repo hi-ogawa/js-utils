@@ -305,7 +305,9 @@ describe("adapter-http", () => {
 
     it("brillout-json", async () => {
       // https://github.com/brillout/json-serializer
+      // @ts-ignore no types?
       const { parse } = await import("@brillout/json-serializer/parse");
+      // @ts-ignore
       const { stringify } = await import("@brillout/json-serializer/stringify");
       const brilloutJSON = { parse, stringify };
 

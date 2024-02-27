@@ -203,7 +203,9 @@ describe("superjson", () => {
 
 describe("brillout-json-serializer", () => {
   it("basic", async () => {
+    // @ts-ignore no types?
     const { stringify } = await import("@brillout/json-serializer/stringify");
+    // @ts-ignore
     const { parse } = await import("@brillout/json-serializer/parse");
 
     const original = [

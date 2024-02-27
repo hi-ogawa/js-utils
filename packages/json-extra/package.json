@@ -39,7 +39,7 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
-    "@brillout/json-serializer": "^0.5.4",
+    "@brillout/json-serializer": "^0.5.8",
     "@hiogawa/utils": "workspace:*",
     "fast-check": "^3.12.0",
     "superjson": "^1.13.1",
