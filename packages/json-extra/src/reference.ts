@@ -7,7 +7,7 @@ interface JsonExtraConfig {
   // reference?: boolean;
 }
 
-export function createJsonExtra2(config: JsonExtraConfig = {}) {
+export function createJsonExtra(config: JsonExtraConfig = {}) {
   const plugins: Record<string, Plugin<any>> = {
     ...(config.builtins === true
       ? builtinPlugins

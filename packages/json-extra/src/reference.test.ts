@@ -2,10 +2,10 @@ import { tinyassert } from "@hiogawa/utils";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { ZodError, z } from "zod";
-import { createJsonExtra2, definePlugin } from "./reference";
+import { createJsonExtra, definePlugin } from "./reference";
 
 // instantiate default one for tests
-const jsonExtra = createJsonExtra2({ builtins: true });
+const jsonExtra = createJsonExtra({ builtins: true });
 
 function runJsonExtra(input: unknown, json = jsonExtra) {
   const stringified = json.stringify(input, null, 2);
@@ -696,7 +696,7 @@ describe("old tests", () => {
   });
 
   it("custom type", () => {
-    const jsonExtra = createJsonExtra2({
+    const jsonExtra = createJsonExtra({
       plugins: {
         ZodError: definePlugin<ZodError>({
           type: "simple",
@@ -738,7 +738,7 @@ describe("old tests", () => {
   });
 
   it("selected builtins", () => {
-    const jsonExtra = createJsonExtra2({ builtins: ["undefined", "Date"] });
+    const jsonExtra = createJsonExtra({ builtins: ["undefined", "Date"] });
     const input = [undefined, new Date("2023-08-17"), NaN, new Set([0, 1])];
     const result = runJsonExtra(input, jsonExtra);
     expect(result.stringified).toMatchInlineSnapshot(`
