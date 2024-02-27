@@ -102,6 +102,9 @@ importers:
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../utils
+      devalue:
+        specifier: ^4.3.2
+        version: 4.3.2
       fast-check:
         specifier: ^3.12.0
         version: 3.12.0
@@ -3116,6 +3119,10 @@ packages:
   /detect-libc@2.0.2:
     resolution: {integrity: sha512-UX6sGumvvqSaXgdKGUsgZWqcUyIXZ/vZTrlRT/iobiKhGL0zL4d3osHj3uqllWJK+i+sixDS/3COVEOFbupFyw==}
     engines: {node: '>=8'}
+    dev: true
+
+  /devalue@4.3.2:
+    resolution: {integrity: sha512-KqFl6pOgOW+Y6wJgu80rHpo2/3H07vr8ntR9rkkFIRETewbf5GaYYcakYfiKz89K+sLsuPkQIZaXDMjUObZwWg==}
     dev: true
 
   /diff-sequences@29.6.3:
