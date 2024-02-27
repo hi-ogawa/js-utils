@@ -11,7 +11,7 @@ and also provides human-readibility for custom containers.
 
 ## examples
 
-See `./misc/example.mjs`.
+See `./misc/example.mjs` and `./misc/reference.mjs`.
 
 <!--
 
@@ -42,6 +42,32 @@ See `./misc/example.mjs`.
 
 ```json
 {%shell node ./misc/example.mjs superjson %}
+```
+
+</details>
+
+Cyclic reference input
+
+```js
+const parent = { children: new Map() };
+const child1 = { parent };
+const child2 = { parent, siblings: new Set([child1]) };
+parent.children.set("foo", child1);
+parent.children.set("bar", child2);
+```
+
+<details><summary>@hiogawa/json-extra</summary>
+
+```json
+{%shell node ./misc/reference.mjs json-extra %}
+```
+
+</details>
+
+<details><summary>devalue</summary>
+
+```json
+{%shell node ./misc/reference.mjs devalue %}
 ```
 
 </details>
@@ -241,6 +267,66 @@ const input = [
     }
   }
 }
+```
+
+</details>
+
+Cyclic reference input
+
+```js
+const parent = { children: new Map() };
+const child1 = { parent };
+const child2 = { parent, siblings: new Set([child1]) };
+parent.children.set("foo", child1);
+parent.children.set("bar", child2);
+```
+
+<details><summary>@hiogawa/json-extra</summary>
+
+```json
+{
+  "children": [
+    "!Map",
+    [
+      [
+        "foo",
+        {
+          "parent": ["!", 0]
+        }
+      ],
+      [
+        "bar",
+        {
+          "parent": ["!", 0],
+          "siblings": ["!Set", [["!", 3]]]
+        }
+      ]
+    ]
+  ]
+}
+```
+
+</details>
+
+<details><summary>devalue</summary>
+
+```json
+[
+  {
+    "children": 1
+  },
+  ["Map", 2, 3, 4, 5],
+  "foo",
+  {
+    "parent": 0
+  },
+  "bar",
+  {
+    "parent": 0,
+    "siblings": 6
+  },
+  ["Set", 3]
+]
 ```
 
 </details>

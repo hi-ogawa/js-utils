@@ -41,6 +41,7 @@
   "devDependencies": {
     "@brillout/json-serializer": "^0.5.8",
     "@hiogawa/utils": "workspace:*",
+    "devalue": "^4.3.2",
     "fast-check": "^3.12.0",
     "superjson": "^1.13.1",
     "zod": "^3.21.4"

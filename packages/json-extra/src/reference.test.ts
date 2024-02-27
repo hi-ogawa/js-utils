@@ -587,6 +587,53 @@ describe("reference", () => {
     expect(u[0]).toBe([...u[0]][1]);
   });
 
+  it("example", () => {
+    const parent = { children: new Map() };
+    const child1 = { parent };
+    const child2 = { parent, siblings: new Set([child1]) };
+    parent.children.set("foo", child1);
+    parent.children.set("bar", child2);
+
+    const result = runJsonExtra(parent);
+    expect(result.serialized).toMatchInlineSnapshot(`
+      {
+        "children": [
+          "!Map",
+          [
+            [
+              "foo",
+              {
+                "parent": [
+                  "!",
+                  0,
+                ],
+              },
+            ],
+            [
+              "bar",
+              {
+                "parent": [
+                  "!",
+                  0,
+                ],
+                "siblings": [
+                  "!Set",
+                  [
+                    [
+                      "!",
+                      3,
+                    ],
+                  ],
+                ],
+              },
+            ],
+          ],
+        ],
+      }
+    `);
+    expect(result.deserialized).toEqual(result.input);
+  });
+
   it("edge cases 1", () => {
     const v = new Set(["!", null]);
     const result = runJsonExtra(v);
