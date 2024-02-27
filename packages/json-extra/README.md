@@ -9,14 +9,14 @@ but it employs an array-based encoding for special values,
 which makes it easy to support custom types
 and also provides human-readibility for custom containers.
 
-## examples
-
-See `./misc/example.mjs` and `./misc/reference.mjs`.
-
 <!--
 
 -------------------------------------
 ---- %template-input-start:example% ----
+
+## example1
+
+See `./misc/example.mjs`
 
 ```js
 {%shell node ./misc/example.mjs input %}
@@ -46,7 +46,9 @@ See `./misc/example.mjs` and `./misc/reference.mjs`.
 
 </details>
 
-Cyclic reference input
+## example2: cyclic reference
+
+See `./misc/reference.mjs`
 
 ```js
 const parent = { children: new Map() };
@@ -78,6 +80,10 @@ parent.children.set("bar", child2);
 -->
 
 <!-- %template-output-start:example% -->
+
+## example1
+
+See `./misc/example.mjs`
 
 ```js
 const input = [
@@ -271,7 +277,9 @@ const input = [
 
 </details>
 
-Cyclic reference input
+## example2: cyclic reference
+
+See `./misc/reference.mjs`
 
 ```js
 const parent = { children: new Map() };
