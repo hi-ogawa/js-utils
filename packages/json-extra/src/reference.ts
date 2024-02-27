@@ -58,11 +58,14 @@ function serialize(data: unknown, plugins: Record<string, Plugin<any>>) {
     for (const tag in plugins) {
       const plugin = plugins[tag];
       if (plugin.is(v)) {
-        v = [`!${tag}`, plugin.replace(v)];
-        if (plugin.type !== "container") {
-          return v;
+        v = plugin.replace(v);
+        if (plugin.type === "container" && v && typeof v === "object") {
+          v = Array.isArray(v) ? [...v] : { ...v };
+          for (const [k, e] of Object.entries(v as any)) {
+            (v as any)[k] = recurse(e);
+          }
         }
-        break;
+        return [`!${tag}`, v];
       }
     }
 
@@ -88,36 +91,35 @@ function deserialize(data: unknown, plugins: Record<string, Plugin<any>>) {
       return refs[v[1]];
     }
 
-    let containerPlugin: ContainerPlugin<unknown> | undefined;
-    let ref: unknown | undefined;
-
+    // custom reviver
     if (
-      // unescape custom encoding collision
-      //   ["!xxx", ...] <== ["!", "!xxx", ....]
-      Array.isArray(v) &&
-      v.length >= 3 &&
-      v[0] === "!"
-    ) {
-      v = v.slice(1);
-    } else if (
-      // custom reviver to obtain ref before recurse
       Array.isArray(v) &&
       v.length === 2 &&
       typeof v[0] === "string" &&
       v[0][0] === "!"
     ) {
       const tag = v[0].slice(1);
-      v = v[1];
       const plugin = plugins[tag];
       tinyassert(plugin);
-      ref = plugin.revive(v);
+      v = v[1];
+      const ref = plugin.revive(v);
       if (ref && typeof ref === "object") {
         refs.push(ref);
       }
-      if (plugin.type !== "container") {
-        return ref;
+      if (plugin.type === "container" && v && typeof v === "object") {
+        v = Array.isArray(v) ? [...v] : { ...v };
+        for (const [k, e] of Object.entries(v as any)) {
+          (v as any)[k] = recurse(e);
+        }
+        plugin.reviveContainer(v, ref);
       }
-      containerPlugin = plugin;
+      return ref;
+    }
+
+    // unescape custom encoding collision
+    //   ["!xxx", ...] <== ["!", "!xxx", ....]
+    if (Array.isArray(v) && v.length >= 3 && v[0] === "!") {
+      v = v.slice(1);
     }
 
     if (v && typeof v === "object") {
@@ -126,11 +128,6 @@ function deserialize(data: unknown, plugins: Record<string, Plugin<any>>) {
       for (const [k, e] of Object.entries(v as any)) {
         (v as any)[k] = recurse(e);
       }
-    }
-
-    // revive container after recurse
-    if (containerPlugin) {
-      v = containerPlugin.reviveContainer(v, ref);
     }
 
     return v;
@@ -143,23 +140,21 @@ function deserialize(data: unknown, plugins: Record<string, Plugin<any>>) {
 // plugin (TODO: move to plugins.ts)
 //
 
-type Plugin<T> = SimplePlugin<T> | ContainerPlugin<T>;
-
-interface SimplePlugin<T> {
-  type: "simple";
-  is: (v: unknown) => boolean;
-  replace: (v: T) => unknown;
-  revive: (v: unknown) => T;
-}
-
-interface ContainerPlugin<T> {
-  type: "container";
-  is: (v: unknown) => boolean;
-  replace: (v: T) => unknown;
-  // container needs to return "empty reference" before recursion then mutate itself later
-  revive: () => T;
-  reviveContainer: (v: unknown, ref: T) => T;
-}
+type Plugin<T> =
+  | {
+      type: "simple";
+      is: (v: unknown) => boolean;
+      replace: (v: T) => unknown;
+      revive: (v: unknown) => T;
+    }
+  | {
+      type: "container";
+      is: (v: unknown) => boolean;
+      replace: (v: T) => unknown;
+      // container needs to return "empty reference" before recursion then mutate itself later
+      revive: () => T;
+      reviveContainer: (v: unknown, ref: T) => void;
+    };
 
 // type helper
 export function definePlugin<T>(v: Plugin<T>): Plugin<T> {
@@ -236,7 +231,6 @@ const builtinPlugins = {
       for (const e of v) {
         ref.set(e[0], e[1]);
       }
-      return ref;
     },
   }),
   Set: definePlugin<Set<unknown>>({
@@ -249,7 +243,6 @@ const builtinPlugins = {
       for (const e of v) {
         ref.add(e);
       }
-      return ref;
     },
   }),
 };

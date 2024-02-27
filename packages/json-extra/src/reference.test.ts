@@ -493,7 +493,7 @@ describe("reference", () => {
             {
               "foo": [
                 "!",
-                3,
+                2,
               ],
             },
           ],
@@ -585,7 +585,6 @@ describe("reference", () => {
         "!Set",
         [
           "!",
-          "!",
           null,
         ],
       ]
@@ -599,8 +598,7 @@ describe("reference", () => {
     expect(u).toEqual(v);
   });
 
-  // TODO
-  it.fails("edge cases 2", () => {
+  it("edge cases 2", () => {
     const v = new Set(["!x", null]);
     const serialized = jsonExtra.serialize(v);
     const u = jsonExtra.deserialize(serialized);
@@ -608,7 +606,6 @@ describe("reference", () => {
       [
         "!Set",
         [
-          "!",
           "!x",
           null,
         ],
@@ -616,7 +613,6 @@ describe("reference", () => {
     `);
     expect(u).toMatchInlineSnapshot(`
       Set {
-        "!",
         "!x",
         null,
       }
