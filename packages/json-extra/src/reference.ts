@@ -1,10 +1,14 @@
 import { tinyassert } from "@hiogawa/utils";
 
-export function replaceReference(data: unknown) {
-  const refs = new Map<unknown, number>();
+// TODO: move to core.ts
 
-  // TODO: configurable
-  const plugins: Record<string, Plugin<any>> = builtinPlugins;
+export function createJsonExtra2() {}
+
+export function replaceReference(
+  data: unknown,
+  plugins: Record<string, Plugin<any>> = builtinPlugins
+) {
+  const refs = new Map<unknown, number>();
 
   function recurse(v: unknown) {
     // return reference placeholder
@@ -41,7 +45,8 @@ export function replaceReference(data: unknown) {
     }
 
     if (v && typeof v === "object") {
-      v = shallowCopy(v);
+      // shallow copy to avoid overwriting original input
+      v = Array.isArray(v) ? [...v] : { ...v };
       for (const [k, e] of Object.entries(v as any)) {
         (v as any)[k] = recurse(e);
       }
@@ -52,11 +57,11 @@ export function replaceReference(data: unknown) {
   return recurse(data);
 }
 
-export function reviveReference(data: unknown) {
+export function reviveReference(
+  data: unknown,
+  plugins: Record<string, Plugin<any>> = builtinPlugins
+) {
   const refs: unknown[] = [];
-
-  // TODO: configurable
-  const plugins: Record<string, Plugin<any>> = builtinPlugins;
 
   function recurse(v: unknown) {
     // revive reference placeholder
@@ -97,7 +102,7 @@ export function reviveReference(data: unknown) {
     }
 
     if (v && typeof v === "object") {
-      v = shallowCopy(v);
+      v = Array.isArray(v) ? [...v] : { ...v };
       refs.push(v);
       for (const [k, e] of Object.entries(v as any)) {
         (v as any)[k] = recurse(e);
@@ -115,16 +120,8 @@ export function reviveReference(data: unknown) {
   return recurse(data);
 }
 
-// shallow copy to avoid overwriting original input
-function shallowCopy(v: unknown) {
-  if (v && typeof v === "object") {
-    return Array.isArray(v) ? [...v] : { ...v };
-  }
-  return v;
-}
-
 //
-// plugin
+// plugin (TODO: move to plugins.ts)
 //
 
 type Plugin<T> =
@@ -148,7 +145,7 @@ export function definePlugin<T>(v: Plugin<T>): Plugin<T> {
   return v;
 }
 
-function definePluginConstant<T>(c: T): Plugin<T> {
+function defineConstant<T>(c: T): Plugin<T> {
   return {
     type: "simple",
     is: (v) => Object.is(v, c),
@@ -161,11 +158,11 @@ export const builtinPlugins = {
   //
   // constants
   //
-  undefined: definePluginConstant(undefined),
-  Infinity: definePluginConstant(Infinity),
-  "-Infinity": definePluginConstant(-Infinity),
-  NaN: definePluginConstant(NaN),
-  "-0": definePluginConstant(-0),
+  undefined: defineConstant(undefined),
+  Infinity: defineConstant(Infinity),
+  "-Infinity": defineConstant(-Infinity),
+  NaN: defineConstant(NaN),
+  "-0": defineConstant(-0),
 
   //
   // non containers
