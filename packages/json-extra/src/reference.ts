@@ -30,9 +30,12 @@ export function replaceReference(data: unknown) {
 
     // custom replacer
     for (const tag in plugins) {
-      const p = plugins[tag];
-      if (p.is(v)) {
-        v = [`!${tag}`, p.replacer(v)];
+      const plugin = plugins[tag];
+      if (plugin.is(v)) {
+        v = [`!${tag}`, plugin.replace(v)];
+        if (plugin.type === "simple") {
+          return v;
+        }
         break;
       }
     }
@@ -61,16 +64,17 @@ export function reviveReference(data: unknown) {
       return refs[v[1]];
     }
 
-    let plugin: Plugin<any> | undefined;
     let ref: unknown | undefined;
+    let reviveContainer: ((v: unknown, ref: unknown) => unknown) | undefined;
 
-    // TODO: refactor messy branches...
-
-    // unescape custom encoding collision
-    //   ["!xxx", ...] <== ["!", "!xxx", ....]
-    if (Array.isArray(v) && v.length >= 3 && v[0] === "!") {
+    if (
+      // unescape custom encoding collision
+      //   ["!xxx", ...] <== ["!", "!xxx", ....]
+      Array.isArray(v) &&
+      v.length >= 3 &&
+      v[0] === "!"
+    ) {
       v = v.slice(1);
-      refs.push(v);
     } else if (
       // custom reviver to obtain ref before recurse
       Array.isArray(v) &&
@@ -79,27 +83,30 @@ export function reviveReference(data: unknown) {
       v[0][0] === "!"
     ) {
       const tag = v[0].slice(1);
-      v = shallowCopy(v[1]);
-      plugin = plugins[tag];
+      v = v[1];
+      const plugin = plugins[tag];
       tinyassert(plugin);
-      ref = plugin.reviverRef();
-      refs.push(ref);
-      refs.push("__dummy"); // dummy ref to align with replaceReference's offset (TODO: probably should fix replaceReference side)
-    } else if (v && typeof v === "object") {
-      // track ref before recurse to handle circular references
-      v = shallowCopy(v);
-      refs.push(v);
+      ref = plugin.revive(v);
+      if (ref && typeof ref === "object") {
+        refs.push(ref);
+      }
+      if (plugin.type === "simple") {
+        return ref;
+      }
+      reviveContainer = plugin.reviveContainer;
     }
 
     if (v && typeof v === "object") {
+      v = shallowCopy(v);
+      refs.push(v);
       for (const [k, e] of Object.entries(v as any)) {
         (v as any)[k] = recurse(e);
       }
     }
 
-    // custom reviver after recurse
-    if (plugin) {
-      v = plugin.reviver(v, ref);
+    // revive container after recurse
+    if (reviveContainer) {
+      v = reviveContainer(v, ref);
     }
 
     return v;
@@ -120,12 +127,21 @@ function shallowCopy(v: unknown) {
 // plugin
 //
 
-type Plugin<T> = {
-  is: (v: unknown) => boolean;
-  replacer: (v: T) => unknown;
-  reviver: (v: unknown, ref: T) => T;
-  reviverRef: () => T;
-};
+type Plugin<T> =
+  | {
+      type: "simple";
+      is: (v: unknown) => boolean;
+      replace: (v: T) => unknown;
+      revive: (v: unknown) => T;
+    }
+  | {
+      // container needs to return "empty reference" before recursion then mutate itself later
+      type: "container";
+      is: (v: unknown) => boolean;
+      replace: (v: T) => unknown;
+      revive: () => T;
+      reviveContainer: (v: unknown, ref: T) => T;
+    };
 
 // type helper
 export function definePlugin<T>(v: Plugin<T>): Plugin<T> {
@@ -134,10 +150,10 @@ export function definePlugin<T>(v: Plugin<T>): Plugin<T> {
 
 function definePluginConstant<T>(c: T): Plugin<T> {
   return {
+    type: "simple",
     is: (v) => Object.is(v, c),
-    replacer: () => 0,
-    reviver: () => c,
-    reviverRef: () => c,
+    replace: () => 0,
+    revive: () => c,
   };
 }
 
@@ -155,29 +171,29 @@ export const builtinPlugins = {
   // non containers
   //
   Date: definePlugin<Date>({
+    type: "simple",
     is: (v) => v instanceof Date,
-    replacer: (v) => v.toISOString(),
-    reviver: (v, ref) => {
+    replace: (v) => v.toISOString(),
+    revive: (v) => {
       tinyassert(typeof v === "string");
-      ref.setTime(new Date(v).getTime());
-      return ref;
+      return new Date(v);
     },
-    reviverRef: () => new Date(0),
   }),
 
   //
   // containers
   //
   Set: definePlugin<Set<unknown>>({
+    type: "container",
     is: (v) => v instanceof Set,
-    replacer: (v) => Array.from(v),
-    reviver: (v, ref) => {
+    replace: (v) => Array.from(v),
+    revive: () => new Set(),
+    reviveContainer: (v, ref) => {
       tinyassert(Array.isArray(v));
       for (const e of v) {
         ref.add(e);
       }
       return ref;
     },
-    reviverRef: () => new Set(),
   }),
 };

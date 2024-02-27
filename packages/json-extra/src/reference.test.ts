@@ -364,7 +364,7 @@ describe("reference", () => {
 
   it("custom constant", () => {
     const v1 = [undefined, Infinity, NaN];
-    const v = [v1, [v1]];
+    const v = [v1, [v1], undefined, new Date(1), Infinity, new Date(0)];
     const replaced = replaceReference(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
@@ -388,6 +388,22 @@ describe("reference", () => {
             1,
           ],
         ],
+        [
+          "!undefined",
+          0,
+        ],
+        [
+          "!Date",
+          "1970-01-01T00:00:00.001Z",
+        ],
+        [
+          "!Infinity",
+          0,
+        ],
+        [
+          "!Date",
+          "1970-01-01T00:00:00.000Z",
+        ],
       ]
     `);
     const u = reviveReference(replaced) as any;
@@ -405,6 +421,10 @@ describe("reference", () => {
             NaN,
           ],
         ],
+        undefined,
+        1970-01-01T00:00:00.001Z,
+        Infinity,
+        1970-01-01T00:00:00.000Z,
       ]
     `);
     expect(u).toEqual(v);
