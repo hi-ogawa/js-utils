@@ -88,8 +88,8 @@ function deserialize(data: unknown, plugins: Record<string, Plugin<any>>) {
       return refs[v[1]];
     }
 
+    let containerPlugin: ContainerPlugin<unknown> | undefined;
     let ref: unknown | undefined;
-    let reviveContainer: ((v: unknown, ref: unknown) => unknown) | undefined;
 
     if (
       // unescape custom encoding collision
@@ -117,7 +117,7 @@ function deserialize(data: unknown, plugins: Record<string, Plugin<any>>) {
       if (plugin.type !== "container") {
         return ref;
       }
-      reviveContainer = plugin.reviveContainer;
+      containerPlugin = plugin;
     }
 
     if (v && typeof v === "object") {
@@ -129,8 +129,8 @@ function deserialize(data: unknown, plugins: Record<string, Plugin<any>>) {
     }
 
     // revive container after recurse
-    if (reviveContainer) {
-      v = reviveContainer(v, ref);
+    if (containerPlugin) {
+      v = containerPlugin.reviveContainer(v, ref);
     }
 
     return v;
@@ -143,21 +143,23 @@ function deserialize(data: unknown, plugins: Record<string, Plugin<any>>) {
 // plugin (TODO: move to plugins.ts)
 //
 
-type Plugin<T> =
-  | {
-      type: "simple";
-      is: (v: unknown) => boolean;
-      replace: (v: T) => unknown;
-      revive: (v: unknown) => T;
-    }
-  | {
-      // container needs to return "empty reference" before recursion then mutate itself later
-      type: "container";
-      is: (v: unknown) => boolean;
-      replace: (v: T) => unknown;
-      revive: () => T;
-      reviveContainer: (v: unknown, ref: T) => T;
-    };
+type Plugin<T> = SimplePlugin<T> | ContainerPlugin<T>;
+
+interface SimplePlugin<T> {
+  type: "simple";
+  is: (v: unknown) => boolean;
+  replace: (v: T) => unknown;
+  revive: (v: unknown) => T;
+}
+
+interface ContainerPlugin<T> {
+  type: "container";
+  is: (v: unknown) => boolean;
+  replace: (v: T) => unknown;
+  // container needs to return "empty reference" before recursion then mutate itself later
+  revive: () => T;
+  reviveContainer: (v: unknown, ref: T) => T;
+}
 
 // type helper
 export function definePlugin<T>(v: Plugin<T>): Plugin<T> {
