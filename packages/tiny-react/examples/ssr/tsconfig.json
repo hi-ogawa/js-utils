@@ -3,7 +3,6 @@
   "include": ["src"],
   "compilerOptions": {
     "types": ["vite/client", "@types/node"],
-    "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "jsxImportSource": "@hiogawa/tiny-react"
   }
