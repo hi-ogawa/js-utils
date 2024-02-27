@@ -138,7 +138,7 @@ function deserialize(data: unknown, plugins: Record<string, Plugin<any>>) {
 }
 
 //
-// plugin (TODO: move to plugins.ts)
+// plugin
 //
 
 type Plugin<T> =
