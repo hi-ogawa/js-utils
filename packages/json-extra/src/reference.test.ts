@@ -7,14 +7,11 @@ import { createJsonExtra2, definePlugin } from "./reference";
 // instantiate default one for tests
 const jsonExtra = createJsonExtra2({ builtins: true });
 
-function runJsonExtra(
-  jsonExtra: ReturnType<typeof createJsonExtra2>,
-  input: unknown
-) {
-  const stringified = jsonExtra.stringify(input, null, 2);
-  const parsed = jsonExtra.parse(stringified);
-  const serialized = jsonExtra.serialize(input);
-  const deserialized = jsonExtra.deserialize(serialized);
+function runJsonExtra(input: unknown, json = jsonExtra) {
+  const stringified = json.stringify(input, null, 2);
+  const parsed = json.parse(stringified);
+  const serialized = json.serialize(input);
+  const deserialized = json.deserialize(serialized);
   return { input, stringified, parsed, serialized, deserialized };
 }
 
@@ -592,9 +589,8 @@ describe("reference", () => {
 
   it("edge cases 1", () => {
     const v = new Set(["!", null]);
-    const serialized = jsonExtra.serialize(v);
-    const u = jsonExtra.deserialize(serialized);
-    expect(serialized).toMatchInlineSnapshot(`
+    const result = runJsonExtra(v);
+    expect(result.serialized).toMatchInlineSnapshot(`
       [
         "!Set",
         [
@@ -603,20 +599,19 @@ describe("reference", () => {
         ],
       ]
     `);
-    expect(u).toMatchInlineSnapshot(`
+    expect(result.deserialized).toMatchInlineSnapshot(`
       Set {
         "!",
         null,
       }
     `);
-    expect(u).toEqual(v);
+    expect(result.deserialized).toEqual(v);
   });
 
   it("edge cases 2", () => {
     const v = new Set(["!x", null]);
-    const serialized = jsonExtra.serialize(v);
-    const u = jsonExtra.deserialize(serialized);
-    expect(serialized).toMatchInlineSnapshot(`
+    const result = runJsonExtra(v);
+    expect(result.serialized).toMatchInlineSnapshot(`
       [
         "!Set",
         [
@@ -625,28 +620,23 @@ describe("reference", () => {
         ],
       ]
     `);
-    expect(u).toMatchInlineSnapshot(`
+    expect(result.deserialized).toMatchInlineSnapshot(`
       Set {
         "!x",
         null,
       }
     `);
-    expect(u).toEqual(v);
+    expect(result.deserialized).toEqual(v);
   });
 });
 
 describe("fuzzing", () => {
-  const jsonExtra = createJsonExtra2({ builtins: true });
-
   it("jsonValue", () => {
     fc.assert(
       fc.property(fc.jsonValue(), (data) => {
-        const stringified = jsonExtra.stringify(data);
-        const parsed = jsonExtra.parse(stringified);
-        const serialized = jsonExtra.serialize(data);
-        const deserialized = jsonExtra.deserialize(serialized);
-        expect(parsed).toEqual(data);
-        expect(deserialized).toEqual(data);
+        const result = runJsonExtra(data);
+        expect(result.parsed).toEqual(data);
+        expect(result.deserialized).toEqual(data);
       })
     );
   });
@@ -661,12 +651,9 @@ describe("fuzzing", () => {
           withSet: true,
         }),
         (data) => {
-          const stringified = jsonExtra.stringify(data);
-          const parsed = jsonExtra.parse(stringified);
-          const serialized = jsonExtra.serialize(data);
-          const deserialized = jsonExtra.deserialize(serialized);
-          expect(parsed).toEqual(data);
-          expect(deserialized).toEqual(data);
+          const result = runJsonExtra(data);
+          expect(result.parsed).toEqual(data);
+          expect(result.deserialized).toEqual(data);
         }
       )
     );
@@ -703,7 +690,7 @@ describe("old tests", () => {
       // escape
       ["!NaN", "collision"],
     ];
-    const result = runJsonExtra(jsonExtra, input);
+    const result = runJsonExtra(input);
     expect(result.stringified).toMatchSnapshot();
     expect(result.parsed).toEqual(input);
   });
@@ -727,7 +714,7 @@ describe("old tests", () => {
       ok: false,
       value: error.error,
     };
-    const result = runJsonExtra(jsonExtra, input);
+    const result = runJsonExtra(input, jsonExtra);
     expect(result.serialized).toMatchInlineSnapshot(`
       {
         "ok": false,
@@ -753,7 +740,7 @@ describe("old tests", () => {
   it("selected builtins", () => {
     const jsonExtra = createJsonExtra2({ builtins: ["undefined", "Date"] });
     const input = [undefined, new Date("2023-08-17"), NaN, new Set([0, 1])];
-    const result = runJsonExtra(jsonExtra, input);
+    const result = runJsonExtra(input, jsonExtra);
     expect(result.stringified).toMatchInlineSnapshot(`
       "[
         [
@@ -785,7 +772,7 @@ describe("old tests", () => {
       collision4: ["!", ["!", 1n, "!"]],
       collision5: [[], ["!"], ["!", 0], ["!", 0, 0], ["!", 0, 0, 0]],
     };
-    const result = runJsonExtra(jsonExtra, input);
+    const result = runJsonExtra(input);
     expect(result.serialized).toMatchSnapshot();
     expect(result.deserialized).toEqual(input);
   });
@@ -823,7 +810,7 @@ describe("old tests", () => {
       () => {},
     ];
 
-    const result = runJsonExtra(jsonExtra, input);
+    const result = runJsonExtra(input);
     expect(result).toMatchSnapshot();
   });
 });
