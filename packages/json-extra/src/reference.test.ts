@@ -7,8 +7,8 @@ describe("reference", () => {
   it("basic", () => {
     const v1 = { hi: 0 };
     const v = [v1, [v1], { foo: v1 }];
-    const replaced = jsonExtra.serialize(v);
-    expect(replaced).toMatchInlineSnapshot(`
+    const serialized = jsonExtra.serialize(v);
+    expect(serialized).toMatchInlineSnapshot(`
       [
         {
           "hi": 0,
@@ -27,7 +27,7 @@ describe("reference", () => {
         },
       ]
     `);
-    const u = jsonExtra.deserialize(replaced);
+    const u = jsonExtra.deserialize(serialized);
     expect(u).toMatchInlineSnapshot(`
       [
         {
@@ -54,8 +54,8 @@ describe("reference", () => {
     const v1 = { hi: 0 };
     const v2 = { hey: 1, yo: v1 };
     const v = [v1, [v1], { ...v1 }, v2, { foo: v1, bar: [v2] }];
-    const replaced = jsonExtra.serialize(v);
-    expect(replaced).toMatchInlineSnapshot(`
+    const serialized = jsonExtra.serialize(v);
+    expect(serialized).toMatchInlineSnapshot(`
       [
         {
           "hi": 0,
@@ -90,7 +90,7 @@ describe("reference", () => {
         },
       ]
     `);
-    const u = jsonExtra.deserialize(replaced);
+    const u = jsonExtra.deserialize(serialized);
     expect(u).toMatchInlineSnapshot(`
       [
         {
@@ -135,8 +135,8 @@ describe("reference", () => {
     const v: any = [];
     v[0] = v;
     v[1] = { hi: v };
-    const replaced = jsonExtra.serialize(v);
-    expect(replaced).toMatchInlineSnapshot(`
+    const serialized = jsonExtra.serialize(v);
+    expect(serialized).toMatchInlineSnapshot(`
       [
         [
           "!",
@@ -150,7 +150,7 @@ describe("reference", () => {
         },
       ]
     `);
-    const u = jsonExtra.deserialize(replaced);
+    const u = jsonExtra.deserialize(serialized);
     expect(u).toMatchInlineSnapshot(`
       [
         [Circular],
@@ -167,8 +167,8 @@ describe("reference", () => {
     const v1 = { hi: 0 };
     const v2 = ["!", v1];
     const v = [v1, v2, v2];
-    const replaced = jsonExtra.serialize(v);
-    expect(replaced).toMatchInlineSnapshot(`
+    const serialized = jsonExtra.serialize(v);
+    expect(serialized).toMatchInlineSnapshot(`
       [
         {
           "hi": 0,
@@ -187,7 +187,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = jsonExtra.deserialize(replaced);
+    const u = jsonExtra.deserialize(serialized);
     expect(u).toMatchInlineSnapshot(`
       [
         {
@@ -224,8 +224,8 @@ describe("reference", () => {
       ["!!", "!", "!"],
       ["!", v2],
     ];
-    const replaced = jsonExtra.serialize(v);
-    expect(replaced).toMatchInlineSnapshot(`
+    const serialized = jsonExtra.serialize(v);
+    expect(serialized).toMatchInlineSnapshot(`
       [
         {
           "hi": 0,
@@ -273,7 +273,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = jsonExtra.deserialize(replaced);
+    const u = jsonExtra.deserialize(serialized);
     expect(u).toMatchInlineSnapshot(`
       [
         {
@@ -328,8 +328,8 @@ describe("reference", () => {
     const v2 = /^\d+/gms;
     const v3 = [v1, v2];
     const v = [v1, [v1], { foo: [v1, v2] }, v2, v3, v3];
-    const replaced = jsonExtra.serialize(v);
-    expect(replaced).toMatchInlineSnapshot(`
+    const serialized = jsonExtra.serialize(v);
+    expect(serialized).toMatchInlineSnapshot(`
       [
         [
           "!Date",
@@ -376,7 +376,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = jsonExtra.deserialize(replaced);
+    const u = jsonExtra.deserialize(serialized);
     expect(u).toMatchInlineSnapshot(`
       [
         2000-01-01T00:00:00.000Z,
@@ -409,8 +409,8 @@ describe("reference", () => {
   it("custom constant", () => {
     const v1 = [undefined, Infinity, NaN];
     const v = [v1, [v1], undefined, new Date(1), Infinity, new Date(0)];
-    const replaced = jsonExtra.serialize(v);
-    expect(replaced).toMatchInlineSnapshot(`
+    const serialized = jsonExtra.serialize(v);
+    expect(serialized).toMatchInlineSnapshot(`
       [
         [
           [
@@ -450,7 +450,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = jsonExtra.deserialize(replaced);
+    const u = jsonExtra.deserialize(serialized);
     expect(u).toMatchInlineSnapshot(`
       [
         [
@@ -479,8 +479,8 @@ describe("reference", () => {
     const v1 = new Date("2000-01-01T00:00:00Z");
     const v2 = new Set([v1, { foo: v1 }]);
     const v = [v2, [v2]];
-    const replaced = jsonExtra.serialize(v);
-    expect(replaced).toMatchInlineSnapshot(`
+    const serialized = jsonExtra.serialize(v);
+    expect(serialized).toMatchInlineSnapshot(`
       [
         [
           "!Set",
@@ -505,7 +505,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = jsonExtra.deserialize(replaced);
+    const u = jsonExtra.deserialize(serialized);
     expect(u).toMatchInlineSnapshot(`
       [
         Set {
@@ -534,8 +534,8 @@ describe("reference", () => {
     const v1 = new Set(["hi" as any]);
     v1.add(v1);
     const v = [v1, [v1]];
-    const replaced = jsonExtra.serialize(v);
-    expect(replaced).toMatchInlineSnapshot(`
+    const serialized = jsonExtra.serialize(v);
+    expect(serialized).toMatchInlineSnapshot(`
       [
         [
           "!Set",
@@ -555,7 +555,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = jsonExtra.deserialize(replaced);
+    const u = jsonExtra.deserialize(serialized);
     expect(u).toMatchInlineSnapshot(`
       [
         Set {
