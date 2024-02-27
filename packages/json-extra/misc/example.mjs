@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { stringify as brilloutStringify } from "@brillout/json-serializer/stringify";
 import superjson from "superjson";
-import { createJsonExtra } from "../dist/index.js";
+import { createJsonExtra } from "../dist/reference.js";
 import { tinyassert } from "@hiogawa/utils";
 
 /*
