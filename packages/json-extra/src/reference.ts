@@ -18,6 +18,7 @@ export function replaceReference(data: unknown) {
     }
 
     // escape custom encoding collision
+    //   ["!xxx", ...] ==> ["!", "!xxx", ....]
     if (
       Array.isArray(v) &&
       v.length >= 2 &&
@@ -66,12 +67,8 @@ export function reviveReference(data: unknown) {
     // TODO: refactor messy branches...
 
     // unescape custom encoding collision
-    if (
-      Array.isArray(v) &&
-      v.length >= 3 &&
-      typeof v[0] === "string" &&
-      v[0][0] === "!"
-    ) {
+    //   ["!xxx", ...] <== ["!", "!xxx", ....]
+    if (Array.isArray(v) && v.length >= 3 && v[0] === "!") {
       v = v.slice(1);
       refs.push(v);
     } else if (
