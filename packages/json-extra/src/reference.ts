@@ -1,10 +1,48 @@
-import { tinyassert } from "@hiogawa/utils";
+import { objectPick, tinyassert } from "@hiogawa/utils";
 
-// TODO: move to core.ts
+// TODO: ability to disable reference preservation?
+interface JsonExtraConfig {
+  builtins?: true | BuiltinPlugin[];
+  plugins?: Record<string, Plugin<any>>;
+}
 
-export function createJsonExtra2() {}
+export function createJsonExtra2(config: JsonExtraConfig = {}) {
+  const plugins: Record<string, Plugin<any>> = {
+    ...(config.builtins === true
+      ? builtinPlugins
+      : Array.isArray(config.builtins)
+      ? objectPick(builtinPlugins, config.builtins)
+      : {}),
+    ...config.plugins,
+  };
 
-export function replaceReference(
+  // any <-> string
+  function stringify(v: any, _unused?: unknown, space?: number) {
+    return JSON.stringify(serialize(v), null, space);
+  }
+
+  function parse(s: string) {
+    return deserialize(JSON.parse(s));
+  }
+
+  // any <-> any
+  function serialize(v: any): any {
+    return replaceReference(v, plugins);
+  }
+
+  function deserialize(v: any): any {
+    return reviveReference(v, plugins);
+  }
+
+  return {
+    stringify,
+    parse,
+    serialize,
+    deserialize,
+  };
+}
+
+function replaceReference(
   data: unknown,
   plugins: Record<string, Plugin<any>> = builtinPlugins
 ) {
@@ -57,7 +95,7 @@ export function replaceReference(
   return recurse(data);
 }
 
-export function reviveReference(
+function reviveReference(
   data: unknown,
   plugins: Record<string, Plugin<any>> = builtinPlugins
 ) {
@@ -154,7 +192,9 @@ function defineConstant<T>(c: T): Plugin<T> {
   };
 }
 
-export const builtinPlugins = {
+type BuiltinPlugin = keyof typeof builtinPlugins;
+
+const builtinPlugins = {
   //
   // constants
   //

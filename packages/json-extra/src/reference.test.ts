@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { replaceReference, reviveReference } from "./reference";
+import { createJsonExtra2 } from "./reference";
+
+const jsonExtra = createJsonExtra2({ builtins: true });
 
 describe("reference", () => {
   it("basic", () => {
     const v1 = { hi: 0 };
     const v = [v1, [v1], { foo: v1 }];
-    const replaced = replaceReference(v);
+    const replaced = jsonExtra.serialize(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
         {
@@ -25,7 +27,7 @@ describe("reference", () => {
         },
       ]
     `);
-    const u = reviveReference(replaced) as any;
+    const u = jsonExtra.deserialize(replaced);
     expect(u).toMatchInlineSnapshot(`
       [
         {
@@ -52,7 +54,7 @@ describe("reference", () => {
     const v1 = { hi: 0 };
     const v2 = { hey: 1, yo: v1 };
     const v = [v1, [v1], { ...v1 }, v2, { foo: v1, bar: [v2] }];
-    const replaced = replaceReference(v);
+    const replaced = jsonExtra.serialize(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
         {
@@ -88,7 +90,7 @@ describe("reference", () => {
         },
       ]
     `);
-    const u = reviveReference(replaced) as any;
+    const u = jsonExtra.deserialize(replaced);
     expect(u).toMatchInlineSnapshot(`
       [
         {
@@ -133,7 +135,7 @@ describe("reference", () => {
     const v: any = [];
     v[0] = v;
     v[1] = { hi: v };
-    const replaced = replaceReference(v);
+    const replaced = jsonExtra.serialize(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
         [
@@ -148,7 +150,7 @@ describe("reference", () => {
         },
       ]
     `);
-    const u = reviveReference(replaced) as any;
+    const u = jsonExtra.deserialize(replaced);
     expect(u).toMatchInlineSnapshot(`
       [
         [Circular],
@@ -165,7 +167,7 @@ describe("reference", () => {
     const v1 = { hi: 0 };
     const v2 = ["!", v1];
     const v = [v1, v2, v2];
-    const replaced = replaceReference(v);
+    const replaced = jsonExtra.serialize(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
         {
@@ -185,7 +187,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = reviveReference(replaced) as any;
+    const u = jsonExtra.deserialize(replaced);
     expect(u).toMatchInlineSnapshot(`
       [
         {
@@ -222,7 +224,7 @@ describe("reference", () => {
       ["!!", "!", "!"],
       ["!", v2],
     ];
-    const replaced = replaceReference(v);
+    const replaced = jsonExtra.serialize(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
         {
@@ -271,7 +273,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = reviveReference(replaced) as any;
+    const u = jsonExtra.deserialize(replaced);
     expect(u).toMatchInlineSnapshot(`
       [
         {
@@ -326,7 +328,7 @@ describe("reference", () => {
     const v2 = /^\d+/gms;
     const v3 = [v1, v2];
     const v = [v1, [v1], { foo: [v1, v2] }, v2, v3, v3];
-    const replaced = replaceReference(v);
+    const replaced = jsonExtra.serialize(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
         [
@@ -374,7 +376,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = reviveReference(replaced) as any;
+    const u = jsonExtra.deserialize(replaced);
     expect(u).toMatchInlineSnapshot(`
       [
         2000-01-01T00:00:00.000Z,
@@ -407,7 +409,7 @@ describe("reference", () => {
   it("custom constant", () => {
     const v1 = [undefined, Infinity, NaN];
     const v = [v1, [v1], undefined, new Date(1), Infinity, new Date(0)];
-    const replaced = replaceReference(v);
+    const replaced = jsonExtra.serialize(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
         [
@@ -448,7 +450,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = reviveReference(replaced) as any;
+    const u = jsonExtra.deserialize(replaced);
     expect(u).toMatchInlineSnapshot(`
       [
         [
@@ -477,7 +479,7 @@ describe("reference", () => {
     const v1 = new Date("2000-01-01T00:00:00Z");
     const v2 = new Set([v1, { foo: v1 }]);
     const v = [v2, [v2]];
-    const replaced = replaceReference(v);
+    const replaced = jsonExtra.serialize(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
         [
@@ -503,7 +505,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = reviveReference(replaced) as any;
+    const u = jsonExtra.deserialize(replaced);
     expect(u).toMatchInlineSnapshot(`
       [
         Set {
@@ -532,7 +534,7 @@ describe("reference", () => {
     const v1 = new Set(["hi" as any]);
     v1.add(v1);
     const v = [v1, [v1]];
-    const replaced = replaceReference(v);
+    const replaced = jsonExtra.serialize(v);
     expect(replaced).toMatchInlineSnapshot(`
       [
         [
@@ -553,7 +555,7 @@ describe("reference", () => {
         ],
       ]
     `);
-    const u = reviveReference(replaced) as any;
+    const u = jsonExtra.deserialize(replaced);
     expect(u).toMatchInlineSnapshot(`
       [
         Set {
