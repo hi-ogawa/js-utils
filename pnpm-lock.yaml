@@ -97,8 +97,8 @@ importers:
   packages/json-extra:
     devDependencies:
       '@brillout/json-serializer':
-        specifier: ^0.5.4
-        version: 0.5.4
+        specifier: ^0.5.8
+        version: 0.5.8
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../utils
@@ -367,8 +367,8 @@ importers:
   packages/tiny-rpc:
     devDependencies:
       '@brillout/json-serializer':
-        specifier: ^0.5.4
-        version: 0.5.4
+        specifier: ^0.5.8
+        version: 0.5.8
       '@hattip/adapter-node':
         specifier: ^0.0.34
         version: 0.0.34
@@ -893,8 +893,8 @@ packages:
       to-fast-properties: 2.0.0
     dev: true
 
-  /@brillout/json-serializer@0.5.4:
-    resolution: {integrity: sha512-Lz/gQXKSoykR4g0PmBHpa+ILNJU7K0mZpWfBpDg5NnmPyHiDVnipwoH90Zv613FAwgUaV5HMCgYns6Lh78M+Yw==}
+  /@brillout/json-serializer@0.5.8:
+    resolution: {integrity: sha512-vEuXw30ok+mJfJutOxXKBb4lBJ0HymA7lev9PcYK6W/hzjhCTPk9Bdk85HrcNcKZWRQiwoWtw0F2Di4TRJ7ssQ==}
     dev: true
 
   /@changesets/apply-release-plan@6.1.4:
