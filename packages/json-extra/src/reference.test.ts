@@ -1,6 +1,6 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { createJsonExtra2 } from "./reference";
-import fc from "fast-check";
 
 const jsonExtra = createJsonExtra2({ builtins: true });
 
@@ -577,7 +577,7 @@ describe("reference", () => {
   });
 
   it("edge cases 1", () => {
-    const v = new Set(["!", null])
+    const v = new Set(["!", null]);
     const serialized = jsonExtra.serialize(v);
     const u = jsonExtra.deserialize(serialized);
     expect(serialized).toMatchInlineSnapshot(`
@@ -597,11 +597,11 @@ describe("reference", () => {
       }
     `);
     expect(u).toEqual(v);
-  })
+  });
 
   // TODO
   it.fails("edge cases 2", () => {
-    const v = new Set(["!x", null])
+    const v = new Set(["!x", null]);
     const serialized = jsonExtra.serialize(v);
     const u = jsonExtra.deserialize(serialized);
     expect(serialized).toMatchInlineSnapshot(`
@@ -622,8 +622,7 @@ describe("reference", () => {
       }
     `);
     expect(u).toEqual(v);
-  })
-
+  });
 });
 
 describe("fuzzing", () => {
@@ -638,7 +637,7 @@ describe("fuzzing", () => {
         const deserialized = jsonExtra.deserialize(serialized);
         expect(parsed).toEqual(data);
         expect(deserialized).toEqual(data);
-      }),
+      })
     );
   });
 
@@ -661,7 +660,7 @@ describe("fuzzing", () => {
           expect(parsed).toEqual(data);
           expect(deserialized).toEqual(data);
         }
-      ),
+      )
     );
   });
 });
