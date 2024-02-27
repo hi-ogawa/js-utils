@@ -14,6 +14,16 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
+    },
+    "./reference": {
+      "import": "./dist/reference.js",
+      "require": "./dist/reference.cjs",
+      "types": "./dist/reference.d.ts"
+    },
+    "./stream": {
+      "import": "./dist/stream.js",
+      "require": "./dist/stream.cjs",
+      "types": "./dist/stream.d.ts"
     }
   },
   "main": "./dist/index.js",
