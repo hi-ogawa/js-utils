@@ -18,7 +18,7 @@
     "build": "tsup",
     "cli": "node ./bin/cli.js",
     "cli-dev": "tsx ./src/cli.ts",
-    "docs": "inline-template ./README.md",
+    "docs-update": "inline-template ./README.md",
     "scrape": "tsx src/scrape.ts > src/scrape-output.json",
     "release": "pnpm publish --no-git-checks --access public"
   },

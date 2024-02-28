@@ -4,6 +4,8 @@ import { TinyCliCommand, arg, tinyCliMain } from "@hiogawa/tiny-cli";
 import { InlineTemplateProcessor } from ".";
 import { version as packageVersion } from "../package.json";
 
+// TODO: "--check" mode to throw error if diff?
+
 const cli = new TinyCliCommand(
   {
     program: "inline-template",

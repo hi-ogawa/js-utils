@@ -1,18 +1,27 @@
 /*
 usage:
-  node ./packages/json-extra/misc/reference.mjs input json-extra devalue
+  node ./packages/json-extra/misc/reference.mjs input console json-extra devalue
 */
 
+// INPUT_START
 const parent = { children: new Map() };
 const child1 = { parent };
 const child2 = { parent, siblings: new Set([child1]) };
 parent.children.set("foo", child1);
 parent.children.set("bar", child2);
+// INPUT_END
 
 const args = process.argv.slice(2);
 const input = parent;
 
 if (args.includes("input")) {
+  const fs = await import("node:fs");
+  const data = fs.readFileSync(new URL(import.meta.url), "utf-8");
+  const re = new RegExp("// INPUT_START\n(.*)\n// INPUT_END", "s");
+  console.log(data.match(re)[1]);
+}
+
+if (args.includes("console")) {
   console.log(input);
 }
 
