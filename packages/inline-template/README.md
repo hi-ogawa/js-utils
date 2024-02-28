@@ -6,9 +6,7 @@ Inspired by [mdocs](https://github.com/brillout/mdocs),
 the primary purpose is to automatically update readme files,
 which typically contain sample code and its output.
 
-## usages
-
-TODO: add image?
+See how this `--help` is generated in [`./README.md`](./README.md?plain=1).
 
 <!--
 %template-input-start:1%
@@ -44,6 +42,5 @@ Options:
 
 ## examples
 
-- [`./README.md`](./README.md?plain=1)
-- [`packages/icheck-ts/README.md`](../icheck-ts/README.md?plain=1)
 - [`packages/json-extra/README.md`](../json-extra/README.md?plain=1)
+- [`packages/icheck-ts/README.md`](../icheck-ts/README.md?plain=1)
