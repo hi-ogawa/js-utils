@@ -34,7 +34,7 @@ $ inline-template --help
 
 ```txt
 $ inline-template --help
-inline-template/0.0.1-pre.4
+inline-template/0.0.1-pre.5
 
 Usage:
   $ inline-template [options] <file>
