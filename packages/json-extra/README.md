@@ -51,17 +51,13 @@ See `./misc/example.mjs`
 See `./misc/reference.mjs`
 
 ```js
-const parent = { children: new Map() };
-const child1 = { parent };
-const child2 = { parent, siblings: new Set([child1]) };
-parent.children.set("foo", child1);
-parent.children.set("bar", child2);
+{%shell node ./misc/reference.mjs input %}
 ```
 
 <details><summary>console.log</summary>
 
 ```js
-{%shell node ./misc/reference.mjs input %}
+{%shell node ./misc/reference.mjs console %}
 ```
 
 </details>
@@ -94,7 +90,7 @@ parent.children.set("bar", child2);
 See `./misc/example.mjs`
 
 ```js
-const input = [
+[
   // standard json value
   null,
   true,
