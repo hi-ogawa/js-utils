@@ -35,7 +35,7 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest",
-    "docs": "inline-template ./README.md && prettier -w ./README.md",
+    "docs-update": "inline-template ./README.md && prettier -w ./README.md",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
