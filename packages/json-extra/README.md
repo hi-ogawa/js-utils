@@ -1,10 +1,10 @@
 # json-extra
 
-Simple and trivial alternative for
+Simple alternative for
 [`@brillout/json-serializer`](https://github.com/brillout/json-serializer/),
 [`superjson`](https://github.com/blitz-js/superjson), etc...
 
-Core ideas are based on [`@brillout/json-serializer`](https://github.com/brillout/json-serializer/)
+The basic idea is based on [`@brillout/json-serializer`](https://github.com/brillout/json-serializer/)
 but it employs an array-based encoding for special values,
 which makes it easy to support custom types
 and also provides human-readibility for custom containers.
@@ -57,6 +57,14 @@ const child2 = { parent, siblings: new Set([child1]) };
 parent.children.set("foo", child1);
 parent.children.set("bar", child2);
 ```
+
+<details><summary>console.log</summary>
+
+```js
+{%shell node ./misc/reference.mjs input %}
+```
+
+</details>
 
 <details><summary>@hiogawa/json-extra</summary>
 
@@ -288,6 +296,19 @@ const child2 = { parent, siblings: new Set([child1]) };
 parent.children.set("foo", child1);
 parent.children.set("bar", child2);
 ```
+
+<details><summary>console.log</summary>
+
+```js
+<ref *1> {
+  children: Map(2) {
+    'foo' => { parent: [Circular *1] },
+    'bar' => { parent: [Circular *1], siblings: [Set] }
+  }
+}
+```
+
+</details>
 
 <details><summary>@hiogawa/json-extra</summary>
 
