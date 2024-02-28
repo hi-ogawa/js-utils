@@ -2,9 +2,20 @@
 
 A simple templating system where both template input and output can be managed in a single file.
 
-Inspired by [mdocs](https://github.com/brillout/mdocs),
-the primary purpose is to automatically update readme files,
-which typically contain sample code and its output.
+<!-- wrap <span>%</span> to avoid this code to be replaced -->
+<pre>
+<b><span>%</span>template-input-start:test%</b>
+
+  Some text and {%shell ... %}
+
+<b><span>%</span>template-input-end:test%</b>
+
+<b>%template-output-start:test%</b>
+
+  Anything inside this range will be replaced with above input and its shell code output
+
+<b>%template-output-end:test%</b>
+</pre>
 
 See how this `--help` is generated in [`./README.md`](./README.md?plain=1).
 
@@ -39,6 +50,10 @@ Options:
 ```
 
 <!-- %template-output-end:1% -->
+
+Inspired by [mdocs](https://github.com/brillout/mdocs),
+the primary purpose is to automatically update readme files,
+which typically contain sample code and its output.
 
 ## examples
 
