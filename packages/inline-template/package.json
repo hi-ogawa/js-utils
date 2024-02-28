@@ -18,6 +18,7 @@
     "build": "tsup",
     "cli": "node ./bin/cli.js",
     "cli-dev": "tsx ./src/cli.ts",
+    "docs-update": "inline-template ./README.md",
     "test": "vitest",
     "release": "pnpm publish --no-git-checks --access public"
   },
