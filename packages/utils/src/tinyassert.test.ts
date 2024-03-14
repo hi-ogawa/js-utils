@@ -20,7 +20,7 @@ describe(tinyassert, () => {
         .replaceAll(/ *$/gm, "") // trim trailing
         .replaceAll(process.cwd(), "__CWD__");
       expect(stack).toMatchInlineSnapshot(`
-        "Error:
+        "Error: TinyAssertionError
             at boom (__CWD__/src/tinyassert.test.ts:8:7)
             at __CWD__/src/tinyassert.test.ts:11:7"
       `);
@@ -52,7 +52,7 @@ describe(tinyassert, () => {
 
   it("error without message", () => {
     expect(() => tinyassert(false)).toThrowErrorMatchingInlineSnapshot(
-      `[Error]`
+      `[Error: TinyAssertionError]`
     );
   });
 
