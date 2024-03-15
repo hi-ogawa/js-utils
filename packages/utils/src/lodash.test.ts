@@ -613,6 +613,47 @@ describe(memoize, () => {
     `);
   });
 
+  it("this context", () => {
+    const f = vi.fn();
+    const context = {
+      x: 100,
+      g(y: number) {
+        f(y);
+        return this.x + y;
+      },
+    };
+    const memoG = memoize(context.g);
+    expect(memoG.apply(context, [10])).toMatchInlineSnapshot(`110`);
+    expect(f.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          10,
+        ],
+      ]
+    `);
+    expect(memoG.apply(context, [10])).toMatchInlineSnapshot(`110`);
+    expect(f.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          10,
+        ],
+      ]
+    `);
+    expect(memoG.apply({ ...context, x: 1000 }, [20])).toMatchInlineSnapshot(
+      `1020`
+    );
+    expect(f.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          10,
+        ],
+        [
+          20,
+        ],
+      ]
+    `);
+  });
+
   it("default cache key is 1st argument", () => {
     const f = vi.fn().mockImplementation((x: number, y: number) => x + y);
     const g = memoize(f);

@@ -163,9 +163,9 @@ export function isNotNil<T>(value: T): value is NonNullable<T> {
 export function once<F extends (...args: any[]) => any>(f: F): F {
   let result: ReturnType<F>;
   let called = false;
-  return safeFunctionCast<F>(function (...args) {
+  return safeFunctionCast<F>(function (this: unknown, ...args) {
     if (!called) {
-      result = f(...args);
+      result = f.apply(this, args);
       called = true;
     }
     return result;
@@ -185,7 +185,7 @@ export function memoize<F extends (...args: any[]) => any>(
   // by default, use 1st argument as a cache key which is same as lodash
   const keyFn = options?.keyFn ?? ((...args) => args[0]);
   const cache = options?.cache ?? new Map<unknown, ReturnType<F>>();
-  return safeFunctionCast<F>(function (...args) {
+  return safeFunctionCast<F>(function (this: unknown, ...args) {
     const key = keyFn(...args);
     // avoid `has/get` since they might not be atomic for some cache (e.g. ttl cache).
     // however, this logic means `undefined` value will not be cached.
@@ -193,7 +193,7 @@ export function memoize<F extends (...args: any[]) => any>(
     if (typeof value !== "undefined") {
       return value;
     }
-    const newValue = f(...args);
+    const newValue = f.apply(this, args);
     cache.set(key, newValue);
     return newValue;
   });
