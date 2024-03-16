@@ -55,10 +55,12 @@ async function main() {
 
   if (fs.existsSync(outDir)) {
     if (!force) {
-      console.log(`⊳ '${outDir}' already exists. --force is required to remove it.`);
+      console.log(
+        `⊳ '${outDir}' already exists. --force is required to remove it.`
+      );
       process.exit(1);
     }
-    console.log(`⊳ Removing '${outDir}' ...`)
+    console.log(`⊳ Removing '${outDir}' ...`);
     await fs.promises.rm(outDir, { recursive: true, force: true });
   }
 
@@ -79,7 +81,7 @@ async function main() {
   }
   await fs.promises.cp(path.join(tmpDir, subDir), outDir, { recursive: true });
   await fs.promises.rm(tmpDir, { recursive: true, force: true });
-  console.log("⊳ Finished!");
+  console.log(`⊳ Finished!`);
 }
 
 main();
