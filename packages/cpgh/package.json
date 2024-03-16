@@ -1,0 +1,32 @@
+{
+  "name": "cpgh",
+  "version": "0.0.2",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/cp-gh",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/cpgh"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bin": "./bin/cli.js",
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "cli": "tsx ./src/cli.ts",
+    "test": "vitest",
+    "docs-update": "inline-template ./README.md && prettier -w ./README.md",
+    "prepack": "tsup --clean",
+    "release": "pnpm publish --no-git-checks --access public"
+  },
+  "devDependencies": {
+    "@hiogawa/utils-node": "workspace:0.0.1-pre.14",
+    "@types/node": "^20.11.19"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}
