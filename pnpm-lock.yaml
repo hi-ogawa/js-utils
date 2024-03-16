@@ -68,12 +68,9 @@ importers:
 
   packages/cpgh:
     devDependencies:
-      '@hiogawa/tiny-cli':
-        specifier: workspace:*
-        version: link:../tiny-cli
-      '@hiogawa/utils':
-        specifier: workspace:*
-        version: link:../utils
+      '@hiogawa/utils-node':
+        specifier: workspace:0.0.1-pre.14
+        version: link:../utils-node
       '@types/node':
         specifier: ^20.11.19
         version: 20.11.19
