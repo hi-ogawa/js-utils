@@ -34,7 +34,7 @@ async function main() {
   }
 
   // TODO: decode url?
-  const [url, outDir] = args;
+  let [url, outDir] = args;
   const match = url.match(
     new RegExp(String.raw`^https://github.com/([^/]+)/([^/]+)/tree/(.*)$`)
   );
@@ -53,20 +53,23 @@ async function main() {
     subDir = splits.slice(1).join("/");
   }
 
+  outDir = path.resolve(outDir);
   if (fs.existsSync(outDir)) {
     if (!force) {
       console.log(
-        `⊳ '${outDir}' already exists. --force is required to remove it.`
+        `⊳ '${outDir}' already exists. --force is required to overwrite.`
       );
       process.exit(1);
     }
-    console.log(`⊳ Removing '${outDir}' ...`);
+    console.log(`⊳ '${outDir}' already exits. Continuing to overwrite...`);
     await fs.promises.rm(outDir, { recursive: true, force: true });
   }
 
+  // git clone to tmp dir
   const tmpDir = path.join(outDir, ".tmp-cpgh");
   await fs.promises.mkdir(tmpDir, { recursive: true });
-  console.log("⊳ Running git clone ...");
+
+  console.log("⊳ Running git clone...");
   if (subDir) {
     // https://stackoverflow.com/a/60729017
     await execp(
@@ -79,9 +82,11 @@ async function main() {
       `git clone --depth 1 https://github.com/${user}/${repo} --single-branch --branch ${branch} ${tmpDir}`
     );
   }
+
+  // copy from tmp dir
   await fs.promises.cp(path.join(tmpDir, subDir), outDir, { recursive: true });
   await fs.promises.rm(tmpDir, { recursive: true, force: true });
-  console.log(`⊳ Finished!`);
+  console.log(`⊳ Successfuly copied to '${outDir}'`);
 }
 
 main();
