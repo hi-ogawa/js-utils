@@ -1,6 +1,6 @@
 {
   "name": "cpgh",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/cp-gh",
   "repository": {
     "type": "git",
@@ -17,6 +17,7 @@
   "scripts": {
     "build": "tsup",
     "cli": "tsx ./src/cli.ts",
+    "docs-update": "inline-template ./README.md && prettier -w ./README.md",
     "prepack": "tsup --clean",
     "release": "pnpm publish --no-git-checks --access public"
   },

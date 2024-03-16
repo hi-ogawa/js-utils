@@ -13,9 +13,12 @@ ${name}@${version}
 Usage:
   npx cpgh https://github.com/<user>/<repo>/tree/<branch>/<subdir> <outdir>
 
+Options:
+  --force      Overwrite <outdir> if it exists
+  -h, --help   Show help
+
 Examples:
-  npx cpgh https://github.com/vitest-dev/vitest/tree/main/examples/basic my-app
-  npx cpgh https://github.com/vitest-dev/vitest/tree/this/is/branch[/]examples/basic my-app
+  npx cpgh https://github.com/vitest-dev/vitest/tree/main/examples/basic my-project
 `;
 
 async function main() {
