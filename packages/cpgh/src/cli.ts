@@ -20,11 +20,16 @@ Examples:
 
 async function main() {
   const args = process.argv.slice(2);
+  if (args.includes("-h") || args.includes("--help") || args.length === 0) {
+    console.log(HELP);
+    return;
+  }
+  const force = args.includes("--force");
+  if (force) {
+    args.splice(args.indexOf("--force"), 1);
+  }
   if (args.length !== 2) {
     console.log(HELP);
-    if (args.includes("-h") || args.includes("--help") || args.length === 0) {
-      return;
-    }
     process.exit(1);
   }
 
@@ -47,23 +52,34 @@ async function main() {
     branch = splits[0];
     subDir = splits.slice(1).join("/");
   }
-  subDir ||= "/";
 
-  // TODO: --force
   if (fs.existsSync(outDir)) {
-    console.log(`'${outDir}' already exists. use --force to overwrite it.`);
-    process.exit(1);
+    if (!force) {
+      console.log(`⊳ '${outDir}' already exists. --force is required to remove it.`);
+      process.exit(1);
+    }
+    console.log(`⊳ Removing '${outDir}' ...`)
+    await fs.promises.rm(outDir, { recursive: true, force: true });
   }
 
   const tmpDir = path.join(outDir, ".tmp-cpgh");
   await fs.promises.mkdir(tmpDir, { recursive: true });
-  await execp(
-    `git clone --sparse --no-checkout --filter=tree:0 --depth 1 https://github.com/${user}/${repo} --branch ${branch} ${tmpDir}`
-  );
-  await execp(`git -C ${tmpDir} sparse-checkout add ${subDir}`);
-  await execp(`git -C ${tmpDir} checkout`);
+  console.log("⊳ Running git clone ...");
+  if (subDir) {
+    // https://stackoverflow.com/a/60729017
+    await execp(
+      `git clone --sparse --no-checkout --filter=tree:0 --depth 1 https://github.com/${user}/${repo} --single-branch --branch ${branch} ${tmpDir}`
+    );
+    await execp(`git -C ${tmpDir} sparse-checkout add ${subDir}`);
+    await execp(`git -C ${tmpDir} checkout`);
+  } else {
+    await execp(
+      `git clone --depth 1 https://github.com/${user}/${repo} --single-branch --branch ${branch} ${tmpDir}`
+    );
+  }
   await fs.promises.cp(path.join(tmpDir, subDir), outDir, { recursive: true });
   await fs.promises.rm(tmpDir, { recursive: true, force: true });
+  console.log("⊳ Finished!");
 }
 
 main();
