@@ -107,7 +107,7 @@ async function main() {
 }
 
 function $(...args: string[]) {
-  console.log("▹▹▹ $ " + args.join(" "));
+  console.log("▹▹▹ " + args.join(" "));
   return new Promise<void>((resolve, reject) => {
     const proc = spawn(args[0], args.slice(1), { stdio: "inherit" });
     proc.on("close", (code) => {
