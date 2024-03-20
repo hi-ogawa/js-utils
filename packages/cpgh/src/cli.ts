@@ -12,11 +12,14 @@ Usage:
 
 Options:
   --force      Overwrite <outdir> if it exists
+  --verbose    Show logs from git command
   -h, --help   Show help
 
 Examples:
   npx cpgh https://github.com/vitest-dev/vitest/tree/main/examples/basic my-project
 `;
+
+let verbose = false;
 
 async function main() {
   const args = process.argv.slice(2);
@@ -27,6 +30,10 @@ async function main() {
   const force = args.includes("--force");
   if (force) {
     args.splice(args.indexOf("--force"), 1);
+  }
+  verbose = args.includes("--verbose");
+  if (verbose) {
+    args.splice(args.indexOf("--verbose"), 1);
   }
   if (args.length !== 2) {
     console.log(HELP);
@@ -107,9 +114,11 @@ async function main() {
 }
 
 function $(...args: string[]) {
-  console.log("▹▹▹ $ " + args.join(" "));
+  console.log("▹▹ $ " + args.join(" "));
   return new Promise<void>((resolve, reject) => {
-    const proc = spawn(args[0], args.slice(1), { stdio: "inherit" });
+    const proc = spawn(args[0], args.slice(1), {
+      stdio: verbose ? "inherit" : "ignore",
+    });
     proc.on("close", (code) => {
       if (code === 0) {
         resolve();
