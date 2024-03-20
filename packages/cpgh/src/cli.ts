@@ -1,11 +1,8 @@
-import { exec } from "node:child_process";
+import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { promisify } from "node:util";
 import { name, version } from "../package.json";
-
-const execp = promisify(exec);
 
 const HELP = `\
 ${name}@${version}
@@ -56,6 +53,7 @@ async function main() {
     subDir = splits.slice(1).join("/");
   }
 
+  // check --force
   outDir = path.resolve(outDir);
   if (fs.existsSync(outDir)) {
     if (!force) {
@@ -68,28 +66,61 @@ async function main() {
     await fs.promises.rm(outDir, { recursive: true, force: true });
   }
 
-  // git clone to tmp dir
   const tmpDir = path.join(outDir, ".tmp-cpgh");
   await fs.promises.mkdir(tmpDir, { recursive: true });
 
-  console.log("⊳ Running git clone...");
+  console.log("⊳ Running git ...");
   if (subDir) {
     // https://stackoverflow.com/a/60729017
-    await execp(
-      `git clone --sparse --no-checkout --filter=tree:0 --depth 1 https://github.com/${user}/${repo} --single-branch --branch ${branch} ${tmpDir}`
+    await $(
+      "git",
+      "clone",
+      "--sparse",
+      "--no-checkout",
+      "--filter=tree:0",
+      "--depth=1",
+      "--single-branch",
+      `--branch`,
+      branch,
+      `https://github.com/${user}/${repo}`,
+      tmpDir
     );
-    await execp(`git -C ${tmpDir} sparse-checkout add ${subDir}`);
-    await execp(`git -C ${tmpDir} checkout`);
+    await $("git", "-C", tmpDir, "sparse-checkout", "add", subDir);
+    await $("git", "-C", tmpDir, "checkout");
   } else {
-    await execp(
-      `git clone --depth 1 https://github.com/${user}/${repo} --single-branch --branch ${branch} ${tmpDir}`
+    await $(
+      "git",
+      "clone",
+      "--depth=1",
+      "--single-branch",
+      `--branch`,
+      branch,
+      `https://github.com/${user}/${repo}`,
+      tmpDir
     );
   }
 
   // copy from tmp dir
   await fs.promises.cp(path.join(tmpDir, subDir), outDir, { recursive: true });
   await fs.promises.rm(tmpDir, { recursive: true, force: true });
-  console.log(`⊳ Successfuly copied to '${outDir}'`);
+  console.log(`⊳ Successfully copied to '${outDir}'`);
+}
+
+function $(...args: string[]) {
+  console.log("▹▹ $ " + args.join(" "));
+  return new Promise<void>((resolve, reject) => {
+    const proc = spawn(args[0], args.slice(1), { stdio: "inherit" });
+    proc.on("close", (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error("Command failed with exit code: " + code));
+      }
+    });
+    proc.on("error", (e) => {
+      reject(e);
+    });
+  });
 }
 
 main();
