@@ -6,14 +6,16 @@ import { escapeRegExp } from "./regexp";
 export function createDebug(namespace: string) {
   const pattern = createDebugPattern(namespace);
   return (...args: unknown[]) => {
-    process.stderr.isTTY;
     const flag =
       globalThis.process?.env?.["DEBUG"] ?? (globalThis as any).__DEBUG;
     if (typeof flag === "string" && pattern.test(flag)) {
-      console.error(`⊳ ${namespace}`, ...args);
+      console.error(bold(`⊳ ${namespace}`), ...args);
     }
   };
 }
+
+const bold = (v: string) =>
+  process.stderr.isTTY ? `\u001B[1m${v}\u001B[22m` : v;
 
 export function createDebugPattern(namespace: string) {
   const parts = namespace.split(":");
