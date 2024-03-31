@@ -2,7 +2,7 @@
 //   ManualPromise https://github.com/microsoft/playwright/blob/10dda30c7f417a92f782e21368fbb211a679838a/packages/playwright-core/src/utils/manualPromise.ts#L31-L38
 //   createDefer https://github.com/vitest-dev/vitest/blob/9c552b6f8decb78677b20e870eb430184e0b78ea/packages/utils/src/helpers.ts#L155
 //   channel https://github.com/remix-run/remix/blob/9a845b6576fbaf112161f6f97295f6dbb44d913f/packages/remix-dev/channel.ts#L1-L2
-interface ManualPromise<T> extends PromiseLike<T> {
+export interface ManualPromise<T> extends PromiseLike<T> {
   promise: Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
   reject: (value: unknown) => void;
