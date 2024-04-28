@@ -19,7 +19,7 @@ $ npx @hiogawa/changelog --help
 
 ```txt
 $ npx @hiogawa/changelog --help
-changelog/0.0.0
+changelog/0.0.0-pre.0
 
 Usage:
   $ changelog [options]

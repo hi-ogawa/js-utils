@@ -8,6 +8,10 @@ import {
   type ParseArgsConfigExtra,
   generateParseArgsHelp,
 } from "@hiogawa/utils-node";
+import {
+  name as packageName,
+  version as packageVersion,
+} from "../package.json";
 
 // TODO:
 // - bump version prompt?
@@ -15,8 +19,8 @@ import {
 // - git tag / commit prompt?
 
 const parseArgsConfig = {
-  $program: "changelog",
-  $version: "0.0.0",
+  $program: packageName,
+  $version: packageVersion,
   options: {
     from: {
       type: "string",
