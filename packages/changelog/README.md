@@ -1,6 +1,6 @@
-# cpgh
+# changelog
 
-cli to copy github repo, similar to [degit](https://github.com/Rich-Harris/degit)
+Minimal `CHANGELOG.md` generator.
 
 ## usage
 
@@ -19,25 +19,18 @@ $ npx cpgh --help
 
 ```txt
 $ npx cpgh --help
-cpgh@0.0.3-pre.0
+changelog/0.0.0
 
 Usage:
-  npx cpgh https://github.com/<user>/<repo>/tree/<branch>/<subdir> <outdir>
+  $ changelog [options]
 
 Options:
-  --force      Overwrite <outdir> if it exists
-  -h, --help   Show help
-
-Examples:
-  npx cpgh https://github.com/vitest-dev/vitest/tree/main/examples/basic my-project
-  npx cpgh https://github.com/vitest-dev/vitest/tree/this/is/branch[/]examples/basic my-app
+  --from=...       (default: last commit modified CHANGELOG.md)
+  --to=...         (default: HEAD)
+  --dir=...        (default: process.cwd())
+  --dry
+  --removeScope
+  --help, -h
 ```
 
 <!-- %template-output-end:help% -->
-
-## development
-
-```sh
-pnpm cli https://github.com/vitest-dev/vitest/tree/main /tmp/cpgh-dev
-pnpm cli https://github.com/vitest-dev/vitest/tree/main/examples/basic /tmp/cpgh-dev
-```
