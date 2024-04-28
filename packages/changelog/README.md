@@ -19,10 +19,10 @@ $ npx @hiogawa/changelog --help
 
 ```txt
 $ npx @hiogawa/changelog --help
-@hiogawa/changelog/0.0.0-pre.0
+changelog/0.0.0-pre.0
 
 Usage:
-  $ @hiogawa/changelog [options]
+  $ changelog [options]
 
 Options:
   --from=...       (default: last commit modified CHANGELOG.md)
