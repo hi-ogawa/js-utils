@@ -34,3 +34,10 @@ Examples:
 ```
 
 <!-- %template-output-end:help% -->
+
+## development
+
+```sh
+pnpm cli https://github.com/vitest-dev/vitest/tree/main /tmp/cpgh-dev
+pnpm cli https://github.com/vitest-dev/vitest/tree/main/examples/basic /tmp/cpgh-dev
+```
