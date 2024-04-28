@@ -61,12 +61,12 @@ async function main() {
   if (!args.from && fs.existsSync(changelogPath)) {
     const { stdout } = await $(
       `git`,
-      [`log`, `--pretty=%H`, `-n=1`, `${changelogPath}`],
+      [`log`, `--pretty=%H`, `-1`, `${changelogPath}`],
       {
         cwd: args.dir,
       }
     );
-    args.from = stdout.trim();
+    args.from = stdout.trim() || undefined;
   }
 
   // collect git logs
