@@ -8,7 +8,7 @@ Minimal `CHANGELOG.md` generator.
 %template-input-start:help%
 
 ```txt
-$ npx cpgh --help
+$ npx @hiogawa/changelog --help
 {%shell node ./bin/cli.js --help %}
 ```
 
@@ -18,7 +18,7 @@ $ npx cpgh --help
 <!-- %template-output-start:help% -->
 
 ```txt
-$ npx cpgh --help
+$ npx @hiogawa/changelog --help
 changelog/0.0.0
 
 Usage:
