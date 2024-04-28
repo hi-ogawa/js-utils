@@ -16,6 +16,7 @@ Options:
 
 Examples:
   npx cpgh https://github.com/vitest-dev/vitest/tree/main/examples/basic my-project
+  npx cpgh https://github.com/vitest-dev/vitest/tree/this/is/branch[/]examples/basic my-app
 `;
 
 async function main() {
@@ -101,6 +102,10 @@ async function main() {
   }
 
   // copy from tmp dir
+  await fs.promises.rm(path.join(tmpDir, ".git"), {
+    recursive: true,
+    force: true,
+  });
   await fs.promises.cp(path.join(tmpDir, subDir), outDir, { recursive: true });
   await fs.promises.rm(tmpDir, { recursive: true, force: true });
   console.log(`⊳ Successfully copied to '${outDir}'`);

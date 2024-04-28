@@ -19,7 +19,7 @@ $ npx cpgh --help
 
 ```txt
 $ npx cpgh --help
-cpgh@0.0.1
+cpgh@0.0.3-pre.0
 
 Usage:
   npx cpgh https://github.com/<user>/<repo>/tree/<branch>/<subdir> <outdir>
@@ -29,8 +29,15 @@ Options:
   -h, --help   Show help
 
 Examples:
-  npx cpgh https://github.com/vitest-dev/vitest/tree/main/examples/basic my-app
+  npx cpgh https://github.com/vitest-dev/vitest/tree/main/examples/basic my-project
   npx cpgh https://github.com/vitest-dev/vitest/tree/this/is/branch[/]examples/basic my-app
 ```
 
 <!-- %template-output-end:help% -->
+
+## development
+
+```sh
+pnpm cli https://github.com/vitest-dev/vitest/tree/main /tmp/cpgh-dev
+pnpm cli https://github.com/vitest-dev/vitest/tree/main/examples/basic /tmp/cpgh-dev
+```

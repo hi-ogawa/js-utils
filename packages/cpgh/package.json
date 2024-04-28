@@ -22,10 +22,6 @@
     "prepack": "tsup --clean",
     "release": "pnpm publish --no-git-checks --access public"
   },
-  "devDependencies": {
-    "@hiogawa/utils-node": "workspace:0.0.1-pre.14",
-    "@types/node": "^20.11.19"
-  },
   "volta": {
     "extends": "../../package.json"
   }
