@@ -37,8 +37,8 @@
     "typescript": "^5.3.3",
     "vitest": "^1.3.1"
   },
-  "packageManager": "pnpm@8.15.4+sha256.cea6d0bdf2de3a0549582da3983c70c92ffc577ff4410cbf190817ddc35137c2",
+  "packageManager": "pnpm@9.0.6+sha512.f6d863130973207cb7a336d6b439a242a26ac8068077df530d6a86069419853dc1ffe64029ec594a9c505a3a410d19643c870aba6776330f5cfddcf10a9c1617",
   "volta": {
-    "node": "20.11.1"
+    "node": "20.12.2"
   }
 }
