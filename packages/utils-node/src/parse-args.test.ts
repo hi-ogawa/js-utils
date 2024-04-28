@@ -19,7 +19,6 @@ describe(generateParseArgsHelp, () => {
         },
         dir: {
           type: "string",
-          default: process.cwd(),
           $help: "(default: process.cwd())",
         },
         dry: {
