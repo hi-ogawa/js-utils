@@ -55,7 +55,6 @@ describe(generateParseArgsHelp, () => {
       {
         "positionals": [],
         "values": {
-          "dir": "/home/hiroshi/code/personal/js-utils/packages/utils-node",
           "help": true,
           "to": "HEAD",
         },
