@@ -16,6 +16,7 @@ Options:
 
 Examples:
   npx cpgh https://github.com/vitest-dev/vitest/tree/main/examples/basic my-project
+  npx cpgh https://github.com/vitest-dev/vitest/tree/this/is/branch[/]examples/basic my-app
 `;
 
 async function main() {
