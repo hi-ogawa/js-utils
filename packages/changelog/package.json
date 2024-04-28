@@ -1,0 +1,33 @@
+{
+  "name": "@hiogawa/changelog",
+  "version": "0.0.0-pre.0",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/changelog",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hi-ogawa/js-utils",
+    "directory": "packages/changelog"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bin": "./bin/cli.js",
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "cli": "tsx ./src/cli.ts",
+    "test": "vitest",
+    "docs-update": "inline-template ./README.md && prettier -w ./README.md",
+    "prepack": "tsup --clean",
+    "release": "pnpm publish --no-git-checks --access public"
+  },
+  "devDependencies": {
+    "@hiogawa/utils": "workspace:*",
+    "@hiogawa/utils-node": "workspace:*"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

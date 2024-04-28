@@ -11,6 +11,9 @@ importers:
       '@changesets/cli':
         specifier: ^2.26.2
         version: 2.26.2
+      '@hiogawa/changelog':
+        specifier: workspace:*
+        version: link:packages/changelog
       '@hiogawa/icheck-ts':
         specifier: workspace:*
         version: link:packages/icheck-ts
@@ -52,7 +55,7 @@ importers:
         version: 2.8.8
       tsup:
         specifier: ^8.0.2
-        version: 8.0.2(@swc/core@1.3.95)(typescript@5.3.3)
+        version: 8.0.2(@swc/core@1.3.95)(postcss@8.4.35)(typescript@5.3.3)
       tsx:
         specifier: ^4.7.1
         version: 4.7.1
@@ -64,7 +67,16 @@ importers:
         version: 5.3.3
       vitest:
         specifier: ^1.3.1
-        version: 1.3.1(@types/node@20.11.19)(@vitest/ui@1.3.1)
+        version: 1.3.1(@types/node@20.11.19)(@vitest/ui@1.3.1)(jsdom@22.1.0)
+
+  packages/changelog:
+    devDependencies:
+      '@hiogawa/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@hiogawa/utils-node':
+        specifier: workspace:*
+        version: link:../utils-node
 
   packages/cpgh: {}
 
@@ -124,13 +136,13 @@ importers:
     devDependencies:
       '@hiogawa/json-extra':
         specifier: latest
-        version: link:../..
+        version: 0.0.2-pre.5
       '@hiogawa/utils':
         specifier: latest
-        version: link:../../../utils
+        version: 1.6.4-pre.2
       '@hiogawa/vite-plugin-ssr-middleware':
         specifier: ^0.0.2
-        version: 0.0.2(vite@5.1.3)
+        version: 0.0.2(vite@5.1.3(@types/node@20.11.19))
       vite:
         specifier: ^5.1.3
         version: 5.1.3(@types/node@20.11.19)
@@ -178,7 +190,7 @@ importers:
         version: link:../..
       '@hiogawa/unocss-preset-antd':
         specifier: 2.2.1-pre.7
-        version: 2.2.1-pre.7(unocss@0.58.5)
+        version: 2.2.1-pre.7(unocss@0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19)))
       '@iconify-json/ri':
         specifier: ^1.1.10
         version: 1.1.10
@@ -196,7 +208,7 @@ importers:
         version: 18.2.0(react@18.2.0)
       unocss:
         specifier: ^0.58.5
-        version: 0.58.5(postcss@8.4.35)(vite@5.1.3)
+        version: 0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
       vite:
         specifier: ^5.1.3
         version: 5.1.3(@types/node@20.11.19)
@@ -247,7 +259,7 @@ importers:
         version: link:../..
       '@hiogawa/unocss-preset-antd':
         specifier: 2.2.1-pre.7
-        version: 2.2.1-pre.7(unocss@0.58.5)
+        version: 2.2.1-pre.7(unocss@0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19)))
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../../../utils
@@ -256,7 +268,7 @@ importers:
         version: 1.1.10
       unocss:
         specifier: ^0.58.5
-        version: 0.58.5(postcss@8.4.35)(vite@5.1.3)
+        version: 0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
       vite:
         specifier: ^5.1.3
         version: 5.1.3(@types/node@20.11.19)
@@ -280,7 +292,7 @@ importers:
         version: link:../..
       '@hiogawa/unocss-preset-antd':
         specifier: 2.2.1-pre.7
-        version: 2.2.1-pre.7(unocss@0.58.5)
+        version: 2.2.1-pre.7(unocss@0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19)))
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../../../utils
@@ -289,13 +301,13 @@ importers:
         version: link:../../../utils-hattip
       '@hiogawa/vite-import-dev-server':
         specifier: ^0.0.1
-        version: 0.0.1(vite@5.1.3)
+        version: 0.0.1(vite@5.1.3(@types/node@20.11.19))
       '@hiogawa/vite-null-export':
         specifier: ^0.0.0
-        version: 0.0.0(vite@5.1.3)
+        version: 0.0.0(vite@5.1.3(@types/node@20.11.19))
       '@hiogawa/vite-plugin-ssr-middleware':
         specifier: ^0.0.2
-        version: 0.0.2(vite@5.1.3)
+        version: 0.0.2(vite@5.1.3(@types/node@20.11.19))
       '@iconify-json/ri':
         specifier: ^1.1.10
         version: 1.1.10
@@ -310,7 +322,7 @@ importers:
         version: 4.18.2
       unocss:
         specifier: ^0.58.5
-        version: 0.58.5(postcss@8.4.35)(vite@5.1.3)
+        version: 0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
       vite:
         specifier: ^5.1.3
         version: 5.1.3(@types/node@20.11.19)
@@ -322,7 +334,7 @@ importers:
         version: link:../utils
       '@testing-library/react':
         specifier: ^14.0.0
-        version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
+        version: 14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/react':
         specifier: ^18.2.14
         version: 18.2.14
@@ -346,7 +358,7 @@ importers:
         version: link:../..
       '@hiogawa/unocss-preset-antd':
         specifier: 2.2.1-pre.3
-        version: 2.2.1-pre.3(@unocss/preset-uno@0.58.5)(unocss@0.58.5)
+        version: 2.2.1-pre.3(@unocss/preset-uno@0.58.5)(unocss@0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19)))
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../../../utils
@@ -367,7 +379,7 @@ importers:
         version: 18.2.0(react@18.2.0)
       unocss:
         specifier: ^0.58.5
-        version: 0.58.5(postcss@8.4.35)(vite@5.1.3)
+        version: 0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
       vite:
         specifier: ^5.1.3
         version: 5.1.3(@types/node@20.11.19)
@@ -418,10 +430,10 @@ importers:
         version: 0.0.34
       '@hiogawa/tiny-rpc':
         specifier: latest
-        version: link:../..
+        version: 0.2.3-pre.18
       '@hiogawa/vite-plugin-ssr-middleware':
         specifier: ^0.0.2
-        version: 0.0.2(vite@5.1.3)
+        version: 0.0.2(vite@5.1.3(@types/node@20.11.19))
       birpc:
         specifier: ^0.2.16
         version: 0.2.16
@@ -472,7 +484,7 @@ importers:
         version: link:../utils
       '@testing-library/react':
         specifier: ^14.0.0
-        version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
+        version: 14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@testing-library/user-event':
         specifier: ^14.4.3
         version: 14.4.3(@testing-library/dom@9.3.4)
@@ -500,7 +512,7 @@ importers:
     dependencies:
       '@hiogawa/utils-node':
         specifier: latest
-        version: link:../..
+        version: 0.0.1-pre.14
 
   packages/utils-react:
     devDependencies:
@@ -509,7 +521,7 @@ importers:
         version: link:../utils
       '@testing-library/react':
         specifier: ^14.0.0
-        version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
+        version: 14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@testing-library/user-event':
         specifier: ^14.4.3
         version: 14.4.3(@testing-library/dom@9.3.4)
@@ -1072,6 +1084,12 @@ packages:
       prettier:
         optional: true
 
+  '@hiogawa/json-extra@0.0.2-pre.5':
+    resolution: {integrity: sha512-etDSpw68MndoITYLQI1/Ti5ldxdL1U3Waa2Es2OgbvlN5+HIL8bcj93aK2WiKjNWtZw+anqPe8p2h8MId9XL5w==}
+
+  '@hiogawa/tiny-rpc@0.2.3-pre.18':
+    resolution: {integrity: sha512-BiNHrutG9G9yV622QvkxZxF+PhkaH2Aspp4/X1KYTfnaQTcg4fFUTBWf5Kf533swon2SuVJwi6U6H1LQbhVOQQ==}
+
   '@hiogawa/unocss-preset-antd@2.2.1-pre.3':
     resolution: {integrity: sha512-NjJ0uKIA6tqmDTXQkO52Hb83tBJjwjOCUx9cgodxiROjTCuEP+yfkmJyzMlDzfxRUl8DnHd8IijnZl2cAX7s9Q==}
     peerDependencies:
@@ -1082,6 +1100,12 @@ packages:
     resolution: {integrity: sha512-gwY0T8FpFzvHE3I2bShDFKRFAlf1dxgAeaLkfGy7VpNkVr7NkrS3hIUb3An95zAjQWSvgP90t+p1e8AaFW8oXw==}
     peerDependencies:
       unocss: '*'
+
+  '@hiogawa/utils-node@0.0.1-pre.14':
+    resolution: {integrity: sha512-Jx6kTxr5+RMy9hHIFqxGmt9EA7v+gKUHnLCHrbs+vwL7BItxCOJ1Oo4hcCJNyg8HbsxoTA7XWsEEinYRMYjR7w==}
+
+  '@hiogawa/utils@1.6.4-pre.2':
+    resolution: {integrity: sha512-t49f46YPtqOBHWdceDX1PKK8dhIemFzNCFx2KtfCVUx0W4rZ4TtAyVAKbh7mJmLh/yITr3gNb0SxkfNyOZy0hQ==}
 
   '@hiogawa/vite-import-dev-server@0.0.1':
     resolution: {integrity: sha512-E/OyLULlz+iNideyhbaKwg/n498WdWD7/tIT1VJAj3moVWNXBfoJMpKRc8BwmcQ8fFOWd7/DnLbS2KvxsNxeeg==}
@@ -4271,30 +4295,39 @@ snapshots:
 
   '@hiogawa/isort-ts@1.1.2-pre.1(prettier@2.8.8)(typescript@5.3.3)':
     dependencies:
-      prettier: 2.8.8
       typescript: 5.3.3
+    optionalDependencies:
+      prettier: 2.8.8
 
-  '@hiogawa/unocss-preset-antd@2.2.1-pre.3(@unocss/preset-uno@0.58.5)(unocss@0.58.5)':
+  '@hiogawa/json-extra@0.0.2-pre.5': {}
+
+  '@hiogawa/tiny-rpc@0.2.3-pre.18': {}
+
+  '@hiogawa/unocss-preset-antd@2.2.1-pre.3(@unocss/preset-uno@0.58.5)(unocss@0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19)))':
     dependencies:
       '@unocss/preset-uno': 0.58.5
       '@unocss/reset': 0.48.5
       local-pkg: 0.4.3
-      unocss: 0.58.5(postcss@8.4.35)(vite@5.1.3)
+      unocss: 0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
 
-  '@hiogawa/unocss-preset-antd@2.2.1-pre.7(unocss@0.58.5)':
+  '@hiogawa/unocss-preset-antd@2.2.1-pre.7(unocss@0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19)))':
     dependencies:
-      unocss: 0.58.5(postcss@8.4.35)(vite@5.1.3)
+      unocss: 0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
 
-  '@hiogawa/vite-import-dev-server@0.0.1(vite@5.1.3)':
+  '@hiogawa/utils-node@0.0.1-pre.14': {}
+
+  '@hiogawa/utils@1.6.4-pre.2': {}
+
+  '@hiogawa/vite-import-dev-server@0.0.1(vite@5.1.3(@types/node@20.11.19))':
     dependencies:
       vite: 5.1.3(@types/node@20.11.19)
 
-  '@hiogawa/vite-null-export@0.0.0(vite@5.1.3)':
+  '@hiogawa/vite-null-export@0.0.0(vite@5.1.3(@types/node@20.11.19))':
     dependencies:
       es-module-lexer: 1.3.1
       vite: 5.1.3(@types/node@20.11.19)
 
-  '@hiogawa/vite-plugin-ssr-middleware@0.0.2(vite@5.1.3)':
+  '@hiogawa/vite-plugin-ssr-middleware@0.0.2(vite@5.1.3(@types/node@20.11.19))':
     dependencies:
       vite: 5.1.3(@types/node@20.11.19)
 
@@ -4392,11 +4425,13 @@ snapshots:
 
   '@polka/url@1.0.0-next.24': {}
 
-  '@rollup/pluginutils@5.1.0':
+  '@rollup/pluginutils@5.1.0(rollup@4.12.0)':
     dependencies:
       '@types/estree': 1.0.5
       estree-walker: 2.0.2
       picomatch: 2.3.1
+    optionalDependencies:
+      rollup: 4.12.0
 
   '@rollup/rollup-android-arm-eabi@4.12.0':
     optional: true
@@ -4513,7 +4548,7 @@ snapshots:
       lz-string: 1.5.0
       pretty-format: 27.5.1
 
-  '@testing-library/react@14.0.0(react-dom@18.2.0)(react@18.2.0)':
+  '@testing-library/react@14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@babel/runtime': 7.22.5
       '@testing-library/dom': 9.3.1
@@ -4627,19 +4662,20 @@ snapshots:
     dependencies:
       '@types/node': 20.11.19
 
-  '@unocss/astro@0.58.5(vite@5.1.3)':
+  '@unocss/astro@0.58.5(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))':
     dependencies:
       '@unocss/core': 0.58.5
       '@unocss/reset': 0.58.5
-      '@unocss/vite': 0.58.5(vite@5.1.3)
+      '@unocss/vite': 0.58.5(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
+    optionalDependencies:
       vite: 5.1.3(@types/node@20.11.19)
     transitivePeerDependencies:
       - rollup
 
-  '@unocss/cli@0.58.5':
+  '@unocss/cli@0.58.5(rollup@4.12.0)':
     dependencies:
       '@ampproject/remapping': 2.2.1
-      '@rollup/pluginutils': 5.1.0
+      '@rollup/pluginutils': 5.1.0(rollup@4.12.0)
       '@unocss/config': 0.58.5
       '@unocss/core': 0.58.5
       '@unocss/preset-uno': 0.58.5
@@ -4765,10 +4801,10 @@ snapshots:
     dependencies:
       '@unocss/core': 0.58.5
 
-  '@unocss/vite@0.58.5(vite@5.1.3)':
+  '@unocss/vite@0.58.5(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))':
     dependencies:
       '@ampproject/remapping': 2.2.1
-      '@rollup/pluginutils': 5.1.0
+      '@rollup/pluginutils': 5.1.0(rollup@4.12.0)
       '@unocss/config': 0.58.5
       '@unocss/core': 0.58.5
       '@unocss/inspector': 0.58.5
@@ -4812,7 +4848,7 @@ snapshots:
       pathe: 1.1.2
       picocolors: 1.0.0
       sirv: 2.0.4
-      vitest: 1.3.1(@types/node@20.11.19)(@vitest/ui@1.3.1)
+      vitest: 1.3.1(@types/node@20.11.19)(@vitest/ui@1.3.1)(jsdom@22.1.0)
 
   '@vitest/utils@1.3.1':
     dependencies:
@@ -6235,10 +6271,12 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.2
 
-  postcss-load-config@4.0.2:
+  postcss-load-config@4.0.2(postcss@8.4.35):
     dependencies:
       lilconfig: 3.1.0
       yaml: 2.3.4
+    optionalDependencies:
+      postcss: 8.4.35
 
   postcss@8.4.35:
     dependencies:
@@ -6753,9 +6791,8 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
-  tsup@8.0.2(@swc/core@1.3.95)(typescript@5.3.3):
+  tsup@8.0.2(@swc/core@1.3.95)(postcss@8.4.35)(typescript@5.3.3):
     dependencies:
-      '@swc/core': 1.3.95
       bundle-require: 4.0.2(esbuild@0.19.12)
       cac: 6.7.14
       chokidar: 3.6.0
@@ -6764,12 +6801,15 @@ snapshots:
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
-      postcss-load-config: 4.0.2
+      postcss-load-config: 4.0.2(postcss@8.4.35)
       resolve-from: 5.0.0
       rollup: 4.12.0
       source-map: 0.8.0-beta.0
       sucrase: 3.35.0
       tree-kill: 1.2.2
+    optionalDependencies:
+      '@swc/core': 1.3.95
+      postcss: 8.4.35
       typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
@@ -6851,10 +6891,10 @@ snapshots:
 
   universalify@0.2.0: {}
 
-  unocss@0.58.5(postcss@8.4.35)(vite@5.1.3):
+  unocss@0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19)):
     dependencies:
-      '@unocss/astro': 0.58.5(vite@5.1.3)
-      '@unocss/cli': 0.58.5
+      '@unocss/astro': 0.58.5(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
+      '@unocss/cli': 0.58.5(rollup@4.12.0)
       '@unocss/core': 0.58.5
       '@unocss/extractor-arbitrary-variants': 0.58.5
       '@unocss/postcss': 0.58.5(postcss@8.4.35)
@@ -6872,7 +6912,8 @@ snapshots:
       '@unocss/transformer-compile-class': 0.58.5
       '@unocss/transformer-directives': 0.58.5
       '@unocss/transformer-variant-group': 0.58.5
-      '@unocss/vite': 0.58.5(vite@5.1.3)
+      '@unocss/vite': 0.58.5(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
+    optionalDependencies:
       vite: 5.1.3(@types/node@20.11.19)
     transitivePeerDependencies:
       - postcss
@@ -6922,21 +6963,19 @@ snapshots:
 
   vite@5.1.3(@types/node@20.11.19):
     dependencies:
-      '@types/node': 20.11.19
       esbuild: 0.19.12
       postcss: 8.4.35
       rollup: 4.12.0
     optionalDependencies:
+      '@types/node': 20.11.19
       fsevents: 2.3.3
 
-  vitest@1.3.1(@types/node@20.11.19)(@vitest/ui@1.3.1):
+  vitest@1.3.1(@types/node@20.11.19)(@vitest/ui@1.3.1)(jsdom@22.1.0):
     dependencies:
-      '@types/node': 20.11.19
       '@vitest/expect': 1.3.1
       '@vitest/runner': 1.3.1
       '@vitest/snapshot': 1.3.1
       '@vitest/spy': 1.3.1
-      '@vitest/ui': 1.3.1(vitest@1.3.1)
       '@vitest/utils': 1.3.1
       acorn-walk: 8.3.2
       chai: 4.4.1
@@ -6953,6 +6992,10 @@ snapshots:
       vite: 5.1.3(@types/node@20.11.19)
       vite-node: 1.3.1(@types/node@20.11.19)
       why-is-node-running: 2.2.2
+    optionalDependencies:
+      '@types/node': 20.11.19
+      '@vitest/ui': 1.3.1(vitest@1.3.1)
+      jsdom: 22.1.0
     transitivePeerDependencies:
       - less
       - lightningcss

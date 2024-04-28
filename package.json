@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
+    "@hiogawa/changelog": "workspace:*",
     "@hiogawa/icheck-ts": "workspace:*",
     "@hiogawa/inline-template": "workspace:*",
     "@hiogawa/isort-ts": "^1.1.2-pre.1",
