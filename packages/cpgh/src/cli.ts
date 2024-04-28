@@ -101,7 +101,10 @@ async function main() {
   }
 
   // copy from tmp dir
-  await fs.promises.rm(path.join(tmpDir, ".git"), { recursive: true, force: true });
+  await fs.promises.rm(path.join(tmpDir, ".git"), {
+    recursive: true,
+    force: true,
+  });
   await fs.promises.cp(path.join(tmpDir, subDir), outDir, { recursive: true });
   await fs.promises.rm(tmpDir, { recursive: true, force: true });
   console.log(`⊳ Successfully copied to '${outDir}'`);
