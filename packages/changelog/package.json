@@ -20,7 +20,7 @@
     "cli": "tsx ./src/cli.ts",
     "test": "vitest",
     "docs-update": "inline-template ./README.md && prettier -w ./README.md",
-    "prepack": "tsup --clean",
+    "prepack": "tsup --clean && pnpm docs-update",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
