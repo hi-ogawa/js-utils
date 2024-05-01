@@ -24,13 +24,15 @@ changelog/0.0.0-pre.0
 Usage:
   $ changelog [options]
 
+Generate or update CHANGELOG.md based on git commits
+
 Options:
-  --from=...       (default: last commit modified CHANGELOG.md)
-  --to=...         (default: HEAD)
-  --dir=...        (default: process.cwd())
+  --from           (default: last commit modified CHANGELOG.md)
+  --to             (default: HEAD)
+  --dir            (default: process.cwd())
   --dry
   --removeScope
-  --help, -h
+  -h, --help
 ```
 
 <!-- %template-output-end:help% -->

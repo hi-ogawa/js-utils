@@ -17,21 +17,22 @@ import { version as packageVersion } from "../package.json";
 
 const parseArgsConfig = {
   $program: "changelog",
+  $description: "Generate or update CHANGELOG.md based on git commits",
   $version: packageVersion,
   options: {
     from: {
       type: "string",
-      $help: "(default: last commit modified CHANGELOG.md)",
+      $description: "(default: last commit modified CHANGELOG.md)",
     },
     to: {
       type: "string",
       default: "HEAD",
-      $help: "(default: HEAD)",
+      $description: "(default: HEAD)",
     },
     dir: {
       type: "string",
       default: process.cwd(),
-      $help: "(default: process.cwd())",
+      $description: "(default: process.cwd())",
     },
     dry: {
       type: "boolean",
