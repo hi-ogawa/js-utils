@@ -5,24 +5,23 @@ import { type ParseArgsConfigExtra, generateParseArgsHelp } from "./parse-args";
 describe(generateParseArgsHelp, () => {
   it("basic", () => {
     const config = {
-      $program: "changelog",
+      $program: "my-changelog",
+      $command: "my-changelog [directory]",
+      $description:
+        "Generate CHANGELOG.md from git commits in the directory (default: process.cwd())",
       $version: "0.0.0",
+      allowPositionals: true,
       options: {
         from: {
           type: "string",
           $description: "(default: last commit modified CHANGELOG.md)",
-          $argument: "<commit>",
+          $argument: "[commit]",
         },
         to: {
           type: "string",
           default: "HEAD",
           $description: "(default: HEAD)",
-          $argument: "<commit>",
-        },
-        dir: {
-          type: "string",
-          $description: "(default: process.cwd())",
-          $argument: "<path>",
+          $argument: "[commit]",
         },
         dry: {
           type: "boolean",
@@ -35,15 +34,16 @@ describe(generateParseArgsHelp, () => {
     } satisfies ParseArgsConfigExtra;
 
     expect(generateParseArgsHelp(config)).toMatchInlineSnapshot(`
-      "changelog/0.0.0
+      "my-changelog/0.0.0
 
       Usage:
-        $ changelog [options]
+        $ my-changelog [directory]
+
+      Generate CHANGELOG.md from git commits in the directory (default: process.cwd())
 
       Options:
-        --from <commit>    (default: last commit modified CHANGELOG.md)
-        --to <commit>      (default: HEAD)
-        --dir <path>       (default: process.cwd())
+        --from [commit]    (default: last commit modified CHANGELOG.md)
+        --to [commit]      (default: HEAD)
         --dry
         -h, --help
 
@@ -51,14 +51,17 @@ describe(generateParseArgsHelp, () => {
     `);
 
     const args = parseArgs({
-      args: ["-h"],
+      args: ["packages/hello", "--dry", "--from", "HEAD^^"],
       ...config,
     });
     expect(args).toMatchInlineSnapshot(`
       {
-        "positionals": [],
+        "positionals": [
+          "packages/hello",
+        ],
         "values": {
-          "help": true,
+          "dry": true,
+          "from": "HEAD^^",
           "to": "HEAD",
         },
       }
