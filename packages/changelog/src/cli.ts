@@ -22,7 +22,7 @@ const parseArgsConfig = {
     dir: {
       type: "string",
       $description: "directory to write CHANGELOG.md (default: process.cwd())",
-      $argument: "<path>"
+      $argument: "<path>",
     },
     from: {
       type: "string",
