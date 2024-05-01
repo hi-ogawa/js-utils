@@ -28,19 +28,15 @@ Usage:
   }
   if (config.options) {
     const entries = Object.entries(config.options);
-    const table = entries.map(([k, v]) => [
+    const rows = entries.map(([k, v]) => [
       (v.short ? `-${v.short}, ` : "") +
         `--${k}` +
         (v.$argument ? ` ${v.$argument}` : ""),
       v.$description ?? "",
     ]);
-    const tableOutput = formatIndent(
-      padColumns(table).map((row) => row.join(" ".repeat(4)).trimEnd()),
-      2
-    );
     output += `\
 Options:
-${tableOutput}
+${formatIndent(formatRows(rows, 4), 2)}
 
 `;
   }
@@ -49,6 +45,11 @@ ${tableOutput}
 
 // copied from
 // https://github.com/hi-ogawa/js-utils/blob/9acdc281f344a92fca242ffadf791427f726b564/packages/tiny-cli/src/utils.ts#L15
+
+function formatRows(rows: string[][], space: number) {
+  return padColumns(rows).map((row) => row.join(" ".repeat(space)).trimEnd());
+}
+
 function padColumns(rows: string[][]): string[][] {
   if (rows.length === 0) {
     return rows;
