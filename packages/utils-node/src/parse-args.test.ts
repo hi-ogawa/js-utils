@@ -10,16 +10,19 @@ describe(generateParseArgsHelp, () => {
       options: {
         from: {
           type: "string",
-          $help: "(default: last commit modified CHANGELOG.md)",
+          $description: "(default: last commit modified CHANGELOG.md)",
+          $argument: "<commit>",
         },
         to: {
           type: "string",
           default: "HEAD",
-          $help: "(default: HEAD)",
+          $description: "(default: HEAD)",
+          $argument: "<commit>",
         },
         dir: {
           type: "string",
-          $help: "(default: process.cwd())",
+          $description: "(default: process.cwd())",
+          $argument: "<path>",
         },
         dry: {
           type: "boolean",
@@ -38,11 +41,11 @@ describe(generateParseArgsHelp, () => {
         $ changelog [options]
 
       Options:
-        --from=...    (default: last commit modified CHANGELOG.md)
-        --to=...      (default: HEAD)
-        --dir=...     (default: process.cwd())
+        --from <commit>    (default: last commit modified CHANGELOG.md)
+        --to <commit>      (default: HEAD)
+        --dir <path>       (default: process.cwd())
         --dry
-        --help, -h
+        -h, --help
 
       "
     `);

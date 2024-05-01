@@ -9,7 +9,8 @@ export interface ParseArgsConfigExtra extends ParseArgsConfig {
   $description?: string;
   options?: {
     [longOption: string]: ParseArgsOptionConfig & {
-      $help?: string;
+      $description?: string;
+      $argument?: string;
     };
   };
 }
@@ -32,10 +33,10 @@ Usage:
   if (config.options) {
     const entries = Object.entries(config.options);
     const table = entries.map(([k, v]) => [
-      `--${k}` +
-        (v.short ? `, -${v.short}` : "") +
-        (v.type === "string" ? "=..." : ""),
-      "$help" in v ? String(v.$help) : "",
+      (v.short ? `-${v.short}, ` : "") +
+        `--${k}` +
+        (v.$argument ? ` ${v.$argument}` : ""),
+      v.$description ?? "",
     ]);
     const tableOutput = formatIndent(
       padColumns(table).map((row) => row.join(" ".repeat(4)).trimEnd()),
