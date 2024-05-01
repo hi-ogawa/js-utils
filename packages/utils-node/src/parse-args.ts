@@ -5,6 +5,7 @@ import { range } from "@hiogawa/utils";
 
 export interface ParseArgsConfigExtra extends ParseArgsConfig {
   $program?: string;
+  $command?: string;
   $version?: string;
   $description?: string;
   options?: {
@@ -19,12 +20,12 @@ export interface ParseArgsConfigExtra extends ParseArgsConfig {
 type ParseArgsOptionConfig = NonNullable<ParseArgsConfig["options"]>[string];
 
 export function generateParseArgsHelp(config: ParseArgsConfigExtra) {
-  const { $program = "my-cli", $version, $description } = config;
+  const { $program = "my-cli", $command, $version, $description } = config;
   let output = `\
 ${[$program, $version].filter(Boolean).join("/")}
 
 Usage:
-  $ ${$program} [options]
+  $ ${$command ?? `${$program} [options]`}
 
 `;
   if ($description) {
