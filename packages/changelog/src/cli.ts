@@ -3,7 +3,6 @@ import fs from "node:fs";
 import { resolve } from "node:path";
 import process from "node:process";
 import { parseArgs, promisify } from "node:util";
-import { tinyassert } from "@hiogawa/utils";
 import {
   type ParseArgsConfigExtra,
   generateParseArgsHelp,
@@ -26,12 +25,10 @@ const parseArgsConfig = {
     },
     to: {
       type: "string",
-      default: "HEAD",
       $description: "(default: HEAD)",
     },
     dir: {
       type: "string",
-      default: process.cwd(),
       $description: "(default: process.cwd())",
     },
     dry: {
@@ -48,14 +45,16 @@ const parseArgsConfig = {
 } satisfies ParseArgsConfigExtra;
 
 async function main() {
-  const { values: args } = parseArgs(parseArgsConfig);
+  const parsed = parseArgs(parseArgsConfig);
+  const args = {
+    ...parsed.values,
+    dir: parsed.values.dir ?? process.cwd(),
+    to: parsed.values.to ?? "HEAD",
+  };
   if (args.help) {
     console.log(generateParseArgsHelp(parseArgsConfig));
     process.exit(0);
   }
-  // TODO: options[key].default not inferred?
-  tinyassert(args.dir);
-  tinyassert(args.to);
 
   // find last commit modified changelog
   const changelogPath = resolve(args.dir, "CHANGELOG.md");
