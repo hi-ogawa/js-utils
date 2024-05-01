@@ -19,17 +19,20 @@ const parseArgsConfig = {
   $description: "Generate or update CHANGELOG.md based on git commits",
   $version: packageVersion,
   options: {
+    dir: {
+      type: "string",
+      $description: "directory to write CHANGELOG.md (default: process.cwd())",
+      $argument: "<path>"
+    },
     from: {
       type: "string",
       $description: "(default: last commit modified CHANGELOG.md)",
+      $argument: "<commit>",
     },
     to: {
       type: "string",
       $description: "(default: HEAD)",
-    },
-    dir: {
-      type: "string",
-      $description: "(default: process.cwd())",
+      $argument: "<commit>",
     },
     dry: {
       type: "boolean",

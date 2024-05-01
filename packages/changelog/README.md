@@ -27,9 +27,9 @@ Usage:
 Generate or update CHANGELOG.md based on git commits
 
 Options:
-  --from           (default: last commit modified CHANGELOG.md)
-  --to             (default: HEAD)
-  --dir            (default: process.cwd())
+  --dir <path>       directory to write CHANGELOG.md (default: process.cwd())
+  --from <commit>    (default: last commit modified CHANGELOG.md)
+  --to <commit>      (default: HEAD)
   --dry
   --removeScope
   -h, --help
