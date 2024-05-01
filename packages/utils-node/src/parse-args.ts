@@ -7,15 +7,12 @@ export interface ParseArgsConfigExtra extends ParseArgsConfig {
   $version?: string;
   $description?: string;
   options?: {
-    [longOption: string]: ParseArgsOptionConfig & {
+    [longOption: string]: NonNullable<ParseArgsConfig["options"]>[string] & {
       $description?: string;
       $argument?: string;
     };
   };
 }
-
-// not exported
-type ParseArgsOptionConfig = NonNullable<ParseArgsConfig["options"]>[string];
 
 export function generateParseArgsHelp(config: ParseArgsConfigExtra) {
   const { $program = "my-cli", $command, $version, $description } = config;
