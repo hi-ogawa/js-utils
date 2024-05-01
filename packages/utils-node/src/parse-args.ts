@@ -1,8 +1,6 @@
 import type { ParseArgsConfig } from "node:util";
 import { range } from "@hiogawa/utils";
 
-// TOOD: positional?
-
 export interface ParseArgsConfigExtra extends ParseArgsConfig {
   $program?: string;
   $command?: string;
