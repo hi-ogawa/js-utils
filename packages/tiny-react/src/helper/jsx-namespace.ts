@@ -1,3 +1,4 @@
+import type { RNode } from "../serialize/types";
 import type {
   ComponentChildren,
   ComponentType,
@@ -29,10 +30,10 @@ import type {
 export namespace JSX {
   // constraint what's usable as jsx element tag e.g. <div /> <Component ... />
   // `keyof IntrinsicElements` further constraints intrinsic tags
-  export type ElementType = ComponentType;
+  export type ElementType = ComponentType | ((props: any) => Promise<VNode>);
 
   // type of JSX element e.g. <div /> <Component />
-  export type Element = VNode;
+  export type Element = VNode & RNode;
 
   // not sure what these are for...
   export interface ElementClass {}

@@ -8,12 +8,7 @@ export default async function Page() {
       <pre>server time: {new Date().toISOString()}</pre>
       <pre>typeof window: {typeof window}</pre>
       <ClientComponent />
-      <InterleaveComponent
-        serverNode={
-          // @ts-expect-error
-          <ServerNode />
-        }
-      />
+      <InterleaveComponent serverNode={<ServerNode />} />
     </div>
   );
 }

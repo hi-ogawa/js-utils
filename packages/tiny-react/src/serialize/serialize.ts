@@ -24,6 +24,7 @@ import {
 // serialize
 //
 
+// TODO: also return collected references
 export async function serializeNode(rnode: RNode): Promise<SNode> {
   return new SerializeManager().serialize(rnode);
 }

@@ -9,10 +9,7 @@ import Page from "./routes/page";
 
 export async function handler(_request: Request) {
   // serialize server component and pass it to SSR and CSR
-  // @ts-ignore TODO: typing
-  const rnode = <Page />;
-  // @ts-ignore
-  const snode = await serializeNode(rnode);
+  const snode = await serializeNode(<Page />);
 
   // SSR
   const vnode = deserializeNode(snode, referenceMap);
