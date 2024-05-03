@@ -1,6 +1,7 @@
 import { sleep } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
 import { h } from "../helper/hyperscript";
+import { render } from "../reconciler";
 import type { VNode } from "../virtual-dom";
 import { deserializeNode, serializeNode } from "./serialize";
 import type { RNode } from "./types";
@@ -66,6 +67,24 @@ describe(serializeNode, () => {
         "type": "tag",
       }
     `);
+
+    const node = document.createElement("main");
+    render(vnode, node);
+    expect(node).toMatchInlineSnapshot(`
+      <main>
+        <div
+          ariacurrent=""
+          class="flex"
+        >
+          hello
+          <span
+            title="foo"
+          >
+            world
+          </span>
+        </div>
+      </main>
+    `);
   });
 
   it("async", async () => {
@@ -111,6 +130,18 @@ describe(serializeNode, () => {
         },
         "type": "tag",
       }
+    `);
+
+    const node = document.createElement("main");
+    render(vnode, node);
+    expect(node).toMatchInlineSnapshot(`
+      <main>
+        <div>
+          <span>
+            {"prop":123}
+          </span>
+        </div>
+      </main>
     `);
   });
 
@@ -176,6 +207,22 @@ describe(serializeNode, () => {
         },
         "type": "tag",
       }
+    `);
+
+    const node = document.createElement("main");
+    render(vnode, node);
+    expect(node).toMatchInlineSnapshot(`
+      <main>
+        <div
+          id="server"
+        >
+          <div
+            id="client-inner"
+          >
+            <span />
+          </div>
+        </div>
+      </main>
     `);
   });
 
@@ -265,6 +312,26 @@ describe(serializeNode, () => {
         "render": [Function],
         "type": "custom",
       }
+    `);
+
+    const node = document.createElement("main");
+    render(vnode, node);
+    expect(node).toMatchInlineSnapshot(`
+      <main>
+        <div
+          id="client-outer"
+        >
+          <div
+            id="server"
+          >
+            <div
+              id="client-inner"
+            >
+              <span />
+            </div>
+          </div>
+        </div>
+      </main>
     `);
   });
 });
