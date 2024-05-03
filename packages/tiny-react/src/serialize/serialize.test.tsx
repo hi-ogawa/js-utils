@@ -23,27 +23,18 @@ describe(serializeNode, () => {
         "name": "div",
         "props": {
           "ariaCurrent": "",
-          "children": {
-            "children": [
-              {
-                "data": "hello",
-                "type": "text",
+          "children": [
+            "hello",
+            {
+              "key": undefined,
+              "name": "span",
+              "props": {
+                "children": "world",
+                "title": "foo",
               },
-              {
-                "key": undefined,
-                "name": "span",
-                "props": {
-                  "children": {
-                    "data": "world",
-                    "type": "text",
-                  },
-                  "title": "foo",
-                },
-                "type": "tag",
-              },
-            ],
-            "type": "fragment",
-          },
+              "type": "tag",
+            },
+          ],
           "className": "flex",
         },
         "type": "tag",
@@ -66,10 +57,7 @@ describe(serializeNode, () => {
             "key": undefined,
             "name": "span",
             "props": {
-              "children": {
-                "data": "{"prop":123}",
-                "type": "text",
-              },
+              "children": "{"prop":123}",
             },
             "type": "tag",
           },
@@ -119,8 +107,6 @@ describe(serializeNode, () => {
   });
 
   it("interleave", async () => {
-    // TODO: reference props needs to be serialized to support interleave
-
     async function Server(props: { clientInner: VNode }) {
       return h.div({ id: "server" }, props.clientInner);
     }
@@ -148,8 +134,9 @@ describe(serializeNode, () => {
         "props": {
           "server": {
             "key": undefined,
+            "name": "div",
             "props": {
-              "clientInner": {
+              "children": {
                 "id": "#ClientInner",
                 "key": undefined,
                 "props": {
@@ -162,9 +149,9 @@ describe(serializeNode, () => {
                 },
                 "type": "reference",
               },
+              "id": "server",
             },
-            "render": [Function],
-            "type": "custom",
+            "type": "tag",
           },
         },
         "type": "reference",

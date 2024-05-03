@@ -1,10 +1,13 @@
-import type {
+import { objectHas } from "@hiogawa/utils";
+import {
   NODE_TYPE_CUSTOM,
+  NODE_TYPE_EMPTY,
   NODE_TYPE_FRAGMENT,
   NODE_TYPE_TAG,
-  NodeKey,
-  VEmpty,
-  VText,
+  NODE_TYPE_TEXT,
+  type NodeKey,
+  type VEmpty,
+  type VText,
 } from "../virtual-dom";
 
 //
@@ -55,6 +58,18 @@ export type RReference = {
   id: string;
 };
 
+export function isRNode(v: unknown): v is RNode {
+  return (
+    objectHas(v, "type") &&
+    (v.type === NODE_TYPE_EMPTY ||
+      v.type === NODE_TYPE_TEXT ||
+      v.type === NODE_TYPE_TAG ||
+      v.type === NODE_TYPE_CUSTOM ||
+      v.type === NODE_TYPE_FRAGMENT ||
+      v.type === NODE_TYPE_REFERENCE)
+  );
+}
+
 // TODO: generic ComponentChild
 export type RComponentChild =
   | RNode
@@ -79,7 +94,7 @@ export type STag = {
   key?: NodeKey;
   name: string; // tagName
   props: Record<string, unknown> & {
-    children?: SNode;
+    children?: SComponentChildren;
   };
 };
 
