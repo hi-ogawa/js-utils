@@ -417,5 +417,4 @@ describe(serializeNode, () => {
       </main>
     `);
   });
-
 });

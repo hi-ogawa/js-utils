@@ -29,9 +29,7 @@ export type RTag = {
   type: typeof NODE_TYPE_TAG;
   key?: NodeKey;
   name: string; // tagName
-  props: Record<string, unknown> & {
-    children: RComponentChildren;
-  };
+  props: Record<string, unknown>;
 };
 
 export type RText = VText;
@@ -64,17 +62,6 @@ export function isSNode(v: unknown): v is SNode {
   return isRNode(v);
 }
 
-// TODO: generic ComponentChild
-export type RComponentChild =
-  | RNode
-  | string
-  | number
-  | null
-  | undefined
-  | boolean;
-
-export type RComponentChildren = RComponentChild | RComponentChildren[];
-
 //
 // serialized node
 //
@@ -87,9 +74,7 @@ export type STag = {
   type: typeof NODE_TYPE_TAG;
   key?: NodeKey;
   name: string; // tagName
-  props: Record<string, unknown> & {
-    children?: SComponentChildren;
-  };
+  props: Record<string, unknown>;
 };
 
 export type SText = VText;
@@ -106,13 +91,3 @@ export type SReference = {
   props: {};
   id: string;
 };
-
-export type SComponentChild =
-  | SNode
-  | string
-  | number
-  | null
-  | undefined
-  | boolean;
-
-export type SComponentChildren = SComponentChild | SComponentChildren[];
