@@ -25,8 +25,13 @@ export function ClientComponent() {
     </div>
   );
 }
-export function InterleaveComponent() {
-  return <div data-testid="interleave-component"></div>;
+export function InterleaveComponent(props: { serverNode: any }) {
+  return (
+    <div data-testid="interleave-component">
+      <h4>{"Interleave server -> client -> server"}</h4>
+      <div>props.serverNode: {props.serverNode}</div>
+    </div>
+  );
 }
 
 // TODO: tranform
