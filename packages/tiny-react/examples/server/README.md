@@ -1,6 +1,6 @@
 # tiny-react server demo
 
-- https://tiny-react-server-hiro18181.vercel.app/
+https://tiny-react-server.hiro18181.workers.dev
 
 ```sh
 pnpm dev
