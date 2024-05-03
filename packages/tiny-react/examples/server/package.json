@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "vite --no-clearScreen",
     "build": "vite build && vite build --ssr",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cf-build": "SERVER_ENTRY=/src/adapters/cloudflare-workers.ts pnpm build && bash misc/cloudflare-workers/build.sh",
+    "cf-preview": "cd misc/cloudflare-workers && wrangler dev",
+    "cf-release": "cd misc/cloudflare-workers && wrangler deploy"
   },
   "devDependencies": {
     "@hattip/adapter-node": "^0.0.34",

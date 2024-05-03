@@ -6,7 +6,7 @@ export default defineConfig((env) => ({
   clearScreen: false,
   plugins: [
     vitePluginSsrMiddleware({
-      entry: process.env["SSR_ENTRY"] ?? "/src/adapter/node.ts",
+      entry: process.env["SERVER_ENTRY"] ?? "/src/adapters/node.ts",
       preview: resolve("dist/server/index.js"),
     }),
     {
