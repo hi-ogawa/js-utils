@@ -1,4 +1,4 @@
-import type { ParseArgsConfig } from "node:util";
+import { type ParseArgsConfig, parseArgs } from "node:util";
 import { range } from "@hiogawa/utils";
 
 export interface ParseArgsConfigExtra extends ParseArgsConfig {
@@ -12,6 +12,23 @@ export interface ParseArgsConfigExtra extends ParseArgsConfig {
       $argument?: string;
     };
   };
+}
+
+export function runParseArgs<T extends ParseArgsConfigExtra, U>(
+  config: T,
+  action: (parsed: ReturnType<typeof parseArgs<T>>) => U
+) {
+  (config.options ??= {})["help"] = {
+    type: "boolean",
+    short: "-h",
+    $description: "",
+  };
+  const parsed = parseArgs(config);
+  if ("help" in parsed.values && parsed.values["help"]) {
+    console.log(generateParseArgsHelp(config));
+    return;
+  }
+  return action(parsed);
 }
 
 export function generateParseArgsHelp(config: ParseArgsConfigExtra) {
