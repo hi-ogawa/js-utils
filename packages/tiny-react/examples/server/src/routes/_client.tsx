@@ -28,17 +28,26 @@ export function ClientComponent() {
 export function InterleaveComponent(props: { serverNode: JSX.Element }) {
   return (
     <div data-testid="interleave-component">
-      <h4>{"Interleave server -> client -> server"}</h4>
-      <div>props.serverNode: {props.serverNode}</div>
+      <h4>Interleave server and client</h4>
+      <div>{props.serverNode}</div>
+      <div>
+        <ClientNode serverNode={props.serverNode} />
+      </div>
     </div>
   );
+}
+
+export function ClientNode(props: { serverNode: JSX.Element }) {
+  return <span>[props.serverNode: {props.serverNode}]</span>;
 }
 
 // TODO: tranform
 Object.assign(ClientComponent, { $$id: "ClientComponent" });
 Object.assign(InterleaveComponent, { $$id: "InterleaveComponent" });
+Object.assign(ClientNode, { $$id: "ClientNode" });
 
 export const referenceMap = {
   ClientComponent,
   InterleaveComponent,
+  ClientNode,
 };
