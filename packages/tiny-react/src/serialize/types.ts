@@ -11,10 +11,10 @@ import {
 } from "../virtual-dom";
 
 //
-// server component serialization
+// server component (de)serialization
 //
-//   RNode --> SNode --> VNode
-//              (+ reference map)
+//   RNode --(ser)--> SNode --(de)--> VNode    ---(csr)--> BNode
+//                          (+ reference map)  \--(ssr)--> string
 //
 
 export const NODE_TYPE_REFERENCE = "reference" as const;
