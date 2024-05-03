@@ -6,20 +6,25 @@ import {
 import type { ViteDevServer } from "vite";
 import Page from "./routes/page";
 
+// TODO: reference map
+
 export async function handler(_request: Request) {
-  // serialize server component
+  // serialize server component and pass it to SSR and CSR
   // @ts-ignore;
   const rnode = <Page />;
   // @ts-ignore
   const snode = await serializeNode(rnode);
 
-  // TODO: reference map
-  // TODO: handoff snode to clent for hydration
+  // SSR
   const vnode = deserializeNode(snode, {});
   const ssrHtml = renderToString(vnode);
 
   let html = await importHtmlTemplate();
   html = html.replace("<body>", `<body><div id="root">${ssrHtml}</div>`);
+  html = html.replace(
+    "<head>",
+    `<head><script>globalThis.__snode = ${JSON.stringify(snode)}</script>`
+  );
   return new Response(html, {
     headers: {
       "content-type": "text/html",
