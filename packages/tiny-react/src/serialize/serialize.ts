@@ -10,7 +10,6 @@ import {
   type VTag,
 } from "../virtual-dom";
 import {
-  NODE_TYPE_REFERENCE,
   type RNode,
   type SFragment,
   type SNode,
@@ -24,7 +23,7 @@ import {
 // serialize
 //
 
-// TODO: also return collected references
+// TODO: also return collected references?
 export async function serializeNode(rnode: RNode): Promise<SNode> {
   return new SerializeManager().serialize(rnode);
 }
@@ -33,17 +32,20 @@ class SerializeManager {
   async serialize(node: RNode): Promise<SNode> {
     if (node.type === NODE_TYPE_EMPTY || node.type === NODE_TYPE_TEXT) {
       return node;
-    } else if (node.type === NODE_TYPE_REFERENCE) {
-      return {
-        ...node,
-        props: await this.serializeProps(node.props),
-      } satisfies SReference;
     } else if (node.type === NODE_TYPE_TAG) {
       return {
         ...node,
         props: await this.serializeProps(node.props),
       } satisfies STag;
     } else if (node.type === NODE_TYPE_CUSTOM) {
+      if (node.render.$$id) {
+        return {
+          type: node.type,
+          key: node.key,
+          props: await this.serializeProps(node.props),
+          id: node.render.$$id,
+        } satisfies SReference;
+      }
       const { render, props } = node;
       const child = await render(props);
       return this.serialize(child);
@@ -117,9 +119,9 @@ class DeserializeManager {
   deserialize(node: SNode): VNode {
     if (node.type === NODE_TYPE_EMPTY || node.type === NODE_TYPE_TEXT) {
       return node;
-    } else if (node.type === NODE_TYPE_REFERENCE) {
+    } else if (node.type === NODE_TYPE_CUSTOM) {
       return {
-        type: NODE_TYPE_CUSTOM,
+        type: node.type,
         key: node.key,
         props: this.deserializeProps(node.props),
         render: this.referenceMap[node.id] as any,

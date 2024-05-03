@@ -1,5 +1,4 @@
 import type { HookContext } from "./hooks";
-import { NODE_TYPE_REFERENCE, type RReference } from "./serialize/types";
 
 //
 // host/virtual/bundle node types and helper
@@ -194,15 +193,6 @@ export function createVNode(
     } satisfies VTag;
   }
   if (typeof tag === "function") {
-    // TODO: rework typing
-    if ("$$id" in tag) {
-      return {
-        type: NODE_TYPE_REFERENCE,
-        key,
-        props,
-        id: tag.$$id as string,
-      } satisfies RReference as any as VNode;
-    }
     return {
       type: NODE_TYPE_CUSTOM,
       render: tag,

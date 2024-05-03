@@ -176,7 +176,7 @@ describe(serializeNode, () => {
                 "type": "tag",
               },
             },
-            "type": "reference",
+            "type": "custom",
           },
           "id": "server",
         },
@@ -268,14 +268,14 @@ describe(serializeNode, () => {
                     "type": "tag",
                   },
                 },
-                "type": "reference",
+                "type": "custom",
               },
               "id": "server",
             },
             "type": "tag",
           },
         },
-        "type": "reference",
+        "type": "custom",
       }
     `);
 
@@ -334,4 +334,88 @@ describe(serializeNode, () => {
       </main>
     `);
   });
+
+  it("client in client", async () => {
+    function ClientOuter(props: { inner: VNode }) {
+      return h.div({ id: "client-outer" }, props.inner);
+    }
+
+    function ClientInner(props: { inner: VNode }) {
+      return h.div({ id: "client-inner" }, props.inner);
+    }
+
+    Object.assign(ClientOuter, { $$id: "#ClientOuter" });
+    Object.assign(ClientInner, { $$id: "#ClientInner" });
+
+    const rnode = h(ClientOuter, {
+      inner: h(ClientInner, { inner: h.span({}) }),
+    });
+    const snode = await serializeNode(rnode as RNode);
+    expect(snode).toMatchInlineSnapshot(`
+      {
+        "id": "#ClientOuter",
+        "key": undefined,
+        "props": {
+          "inner": {
+            "id": "#ClientInner",
+            "key": undefined,
+            "props": {
+              "inner": {
+                "key": undefined,
+                "name": "span",
+                "props": {},
+                "type": "tag",
+              },
+            },
+            "type": "custom",
+          },
+        },
+        "type": "custom",
+      }
+    `);
+
+    const vnode = deserializeNode(snode, {
+      "#ClientOuter": ClientOuter,
+      "#ClientInner": ClientInner,
+    });
+    expect(vnode).toMatchInlineSnapshot(`
+      {
+        "key": undefined,
+        "props": {
+          "inner": {
+            "key": undefined,
+            "props": {
+              "inner": {
+                "key": undefined,
+                "name": "span",
+                "props": {},
+                "type": "tag",
+              },
+            },
+            "render": [Function],
+            "type": "custom",
+          },
+        },
+        "render": [Function],
+        "type": "custom",
+      }
+    `);
+
+    const node = document.createElement("main");
+    render(vnode, node);
+    expect(node).toMatchInlineSnapshot(`
+      <main>
+        <div
+          id="client-outer"
+        >
+          <div
+            id="client-inner"
+          >
+            <span />
+          </div>
+        </div>
+      </main>
+    `);
+  });
+
 });

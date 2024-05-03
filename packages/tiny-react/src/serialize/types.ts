@@ -17,13 +17,11 @@ import {
 //                          (+ reference map)  \--(ssr)--> string
 //
 
-export const NODE_TYPE_REFERENCE = "reference" as const;
-
 //
 // raw node
 //
 
-export type RNode = REmpty | RTag | RText | RFragment | RCustom | SReference;
+export type RNode = REmpty | RTag | RText | RFragment | RCustom;
 
 export type REmpty = VEmpty;
 
@@ -42,20 +40,13 @@ export type RCustom = {
   type: typeof NODE_TYPE_CUSTOM;
   key?: NodeKey;
   props: {};
-  render: (props: {}) => Promise<RNode> | RNode;
+  render: ((props: {}) => Promise<RNode> | RNode) & { $$id?: string };
 };
 
 export type RFragment = {
   type: typeof NODE_TYPE_FRAGMENT;
   key?: NodeKey;
   children: RNode[];
-};
-
-export type RReference = {
-  type: typeof NODE_TYPE_REFERENCE;
-  key?: NodeKey;
-  props: {};
-  id: string;
 };
 
 export function isRNode(v: unknown): v is RNode {
@@ -65,20 +56,12 @@ export function isRNode(v: unknown): v is RNode {
       v.type === NODE_TYPE_TEXT ||
       v.type === NODE_TYPE_TAG ||
       v.type === NODE_TYPE_CUSTOM ||
-      v.type === NODE_TYPE_FRAGMENT ||
-      v.type === NODE_TYPE_REFERENCE)
+      v.type === NODE_TYPE_FRAGMENT)
   );
 }
 
 export function isSNode(v: unknown): v is SNode {
-  return (
-    objectHas(v, "type") &&
-    (v.type === NODE_TYPE_EMPTY ||
-      v.type === NODE_TYPE_TEXT ||
-      v.type === NODE_TYPE_TAG ||
-      v.type === NODE_TYPE_FRAGMENT ||
-      v.type === NODE_TYPE_REFERENCE)
-  );
+  return isRNode(v);
 }
 
 // TODO: generic ComponentChild
@@ -117,7 +100,12 @@ export type SFragment = {
   children: SNode[];
 };
 
-export type SReference = RReference;
+export type SReference = {
+  type: typeof NODE_TYPE_CUSTOM;
+  key?: NodeKey;
+  props: {};
+  id: string;
+};
 
 export type SComponentChild =
   | SNode
