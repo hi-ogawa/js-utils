@@ -23,7 +23,7 @@ import {
 // serialize
 //
 
-// TODO: also return collected references?
+// TODO: also return discovered references?
 export async function serializeNode(rnode: RNode): Promise<SNode> {
   return new SerializeManager().serialize(rnode);
 }
