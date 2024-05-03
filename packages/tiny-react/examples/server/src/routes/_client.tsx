@@ -1,4 +1,5 @@
 import { useEffect, useState } from "@hiogawa/tiny-react";
+import type { JSX } from "@hiogawa/tiny-react/jsx-runtime";
 
 export function ClientComponent() {
   const [count, setCount] = useState(0);
@@ -24,7 +25,7 @@ export function ClientComponent() {
   );
 }
 
-export function InterleaveComponent(props: { serverNode: any }) {
+export function InterleaveComponent(props: { serverNode: JSX.Element }) {
   return (
     <div data-testid="interleave-component">
       <h4>{"Interleave server -> client -> server"}</h4>
