@@ -1,0 +1,19 @@
+{
+  "name": "tiny-react-examples-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --no-clearScreen",
+    "build": "vite build && vite build --ssr",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@hattip/adapter-node": "^0.0.34",
+    "@hiogawa/tiny-react": "workspace:*",
+    "@hiogawa/vite-plugin-ssr-middleware": "^0.0.3",
+    "vite": "^5.1.3"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

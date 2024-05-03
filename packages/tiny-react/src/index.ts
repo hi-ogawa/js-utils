@@ -11,3 +11,4 @@ export { h } from "./helper/hyperscript";
 export * from "./hooks";
 export * from "./compat";
 export * from "./ssr/render";
+export { serializeNode, deserializeNode } from "./serialize/serialize";
