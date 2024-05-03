@@ -2,7 +2,7 @@ import { resolve } from "path";
 import { vitePluginSsrMiddleware } from "@hiogawa/vite-plugin-ssr-middleware";
 import { defineConfig } from "vite";
 
-export default defineConfig((ctx) => ({
+export default defineConfig((env) => ({
   clearScreen: false,
   plugins: [
     vitePluginSsrMiddleware({
@@ -17,7 +17,7 @@ export default defineConfig((ctx) => ({
     },
   ],
   build: {
-    outDir: ctx.isSsrBuild ? "dist/server" : "dist/client",
+    outDir: env.isSsrBuild ? "dist/server" : "dist/client",
     sourcemap: true,
     minify: false,
   },

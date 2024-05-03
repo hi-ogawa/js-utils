@@ -21,6 +21,14 @@ export function ClientComponent() {
       <button className="client-btn" onclick={() => setCount((v) => v + 1)}>
         +1
       </button>
+      <div></div>
     </div>
   );
 }
+export function InterleaveComponent() {
+  return <div data-testid="interleave-component"></div>;
+}
+
+// TODO: tranform
+Object.assign(ClientComponent, { $$id: "ClientComponent" });
+Object.assign(InterleaveComponent, { $$id: "InterleaveComponent" });
