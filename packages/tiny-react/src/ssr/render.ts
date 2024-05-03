@@ -44,6 +44,9 @@ class SsrManager {
     return vnode satisfies never;
   }
 
+  async renderAsync() {
+  }
+
   // cf. https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/index.js#L322
   renderTag(vnode: VTag) {
     const { name, props } = vnode;
