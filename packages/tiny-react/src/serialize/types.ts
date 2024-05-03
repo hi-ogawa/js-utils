@@ -117,10 +117,3 @@ export type SComponentChild =
   | boolean;
 
 export type SComponentChildren = SComponentChild | SComponentChildren[];
-
-// //
-// // hyperscript
-// //
-
-// export function createRNode(): RNode {
-// }
