@@ -70,6 +70,17 @@ export function isRNode(v: unknown): v is RNode {
   );
 }
 
+export function isSNode(v: unknown): v is SNode {
+  return (
+    objectHas(v, "type") &&
+    (v.type === NODE_TYPE_EMPTY ||
+      v.type === NODE_TYPE_TEXT ||
+      v.type === NODE_TYPE_TAG ||
+      v.type === NODE_TYPE_FRAGMENT ||
+      v.type === NODE_TYPE_REFERENCE)
+  );
+}
+
 // TODO: generic ComponentChild
 export type RComponentChild =
   | RNode
