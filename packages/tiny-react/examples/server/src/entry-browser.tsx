@@ -1,11 +1,11 @@
 import { deserializeNode, hydrate } from "@hiogawa/tiny-react";
 import { tinyassert } from "@hiogawa/utils";
-import * as clientReferences from "./routes/_client";
+import { referenceMap } from "./routes/_client";
 
 declare let __snode: any;
 
 function main() {
-  const vnode = deserializeNode(__snode, clientReferences);
+  const vnode = deserializeNode(__snode, referenceMap);
   const el = document.getElementById("root");
   tinyassert(el);
   hydrate(vnode, el);

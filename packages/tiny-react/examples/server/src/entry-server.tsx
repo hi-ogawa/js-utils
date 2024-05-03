@@ -4,7 +4,7 @@ import {
   serializeNode,
 } from "@hiogawa/tiny-react";
 import type { ViteDevServer } from "vite";
-import * as clientReferences from "./routes/_client";
+import { referenceMap } from "./routes/_client";
 import Page from "./routes/page";
 
 export async function handler(_request: Request) {
@@ -15,7 +15,7 @@ export async function handler(_request: Request) {
   const snode = await serializeNode(rnode);
 
   // SSR
-  const vnode = deserializeNode(snode, clientReferences);
+  const vnode = deserializeNode(snode, referenceMap);
   const ssrHtml = renderToString(vnode);
 
   let html = await importHtmlTemplate();

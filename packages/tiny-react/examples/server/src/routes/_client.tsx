@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "@hiogawa/tiny-react";
 
 export function ClientComponent() {
@@ -25,6 +23,7 @@ export function ClientComponent() {
     </div>
   );
 }
+
 export function InterleaveComponent(props: { serverNode: any }) {
   return (
     <div data-testid="interleave-component">
@@ -37,3 +36,8 @@ export function InterleaveComponent(props: { serverNode: any }) {
 // TODO: tranform
 Object.assign(ClientComponent, { $$id: "ClientComponent" });
 Object.assign(InterleaveComponent, { $$id: "InterleaveComponent" });
+
+export const referenceMap = {
+  ClientComponent,
+  InterleaveComponent,
+};
