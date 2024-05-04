@@ -13,11 +13,11 @@ for (const [name, Component] of Object.entries(referenceMap)) {
 }
 
 export async function handler(request: Request) {
-  // serialize server component and pass it to SSR and CSR
+  // serialize server component
   const url = new URL(request.url);
   const snode = await serializeNode(<Router url={url} />);
 
-  // pass to client directly
+  // to CSR
   if (url.searchParams.has("__snode")) {
     return new Response(JSON.stringify(snode, null, 2), {
       headers: {
@@ -26,7 +26,7 @@ export async function handler(request: Request) {
     });
   }
 
-  // SSR
+  // to SSR
   const vnode = deserializeNode(snode, referenceMap);
   const ssrHtml = renderToString(vnode);
 

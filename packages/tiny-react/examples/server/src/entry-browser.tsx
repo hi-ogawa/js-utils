@@ -6,6 +6,10 @@ import * as referenceMap from "./routes/_client";
 declare let __snode: any;
 
 function main() {
+  if (window.location.href.includes("__nojs")) {
+    return;
+  }
+
   // hydrate with initial SNode
   const vnode = deserializeNode(__snode, referenceMap);
   const el = document.getElementById("root");
