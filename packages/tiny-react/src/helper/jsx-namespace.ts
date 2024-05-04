@@ -1,4 +1,4 @@
-import type { RNode } from "../serialize/types";
+import type { RNode } from "../server/types";
 import type {
   ComponentChildren,
   ComponentType,

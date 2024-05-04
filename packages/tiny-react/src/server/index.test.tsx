@@ -1,9 +1,9 @@
 import { sleep } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
+import { deserializeNode, serializeNode } from ".";
 import { h } from "../helper/hyperscript";
 import { render } from "../reconciler";
 import type { VNode } from "../virtual-dom";
-import { deserializeNode, serializeNode } from "./serialize";
 import type { RNode } from "./types";
 
 describe(serializeNode, () => {
