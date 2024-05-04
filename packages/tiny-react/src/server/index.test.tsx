@@ -166,7 +166,7 @@ describe(serializeNode, () => {
         "name": "div",
         "props": {
           "children": {
-            "id": "#ClientInner",
+            "$$id": "#ClientInner",
             "key": undefined,
             "props": {
               "inner": {
@@ -250,7 +250,7 @@ describe(serializeNode, () => {
     const snode = await serializeNode(rnode as RNode);
     expect(snode).toMatchInlineSnapshot(`
       {
-        "id": "#ClientOuter",
+        "$$id": "#ClientOuter",
         "key": undefined,
         "props": {
           "server": {
@@ -258,7 +258,7 @@ describe(serializeNode, () => {
             "name": "div",
             "props": {
               "children": {
-                "id": "#ClientInner",
+                "$$id": "#ClientInner",
                 "key": undefined,
                 "props": {
                   "inner": {
@@ -353,11 +353,11 @@ describe(serializeNode, () => {
     const snode = await serializeNode(rnode as RNode);
     expect(snode).toMatchInlineSnapshot(`
       {
-        "id": "#ClientOuter",
+        "$$id": "#ClientOuter",
         "key": undefined,
         "props": {
           "inner": {
-            "id": "#ClientInner",
+            "$$id": "#ClientInner",
             "key": undefined,
             "props": {
               "inner": {
