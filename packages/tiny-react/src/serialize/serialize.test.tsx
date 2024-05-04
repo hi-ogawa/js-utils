@@ -417,4 +417,11 @@ describe(serializeNode, () => {
       </main>
     `);
   });
+
+  it("function client prop error", async () => {
+    const rnode = h.div({ onclick: () => {} });
+    await expect(() =>
+      serializeNode(rnode as RNode)
+    ).rejects.toMatchInlineSnapshot(`[Error: Cannot serialize function]`);
+  });
 });
