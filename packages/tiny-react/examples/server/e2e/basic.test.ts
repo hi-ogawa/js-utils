@@ -27,7 +27,7 @@ testNoJs("basic @nojs", async ({ page }) => {
     .click();
 });
 
-test("hmr @js", async ({ page }) => {
+test("hmr @dev", async ({ page }) => {
   await page.goto("/");
   await waitForHydration(page);
 
