@@ -5,15 +5,9 @@ import type { JSX } from "@hiogawa/tiny-react/jsx-runtime";
 export function ClientComponent() {
   const [count, setCount] = useState(0);
 
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-
   return (
     <div data-testid="client-component">
       <h4>Hello Client Component</h4>
-      <div data-hydrated={hydrated}>[hydrated: {String(hydrated)}]</div>
       <div>Count: {count}</div>
       <button className="client-btn" onclick={() => setCount((v) => v - 1)}>
         -1
@@ -59,4 +53,14 @@ export function Link(props: JSX.IntrinsicElements["a"]) {
       {...props}
     />
   );
+}
+
+export function Hydrated() {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  return <span>[hydrated: {String(hydrated)}]</span>;
 }

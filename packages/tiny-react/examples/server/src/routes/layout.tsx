@@ -1,5 +1,5 @@
 import type { JSX } from "@hiogawa/tiny-react/jsx-runtime";
-import { Link } from "./_client";
+import { Hydrated, Link } from "./_client";
 
 export default function Layout(props: JSX.ElementChildrenAttribute) {
   return (
@@ -16,6 +16,10 @@ export default function Layout(props: JSX.ElementChildrenAttribute) {
           <Link href="/not-found">Not found</Link>
         </li>
       </ul>
+      <div>
+        <input className="antd-input px-2" placeholder="test-input" />
+        <Hydrated />
+      </div>
       {props.children}
     </div>
   );

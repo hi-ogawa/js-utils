@@ -42,7 +42,7 @@ function main() {
   const oldReplaceState = window.history.replaceState;
   window.history.replaceState = function (...args) {
     const res = oldReplaceState.apply(this, args);
-    onNavigation;
+    onNavigation();
     return res;
   };
 }
