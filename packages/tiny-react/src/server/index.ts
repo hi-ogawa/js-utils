@@ -11,9 +11,9 @@ import {
 } from "../virtual-dom";
 import {
   type RNode,
+  type SCustom,
   type SFragment,
   type SNode,
-  type SReference,
   type STag,
   isRNode,
   isSNode,
@@ -43,8 +43,8 @@ class SerializeManager {
           type: node.type,
           key: node.key,
           props: await this.serializeProps(node.props),
-          id: node.render.$$id,
-        } satisfies SReference;
+          $$id: node.render.$$id,
+        } satisfies SCustom;
       }
       const { render, props } = node;
       const child = await render(props);
@@ -125,7 +125,7 @@ class DeserializeManager {
         type: node.type,
         key: node.key,
         props: this.deserializeProps(node.props),
-        render: this.referenceMap[node.id] as any,
+        render: this.referenceMap[node.$$id] as any,
       } satisfies VCustom;
     } else if (node.type === NODE_TYPE_TAG) {
       return {
