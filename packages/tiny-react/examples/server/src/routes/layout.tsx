@@ -1,4 +1,5 @@
 import type { JSX } from "@hiogawa/tiny-react/jsx-runtime";
+import { Link } from "./_client";
 
 export default function Layout(props: JSX.ElementChildrenAttribute) {
   return (
@@ -6,13 +7,13 @@ export default function Layout(props: JSX.ElementChildrenAttribute) {
       <h4>Hello Server Component</h4>
       <ul>
         <li>
-          <a href="/">Home</a>
+          <Link href="/">Home</Link>
         </li>
         <li>
-          <a href="/test">Test</a>
+          <Link href="/test">Test</Link>
         </li>
         <li>
-          <a href="/not-found">Not found</a>
+          <Link href="/not-found">Not found</Link>
         </li>
       </ul>
       {props.children}

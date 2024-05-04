@@ -14,7 +14,17 @@ for (const [name, Component] of Object.entries(referenceMap)) {
 
 export async function handler(request: Request) {
   // serialize server component and pass it to SSR and CSR
-  const snode = await serializeNode(<Router request={request} />);
+  const url = new URL(request.url);
+  const snode = await serializeNode(<Router url={url} />);
+
+  // pass to client directly
+  if (url.searchParams.has("__snode")) {
+    return new Response(JSON.stringify(snode, null, 2), {
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+  }
 
   // SSR
   const vnode = deserializeNode(snode, referenceMap);
@@ -40,8 +50,7 @@ export async function handler(request: Request) {
   });
 }
 
-async function Router({ request }: { request: Request }) {
-  const url = new URL(request.url);
+async function Router({ url }: { url: URL }) {
   const routes = {
     "/": () => import("./routes/page"),
     "/test": () => import("./routes/test/page"),
