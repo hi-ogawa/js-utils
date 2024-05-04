@@ -19,6 +19,7 @@ test("basic @js", async ({ page }) => {
 
 testNoJs("basic @nojs", async ({ page }) => {
   await page.goto("/");
+  await page.getByText("Count: 0").click();
   await page.getByText("typeof window: undefined").click();
   await page
     .getByText(
