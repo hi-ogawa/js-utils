@@ -83,6 +83,7 @@ class SerializeManager {
     ) {
       return v;
     }
+    // TODO: use "Symbol.for" as vnode type tag
     if (isRNode(v)) {
       return this.serialize(v);
     }
