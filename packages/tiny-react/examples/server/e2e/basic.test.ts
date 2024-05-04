@@ -1,4 +1,4 @@
-import { test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 import { createFileEditor, testNoJs, waitForHydration } from "./helper";
 
 test("basic @js", async ({ page }) => {
@@ -27,6 +27,27 @@ testNoJs("basic @nojs", async ({ page }) => {
     )
     .click();
 });
+
+test("navigation @js", async ({ page }) => {
+  await page.goto("/");
+  await waitForHydration(page);
+  await testNavigation(page, { js: true });
+});
+
+testNoJs("navigation @nojs", async ({ page }) => {
+  await page.goto("/");
+  await testNavigation(page, { js: false });
+});
+
+async function testNavigation(page: Page, options: { js: boolean }) {
+  await page.getByPlaceholder("test-input").fill("hello");
+  await page.getByRole("link", { name: "Test" }).click();
+  await page.waitForURL("/test");
+  await page.getByRole("heading", { name: "Test page" }).click();
+  await expect(page.getByPlaceholder("test-input")).toHaveValue(
+    options.js ? "hello" : ""
+  );
+}
 
 test("hmr @dev", async ({ page }) => {
   await page.goto("/");
