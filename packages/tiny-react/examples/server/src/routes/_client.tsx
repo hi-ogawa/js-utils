@@ -1,6 +1,7 @@
 import { useEffect, useState } from "@hiogawa/tiny-react";
 import type { JSX } from "@hiogawa/tiny-react/jsx-runtime";
 
+// @hmr-unsafe
 export function ClientComponent() {
   const [count, setCount] = useState(0);
 
