@@ -4,8 +4,13 @@ import {
   serializeNode,
 } from "@hiogawa/tiny-react";
 import type { ViteDevServer } from "vite";
-import { referenceMap } from "./routes/_client";
+import * as referenceMap from "./routes/_client";
 import Page from "./routes/page";
+
+// TODO: tranform
+for (const [name, Component] of Object.entries(referenceMap)) {
+  Object.assign(Component, { $$id: name });
+}
 
 export async function handler(_request: Request) {
   // serialize server component and pass it to SSR and CSR

@@ -20,7 +20,6 @@ export function ClientComponent() {
       <button className="client-btn" onclick={() => setCount((v) => v + 1)}>
         +1
       </button>
-      <div></div>
     </div>
   );
 }
@@ -40,14 +39,3 @@ export function InterleaveComponent(props: { serverNode: JSX.Element }) {
 export function ClientNode(props: { serverNode: JSX.Element }) {
   return <span>[props.serverNode: {props.serverNode}]</span>;
 }
-
-// TODO: tranform
-Object.assign(ClientComponent, { $$id: "ClientComponent" });
-Object.assign(InterleaveComponent, { $$id: "InterleaveComponent" });
-Object.assign(ClientNode, { $$id: "ClientNode" });
-
-export const referenceMap = {
-  ClientComponent,
-  InterleaveComponent,
-  ClientNode,
-};

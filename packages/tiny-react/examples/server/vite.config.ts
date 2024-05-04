@@ -1,10 +1,12 @@
 import { resolve } from "path";
+import { tinyReactVitePlugin } from "@hiogawa/tiny-react/dist/plugins/vite";
 import { vitePluginSsrMiddleware } from "@hiogawa/vite-plugin-ssr-middleware";
 import { defineConfig } from "vite";
 
 export default defineConfig((env) => ({
   clearScreen: false,
   plugins: [
+    tinyReactVitePlugin(),
     vitePluginSsrMiddleware({
       entry: process.env["SERVER_ENTRY"] ?? "/src/adapters/node.ts",
       preview: resolve("dist/server/index.js"),

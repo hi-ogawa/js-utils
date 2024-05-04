@@ -1,6 +1,6 @@
 import { deserializeNode, hydrate } from "@hiogawa/tiny-react";
 import { tinyassert } from "@hiogawa/utils";
-import { referenceMap } from "./routes/_client";
+import * as referenceMap from "./routes/_client";
 
 declare let __snode: any;
 
