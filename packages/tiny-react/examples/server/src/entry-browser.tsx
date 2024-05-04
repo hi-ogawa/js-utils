@@ -1,3 +1,4 @@
+import "./style.css";
 import { deserializeNode, hydrate } from "@hiogawa/tiny-react";
 import { tinyassert } from "@hiogawa/utils";
 import * as referenceMap from "./routes/_client";

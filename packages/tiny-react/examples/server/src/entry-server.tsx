@@ -26,6 +26,13 @@ export async function handler(_request: Request) {
     "<head>",
     `<head><script>globalThis.__snode = ${JSON.stringify(snode)}</script>`
   );
+  // dev only FOUC fix
+  if (import.meta.env.DEV) {
+    html = html.replace(
+      "<head>",
+      `<head><link rel="stylesheet" href="/src/style.css?direct" />`
+    );
+  }
   return new Response(html, {
     headers: {
       "content-type": "text/html",
