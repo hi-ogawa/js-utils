@@ -58,5 +58,9 @@ export function isRNode(v: unknown): v is RNode {
 }
 
 export function isSNode(v: unknown): v is SNode {
-  return isRNode(v);
+  return isVNode(v);
+}
+
+export function registerClientReference(Component: Function, $$id: string) {
+  return Object.assign(Component, { $$id });
 }

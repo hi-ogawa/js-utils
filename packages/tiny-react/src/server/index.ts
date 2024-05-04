@@ -121,11 +121,16 @@ class DeserializeManager {
     if (node.type === NODE_TYPE_EMPTY || node.type === NODE_TYPE_TEXT) {
       return node;
     } else if (node.type === NODE_TYPE_CUSTOM) {
+      const Component = this.referenceMap[node.$$id];
+      if (!Component) {
+        console.error(node);
+        throw new Error("client reference not found");
+      }
       return {
         type: node.type,
         key: node.key,
         props: this.deserializeProps(node.props),
-        render: this.referenceMap[node.$$id] as any,
+        render: Component as any,
       } satisfies VCustom;
     } else if (node.type === NODE_TYPE_TAG) {
       return {

@@ -22,7 +22,7 @@ export const NODE_TYPE_FRAGMENT = "fragment" as const;
 
 export function isVNode(v: unknown): v is VNode {
   return (
-    !!v &&
+    v != null &&
     typeof v === "object" &&
     "type" in v &&
     (v.type === NODE_TYPE_EMPTY ||
