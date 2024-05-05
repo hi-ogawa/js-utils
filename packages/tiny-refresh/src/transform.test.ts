@@ -3,12 +3,11 @@ import { hmrTransform } from "./transform";
 
 describe(hmrTransform, () => {
   it("basic", async () => {
-    const input = `\
-export default function CompFn() {
-  return "hello";
-}
+    const input = /* js */ `\
 
-export let CompLet = () => {
+export default function FnDefault() {}
+
+export let FnLet = () => {
   useState();
   useEffect;
   useRef();
@@ -16,13 +15,17 @@ export let CompLet = () => {
   return "hello";
 }
 
-export const CompConst = () => {
-  return "hello";
-}
+export const FnConst = () => {}
 
-const CompInternal = () => {
-  return "hello";
-}
+const FnNonExport = () => {}
+
+function notCapitalFn() {}
+
+const NotFn = "hello";
+
+// TODO
+// export const FnExpr = function() {}
+// export const NotFn2 = "hello";
 `;
     expect(
       await hmrTransform(input, {
@@ -30,11 +33,10 @@ const CompInternal = () => {
         refreshRuntime: "/refresh-runtime",
       })
     ).toMatchInlineSnapshot(`
-      "export default function CompFn() {
-        return "hello";
-      }
+      "
+      export default function FnDefault() {}
 
-      export let CompLet = () => {
+      export let FnLet = () => {
         useState();
         useEffect;
         useRef();
@@ -42,13 +44,17 @@ const CompInternal = () => {
         return "hello";
       }
 
-      export let   CompConst = () => {
-        return "hello";
-      }
+      export let   FnConst = () => {}
 
-      let   CompInternal = () => {
-        return "hello";
-      }
+      let   FnNonExport = () => {}
+
+      function notCapitalFn() {}
+
+      let   NotFn = "hello";
+
+      // TODO
+      // export const FnExpr = function() {}
+      // export const NotFn2 = "hello";
 
       import * as $$runtime from "/runtime";
       import * as $$refresh from "/refresh-runtime";
@@ -61,33 +67,33 @@ const CompInternal = () => {
         false,
       );
 
-      if (import.meta.hot && typeof CompFn === "function") {
-        CompFn = $$refresh.createHmrComponent(
-          $$registry, "CompFn", CompFn,
+      if (import.meta.hot && typeof FnDefault === "function") {
+        FnDefault = $$refresh.createHmrComponent(
+          $$registry, "FnDefault", FnDefault,
           { key: "" },
           import.meta.hot,
         );
       }
 
-      if (import.meta.hot && typeof CompLet === "function") {
-        CompLet = $$refresh.createHmrComponent(
-          $$registry, "CompLet", CompLet,
+      if (import.meta.hot && typeof FnLet === "function") {
+        FnLet = $$refresh.createHmrComponent(
+          $$registry, "FnLet", FnLet,
           { key: "useState/useRef/useCallback" },
           import.meta.hot,
         );
       }
 
-      if (import.meta.hot && typeof CompConst === "function") {
-        CompConst = $$refresh.createHmrComponent(
-          $$registry, "CompConst", CompConst,
+      if (import.meta.hot && typeof FnConst === "function") {
+        FnConst = $$refresh.createHmrComponent(
+          $$registry, "FnConst", FnConst,
           { key: "" },
           import.meta.hot,
         );
       }
 
-      if (import.meta.hot && typeof CompInternal === "function") {
-        CompInternal = $$refresh.createHmrComponent(
-          $$registry, "CompInternal", CompInternal,
+      if (import.meta.hot && typeof FnNonExport === "function") {
+        FnNonExport = $$refresh.createHmrComponent(
+          $$registry, "FnNonExport", FnNonExport,
           { key: "" },
           import.meta.hot,
         );

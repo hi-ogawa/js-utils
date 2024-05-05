@@ -165,7 +165,7 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     //   continue;
     // }
 
-    // TODO: debounce re-rendering
+    // TODO: debounce re-rendering?
     if (latestReg.debug) {
       console.debug(
         `[tiny-refresh] refresh '${key}' (key = ${latest.options.key}, listeners.size = ${initial.listeners.size})`

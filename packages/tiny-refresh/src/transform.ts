@@ -53,7 +53,7 @@ declare module "estree" {
   }
 }
 
-type HotEntry = {
+type ParsedEntry = {
   id: string;
   hooks: string[];
 };
@@ -66,7 +66,7 @@ async function analyzeCode(code: string) {
   const errors: unknown[] = [];
 
   // TODO: collect also non-exported functions with a capitalized names
-  const entries: HotEntry[] = [];
+  const entries: ParsedEntry[] = [];
 
   // replace "export const" with "export let"
   let outCode = code;
@@ -169,6 +169,7 @@ async function analyzeCode(code: string) {
         outCode = replaceCode(outCode, start, start + 5, "let  ");
       }
       for (const decl of node.declarations) {
+        // TODO: FunctionExpression
         if (
           decl.id.type === "Identifier" &&
           decl.init &&
@@ -198,6 +199,7 @@ function analyzeFunction(
     | estree.ArrowFunctionExpression
     | estree.MaybeNamedFunctionDeclaration
 ) {
+  // NOTE: we could also do this runtime via `fn.toString()`
   const bodyCode = code.slice(node.body.start, node.body.end);
   const matches = bodyCode.matchAll(HOOK_CALL_RE);
   const hooks = [...matches].map((m) => m[1]!);
