@@ -1,5 +1,5 @@
 import process from "node:process";
-import { vitePluginTinyRefresh } from "@hiogawa/tiny-refresh/dist/vite";
+import { vitePluginTinyRefresh } from "@hiogawa/tiny-refresh/vite";
 import unocss from "unocss/vite";
 import { defineConfig } from "vite";
 

@@ -1,4 +1,4 @@
-import { vitePluginTinyRefresh } from "@hiogawa/tiny-refresh/dist/vite";
+import { vitePluginTinyRefresh } from "@hiogawa/tiny-refresh/vite";
 import { typedBoolean } from "@hiogawa/utils";
 import { type FilterPattern, type Plugin } from "vite";
 

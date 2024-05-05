@@ -26,9 +26,10 @@
     "dist"
   ],
   "scripts": {
+    "dev": "tsup --watch",
     "build": "tsup",
     "test": "vitest",
-    "prepack": "pnpm build",
+    "prepack": "tsup --clean",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
