@@ -1,31 +1,39 @@
 import "./style.css";
-import { deserializeNode, hydrate, render } from "@hiogawa/tiny-react";
+import {
+  type SerializeResult,
+  deserializeNode,
+  hydrateRoot,
+} from "@hiogawa/tiny-react";
 import { tinyassert } from "@hiogawa/utils";
-import * as referenceMap from "./routes/_client";
+import { createReferenceMap } from "./integration/client-reference/runtime";
 
-declare let __snode: any;
-
-function main() {
+async function main() {
   if (window.location.href.includes("__nojs")) {
     return;
   }
 
   // hydrate with initial SNode
-  const vnode = deserializeNode(__snode, referenceMap);
+  const initResult: SerializeResult = (globalThis as any).__serialized;
+  const vnode = deserializeNode(
+    initResult.snode,
+    await createReferenceMap(initResult.referenceIds)
+  );
   const el = document.getElementById("root");
   tinyassert(el);
-  const bnode = hydrate(vnode, el);
+  const root = hydrateRoot(el, vnode);
 
   // re-render on client side navigation
   async function onNavigation() {
     const url = new URL(window.location.href);
-    url.searchParams.set("__snode", "");
+    url.searchParams.set("__serialize", "");
     const res = await fetch(url);
     tinyassert(res.ok);
-    const newSnode = await res.json();
-    const newVnode = deserializeNode(newSnode, referenceMap);
-    tinyassert(el);
-    render(newVnode, el, bnode);
+    const result: SerializeResult = await res.json();
+    const newVnode = deserializeNode(
+      result.snode,
+      await createReferenceMap(result.referenceIds)
+    );
+    root.render(newVnode);
   }
 
   // cf. https://github.com/TanStack/router/blob/7095f9e5af79ff98d5a1cad126c2d7d9eacfa253/packages/history/src/index.ts#L301-L314

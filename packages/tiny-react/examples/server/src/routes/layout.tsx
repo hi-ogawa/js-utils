@@ -17,7 +17,7 @@ export default function Layout(props: JSX.ElementChildrenAttribute) {
         </li>
       </ul>
       <div>
-        <input className="antd-input px-2" placeholder="test-input" />
+        <input placeholder="test-input" />
         <Hydrated />
       </div>
       {props.children}

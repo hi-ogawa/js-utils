@@ -18,7 +18,8 @@ describe(serializeNode, () => {
         "world"
       )
     );
-    const snode = await serializeNode(rnode as RNode);
+    const { snode, referenceIds } = await serializeNode(rnode as RNode);
+    expect(referenceIds).toMatchInlineSnapshot(`[]`);
     expect(snode).toMatchInlineSnapshot(`
       {
         "key": undefined,
@@ -94,7 +95,8 @@ describe(serializeNode, () => {
     }
     const rnode = h.div({}, h(Custom as any, { value: 123 }));
 
-    const snode = await serializeNode(rnode as RNode);
+    const { snode, referenceIds } = await serializeNode(rnode as RNode);
+    expect(referenceIds).toMatchInlineSnapshot(`[]`);
     expect(snode).toMatchInlineSnapshot(`
       {
         "key": undefined,
@@ -159,7 +161,13 @@ describe(serializeNode, () => {
     const rnode = h(Server as any, {
       clientInner: h(ClientInner, { inner: h.span({}) }),
     });
-    const snode = await serializeNode(rnode as RNode);
+
+    const { snode, referenceIds } = await serializeNode(rnode as RNode);
+    expect(referenceIds).toMatchInlineSnapshot(`
+      [
+        "#ClientInner",
+      ]
+    `);
     expect(snode).toMatchInlineSnapshot(`
       {
         "key": undefined,
@@ -247,7 +255,14 @@ describe(serializeNode, () => {
         clientInner: h(ClientInner, { inner: h.span({}) }),
       }),
     });
-    const snode = await serializeNode(rnode as RNode);
+
+    const { snode, referenceIds } = await serializeNode(rnode as RNode);
+    expect(referenceIds).toMatchInlineSnapshot(`
+      [
+        "#ClientOuter",
+        "#ClientInner",
+      ]
+    `);
     expect(snode).toMatchInlineSnapshot(`
       {
         "$$id": "#ClientOuter",
@@ -350,7 +365,14 @@ describe(serializeNode, () => {
     const rnode = h(ClientOuter, {
       inner: h(ClientInner, { inner: h.span({}) }),
     });
-    const snode = await serializeNode(rnode as RNode);
+
+    const { snode, referenceIds } = await serializeNode(rnode as RNode);
+    expect(referenceIds).toMatchInlineSnapshot(`
+      [
+        "#ClientOuter",
+        "#ClientInner",
+      ]
+    `);
     expect(snode).toMatchInlineSnapshot(`
       {
         "$$id": "#ClientOuter",
