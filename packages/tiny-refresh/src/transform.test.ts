@@ -64,7 +64,7 @@ const CompInternal = () => {
       if (import.meta.hot && typeof CompFn === "function") {
         CompFn = $$refresh.createHmrComponent(
           $$registry, "CompFn", CompFn,
-          { key: "", remount: false },
+          { key: "" },
           import.meta.hot,
         );
       }
@@ -72,7 +72,7 @@ const CompInternal = () => {
       if (import.meta.hot && typeof CompLet === "function") {
         CompLet = $$refresh.createHmrComponent(
           $$registry, "CompLet", CompLet,
-          { key: "useState/useRef", remount: false },
+          { key: "useState/useRef" },
           import.meta.hot,
         );
       }
@@ -80,7 +80,7 @@ const CompInternal = () => {
       if (import.meta.hot && typeof CompConst === "function") {
         CompConst = $$refresh.createHmrComponent(
           $$registry, "CompConst", CompConst,
-          { key: "", remount: false },
+          { key: "" },
           import.meta.hot,
         );
       }
@@ -88,7 +88,7 @@ const CompInternal = () => {
       if (import.meta.hot && typeof CompInternal === "function") {
         CompInternal = $$refresh.createHmrComponent(
           $$registry, "CompInternal", CompInternal,
-          { key: "", remount: false },
+          { key: "" },
           import.meta.hot,
         );
       }

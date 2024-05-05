@@ -46,7 +46,8 @@ describe(setupHmrVite, () => {
           }, []);
           return <div>1</div>;
         },
-        { remount: false, key: "useEffect" }
+        { key: "useEffect" },
+        hot
       );
 
       setupHmrVite(hot, registry);
@@ -86,7 +87,8 @@ describe(setupHmrVite, () => {
         function Child() {
           return <div>2</div>;
         },
-        { remount: true, key: "" }
+        { key: "" },
+        hot
       );
 
       setupHmrVite(hot, registry);
@@ -132,7 +134,8 @@ describe(setupHmrVite, () => {
           }, []);
           return <div>3</div>;
         },
-        { remount: false, key: "useEffect" }
+        { key: "useEffect" },
+        hot
       );
 
       setupHmrVite(hot, registry);
@@ -200,7 +203,8 @@ describe(setupHmrVite, () => {
           }, []);
           return <div>1</div>;
         },
-        { remount: false, key: "useEffect" }
+        { key: "useEffect" },
+        hot
       );
 
       setupHmrVite(hot, registry);
@@ -243,7 +247,8 @@ describe(setupHmrVite, () => {
           }, []);
           return <div>2</div>;
         },
-        { remount: false, key: "useEffect" }
+        { key: "useEffect" },
+        hot
       );
 
       setupHmrVite(hot, registry);
@@ -279,7 +284,8 @@ describe(setupHmrVite, () => {
         function Child() {
           return <div>3</div>;
         },
-        { remount: false, key: "" }
+        { key: "" },
+        hot
       );
 
       setupHmrVite(hot, registry);
