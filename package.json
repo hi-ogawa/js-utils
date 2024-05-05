@@ -4,7 +4,7 @@
   "scripts": {
     "clean": "rm -rf packages/*/dist",
     "dev": "pnpm run /^dev:/",
-    "build": "pnpm -r build",
+    "build": "pnpm -r '--filter=!*example*' build",
     "tsc": "tsc -b packages/*/tsconfig.json packages/*/examples/*/tsconfig.json",
     "dev:tsc": "pnpm tsc --watch --preserveWatchOutput",
     "test": "pnpm -r --sequential test run",

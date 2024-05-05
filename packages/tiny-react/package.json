@@ -44,10 +44,10 @@
   ],
   "scripts": {
     "dev": "tsup --watch",
-    "build": "tsup --clean",
+    "build": "tsup",
     "test": "vitest",
     "lint": "icheck-ts $(find src -name '*.ts')",
-    "prepack": "pnpm --filter @hiogawa/tiny-react... build",
+    "prepack": "tsup --clean",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
