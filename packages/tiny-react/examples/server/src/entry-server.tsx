@@ -14,7 +14,7 @@ export async function handler(request: Request) {
 
   // to CSR
   if (url.searchParams.has("__serialize")) {
-    return new Response(JSON.stringify(serialized, null, 2), {
+    return new Response(JSON.stringify(serialized), {
       headers: {
         "content-type": "application/json",
       },

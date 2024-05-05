@@ -43,6 +43,7 @@ export function createRoot(container: Element) {
     unmount() {
       render(EMPTY_NODE, container, bnode);
     },
+    _bnode: () => bnode,
   };
 }
 
