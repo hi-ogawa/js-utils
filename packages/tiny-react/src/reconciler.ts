@@ -164,18 +164,12 @@ function reconcileNode(
         slot: null,
       } satisfies BFragment;
     }
-    // unmount excess bnode.children
-    // TODO: is it already handled above?
-    const bchildren = bnode.children;
-    for (const bchild of bchildren.slice(vnode.children.length)) {
-      unmount(bchild);
-    }
     // reconcile vnode.children
     bnode.slot = null;
     for (let i = 0; i < vnode.children.length; i++) {
       const bchild = reconcileNode(
         vnode.children[i],
-        bchildren[i] ?? EMPTY_NODE,
+        bnode.children[i] ?? EMPTY_NODE,
         hparent,
         preSlot,
         effectManager,
