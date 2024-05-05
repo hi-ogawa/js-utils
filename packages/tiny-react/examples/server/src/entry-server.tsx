@@ -1,26 +1,20 @@
 import {
   deserializeNode,
-  registerClientReference,
   renderToString,
   serializeNode,
 } from "@hiogawa/tiny-react";
 import type { ViteDevServer } from "vite";
-import * as referenceMap from "./routes/_client";
+import { createReferenceMap } from "./integration/client-reference/runtime";
 import Layout from "./routes/layout";
-
-// TODO: tranform
-for (const [name, Component] of Object.entries(referenceMap)) {
-  registerClientReference(Component, name);
-}
 
 export async function handler(request: Request) {
   // serialize server component
   const url = new URL(request.url);
-  const snode = await serializeNode(<Router url={url} />);
+  const serialized = await serializeNode(<Router url={url} />);
 
   // to CSR
-  if (url.searchParams.has("__snode")) {
-    return new Response(JSON.stringify(snode, null, 2), {
+  if (url.searchParams.has("__serialize")) {
+    return new Response(JSON.stringify(serialized, null, 2), {
       headers: {
         "content-type": "application/json",
       },
@@ -28,14 +22,20 @@ export async function handler(request: Request) {
   }
 
   // to SSR
-  const vnode = deserializeNode(snode, referenceMap);
+  const vnode = deserializeNode(
+    serialized.snode,
+    await createReferenceMap(serialized.referenceIds)
+  );
   const ssrHtml = renderToString(vnode);
 
   let html = await importHtmlTemplate();
   html = html.replace("<body>", () => `<body><div id="root">${ssrHtml}</div>`);
   html = html.replace(
     "<head>",
-    () => `<head><script>globalThis.__snode = ${JSON.stringify(snode)}</script>`
+    () =>
+      `<head><script>globalThis.__serialized = ${JSON.stringify(
+        serialized
+      )}</script>`
   );
   // dev only FOUC fix
   if (import.meta.env.DEV) {

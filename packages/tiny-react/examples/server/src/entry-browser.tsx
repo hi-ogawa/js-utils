@@ -1,17 +1,25 @@
 import "./style.css";
-import { deserializeNode, hydrate, render } from "@hiogawa/tiny-react";
+import {
+  type SerializeResult,
+  deserializeNode,
+  hydrate,
+  render,
+} from "@hiogawa/tiny-react";
 import { tinyassert } from "@hiogawa/utils";
-import * as referenceMap from "./routes/_client";
+import { createReferenceMap } from "./integration/client-reference/runtime";
 
-declare let __snode: any;
+declare let __serialized: SerializeResult;
 
-function main() {
+async function main() {
   if (window.location.href.includes("__nojs")) {
     return;
   }
 
   // hydrate with initial SNode
-  const vnode = deserializeNode(__snode, referenceMap);
+  const vnode = deserializeNode(
+    __serialized.snode,
+    await createReferenceMap(__serialized.referenceIds)
+  );
   const el = document.getElementById("root");
   tinyassert(el);
   const bnode = hydrate(vnode, el);
@@ -19,11 +27,14 @@ function main() {
   // re-render on client side navigation
   async function onNavigation() {
     const url = new URL(window.location.href);
-    url.searchParams.set("__snode", "");
+    url.searchParams.set("__serialize", "");
     const res = await fetch(url);
     tinyassert(res.ok);
-    const newSnode = await res.json();
-    const newVnode = deserializeNode(newSnode, referenceMap);
+    const result: SerializeResult = await res.json();
+    const newVnode = deserializeNode(
+      result.snode,
+      await createReferenceMap(result.referenceIds)
+    );
     tinyassert(el);
     render(newVnode, el, bnode);
   }

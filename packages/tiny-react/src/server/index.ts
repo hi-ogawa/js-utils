@@ -23,12 +23,20 @@ import {
 // serialize
 //
 
-// TODO: also return discovered references?
-export async function serializeNode(rnode: RNode): Promise<SNode> {
-  return new SerializeManager().serialize(rnode);
+export type SerializeResult = {
+  snode: SNode;
+  referenceIds: string[];
+};
+
+export async function serializeNode(rnode: RNode): Promise<SerializeResult> {
+  const manager = new SerializeManager();
+  const snode = await manager.serialize(rnode);
+  return { snode, referenceIds: [...manager.referenceIds] };
 }
 
 class SerializeManager {
+  referenceIds = new Set<string>();
+
   async serialize(node: RNode): Promise<SNode> {
     if (node.type === NODE_TYPE_EMPTY || node.type === NODE_TYPE_TEXT) {
       return node;
@@ -39,6 +47,7 @@ class SerializeManager {
       } satisfies STag;
     } else if (node.type === NODE_TYPE_CUSTOM) {
       if (node.render.$$id) {
+        this.referenceIds.add(node.render.$$id);
         return {
           type: node.type,
           key: node.key,
@@ -105,7 +114,7 @@ class SerializeManager {
 // deserialize
 //
 
-export type ReferenceMap = Record<string, Function>;
+export type ReferenceMap = Record<string, unknown>;
 
 export function deserializeNode(
   snode: SNode,
