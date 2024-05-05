@@ -6,7 +6,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     outDir: "./dist/vite",
-    minify: true, // set `false` to verify transpilated output easily
+    minify: true, // set `false` to verify transpiled output easily
   },
   plugins: [tinyReactVitePlugin(), unocss(), themeScriptPlugin()],
 });
