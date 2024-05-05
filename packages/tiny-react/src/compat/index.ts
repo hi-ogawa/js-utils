@@ -1,6 +1,6 @@
 import { once } from "@hiogawa/utils";
 import { useEffect, useRef, useState } from "../hooks";
-import { render } from "../reconciler";
+import { hydrate, render } from "../reconciler";
 import {
   type BNode,
   EMPTY_NODE,
@@ -42,6 +42,19 @@ export function createRoot(container: Element) {
     },
     unmount() {
       render(EMPTY_NODE, container, bnode);
+    },
+  };
+}
+
+// https://react.dev/reference/react-dom/client/hydrateRoot
+export function hydrateRoot(domNode: Element, vnode: VNode) {
+  let bnode = hydrate(vnode, domNode);
+  return {
+    render: (vnode: VNode) => {
+      bnode = render(vnode, domNode, bnode);
+    },
+    unmount() {
+      render(EMPTY_NODE, domNode, bnode);
     },
   };
 }

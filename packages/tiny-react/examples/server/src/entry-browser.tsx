@@ -2,8 +2,7 @@ import "./style.css";
 import {
   type SerializeResult,
   deserializeNode,
-  hydrate,
-  render,
+  hydrateRoot,
 } from "@hiogawa/tiny-react";
 import { tinyassert } from "@hiogawa/utils";
 import { createReferenceMap } from "./integration/client-reference/runtime";
@@ -22,7 +21,7 @@ async function main() {
   );
   const el = document.getElementById("root");
   tinyassert(el);
-  const bnode = hydrate(vnode, el);
+  const root = hydrateRoot(el, vnode);
 
   // re-render on client side navigation
   async function onNavigation() {
@@ -35,8 +34,7 @@ async function main() {
       result.snode,
       await createReferenceMap(result.referenceIds)
     );
-    tinyassert(el);
-    render(newVnode, el, bnode);
+    root.render(newVnode);
   }
 
   // cf. https://github.com/TanStack/router/blob/7095f9e5af79ff98d5a1cad126c2d7d9eacfa253/packages/history/src/index.ts#L301-L314
