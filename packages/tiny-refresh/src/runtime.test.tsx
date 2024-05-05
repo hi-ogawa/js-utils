@@ -13,7 +13,7 @@ import {
 afterEach(cleanup);
 
 describe(setupHmrVite, () => {
-  it("basic", async () => {
+  it("basic 1", async () => {
     const acceptCallbacks: ((newModule?: unknown) => void)[] = [];
 
     const hot: ViteHot = {
@@ -46,7 +46,7 @@ describe(setupHmrVite, () => {
           }, []);
           return <div>1</div>;
         },
-        { remount: true }
+        { remount: false, key: "useEffect" }
       );
 
       setupHmrVite(hot, registry);
@@ -74,7 +74,7 @@ describe(setupHmrVite, () => {
     `);
 
     //
-    // 2nd version (remount mode allows modifying hooks)
+    // 2nd version
     //
     {
       const registry = createHmrRegistry(React);
@@ -86,7 +86,7 @@ describe(setupHmrVite, () => {
         function Child() {
           return <div>2</div>;
         },
-        { remount: true }
+        { remount: true, key: "" }
       );
 
       setupHmrVite(hot, registry);
@@ -132,7 +132,7 @@ describe(setupHmrVite, () => {
           }, []);
           return <div>3</div>;
         },
-        { remount: true }
+        { remount: false, key: "useEffect" }
       );
 
       setupHmrVite(hot, registry);
@@ -163,7 +163,7 @@ describe(setupHmrVite, () => {
     `);
   });
 
-  it("unsafe", async () => {
+  it("basic 2", async () => {
     const acceptCallbacks: ((newModule?: unknown) => void)[] = [];
 
     const hot: ViteHot = {
@@ -200,7 +200,7 @@ describe(setupHmrVite, () => {
           }, []);
           return <div>1</div>;
         },
-        { remount: false }
+        { remount: false, key: "useEffect" }
       );
 
       setupHmrVite(hot, registry);
@@ -225,7 +225,7 @@ describe(setupHmrVite, () => {
     `);
 
     //
-    // 2nd version ("remount: false" will preserve hook state thus no effect run)
+    // 2nd version
     //
     {
       const registry = createHmrRegistry(React);
@@ -243,7 +243,7 @@ describe(setupHmrVite, () => {
           }, []);
           return <div>2</div>;
         },
-        { remount: false }
+        { remount: false, key: "useEffect" }
       );
 
       setupHmrVite(hot, registry);
@@ -268,7 +268,7 @@ describe(setupHmrVite, () => {
     `);
 
     //
-    // 3rd version (removing hook would crash)
+    // 3rd version
     //
     {
       const registry = createHmrRegistry(React);
@@ -279,13 +279,12 @@ describe(setupHmrVite, () => {
         function Child() {
           return <div>3</div>;
         },
-        { remount: false }
+        { remount: false, key: "" }
       );
 
       setupHmrVite(hot, registry);
     }
 
-    // TODO: cannot reproduce conditional hook error
     act(() => acceptCallbacks[1]({}));
     expect(result.baseElement).toMatchInlineSnapshot(`
       <body>
@@ -300,6 +299,9 @@ describe(setupHmrVite, () => {
       [
         [
           "effect-setup-1",
+        ],
+        [
+          "effect-cleanup-1",
         ],
       ]
     `);
