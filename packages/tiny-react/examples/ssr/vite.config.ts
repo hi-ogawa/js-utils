@@ -1,5 +1,5 @@
 import { themeScriptPlugin } from "@hiogawa/theme-script/dist/vite";
-import { tinyReactVitePlugin } from "@hiogawa/tiny-react/dist/plugins/vite";
+import { tinyReactVitePlugin } from "@hiogawa/tiny-react/vite";
 import { importDevServerPlugin } from "@hiogawa/vite-import-dev-server";
 import { viteNullExportPlugin } from "@hiogawa/vite-null-export";
 import { vitePluginSsrMiddleware } from "@hiogawa/vite-plugin-ssr-middleware";

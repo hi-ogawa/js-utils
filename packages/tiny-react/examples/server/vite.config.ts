@@ -1,5 +1,5 @@
 import path from "node:path";
-import { tinyReactVitePlugin } from "@hiogawa/tiny-react/dist/plugins/vite";
+import { tinyReactVitePlugin } from "@hiogawa/tiny-react/vite";
 import {
   vitePluginLogger,
   vitePluginSsrMiddleware,

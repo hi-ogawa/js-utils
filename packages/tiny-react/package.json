@@ -30,7 +30,7 @@
       "require": "./dist/hmr/index.cjs",
       "types": "./dist/hmr/index.d.ts"
     },
-    "./dist/plugins/vite": {
+    "./vite": {
       "import": "./dist/plugins/vite.js",
       "require": "./dist/plugins/vite.cjs",
       "types": "./dist/plugins/vite.d.ts"

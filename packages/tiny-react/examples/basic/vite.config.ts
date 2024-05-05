@@ -1,5 +1,5 @@
 import { themeScriptPlugin } from "@hiogawa/theme-script/dist/vite";
-import { tinyReactVitePlugin } from "@hiogawa/tiny-react/dist/plugins/vite";
+import { tinyReactVitePlugin } from "@hiogawa/tiny-react/vite";
 import unocss from "unocss/vite";
 import { defineConfig } from "vite";
 
