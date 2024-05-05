@@ -39,13 +39,6 @@ class SerializeManager {
   depth = 0;
 
   async serialize(node: RNode): Promise<SNode> {
-    // console.time(`[serialize:${this.depth++}]`)
-    // using _ = {
-    //   [Symbol.dispose]: () => {
-    //     console.timeEnd(`[serialize:${--this.depth}]`);
-    //   }
-    // };
-
     if (node.type === NODE_TYPE_EMPTY || node.type === NODE_TYPE_TEXT) {
       return node;
     } else if (node.type === NODE_TYPE_TAG) {
