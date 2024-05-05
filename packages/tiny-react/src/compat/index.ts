@@ -47,14 +47,14 @@ export function createRoot(container: Element) {
 }
 
 // https://react.dev/reference/react-dom/client/hydrateRoot
-export function hydrateRoot(domNode: Element, vnode: VNode) {
-  let bnode = hydrate(vnode, domNode);
+export function hydrateRoot(container: Element, vnode: VNode) {
+  let bnode = hydrate(vnode, container);
   return {
     render: (vnode: VNode) => {
-      bnode = render(vnode, domNode, bnode);
+      bnode = render(vnode, container, bnode);
     },
     unmount() {
-      render(EMPTY_NODE, domNode, bnode);
+      render(EMPTY_NODE, container, bnode);
     },
   };
 }
