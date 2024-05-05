@@ -6,22 +6,22 @@ test("repro", () => {
   const root = createRoot(el);
   root.render(
     <div>
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
+      <div>a1</div>
+      <div>a2</div>
+      <div>a3</div>
     </div>
   );
   expect(el).toMatchInlineSnapshot(`
     <main>
       <div>
         <div>
-          1
+          a1
         </div>
         <div>
-          2
+          a2
         </div>
         <div>
-          3
+          a3
         </div>
       </div>
     </main>
@@ -29,39 +29,41 @@ test("repro", () => {
 
   root.render(
     <div>
-      <div>Test</div>
-      <div>hey</div>
+      <div>x1</div>
+      <div>x2</div>
     </div>
   );
   expect(el).toMatchInlineSnapshot(`
     <main>
       <div>
         <div>
-          Test
+          x1
         </div>
         <div>
-          hey
+          x2
         </div>
       </div>
     </main>
   `);
 
-  // TODO: where is "<div>3</div>" ???
   root.render(
     <div>
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
+      <div>y1</div>
+      <div>y2</div>
+      <div>y3</div>
     </div>
   );
   expect(el).toMatchInlineSnapshot(`
     <main>
       <div>
         <div>
-          1
+          y1
         </div>
         <div>
-          2
+          y2
+        </div>
+        <div>
+          y3
         </div>
       </div>
     </main>
