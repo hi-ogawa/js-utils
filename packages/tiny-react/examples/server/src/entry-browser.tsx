@@ -7,17 +7,16 @@ import {
 import { tinyassert } from "@hiogawa/utils";
 import { createReferenceMap } from "./integration/client-reference/runtime";
 
-declare let __serialized: SerializeResult;
-
 async function main() {
   if (window.location.href.includes("__nojs")) {
     return;
   }
 
   // hydrate with initial SNode
+  const initResult: SerializeResult = (globalThis as any).__serialized;
   const vnode = deserializeNode(
-    __serialized.snode,
-    await createReferenceMap(__serialized.referenceIds)
+    initResult.snode,
+    await createReferenceMap(initResult.referenceIds)
   );
   const el = document.getElementById("root");
   tinyassert(el);
