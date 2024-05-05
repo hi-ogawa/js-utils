@@ -6,6 +6,7 @@
     "dev": "vite --no-clearScreen",
     "build": "vite build && vite build --ssr",
     "preview": "vite preview",
+    "preview-debug": "NODE_OPTIONS='--inspect' vite preview",
     "test-e2e": "playwright test",
     "test-e2e-preview": "E2E_PREVIEW=1 playwright test",
     "cf-build": "SERVER_ENTRY=/src/adapters/cloudflare-workers.ts pnpm build && bash misc/cloudflare-workers/build.sh",
