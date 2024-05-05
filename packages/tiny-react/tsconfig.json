@@ -4,6 +4,8 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "@hiogawa/tiny-react",
-    "types": ["vite/client"]
+    "paths": {
+      "@hiogawa/tiny-react/jsx-runtime": ["./src/helper/jsx-runtime.ts"]
+    }
   }
 }
