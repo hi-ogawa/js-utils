@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hmrTransform, hmrTransform2 } from "./transform";
+import { hmrTransform } from "./transform";
 
 describe(hmrTransform, () => {
   it("basic", async () => {
@@ -19,11 +19,15 @@ export let CompLet = () => {
 export const CompConst = () => {
   return "hello";
 }
+
+const CompInternal = () => {
+  return "hello";
+}
 `;
     expect(
-      await hmrTransform2(input, {
-        runtime: "react",
-        bundler: "vite",
+      await hmrTransform(input, {
+        runtime: "/runtime",
+        refreshRuntime: "/refresh-runtime",
       })
     ).toMatchInlineSnapshot(`
       "export default function CompFn() {
@@ -42,8 +46,12 @@ export const CompConst = () => {
         return "hello";
       }
 
-      import * as $$runtime from "react";
-      import * as $$refresh from "react";
+      let   CompInternal = () => {
+        return "hello";
+      }
+
+      import * as $$runtime from "/runtime";
+      import * as $$refresh from "/refresh-runtime";
       const $$registry = $$refresh.createHmrRegistry(
         {
           createElement: $$runtime.createElement,
@@ -53,24 +61,35 @@ export const CompConst = () => {
         false,
       );
 
-      if (typeof CompFn === "function" && CompFn.length <= 1) {
+      if (import.meta.hot && typeof CompFn === "function") {
         CompFn = $$refresh.createHmrComponent(
           $$registry, "CompFn", CompFn,
-          { key: "", remount: false }
+          { key: "", remount: false },
+          import.meta.hot,
         );
       }
 
-      if (typeof CompLet === "function" && CompLet.length <= 1) {
+      if (import.meta.hot && typeof CompLet === "function") {
         CompLet = $$refresh.createHmrComponent(
           $$registry, "CompLet", CompLet,
-          { key: "useState/useRef", remount: false }
+          { key: "useState/useRef", remount: false },
+          import.meta.hot,
         );
       }
 
-      if (typeof CompConst === "function" && CompConst.length <= 1) {
+      if (import.meta.hot && typeof CompConst === "function") {
         CompConst = $$refresh.createHmrComponent(
           $$registry, "CompConst", CompConst,
-          { key: "", remount: false }
+          { key: "", remount: false },
+          import.meta.hot,
+        );
+      }
+
+      if (import.meta.hot && typeof CompInternal === "function") {
+        CompInternal = $$refresh.createHmrComponent(
+          $$registry, "CompInternal", CompInternal,
+          { key: "", remount: false },
+          import.meta.hot,
         );
       }
 

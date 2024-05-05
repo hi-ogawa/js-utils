@@ -1,5 +1,5 @@
 import { type FilterPattern, type Plugin, createFilter } from "vite";
-import { hmrTransform2 } from "./transform";
+import { hmrTransform } from "./transform";
 
 export function vitePluginTinyRefresh(options?: {
   include?: FilterPattern;
@@ -18,7 +18,7 @@ export function vitePluginTinyRefresh(options?: {
     apply: "serve",
     transform(code, id, transformOptions) {
       if (!transformOptions?.ssr && filter(id)) {
-        return hmrTransform2(code, {
+        return hmrTransform(code, {
           runtime: options?.runtime ?? "react",
           refreshRuntime: options?.refreshRuntime ?? "@hiogawa/tiny-refresh",
           debug: true,

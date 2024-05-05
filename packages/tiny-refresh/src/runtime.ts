@@ -56,8 +56,6 @@ export function createHmrRegistry(
 }
 
 interface HmrComponentOptions {
-  // TODO: remove
-  remount: boolean;
   key?: string;
 }
 
@@ -97,9 +95,8 @@ export function createHmrComponent(
       return `!!! [tiny-refresh] missing '${name}' !!!`;
     }
 
-    //   This directly calls into functional component and use it as implementation of `UnsafeWrapperFc`.
-    //   This won't cause re-mount but it must ensure hook usage didn't change, otherwise it'll crash client.
-    //   Ideally, to employ this approach, we need to detect the usage of hook and force remount when hook usage is changed.
+    // This directly calls into functional component and use it as implementation of `UnsafeWrapperFc`.
+    // We change `key` when hook count changes so that it will remount.
     return createElement(UnsafeWrapperFc, {
       key: data.options.key,
       data,
@@ -170,9 +167,8 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
 
     // TODO: debounce re-rendering
     if (latestReg.debug) {
-      // cf. "[vite] hot updated" log https://github.com/vitejs/vite/pull/8855
       console.debug(
-        `[tiny-refresh] refresh '${key}' (remount = ${initial.options.remount}, listeners.size = ${initial.listeners.size})`
+        `[tiny-refresh] refresh '${key}' (key = ${latest.options.key}, listeners.size = ${initial.listeners.size})`
       );
     }
     for (const setState of initial.listeners) {
