@@ -90,12 +90,6 @@ test("hmr show/hide", async ({ page }) => {
     await page.getByRole("button", { name: "+1" }).first().click();
   }
 
-  async function checkInner(value: number, add: number) {
-    const text = `Inner: counter + ${add} = ${value + add}`;
-    await page.locator("#inner1").getByText(text).click();
-    await page.locator("#inner2").getByText(text).click();
-  }
-
   await expect(page.locator("#inner4-message")).toHaveText("hello");
   await increment();
   await expect(page.locator("#inner4-message")).toHaveText("");

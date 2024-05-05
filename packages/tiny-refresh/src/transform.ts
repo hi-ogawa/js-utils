@@ -4,7 +4,7 @@ import { parseAstAsync } from "vite";
 
 interface HmrTransformOptions {
   runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
-  refreshRuntime?: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
+  refreshRuntime: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
   bundler?: "vite" | "webpack4";
   autoDetect?: boolean;
   debug?: boolean;
@@ -143,7 +143,7 @@ export async function hmrTransform2(
   }
   let footer = /* js */ `
 import * as $$runtime from "${options.runtime}";
-import * as $$refresh from "${options.refreshRuntime ?? options.runtime}";
+import * as $$refresh from "${options.refreshRuntime}";
 const $$registry = $$refresh.createHmrRegistry(
   {
     createElement: $$runtime.createElement,
