@@ -1,4 +1,6 @@
 import { tinyassert } from "@hiogawa/utils";
+import { stripLiteral } from "strip-literal";
+import { parseAstAsync } from "vite";
 
 interface HmrTransformOptions {
   runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
@@ -109,7 +111,6 @@ if (typeof ${name} === "function" && ${name}.length <= 1) {
 }
 `;
 
-// /* js */ comment is for https://github.com/mjbvz/vscode-comment-tagged-templates
 const headerCode = (
   runtime: string,
   refresh: string,
@@ -137,3 +138,159 @@ if (module.hot) {
   $$refresh.setupHmrWebpack(module.hot, $$registry);
 }
 `;
+
+export async function hmrTransform2(
+  code: string,
+  options: HmrTransformOptions
+) {
+  const result = await analyzeCode(code);
+  if (result.errors.length || result.entries.length === 0) {
+    return;
+  }
+  let footer = /* js */ `
+import * as $$runtime from "${options.runtime}";
+import * as $$refresh from "${options.refreshRuntime ?? options.runtime}";
+const $$registry = $$refresh.createHmrRegistry(
+  {
+    createElement: $$runtime.createElement,
+    useReducer: $$runtime.useReducer,
+    useEffect: $$runtime.useEffect,
+  },
+  ${options.debug},
+);
+`;
+  for (const entry of result.entries) {
+    footer += wrapCreateHmrComponent(entry.id, true);
+  }
+  // no need to manipulate sourcemap since transform only appends
+  return [result.outCode, footer].join("\n\n");
+}
+
+import type * as estree from "estree";
+
+// extend types for rollup ast with node position
+declare module "estree" {
+  interface BaseNode {
+    start: number;
+    end: number;
+  }
+}
+
+type HotEntry = {
+  id: string;
+  hooks: string[];
+};
+
+const HOOK_CALL_RE = /\b(use\w*)\b/;
+
+async function analyzeCode(code: string) {
+  const ast = await parseAstAsync(code);
+  const errors: unknown[] = [];
+  const entries: HotEntry[] = [];
+
+  // replace "export const" with "export let"
+  let outCode = code;
+
+  // loop exports
+  // https://github.com/hi-ogawa/vite-plugins/blob/243064edcf80429be13bee81c0dc1d7bea670f4b/packages/react-server/src/plugin/ast-utils.ts#L14
+  for (const node of ast.body) {
+    // named exports
+    if (node.type === "ExportNamedDeclaration") {
+      if (node.declaration) {
+        if (node.declaration.type === "FunctionDeclaration") {
+          /**
+           * export function foo() {}
+           */
+          entries.push({
+            id: node.declaration.id.name,
+            hooks: analyzeFunction(code, node.declaration).hooks,
+          });
+        } else if (node.declaration.type === "VariableDeclaration") {
+          /**
+           * export const foo = 1, bar = 2
+           */
+          // replace "const" to "let"
+          if (node.declaration.kind === "const") {
+            const start = node.declaration.start;
+            outCode = replaceCode(outCode, start, start + 5, "let  ");
+          }
+          for (const decl of node.declaration.declarations) {
+            if (
+              decl.id.type === "Identifier" &&
+              decl.init &&
+              decl.init.type === "ArrowFunctionExpression"
+            ) {
+              entries.push({
+                id: decl.id.name,
+                hooks: analyzeFunction(code, decl.init).hooks,
+              });
+            } else {
+              errors.push(decl);
+            }
+          }
+        } else {
+          errors.push(node);
+        }
+      } else {
+        /**
+         * export { foo, bar } from './foo'
+         * export { foo, bar as car }
+         */
+        errors.push(node);
+      }
+    }
+
+    // default export
+    if (node.type === "ExportDefaultDeclaration") {
+      /**
+       * export default function foo() {}
+       */
+      if (
+        node.declaration.type === "FunctionDeclaration" &&
+        node.declaration.id
+      ) {
+        entries.push({
+          id: node.declaration.id.name,
+          hooks: analyzeFunction(code, node.declaration).hooks,
+        });
+      } else {
+        errors.push(node);
+      }
+    }
+
+    /**
+     * export * from './foo'
+     */
+    if (node.type === "ExportAllDeclaration") {
+      errors.push(node);
+    }
+  }
+  return {
+    entries,
+    outCode,
+    errors,
+  };
+}
+
+function analyzeFunction(
+  code: string,
+  node:
+    | estree.FunctionDeclaration
+    | estree.ArrowFunctionExpression
+    | estree.MaybeNamedFunctionDeclaration
+) {
+  const bodyCode = code.slice(node.body.start, node.body.end);
+  const bodyCodeStrip = stripLiteral(bodyCode);
+  const matches = bodyCodeStrip.matchAll(HOOK_CALL_RE);
+  const hooks = [...matches].map((m) => m[1]!);
+  return { hooks };
+}
+
+function replaceCode(
+  code: string,
+  start: number,
+  end: number,
+  content: string
+) {
+  return code.slice(0, start) + content + code.slice(end);
+}

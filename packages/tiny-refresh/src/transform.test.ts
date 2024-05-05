@@ -5,6 +5,7 @@ describe(hmrTransform, () => {
   it("basic", () => {
     const input = `\
 // @hmr
+"hmr"
 export default function CompFn() {
   return <div>hello</div>;
 }
