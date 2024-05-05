@@ -27,6 +27,7 @@ export default defineConfig((env) => ({
   build: {
     outDir: env.isSsrBuild ? "dist/server" : "dist/client",
     sourcemap: true,
+    manifest: true,
     minify: false,
   },
 }));
