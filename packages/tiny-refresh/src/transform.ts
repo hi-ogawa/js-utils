@@ -199,7 +199,8 @@ function analyzeFunction(
     | estree.ArrowFunctionExpression
     | estree.MaybeNamedFunctionDeclaration
 ) {
-  // NOTE: we could also do this runtime via `fn.toString()`
+  // we could do this runtime via `fn.toString()`,
+  // but that will impact performance on each render.
   const bodyCode = code.slice(node.body.start, node.body.end);
   const matches = bodyCode.matchAll(HOOK_CALL_RE);
   const hooks = [...matches].map((m) => m[1]!);
