@@ -34,6 +34,11 @@ const parseArgsConfig = {
       $description: "(default: HEAD)",
       $argument: "<commit>",
     },
+    repo: {
+      type: "string",
+      $description: "repository url for PR link formatting",
+      $argument: "<url>",
+    },
     dry: {
       type: "boolean",
     },
@@ -143,13 +148,15 @@ async function getGitlogs(opts: {
     .map(([hash, subject]) => ({ hash, subject }));
 }
 
-function formatMessage(s: string, opts: { removeScope?: boolean }) {
+function formatMessage(
+  s: string,
+  opts: { removeScope?: boolean; repo?: string }
+) {
   // format PR url
   //   (#184)  ⇒  ([#184](https://github.com/hi-ogawa/vite-plugins/pull/184))
-  s = s.replace(
-    /\(#(\d+)\)/,
-    "([#$1](https://github.com/hi-ogawa/vite-plugins/pull/$1))"
-  );
+  if (opts.repo) {
+    s = s.replace(/\(#(\d+)\)/, `([#$1](${opts.repo}/pull/$1))`);
+  }
   // remove scope
   //   feat(react-server): ...  ⇒  feat: ...
   if (opts.removeScope) {
