@@ -173,6 +173,7 @@ function reconcileNode(
       } satisfies BFragment;
     }
     // unmount excess bnode.children
+    // TODO: is it already handled above?
     const bchildren = bnode.children;
     for (const bchild of bchildren.slice(vnode.children.length)) {
       unmount(bchild);
@@ -485,7 +486,7 @@ function alignChildrenByKey(
 
   // for now, handle only when all nodes have keys
   if (keyMap.size !== vnodes.length) {
-    return [bnodes, []];
+    return [bnodes.slice(0, vnodes.length), bnodes.slice(vnodes.length)];
   }
 
   const newBnodes: BNode[] = vnodes.map(() => EMPTY_NODE);
