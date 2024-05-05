@@ -1,6 +1,6 @@
 import { once } from "@hiogawa/utils";
 import { useEffect, useRef, useState } from "../hooks";
-import { render } from "../reconciler";
+import { hydrate, render } from "../reconciler";
 import {
   type BNode,
   EMPTY_NODE,
@@ -36,6 +36,19 @@ export function useSyncExternalStore<T>(
 // https://react.dev/reference/react-dom/client/createRoot
 export function createRoot(container: Element) {
   let bnode: BNode | undefined;
+  return {
+    render: (vnode: VNode) => {
+      bnode = render(vnode, container, bnode);
+    },
+    unmount() {
+      render(EMPTY_NODE, container, bnode);
+    },
+  };
+}
+
+// https://react.dev/reference/react-dom/client/hydrateRoot
+export function hydrateRoot(container: Element, vnode: VNode) {
+  let bnode = hydrate(vnode, container);
   return {
     render: (vnode: VNode) => {
       bnode = render(vnode, container, bnode);

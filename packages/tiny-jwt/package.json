@@ -36,9 +36,9 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
-    "@hiogawa/utils": "workspace:*",
     "@hiogawa/tiny-cli": "workspace:*",
-    "@types/node": "^18.17.1"
+    "@hiogawa/utils": "workspace:*",
+    "@types/node": "^20.11.19"
   },
   "volta": {
     "extends": "../../package.json"

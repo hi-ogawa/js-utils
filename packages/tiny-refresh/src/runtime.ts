@@ -2,9 +2,10 @@
 namespace ReactTypes {
   export type FC = (props: any) => unknown;
   export type createElement = (...args: any[]) => unknown;
-  export type useState = <T>(
-    init: T | (() => T)
-  ) => [T, (next: T | ((prev: T) => T)) => void];
+  export type useReducer = <S, A>(
+    reducer: (prevState: S, action: A) => S,
+    initialState: S
+  ) => [S, (action: A) => void];
   export type useEffect = (effect: () => void, deps?: unknown[]) => void;
 }
 
@@ -31,16 +32,19 @@ interface HotData {
 interface HmrRegistry {
   runtime: {
     createElement: ReactTypes.createElement;
-    useState: ReactTypes.useState;
+    useReducer: ReactTypes.useReducer;
     useEffect: ReactTypes.useEffect;
   };
-  debug?: boolean; // to hide log for testing
   componentMap: Map<string, HmrComponentData>;
+  debug?: boolean; // to hide log for testing
+  // each HmrRegistry references initial registry (except initial module itself)
+  // as we keep all following changes reflected to the initial registry.
+  initial?: HmrRegistry;
 }
 
 interface HmrComponentData {
   component: ReactTypes.FC;
-  listeners: Set<(latest: HmrComponentData) => void>;
+  listeners: Set<() => void>;
   options: HmrComponentOptions;
 }
 
@@ -65,25 +69,36 @@ export function createHmrComponent(
   Fc: ReactTypes.FC,
   options: HmrComponentOptions
 ) {
-  const current: HmrComponentData = {
+  registry.componentMap.set(name, {
     component: Fc,
     listeners: new Set(),
     options,
-  };
-  registry.componentMap.set(name, current);
+  });
 
-  const { createElement, useEffect, useState } = registry.runtime;
+  const { createElement, useEffect, useReducer } = registry.runtime;
 
   const WrapperFc: ReactTypes.FC = (props) => {
-    const [latest, setLatest] = useState(() => current);
+    const data = (registry.initial ?? registry).componentMap.get(name);
+
+    const forceUpdate = useReducer<boolean, void>(
+      (prev: boolean) => !prev,
+      true
+    )[1];
 
     useEffect(() => {
-      // expose setter to force update
-      current.listeners.add(setLatest);
+      if (!data) {
+        return;
+      }
+      // expose "force update" to registry
+      data.listeners.add(forceUpdate);
       return () => {
-        current.listeners.delete(setLatest);
+        data.listeners.delete(forceUpdate);
       };
     }, []);
+
+    if (!data) {
+      return `!!! [tiny-refresh] missing '${name}' !!!`;
+    }
 
     //
     // approach 1.
@@ -103,19 +118,22 @@ export function createHmrComponent(
     //   For now, however, we allow this mode via explicit "// @hmr-unsafe" comment.
     //
 
-    return latest.options.remount
-      ? createElement(latest.component, props)
-      : createElement(UnsafeWrapperFc, { latest, props });
+    return data.options.remount
+      ? createElement(data.component, props)
+      : createElement(UnsafeWrapperFc, {
+          data,
+          props,
+        });
   };
 
   const UnsafeWrapperFc: ReactTypes.FC = ({
-    latest,
+    data,
     props,
   }: {
-    latest: HmrComponentData;
+    data: HmrComponentData;
     props: any;
   }) => {
-    return latest.component(props);
+    return data.component(props);
   };
 
   // patch Function.name for react error stacktrace
@@ -132,31 +150,42 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     ...currentReg.componentMap.keys(),
     ...latestReg.componentMap.keys(),
   ]);
+
+  // pass reference to initial registry
+  const initialReg = currentReg.initial ?? currentReg;
+  latestReg.initial = initialReg;
+
   for (const key of keys) {
-    const current = currentReg.componentMap.get(key);
+    const initial = initialReg.componentMap.get(key);
     const latest = latestReg.componentMap.get(key);
-    if (!current || !latest) {
+    if (!initial || !latest) {
       return false;
     }
-
-    // copy over some states from current component
-    latest.listeners = current.listeners;
 
     // Skip re-rendering if function code is exactly same.
     // Note that this can cause "false-negative", for example,
     // when a constant defined in the same file has changed
     // and such constant is used by the component.
-    if (current.component.toString() === latest.component.toString()) {
+    // TODO: instead of completely skipping, we could still render with "unsafe" mode since no change in component implies there's no hook change.
+    const skip = initial.component.toString() === latest.component.toString();
+
+    // sync "latest" to "initial"
+    initial.component = latest.component;
+    initial.options = latest.options;
+
+    if (skip) {
       continue;
     }
+
+    // TODO: debounce re-rendering
     if (latestReg.debug) {
       // cf. "[vite] hot updated" log https://github.com/vitejs/vite/pull/8855
       console.debug(
-        `[tiny-refresh] refresh '${key}' (remount = ${latest.options.remount}, listeners.size = ${latest.listeners.size})`
+        `[tiny-refresh] refresh '${key}' (remount = ${initial.options.remount}, listeners.size = ${initial.listeners.size})`
       );
     }
-    for (const setState of latest.listeners) {
-      setState(latest);
+    for (const setState of initial.listeners) {
+      setState();
     }
   }
   return true;
@@ -182,7 +211,7 @@ export function setupHmrWebpack(hot: WebpackHot, registry: HmrRegistry) {
   // perspective flips for webpack since `hot.data` is passed by old module.
   const lastRegistry = hot.data && hot.data[REGISTRY_KEY];
   if (lastRegistry) {
-    const patchSuccess = lastRegistry && patchRegistry(lastRegistry, registry);
+    const patchSuccess = patchRegistry(lastRegistry, registry);
     if (!patchSuccess) {
       hot.invalidate();
     }

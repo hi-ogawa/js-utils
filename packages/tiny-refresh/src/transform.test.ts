@@ -31,11 +31,11 @@ function CompNooo() {
       })
     ).toMatchInlineSnapshot(`
       "
-      import * as $$runtime from \\"react\\";
-      import * as $$refresh from \\"@hiogawa/tiny-refresh\\";
+      import * as $$runtime from "react";
+      import * as $$refresh from "@hiogawa/tiny-refresh";
       const $$registry = $$refresh.createHmrRegistry({
         createElement: $$runtime.createElement,
-        useState: $$runtime.useState,
+        useReducer: $$runtime.useReducer,
         useEffect: $$runtime.useEffect,
       }, false);
 
@@ -59,21 +59,21 @@ function CompNooo() {
       }
 
 
-      if (typeof CompFn === \\"function\\" && CompFn.length <= 1) {
+      if (typeof CompFn === "function" && CompFn.length <= 1) {
         var $$tmp_CompFn = CompFn;
-        CompFn = $$refresh.createHmrComponent($$registry, \\"CompFn\\", $$tmp_CompFn, { remount: true });
+        CompFn = $$refresh.createHmrComponent($$registry, "CompFn", $$tmp_CompFn, { remount: true });
       }
 
 
-      if (typeof CompLet === \\"function\\" && CompLet.length <= 1) {
+      if (typeof CompLet === "function" && CompLet.length <= 1) {
         var $$tmp_CompLet = CompLet;
-        CompLet = $$refresh.createHmrComponent($$registry, \\"CompLet\\", $$tmp_CompLet, { remount: true });
+        CompLet = $$refresh.createHmrComponent($$registry, "CompLet", $$tmp_CompLet, { remount: true });
       }
 
 
-      if (typeof CompConst === \\"function\\" && CompConst.length <= 1) {
+      if (typeof CompConst === "function" && CompConst.length <= 1) {
         var $$tmp_CompConst = CompConst;
-        CompConst = $$refresh.createHmrComponent($$registry, \\"CompConst\\", $$tmp_CompConst, { remount: false });
+        CompConst = $$refresh.createHmrComponent($$registry, "CompConst", $$tmp_CompConst, { remount: false });
       }
 
 
@@ -122,11 +122,11 @@ const UPPER = 1;
       })
     ).toMatchInlineSnapshot(`
       "
-      import * as $$runtime from \\"react\\";
-      import * as $$refresh from \\"@hiogawa/tiny-refresh\\";
+      import * as $$runtime from "react";
+      import * as $$refresh from "@hiogawa/tiny-refresh";
       const $$registry = $$refresh.createHmrRegistry({
         createElement: $$runtime.createElement,
-        useState: $$runtime.useState,
+        useReducer: $$runtime.useReducer,
         useEffect: $$runtime.useEffect,
       }, false);
 
@@ -158,33 +158,33 @@ const UPPER = 1;
 
 
 
-      if (typeof CompFn === \\"function\\" && CompFn.length <= 1) {
+      if (typeof CompFn === "function" && CompFn.length <= 1) {
         var $$tmp_CompFn = CompFn;
-        CompFn = $$refresh.createHmrComponent($$registry, \\"CompFn\\", $$tmp_CompFn, { remount: true });
+        CompFn = $$refresh.createHmrComponent($$registry, "CompFn", $$tmp_CompFn, { remount: true });
       }
 
 
-      if (typeof CompLet === \\"function\\" && CompLet.length <= 1) {
+      if (typeof CompLet === "function" && CompLet.length <= 1) {
         var $$tmp_CompLet = CompLet;
-        CompLet = $$refresh.createHmrComponent($$registry, \\"CompLet\\", $$tmp_CompLet, { remount: true });
+        CompLet = $$refresh.createHmrComponent($$registry, "CompLet", $$tmp_CompLet, { remount: true });
       }
 
 
-      if (typeof CompConst === \\"function\\" && CompConst.length <= 1) {
+      if (typeof CompConst === "function" && CompConst.length <= 1) {
         var $$tmp_CompConst = CompConst;
-        CompConst = $$refresh.createHmrComponent($$registry, \\"CompConst\\", $$tmp_CompConst, { remount: false });
+        CompConst = $$refresh.createHmrComponent($$registry, "CompConst", $$tmp_CompConst, { remount: false });
       }
 
 
-      if (typeof CompFn2 === \\"function\\" && CompFn2.length <= 1) {
+      if (typeof CompFn2 === "function" && CompFn2.length <= 1) {
         var $$tmp_CompFn2 = CompFn2;
-        CompFn2 = $$refresh.createHmrComponent($$registry, \\"CompFn2\\", $$tmp_CompFn2, { remount: true });
+        CompFn2 = $$refresh.createHmrComponent($$registry, "CompFn2", $$tmp_CompFn2, { remount: true });
       }
 
 
-      if (typeof UPPER === \\"function\\" && UPPER.length <= 1) {
+      if (typeof UPPER === "function" && UPPER.length <= 1) {
         var $$tmp_UPPER = UPPER;
-        UPPER = $$refresh.createHmrComponent($$registry, \\"UPPER\\", $$tmp_UPPER, { remount: true });
+        UPPER = $$refresh.createHmrComponent($$registry, "UPPER", $$tmp_UPPER, { remount: true });
       }
 
 

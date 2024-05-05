@@ -1,6 +1,7 @@
 import {
   type Result,
-  newPromiseWithResolvers,
+  createManualPromise,
+  uniq,
   wrapErrorAsync,
 } from "@hiogawa/utils";
 import {
@@ -11,8 +12,9 @@ import {
 } from "./core";
 
 // TODO:
-// - support "transferable"?
 // - dispose?
+// - handle connection error?
+// - just use same API as birpc? (send/on/serialize/deserialize)
 
 //
 // slim down MessagePort interface
@@ -20,12 +22,17 @@ import {
 //
 
 export interface TinyRpcMessagePort {
-  postMessage(data: unknown): void;
+  postMessage(data: unknown, options?: postMessageOptions): void;
   addEventListener(type: "message", handler: MessageHandler): void;
   removeEventListener(type: "message", handler: MessageHandler): void;
 }
 
-type MessageHandler = (ev: { data: unknown }) => void;
+// cf. StructuredSerializeOptions
+type postMessageOptions = {
+  transfer?: unknown[];
+};
+
+export type MessageHandler = (ev: { data: unknown }) => void;
 
 //
 // adapter
@@ -34,26 +41,42 @@ type MessageHandler = (ev: { data: unknown }) => void;
 export function messagePortServerAdapter({
   port,
   onError,
+  tag,
+  serialize = (v) => v,
+  deserialize = (v) => v,
 }: {
   port: TinyRpcMessagePort;
   onError?: (e: unknown) => void;
+  tag?: string; // extra tag to resue single port for a different purpose
+  serialize?: (v: any) => any;
+  deserialize?: (v: any) => any;
 }): TinyRpcServerAdapter<() => void> {
   return {
     register: (invokeRoute) => {
       // TODO: async handler caveat
       return listen(port, async (ev) => {
         // TODO: collision check req.id on server?
-        const req = ev.data as RequestPayload;
-        const result = await wrapErrorAsync(async () => invokeRoute(req.data));
+        const req = deserialize(ev.data) as RequestPayload;
+        if (req.type !== "request" || req.tag !== tag) {
+          return;
+        }
+        let transfer!: unknown[];
+        const result = await wrapErrorAsync(async () => {
+          let ret = await invokeRoute(req.data);
+          [ret, transfer] = unwrapTransfer(ret);
+          return ret;
+        });
         if (!result.ok) {
           onError?.(result.value);
           result.value = TinyRpcError.fromUnknown(result.value).serialize();
         }
         const res: ResponsePayload = {
+          type: "response",
           id: req.id,
           result,
+          tag,
         };
-        port.postMessage(res);
+        port.postMessage(serialize(res), { transfer });
       });
     },
   };
@@ -62,26 +85,37 @@ export function messagePortServerAdapter({
 export function messagePortClientAdapter({
   port,
   generateId = defaultGenerateId,
+  tag,
+  serialize = (v) => v,
+  deserialize = (v) => v,
 }: {
   port: TinyRpcMessagePort;
   generateId?: () => string;
+  tag?: string; // extra tag to resue single port for a different purpose
+  serialize?: (v: any) => any;
+  deserialize?: (v: any) => any;
 }): TinyRpcClientAdapter {
   return {
     send: async (data) => {
+      const unwraped = data.args.map((arg) => unwrapTransfer(arg));
+      const args = unwraped.map(([arg]) => arg);
+      const transfer = uniq(unwraped.flatMap(([_, t]) => t));
       const req: RequestPayload = {
+        type: "request",
+        tag,
         id: generateId(),
-        data,
+        data: { ...data, args },
       };
-      const promiseResolvers = newPromiseWithResolvers<ResponsePayload>();
+      const responsePromise = createManualPromise<ResponsePayload>();
       const unlisten = listen(port, (ev) => {
-        const res = ev.data as ResponsePayload;
-        if (res.id === req.id) {
-          promiseResolvers.resolve(res);
+        const res = deserialize(ev.data) as ResponsePayload;
+        if (res.id === req.id && res.tag === tag) {
+          responsePromise.resolve(res);
           unlisten();
         }
       });
-      port.postMessage(req);
-      const res = await promiseResolvers.promise;
+      port.postMessage(serialize(req), { transfer });
+      const res = await responsePromise;
       if (!res.result.ok) {
         throw TinyRpcError.deserialize(res.result.value);
       }
@@ -91,16 +125,20 @@ export function messagePortClientAdapter({
 }
 
 interface RequestPayload {
+  type: "request";
+  tag?: string;
   id: string;
   data: TinyRpcPayload;
 }
 
 interface ResponsePayload {
+  type: "response";
+  tag?: string;
   id: string;
   result: Result<unknown, unknown>;
 }
 
-function defaultGenerateId() {
+export function defaultGenerateId() {
   if (typeof globalThis?.crypto?.randomUUID !== "undefined") {
     return globalThis.crypto.randomUUID();
   }
@@ -123,4 +161,22 @@ function listen(port: TinyRpcMessagePort, listener: MessageHandler) {
   return () => {
     port.removeEventListener("message", listener);
   };
+}
+
+class WrapepdTransfer {
+  constructor(public inner: [unknown, unknown[]]) {}
+}
+
+export function messagePortWrapTransfer<T>(
+  value: T,
+  transferables: unknown[]
+): T {
+  return new WrapepdTransfer([value, transferables]) as any;
+}
+
+function unwrapTransfer(value: unknown): [unknown, unknown[]] {
+  if (value instanceof WrapepdTransfer) {
+    return value.inner;
+  }
+  return [value, []];
 }

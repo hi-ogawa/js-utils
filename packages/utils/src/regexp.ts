@@ -1,26 +1,19 @@
-import { zip } from "./lodash";
 import { tinyassert } from "./tinyassert";
 
 /**
- * new RegExp(String.raw`...`) with inner strings are escaped which allows easier composition for matching urls e.g.
+ * Composition of `String.raw` and `RegExp`
  * @example
  * regExpRaw`/username/${/\w+/}/profile`
  */
 export function regExpRaw(
-  { raw }: TemplateStringsArray,
-  ...params: RegExp[]
+  strings: TemplateStringsArray,
+  ...params: (string | RegExp)[]
 ): RegExp {
-  tinyassert(raw.length === params.length + 1);
   return new RegExp(
-    [
-      ...zip(
-        raw,
-        params.map((p) => p.source)
-      ),
-      raw.slice(-1),
-    ]
-      .flat()
-      .join("")
+    String.raw(
+      strings,
+      ...params.map((p) => (typeof p === "string" ? p : p.source))
+    )
   );
 }
 

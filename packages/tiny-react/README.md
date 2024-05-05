@@ -2,7 +2,7 @@
 
 Experiment to study react-like virtual-dom rendering implementation.
 
-Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and [preact](https://github.com/preactjs/preact).
+Internal architecture is inspired by [yew](https://github.com/yewstack/yew)
 
 ## features
 
@@ -12,6 +12,7 @@ Internal architecture is inspired by [yew](https://github.com/yewstack/yew) and 
 - jsx-runtime (similar typescript DX as react)
 - hmr (via [`tiny-refresh`](https://github.com/hi-ogawa/js-utils/blob/a93f919c083c3ab0f505f1179124397c8f8f1b0d/packages/tiny-refresh/README.md))
 - ssr
+- server component and client reference
 
 ## unsupported
 

@@ -240,6 +240,7 @@ function reconcileNode(
   return bnode;
 }
 
+// TODO: check excess nodes during SSR?
 function hydrateNode(
   vnode: VNode,
   hparent: HNode,
@@ -263,7 +264,24 @@ function hydrateNode(
       listeners: new Map(),
     } satisfies BTag;
   } else if (vnode.type === NODE_TYPE_TEXT) {
-    const hnode = hnextSibling?.previousSibling ?? hparent.lastChild;
+    let hnode = hnextSibling?.previousSibling ?? hparent.lastChild;
+    // no text node for empty text during SSR
+    if (hnode === null && vnode.data === "") {
+      return EMPTY_NODE;
+    }
+    // split concatenated single text during SSR
+    // (is this what preact does? https://github.com/preactjs/preact/blob/f96350987873bd4082c347cbc00cdc43ebfd0b4e/src/diff/index.js#L419)
+    if (
+      hnode instanceof Text &&
+      hnode.data.length > vnode.data.length &&
+      hnode.data.endsWith(vnode.data)
+    ) {
+      hparent.insertBefore(
+        document.createTextNode(hnode.data.slice(0, -vnode.data.length)),
+        hnode
+      );
+      hnode.data = vnode.data;
+    }
     tinyassert(
       hnode instanceof Text,
       `text hydration mismatch (actual: '${hnode?.nodeName}', expected: '#text')`

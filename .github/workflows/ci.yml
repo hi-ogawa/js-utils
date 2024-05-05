@@ -3,18 +3,31 @@ on:
   push:
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: pnpm/action-setup@v2.0.1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          version: 8
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 18
-      - run: pnpm i --frozen-lockfile
+          node-version: 20
+      - run: corepack enable
+      - run: pnpm i
       - run: pnpm lint-check
       - run: pnpm build
       - run: pnpm tsc
       - run: pnpm test
       - run: npx typedoc
+
+  tiny-react:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: corepack enable
+      - run: pnpm i
+      - run: pnpm build
+      - run: npx playwright install chromium
+      - run: pnpm -C packages/tiny-react/examples/server test-e2e
+      - run: pnpm -C packages/tiny-react/examples/server build
+      - run: pnpm -C packages/tiny-react/examples/server test-e2e-preview

@@ -1,7 +1,7 @@
 import fs from "node:fs";
-import { test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-test("hmr", async ({ page }) => {
+test("hmr basic", async ({ page }) => {
   await page.goto("/");
 
   async function increment() {
@@ -79,6 +79,39 @@ test("hmr", async ({ page }) => {
           );
         }
       );
+    }
+  );
+});
+
+test("hmr show/hide", async ({ page }) => {
+  await page.goto("/");
+
+  async function increment() {
+    await page.getByRole("button", { name: "+1" }).first().click();
+  }
+
+  async function checkInner(value: number, add: number) {
+    const text = `Inner: counter + ${add} = ${value + add}`;
+    await page.locator("#inner1").getByText(text).click();
+    await page.locator("#inner2").getByText(text).click();
+  }
+
+  await expect(page.locator("#inner4-message")).toHaveText("hello");
+  await increment();
+  await expect(page.locator("#inner4-message")).toHaveText("");
+  await increment();
+  await expect(page.locator("#inner4-message")).toHaveText("hello");
+
+  // update message
+  await withEditFile(
+    "src/other-file.tsx",
+    (code) => code.replace(`const message = "hello"`, `const message = "hey"`),
+    async () => {
+      await expect(page.locator("#inner4-message")).toHaveText("hey");
+      await increment();
+      await expect(page.locator("#inner4-message")).toHaveText("");
+      await increment();
+      await expect(page.locator("#inner4-message")).toHaveText("hey");
     }
   );
 });

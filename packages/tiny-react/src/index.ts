@@ -11,3 +11,10 @@ export { h } from "./helper/hyperscript";
 export * from "./hooks";
 export * from "./compat";
 export * from "./ssr/render";
+export {
+  serializeNode,
+  deserializeNode,
+  type SerializeResult,
+  type ReferenceMap,
+} from "./server";
+export { registerClientReference } from "./server/types";

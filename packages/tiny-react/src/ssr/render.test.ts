@@ -16,7 +16,7 @@ describe(renderToString, () => {
       )
     );
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<div class=\\"flex\\" aria-current=\\"\\">hello<span title=\\"foo\\">world</span></div>"'
+      `"<div class="flex" aria-current="">hello<span title="foo">world</span></div>"`
     );
   });
 
@@ -30,7 +30,7 @@ describe(renderToString, () => {
   it("escape", () => {
     const vnode = h.div({ title: "a & b" }, "<hehe />", "'\"");
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<div title=\\"a &amp; b\\">&lt;hehe /&gt;&#x27;&quot;</div>"'
+      `"<div title="a &amp; b">&lt;hehe /&gt;&#x27;&quot;</div>"`
     );
   });
 
@@ -54,7 +54,7 @@ describe(renderToString, () => {
       inputMode: "numeric",
     });
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<input maxlength=\\"0\\" readonly=\\"true\\" inputmode=\\"numeric\\"/>"'
+      `"<input maxlength="0" readonly="true" inputmode="numeric"/>"`
     );
   });
 
@@ -72,7 +72,7 @@ describe(renderToString, () => {
       h.option({ value: "b" }, "y")
     );
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<select><option value=\\"a\\">x</option><option selected=\\"true\\" value=\\"b\\">y</option></select>"'
+      `"<select><option value="a">x</option><option selected="true" value="b">y</option></select>"`
     );
   });
 });

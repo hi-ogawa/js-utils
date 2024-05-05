@@ -35,121 +35,121 @@ describe("superjson", () => {
     const stringified = JSON.stringify(superjson.serialize(original), null, 2);
     expect(stringified).toMatchInlineSnapshot(`
       "{
-        \\"json\\": [
+        "json": [
           null,
           true,
           123,
-          \\"string\\",
+          "string",
           [
-            \\"array\\"
+            "array"
           ],
           {
-            \\"k\\": \\"v\\"
+            "k": "v"
           },
           null,
-          \\"Infinity\\",
-          \\"-Infinity\\",
-          \\"NaN\\",
+          "Infinity",
+          "-Infinity",
+          "NaN",
           0,
-          \\"-0\\",
-          \\"2023-08-17T00:00:00.000Z\\",
-          \\"1234\\",
-          \\"/^\\\\\\\\d+/gms\\",
+          "-0",
+          "2023-08-17T00:00:00.000Z",
+          "1234",
+          "/^\\\\d+/gms",
           [
             [
               0,
-              \\"1970-01-01T00:00:00.000Z\\"
+              "1970-01-01T00:00:00.000Z"
             ],
             [
-              \\"1\\",
+              "1",
               [
-                \\"/a/g\\"
+                "/a/g"
               ]
             ]
           ],
           [
             0,
-            \\"1970-01-01T00:00:00.000Z\\",
+            "1970-01-01T00:00:00.000Z",
             [
               [
-                \\"1\\",
-                \\"/a/g\\"
+                "1",
+                "/a/g"
               ]
             ]
           ],
           [
-            \\"!NaN\\",
-            \\"collision\\"
+            "!NaN",
+            "collision"
           ]
         ],
-        \\"meta\\": {
-          \\"values\\": {
-            \\"6\\": [
-              \\"undefined\\"
+        "meta": {
+          "values": {
+            "6": [
+              "undefined"
             ],
-            \\"7\\": [
-              \\"number\\"
+            "7": [
+              "number"
             ],
-            \\"8\\": [
-              \\"number\\"
+            "8": [
+              "number"
             ],
-            \\"9\\": [
-              \\"number\\"
+            "9": [
+              "number"
             ],
-            \\"11\\": [
-              \\"number\\"
+            "11": [
+              "number"
             ],
-            \\"12\\": [
-              \\"Date\\"
+            "12": [
+              "Date"
             ],
-            \\"13\\": [
-              \\"bigint\\"
+            "13": [
+              "bigint"
             ],
-            \\"14\\": [
-              \\"regexp\\"
+            "14": [
+              "regexp"
             ],
-            \\"15\\": [
-              \\"map\\",
+            "15": [
+              "map",
               {
-                \\"0.1\\": [
-                  \\"Date\\"
+                "0.1": [
+                  "Date"
                 ],
-                \\"1.0\\": [
-                  \\"bigint\\"
+                "1.0": [
+                  "bigint"
                 ],
-                \\"1.1\\": [
-                  \\"set\\",
+                "1.1": [
+                  "set",
                   {
-                    \\"0\\": [
-                      \\"regexp\\"
+                    "0": [
+                      "regexp"
                     ]
                   }
                 ]
               }
             ],
-            \\"16\\": [
-              \\"set\\",
+            "16": [
+              "set",
               {
-                \\"1\\": [
-                  \\"Date\\"
+                "1": [
+                  "Date"
                 ],
-                \\"2\\": [
-                  \\"map\\",
+                "2": [
+                  "map",
                   {
-                    \\"0.0\\": [
-                      \\"bigint\\"
+                    "0.0": [
+                      "bigint"
                     ],
-                    \\"0.1\\": [
-                      \\"regexp\\"
+                    "0.1": [
+                      "regexp"
                     ]
                   }
                 ]
               }
             ]
           },
-          \\"referentialEqualities\\": {
-            \\"15.1.0\\": [
-              \\"16.2.0.0\\"
+          "referentialEqualities": {
+            "15.1.0": [
+              "16.2.0.0"
             ]
           }
         }
@@ -203,7 +203,9 @@ describe("superjson", () => {
 
 describe("brillout-json-serializer", () => {
   it("basic", async () => {
+    // @ts-ignore no types?
     const { stringify } = await import("@brillout/json-serializer/stringify");
+    // @ts-ignore
     const { parse } = await import("@brillout/json-serializer/parse");
 
     const original = [
@@ -243,27 +245,27 @@ describe("brillout-json-serializer", () => {
         null,
         true,
         123,
-        \\"string\\",
+        "string",
         [
-          \\"array\\"
+          "array"
         ],
         {
-          \\"k\\": \\"v\\"
+          "k": "v"
         },
-        \\"!undefined\\",
-        \\"!Infinity\\",
-        \\"!-Infinity\\",
-        \\"!NaN\\",
+        "!undefined",
+        "!Infinity",
+        "!-Infinity",
+        "!NaN",
         0,
         0,
-        \\"!Date:2023-08-17T00:00:00.000Z\\",
-        \\"!BigInt:1234\\",
-        \\"!RegExp:/^\\\\\\\\d+/gms\\",
-        \\"!Map:[\\\\n  [\\\\n    0,\\\\n    \\\\\\"!Date:1970-01-01T00:00:00.000Z\\\\\\"\\\\n  ],\\\\n  [\\\\n    \\\\\\"!BigInt:1\\\\\\",\\\\n    \\\\\\"!Set:[\\\\\\\\n  \\\\\\\\\\\\\\"!RegExp:/a/g\\\\\\\\\\\\\\"\\\\\\\\n]\\\\\\"\\\\n  ]\\\\n]\\",
-        \\"!Set:[\\\\n  0,\\\\n  \\\\\\"!Date:1970-01-01T00:00:00.000Z\\\\\\",\\\\n  \\\\\\"!Map:[\\\\\\\\n  [\\\\\\\\n    \\\\\\\\\\\\\\"!BigInt:1\\\\\\\\\\\\\\",\\\\\\\\n    \\\\\\\\\\\\\\"!RegExp:/a/g\\\\\\\\\\\\\\"\\\\\\\\n  ]\\\\\\\\n]\\\\\\"\\\\n]\\",
+        "!Date:2023-08-17T00:00:00.000Z",
+        "!BigInt:1234",
+        "!RegExp:/^\\\\d+/gms",
+        "!Map:[\\n  [\\n    0,\\n    \\"!Date:1970-01-01T00:00:00.000Z\\"\\n  ],\\n  [\\n    \\"!BigInt:1\\",\\n    \\"!Set:[\\\\n  \\\\\\"!RegExp:/a/g\\\\\\"\\\\n]\\"\\n  ]\\n]",
+        "!Set:[\\n  0,\\n  \\"!Date:1970-01-01T00:00:00.000Z\\",\\n  \\"!Map:[\\\\n  [\\\\n    \\\\\\"!BigInt:1\\\\\\",\\\\n    \\\\\\"!RegExp:/a/g\\\\\\"\\\\n  ]\\\\n]\\"\\n]",
         [
-          \\"!!NaN\\",
-          \\"collision\\"
+          "!!NaN",
+          "collision"
         ]
       ]"
     `);

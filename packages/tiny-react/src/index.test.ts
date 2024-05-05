@@ -842,7 +842,7 @@ describe("hooks", () => {
     expect(() =>
       render(h(Custom, {}), parent)
     ).toThrowErrorMatchingInlineSnapshot(
-      '"Unsupported force-update during render"'
+      `[Error: Unsupported force-update during render]`
     );
   });
 

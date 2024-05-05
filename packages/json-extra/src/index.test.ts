@@ -43,72 +43,72 @@ describe(createJsonExtra, () => {
         null,
         true,
         123,
-        \\"string\\",
+        "string",
         [
-          \\"array\\"
+          "array"
         ],
         {
-          \\"k\\": \\"v\\"
+          "k": "v"
         },
         [
-          \\"!undefined\\",
+          "!undefined",
           0
         ],
         [
-          \\"!Infinity\\",
+          "!Infinity",
           0
         ],
         [
-          \\"!-Infinity\\",
+          "!-Infinity",
           0
         ],
         [
-          \\"!NaN\\",
+          "!NaN",
           0
         ],
         0,
         [
-          \\"!-0\\",
+          "!-0",
           0
         ],
         [
-          \\"!Date\\",
-          \\"2023-08-17T00:00:00.000Z\\"
+          "!Date",
+          "2023-08-17T00:00:00.000Z"
         ],
         [
-          \\"!BigInt\\",
-          \\"1234\\"
+          "!BigInt",
+          "1234"
         ],
         [
-          \\"!RegExp\\",
+          "!RegExp",
           [
-            \\"^\\\\\\\\d+\\",
-            \\"gms\\"
+            "^\\\\d+",
+            "gms"
           ]
         ],
         [
-          \\"!Map\\",
+          "!Map",
           [
             [
               0,
               [
-                \\"!Date\\",
-                \\"1970-01-01T00:00:00.000Z\\"
+                "!Date",
+                "1970-01-01T00:00:00.000Z"
               ]
             ],
             [
               [
-                \\"!BigInt\\",
-                \\"1\\"
+                "!BigInt",
+                "1"
               ],
               [
-                \\"!Set\\",
+                "!Set",
                 [
                   [
-                    \\"!RegExp\\",
+                    "!RegExp",
                     [
-                      \\"a\\",
-                      \\"g\\"
+                      "a",
+                      "g"
                     ]
                   ]
                 ]
@@ -117,26 +117,26 @@ describe(createJsonExtra, () => {
           ]
         ],
         [
-          \\"!Set\\",
+          "!Set",
           [
             0,
             [
-              \\"!Date\\",
-              \\"1970-01-01T00:00:00.000Z\\"
+              "!Date",
+              "1970-01-01T00:00:00.000Z"
             ],
             [
-              \\"!Map\\",
+              "!Map",
               [
                 [
                   [
-                    \\"!BigInt\\",
-                    \\"1\\"
+                    "!BigInt",
+                    "1"
                   ],
                   [
-                    \\"!RegExp\\",
+                    "!RegExp",
                     [
-                      \\"a\\",
-                      \\"g\\"
+                      "a",
+                      "g"
                     ]
                   ]
                 ]
@@ -145,9 +145,9 @@ describe(createJsonExtra, () => {
           ]
         ],
         [
-          \\"!\\",
-          \\"!NaN\\",
-          \\"collision\\"
+          "!",
+          "!NaN",
+          "collision"
         ]
       ]"
     `);
@@ -195,7 +195,7 @@ describe(createJsonExtra, () => {
     `);
     expect(revived).toEqual(original);
 
-    const revivedUndefined = jsonExtra.parseReviveUndefined(stringified);
+    const revivedUndefined = jsonExtra._parse2(stringified);
     expect(revivedUndefined).toMatchInlineSnapshot(`
       [
         null,
@@ -263,17 +263,17 @@ describe(createJsonExtra, () => {
     expect(stringified).toMatchInlineSnapshot(
       `
       "{
-        \\"ok\\": false,
-        \\"value\\": [
-          \\"!ZodError\\",
+        "ok": false,
+        "value": [
+          "!ZodError",
           [
             {
-              \\"code\\": \\"invalid_type\\",
-              \\"expected\\": \\"integer\\",
-              \\"received\\": \\"float\\",
-              \\"message\\": \\"Expected integer, received float\\",
-              \\"path\\": [
-                \\"int\\"
+              "code": "invalid_type",
+              "expected": "integer",
+              "received": "float",
+              "message": "Expected integer, received float",
+              "path": [
+                "int"
               ]
             }
           ]
@@ -332,12 +332,12 @@ describe(createJsonExtra, () => {
         ],
         "stringified": "[
         [
-          \\"!undefined\\",
+          "!undefined",
           0
         ],
         [
-          \\"!Date\\",
-          \\"2023-08-17T00:00:00.000Z\\"
+          "!Date",
+          "2023-08-17T00:00:00.000Z"
         ],
         null,
         {}
@@ -359,55 +359,55 @@ describe(createJsonExtra, () => {
     const stringified = jsonExtra.stringify(original, null, 2);
     expect(stringified).toMatchInlineSnapshot(`
       "{
-        \\"collision2\\": [
-          \\"!\\",
-          \\"!\\",
+        "collision2": [
+          "!",
+          "!",
           [
-            \\"!BigInt\\",
-            \\"1\\"
+            "!BigInt",
+            "1"
           ]
         ],
-        \\"collision3\\": [
-          \\"!\\",
-          \\"!\\",
+        "collision3": [
+          "!",
+          "!",
           [
-            \\"!\\",
-            \\"!\\",
+            "!",
+            "!",
             0
           ]
         ],
-        \\"collision4\\": [
-          \\"!\\",
-          \\"!\\",
+        "collision4": [
+          "!",
+          "!",
           [
-            \\"!\\",
-            \\"!\\",
+            "!",
+            "!",
             [
-              \\"!BigInt\\",
-              \\"1\\"
+              "!BigInt",
+              "1"
             ],
-            \\"!\\"
+            "!"
           ]
         ],
-        \\"collision5\\": [
+        "collision5": [
           [],
           [
-            \\"!\\"
+            "!"
           ],
           [
-            \\"!\\",
-            \\"!\\",
+            "!",
+            "!",
             0
           ],
           [
-            \\"!\\",
-            \\"!\\",
+            "!",
+            "!",
             0,
             0
           ],
           [
-            \\"!\\",
-            \\"!\\",
+            "!",
+            "!",
             0,
             0,
             0
@@ -521,12 +521,12 @@ describe(createJsonExtra, () => {
         null,
         null,
         {
-          \\"name\\": \\"hello\\"
+          "name": "hello"
         },
-        \\"foo\\",
-        \\"zzz\\",
+        "foo",
+        "zzz",
         {
-          \\"toJSON\\": \\"www\\"
+          "toJSON": "www"
         },
         null,
         null
@@ -565,10 +565,10 @@ describe(createJsonExtra, () => {
 
     expect(() => jsonExtra.stringify(original, null, 2))
       .toThrowErrorMatchingInlineSnapshot(`
-      "Converting circular structure to JSON
-          --> starting at object with constructor 'Array'
-          --- index 0 closes the circle"
-    `);
+        [TypeError: Converting circular structure to JSON
+            --> starting at object with constructor 'Array'
+            --- index 0 closes the circle]
+      `);
   });
 
   describe("undefined", () => {
@@ -581,7 +581,7 @@ describe(createJsonExtra, () => {
           "revived": undefined,
           "revivedUndefined": undefined,
           "stringified": "[
-          \\"!undefined\\",
+          "!undefined",
           0
         ]",
         }
@@ -602,8 +602,8 @@ describe(createJsonExtra, () => {
             "prop": undefined,
           },
           "stringified": "{
-          \\"prop\\": [
-            \\"!undefined\\",
+          "prop": [
+            "!undefined",
             0
           ]
         }",
@@ -629,7 +629,7 @@ describe(createJsonExtra, () => {
           ],
           "stringified": "[
           [
-            \\"!undefined\\",
+            "!undefined",
             0
           ]
         ]",
@@ -794,7 +794,7 @@ describe(createJsonExtra, () => {
           [
             "!RegExp",
             [
-              "^\\\\d+",
+              "^\\d+",
               "gms",
             ],
           ],
@@ -878,38 +878,38 @@ describe(createJsonExtra, () => {
 
       const y = testStringifyAndParse(x, jsonExtra);
       expect(y).toMatchInlineSnapshot(`
-          {
-            "original": {
-              "__proto__": {
-                "bar": undefined,
-                "foo": NaN,
-              },
+        {
+          "original": {
+            "__proto__": {
+              "bar": undefined,
+              "foo": NaN,
             },
-            "revived": {
-              "__proto__": {
-                "foo": NaN,
-              },
+          },
+          "revived": {
+            "__proto__": {
+              "foo": NaN,
             },
-            "revivedUndefined": {
-              "__proto__": {
-                "bar": undefined,
-                "foo": NaN,
-              },
+          },
+          "revivedUndefined": {
+            "__proto__": {
+              "bar": undefined,
+              "foo": NaN,
             },
-            "stringified": "{
-            \\"__proto__\\": {
-              \\"foo\\": [
-                \\"!NaN\\",
-                0
-              ],
-              \\"bar\\": [
-                \\"!undefined\\",
-                0
-              ]
-            }
-          }",
+          },
+          "stringified": "{
+          "__proto__": {
+            "foo": [
+              "!NaN",
+              0
+            ],
+            "bar": [
+              "!undefined",
+              0
+            ]
           }
-        `);
+        }",
+        }
+      `);
       expect(y.revived.foo).toMatchInlineSnapshot("undefined");
       expect(y.revivedUndefined.foo).toMatchInlineSnapshot("undefined");
       expect(y.revived).toEqual(x);
@@ -1051,7 +1051,7 @@ function testStringifyAndParse(
 ) {
   const stringified = jsonExtra.stringify(original, null, 2);
   const revived = jsonExtra.parse(stringified);
-  const revivedUndefined = jsonExtra.parseReviveUndefined(stringified);
+  const revivedUndefined = jsonExtra._parse2(stringified);
   return { original, stringified, revived, revivedUndefined };
 }
 

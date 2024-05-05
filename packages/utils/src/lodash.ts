@@ -17,6 +17,11 @@ export function sortBy<T>(ls: T[], ...keyFns: ((x: T) => any)[]): T[] {
   return sortByMap(ls, (x) => keyFns.map((f) => f(x)), arrayCompareFn);
 }
 
+// for example, this can be used to sort strings with separators
+export function sortByArray<T, U>(ls: T[], keysFn: (v: T) => U[]) {
+  return sortByMap(ls, keysFn, arrayCompareFn);
+}
+
 // aka. lodash's chunk
 export function splitByChunk<T>(ls: readonly T[], size: number): T[][] {
   // guard nonsense cases, which could end up infinite loop below
@@ -156,16 +161,15 @@ export function isNotNil<T>(value: T): value is NonNullable<T> {
 
 // TODO: handle error?
 export function once<F extends (...args: any[]) => any>(f: F): F {
-  let result: unknown;
+  let result: ReturnType<F>;
   let called = false;
-  function wrapper(...args: any[]) {
+  return safeFunctionCast<F>(function (this: unknown, ...args) {
     if (!called) {
-      result = f(...args);
+      result = f.apply(this, args);
       called = true;
     }
     return result;
-  }
-  return wrapper as F;
+  });
 }
 
 export function memoize<F extends (...args: any[]) => any>(
@@ -181,7 +185,7 @@ export function memoize<F extends (...args: any[]) => any>(
   // by default, use 1st argument as a cache key which is same as lodash
   const keyFn = options?.keyFn ?? ((...args) => args[0]);
   const cache = options?.cache ?? new Map<unknown, ReturnType<F>>();
-  return safeFunctionCast<F>((...args) => {
+  return safeFunctionCast<F>(function (this: unknown, ...args) {
     const key = keyFn(...args);
     // avoid `has/get` since they might not be atomic for some cache (e.g. ttl cache).
     // however, this logic means `undefined` value will not be cached.
@@ -189,7 +193,7 @@ export function memoize<F extends (...args: any[]) => any>(
     if (typeof value !== "undefined") {
       return value;
     }
-    const newValue = f(...args);
+    const newValue = f.apply(this, args);
     cache.set(key, newValue);
     return newValue;
   });
@@ -314,7 +318,7 @@ function objectMapEntries<T extends object, K2 extends PropertyKey, V2>(
 export function objectMapValues<T extends object, V>(
   o: T,
   f: (v: T[keyof T], k: keyof T) => V
-): Record<keyof T, V> {
+): { [k in keyof T]: V } {
   return objectMapEntries(o, ([k, v]) => [k, f(v, k)]);
 }
 
@@ -356,12 +360,13 @@ function anyCompareFn(x: any, y: any): number {
   return x < y ? -1 : x > y ? 1 : 0;
 }
 
-function arrayCompareFn(xs: any[], ys: any[]): number {
-  for (let i = 0; i < xs.length; i++) {
+function arrayCompareFn(xs: unknown[], ys: unknown[]): number {
+  const length = Math.min(xs.length, ys.length);
+  for (let i = 0; i < length; i++) {
     const result = anyCompareFn(xs[i], ys[i]);
     if (result !== 0) {
       return result;
     }
   }
-  return 0;
+  return anyCompareFn(xs.length, ys.length);
 }
