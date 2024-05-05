@@ -1,4 +1,4 @@
-import { stripLiteral } from "strip-literal";
+import type * as estree from "estree";
 import { parseAstAsync } from "vite";
 
 interface HmrTransformOptions {
@@ -44,8 +44,6 @@ if (import.meta.hot) {
   // no need to manipulate sourcemap since transform only appends
   return result.outCode + footer;
 }
-
-import type * as estree from "estree";
 
 // extend types for rollup ast with node position
 declare module "estree" {
@@ -201,8 +199,7 @@ function analyzeFunction(
     | estree.MaybeNamedFunctionDeclaration
 ) {
   const bodyCode = code.slice(node.body.start, node.body.end);
-  const bodyCodeStrip = stripLiteral(bodyCode);
-  const matches = bodyCodeStrip.matchAll(HOOK_CALL_RE);
+  const matches = bodyCode.matchAll(HOOK_CALL_RE);
   const hooks = [...matches].map((m) => m[1]!);
   return { hooks };
 }

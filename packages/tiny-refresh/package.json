@@ -32,9 +32,6 @@
     "prepack": "tsup --clean",
     "release": "pnpm publish --no-git-checks --access public"
   },
-  "dependencies": {
-    "strip-literal": "^2.1.0"
-  },
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",
     "@testing-library/react": "^14.0.0",

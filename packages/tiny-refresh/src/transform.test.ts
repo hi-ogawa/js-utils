@@ -72,7 +72,7 @@ const CompInternal = () => {
       if (import.meta.hot && typeof CompLet === "function") {
         CompLet = $$refresh.createHmrComponent(
           $$registry, "CompLet", CompLet,
-          { key: "useState/useRef" },
+          { key: "useState/useRef/useCallback" },
           import.meta.hot,
         );
       }
