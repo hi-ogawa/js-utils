@@ -2,7 +2,7 @@ import type { JSX } from "@hiogawa/tiny-react/jsx-runtime";
 import { ClientComponent, ClientNode, InterleaveComponent } from "./_client";
 
 export default async function Page() {
-  await new Promise((resolve) => setTimeout(resolve, 50));
+  await new Promise((resolve) => setTimeout(resolve));
   return (
     <div>
       <pre>server time: {new Date().toISOString()}</pre>
@@ -18,6 +18,6 @@ export default async function Page() {
 }
 
 async function ServerNode(props: { clientNode?: JSX.Element }) {
-  await new Promise((resolve) => setTimeout(resolve, 30));
+  await new Promise((resolve) => setTimeout(resolve));
   return <span>[props.clientNode: {props.clientNode}]</span>;
 }
