@@ -11,9 +11,9 @@ import {
 } from "../virtual-dom";
 import {
   type RNode,
+  type SCustom,
   type SFragment,
   type SNode,
-  type SReference,
   type STag,
   isRNode,
   isSNode,
@@ -43,8 +43,8 @@ class SerializeManager {
           type: node.type,
           key: node.key,
           props: await this.serializeProps(node.props),
-          id: node.render.$$id,
-        } satisfies SReference;
+          $$id: node.render.$$id,
+        } satisfies SCustom;
       }
       const { render, props } = node;
       const child = await render(props);
@@ -121,11 +121,16 @@ class DeserializeManager {
     if (node.type === NODE_TYPE_EMPTY || node.type === NODE_TYPE_TEXT) {
       return node;
     } else if (node.type === NODE_TYPE_CUSTOM) {
+      const Component = this.referenceMap[node.$$id];
+      if (!Component) {
+        console.error(node);
+        throw new Error("client reference not found");
+      }
       return {
         type: node.type,
         key: node.key,
         props: this.deserializeProps(node.props),
-        render: this.referenceMap[node.id] as any,
+        render: Component as any,
       } satisfies VCustom;
     } else if (node.type === NODE_TYPE_TAG) {
       return {

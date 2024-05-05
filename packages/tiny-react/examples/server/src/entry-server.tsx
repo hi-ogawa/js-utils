@@ -1,5 +1,6 @@
 import {
   deserializeNode,
+  registerClientReference,
   renderToString,
   serializeNode,
 } from "@hiogawa/tiny-react";
@@ -7,9 +8,9 @@ import type { ViteDevServer } from "vite";
 import * as referenceMap from "./routes/_client";
 import Layout from "./routes/layout";
 
-// TODO: tranform to register client reference
+// TODO: tranform
 for (const [name, Component] of Object.entries(referenceMap)) {
-  Object.assign(Component, { $$id: name });
+  registerClientReference(Component, name);
 }
 
 export async function handler(request: Request) {
@@ -31,10 +32,10 @@ export async function handler(request: Request) {
   const ssrHtml = renderToString(vnode);
 
   let html = await importHtmlTemplate();
-  html = html.replace("<body>", `<body><div id="root">${ssrHtml}</div>`);
+  html = html.replace("<body>", () => `<body><div id="root">${ssrHtml}</div>`);
   html = html.replace(
     "<head>",
-    `<head><script>globalThis.__snode = ${JSON.stringify(snode)}</script>`
+    () => `<head><script>globalThis.__snode = ${JSON.stringify(snode)}</script>`
   );
   // dev only FOUC fix
   if (import.meta.env.DEV) {

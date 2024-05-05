@@ -12,3 +12,4 @@ export * from "./hooks";
 export * from "./compat";
 export * from "./ssr/render";
 export { serializeNode, deserializeNode } from "./server";
+export { registerClientReference } from "./server/types";
