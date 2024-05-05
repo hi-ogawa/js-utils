@@ -30,7 +30,7 @@
       "require": "./dist/hmr/index.cjs",
       "types": "./dist/hmr/index.d.ts"
     },
-    "./dist/plugins/vite": {
+    "./vite": {
       "import": "./dist/plugins/vite.js",
       "require": "./dist/plugins/vite.cjs",
       "types": "./dist/plugins/vite.d.ts"
@@ -44,10 +44,10 @@
   ],
   "scripts": {
     "dev": "tsup --watch",
-    "build": "tsup --clean",
+    "build": "tsup",
     "test": "vitest",
     "lint": "icheck-ts $(find src -name '*.ts')",
-    "prepack": "pnpm --filter @hiogawa/tiny-react... build",
+    "prepack": "tsup --clean",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {

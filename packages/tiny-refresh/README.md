@@ -21,7 +21,7 @@ This simplified runtime architecture is inspired by [`solid-refresh`](https://gi
 // vite.config.ts
 //
 import { defineConfig } from "vite";
-import { vitePluginTinyRefresh } from "@hiogawa/tiny-refresh/dist/vite";
+import { vitePluginTinyRefresh } from "@hiogawa/tiny-refresh/vite";
 
 export default defineConfig({
   plugins: [

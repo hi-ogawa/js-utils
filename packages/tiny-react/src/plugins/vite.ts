@@ -1,6 +1,5 @@
-import { vitePluginTinyRefresh } from "@hiogawa/tiny-refresh/dist/vite";
-import { typedBoolean } from "@hiogawa/utils";
-import { type FilterPattern, type Plugin } from "vite";
+import { vitePluginTinyRefresh } from "@hiogawa/tiny-refresh/vite";
+import { type FilterPattern, type PluginOption } from "vite";
 
 // cf.
 // https://github.com/preactjs/preset-vite
@@ -20,7 +19,7 @@ interface TinyReactVitePluginOptions {
 
 export function tinyReactVitePlugin(
   options?: TinyReactVitePluginOptions
-): Plugin[] {
+): PluginOption {
   return [
     !options?.hmr?.disable &&
       vitePluginTinyRefresh({
@@ -29,22 +28,19 @@ export function tinyReactVitePlugin(
         runtime: "@hiogawa/tiny-react",
         refreshRuntime: "@hiogawa/tiny-react/hmr",
       }),
-    !options?.alias?.disable && aliasPlugin(),
-  ].filter(typedBoolean);
-}
-
-function aliasPlugin(): Plugin {
-  return {
-    name: "@hiogawa/tiny-react:alias",
-    config(_config, _env) {
-      // https://github.com/preactjs/preset-vite/blob/4dfecb379c17fbb2f442987a8ff95536ff290cbd/src/index.ts#L184C1-L190
-      return {
-        resolve: {
-          alias: {
-            react: "@hiogawa/tiny-react",
+    // https://github.com/preactjs/preset-vite/blob/4dfecb379c17fbb2f442987a8ff95536ff290cbd/src/index.ts#L184C1-L190
+    {
+      name: "@hiogawa/tiny-react:alias",
+      apply: () => !options?.alias?.disable,
+      config(_config, _env) {
+        return {
+          resolve: {
+            alias: {
+              react: "@hiogawa/tiny-react",
+            },
           },
-        },
-      };
+        };
+      },
     },
-  };
+  ];
 }

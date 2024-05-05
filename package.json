@@ -4,7 +4,7 @@
   "scripts": {
     "clean": "rm -rf packages/*/dist",
     "dev": "pnpm run /^dev:/",
-    "build": "pnpm -r build",
+    "build": "pnpm -r '--filter=!*example*' build",
     "tsc": "tsc -b packages/*/tsconfig.json packages/*/examples/*/tsconfig.json",
     "dev:tsc": "pnpm tsc --watch --preserveWatchOutput",
     "test": "pnpm -r --sequential test run",
@@ -26,7 +26,6 @@
     "@hiogawa/utils": "workspace:*",
     "@hiogawa/utils-node": "workspace:*",
     "@playwright/test": "^1.41.2",
-    "@swc/core": "^1.3.95",
     "@tsconfig/strictest": "^2.0.3",
     "@types/node": "^20.11.19",
     "@vitest/ui": "^1.3.1",
