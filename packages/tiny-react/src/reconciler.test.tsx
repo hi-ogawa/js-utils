@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { createRoot } from "./compat";
 
-test("repro", () => {
+test("fragment", () => {
   const el = document.createElement("main");
   const root = createRoot(el);
   root.render(
