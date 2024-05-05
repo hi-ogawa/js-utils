@@ -1,13 +1,16 @@
 import { tinyassert } from "@hiogawa/utils";
 import { describe, expect, it, vi } from "vitest";
-import { h } from "../helper/hyperscript";
 import { hydrate } from "../reconciler";
-import { createVNode } from "../virtual-dom";
 import { renderToString } from "./render";
 
 describe(hydrate, () => {
   it("basic", () => {
-    const vnode = h.div({}, "hello", h.span({}, "world"));
+    const vnode = (
+      <div>
+        hello
+        <span>world</span>
+      </div>
+    );
     const vnodeSsr = renderToString(vnode);
     expect(vnodeSsr).toMatchInlineSnapshot(
       '"<div>hello<span>world</span></div>"'
@@ -48,7 +51,9 @@ describe(hydrate, () => {
   it("mismatch - tag", () => {
     const parent = document.createElement("main");
     parent.innerHTML = `<span></span>`;
-    expect(() => hydrate(h.div({}), parent)).toThrowErrorMatchingInlineSnapshot(
+    expect(() =>
+      hydrate(<div></div>, parent)
+    ).toThrowErrorMatchingInlineSnapshot(
       `[Error: tag hydration mismatch (actual: 'SPAN', expected: 'div')]`
     );
   });
@@ -57,7 +62,7 @@ describe(hydrate, () => {
     const parent = document.createElement("main");
     parent.innerHTML = `<div><span></span></div>`;
     expect(() =>
-      hydrate(h.div({}, "hello"), parent)
+      hydrate(<div>hello</div>, parent)
     ).toThrowErrorMatchingInlineSnapshot(
       `[Error: text hydration mismatch (actual: 'SPAN', expected: '#text')]`
     );
@@ -66,10 +71,11 @@ describe(hydrate, () => {
   it("ref", () => {
     const refDiv = vi.fn();
     const refSpan = vi.fn();
-    const vnode = h.div(
-      { ref: refDiv },
-      "hello",
-      h.span({ ref: refSpan }, "world")
+    const vnode = (
+      <div ref={refDiv}>
+        hello
+        <span ref={refSpan}>world</span>
+      </div>
     );
 
     const vnodeSsr = renderToString(vnode);
@@ -104,10 +110,11 @@ describe(hydrate, () => {
 
   it("props", () => {
     const clickFn = vi.fn();
-    const vnode = h.div(
-      { id: "x" },
-      "hello",
-      h.button({ onclick: () => clickFn("hi") }, "world")
+    const vnode = (
+      <div id="x">
+        hello
+        <button onclick={() => clickFn("hi")}>world</button>
+      </div>
     );
 
     const vnodeSsr = renderToString(vnode);
@@ -158,9 +165,18 @@ describe(hydrate, () => {
   });
 
   it("text empty", () => {
-    // https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&corejs=3.21&spec=false&loose=false&code_lz=DwEwlgbgfA3gRHAvsA9OaBuAUKSs4AESq6U2u0AhvAEbFp4ZA&debug=false&forceAllTransforms=false&modules=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=env%2Creact%2Cstage-2&prettier=false&targets=&version=7.23.6&externalPlugins=&assumptions=%7B%7D
-    // <div>{""}</div>
-    const vnode = createVNode("div", { children: "" });
+    const vnode = <div>{""}</div>;
+    expect(vnode).toMatchInlineSnapshot(`
+      {
+        "key": undefined,
+        "name": "div",
+        "props": {
+          "children": "",
+        },
+        "type": "tag",
+      }
+    `);
+
     const vnodeSsr = renderToString(vnode);
     expect(vnodeSsr).toMatchInlineSnapshot(`"<div></div>"`);
 
@@ -183,8 +199,18 @@ describe(hydrate, () => {
   });
 
   it("text whitespace", () => {
-    // <div>{" "}</div>
-    const vnode = createVNode("div", { children: " " });
+    const vnode = <div> </div>;
+    expect(vnode).toMatchInlineSnapshot(`
+      {
+        "key": undefined,
+        "name": "div",
+        "props": {
+          "children": " ",
+        },
+        "type": "tag",
+      }
+    `);
+
     const vnodeSsr = renderToString(vnode);
     expect(vnodeSsr).toMatchInlineSnapshot(`"<div> </div>"`);
 
@@ -209,8 +235,21 @@ describe(hydrate, () => {
   });
 
   it("text concat", () => {
-    // <div>a{"b"}</div>
-    const vnode = createVNode("div", { children: ["a", "b"] });
+    const vnode = <div>a{"b"}</div>;
+    expect(vnode).toMatchInlineSnapshot(`
+      {
+        "key": undefined,
+        "name": "div",
+        "props": {
+          "children": [
+            "a",
+            "b",
+          ],
+        },
+        "type": "tag",
+      }
+    `);
+
     const vnodeSsr = renderToString(vnode);
     expect(vnodeSsr).toMatchInlineSnapshot(`"<div>ab</div>"`);
 
