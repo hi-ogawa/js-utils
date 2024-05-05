@@ -36,7 +36,6 @@ export async function serializeNode(rnode: RNode): Promise<SerializeResult> {
 
 class SerializeManager {
   referenceIds = new Set<string>();
-  depth = 0;
 
   async serialize(node: RNode): Promise<SNode> {
     if (node.type === NODE_TYPE_EMPTY || node.type === NODE_TYPE_TEXT) {

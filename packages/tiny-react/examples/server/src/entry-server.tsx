@@ -10,9 +10,7 @@ import Layout from "./routes/layout";
 export async function handler(request: Request) {
   // serialize server component
   const url = new URL(request.url);
-  console.time("[serializeNode]");
   const serialized = await serializeNode(<Router url={url} />);
-  console.timeEnd("[serializeNode]");
 
   // to CSR
   if (url.searchParams.has("__serialize")) {
