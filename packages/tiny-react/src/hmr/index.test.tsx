@@ -52,7 +52,8 @@ describe(setupHmrVite, () => {
           }, []);
           return <div>1</div>;
         },
-        { remount: true }
+        { key: "useEffect" },
+        hot
       );
       ChildExport = Child;
 
@@ -96,7 +97,8 @@ describe(setupHmrVite, () => {
         function Child() {
           return <div>2</div>;
         },
-        { remount: true }
+        { key: "" },
+        hot
       );
 
       setupHmrVite(hot, registry);
@@ -146,7 +148,8 @@ describe(setupHmrVite, () => {
           }, []);
           return <div>3</div>;
         },
-        { remount: true }
+        { key: "useEffect" },
+        hot
       );
 
       setupHmrVite(hot, registry);
