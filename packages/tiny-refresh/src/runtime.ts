@@ -61,6 +61,7 @@ export function createHmrRegistry(
 
 interface HmrComponentOptions {
   remount: boolean;
+  key?: string;
 }
 
 export function createHmrComponent(
@@ -121,6 +122,7 @@ export function createHmrComponent(
     return data.options.remount
       ? createElement(data.component, props)
       : createElement(UnsafeWrapperFc, {
+          key: data.options.key,
           data,
           props,
         });

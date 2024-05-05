@@ -5,7 +5,7 @@ import { parseAstAsync } from "vite";
 interface HmrTransformOptions {
   runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
   refreshRuntime?: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
-  bundler: "vite" | "webpack4";
+  bundler?: "vite" | "webpack4";
   autoDetect?: boolean;
   debug?: boolean;
 }
@@ -60,7 +60,7 @@ export function hmrTransform(
     ),
     ...newLines,
     ...extraCodes,
-    options.bundler === "vite" ? FOOTER_CODE_VITE : FOOTER_CODE_WEBPACK4,
+    FOOTER_CODE_VITE,
   ].join("\n");
 }
 
@@ -133,12 +133,6 @@ if (import.meta.hot) {
 }
 `;
 
-const FOOTER_CODE_WEBPACK4 = /* js */ `
-if (module.hot) {
-  $$refresh.setupHmrWebpack(module.hot, $$registry);
-}
-`;
-
 export async function hmrTransform2(
   code: string,
   options: HmrTransformOptions
@@ -156,14 +150,27 @@ const $$registry = $$refresh.createHmrRegistry(
     useReducer: $$runtime.useReducer,
     useEffect: $$runtime.useEffect,
   },
-  ${options.debug},
+  ${options.debug ?? false},
 );
 `;
-  for (const entry of result.entries) {
-    footer += wrapCreateHmrComponent(entry.id, true);
+  for (const { id, hooks } of result.entries) {
+    footer += /* js */ `
+if (typeof ${id} === "function" && ${id}.length <= 1) {
+  ${id} = $$refresh.createHmrComponent(
+    $$registry, "${id}", ${id},
+    { key: ${JSON.stringify(hooks.join("/"))}, remount: false }
+  );
+}
+`;
   }
+  footer += `
+if (import.meta.hot) {
+  $$refresh.setupHmrVite(import.meta.hot, $$registry);
+  () => import.meta.hot.accept();
+}
+`;
   // no need to manipulate sourcemap since transform only appends
-  return [result.outCode, footer].join("\n\n");
+  return result.outCode + footer;
 }
 
 import type * as estree from "estree";
@@ -181,7 +188,7 @@ type HotEntry = {
   hooks: string[];
 };
 
-const HOOK_CALL_RE = /\b(use\w*)\b/;
+const HOOK_CALL_RE = /\b(use\w*)\s*\(/g;
 
 async function analyzeCode(code: string) {
   const ast = await parseAstAsync(code);
