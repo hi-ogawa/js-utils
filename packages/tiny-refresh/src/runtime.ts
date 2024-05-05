@@ -69,10 +69,6 @@ export function createHmrComponent(
   const { createElement, useEffect, useReducer } = registry.runtime;
 
   const WrapperFc: ReactTypes.FC = (props) => {
-    // TODO
-    // check if this is in render context,
-    // so that we can bail out as a normal function?
-
     const data = (registry.initial ?? registry).componentMap.get(name);
 
     const [, forceUpdate] = useReducer<boolean, void>(
