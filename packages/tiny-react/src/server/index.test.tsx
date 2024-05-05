@@ -1,31 +1,26 @@
 import { sleep } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
 import { deserializeNode, serializeNode } from ".";
-import { h } from "../helper/hyperscript";
 import { render } from "../reconciler";
 import type { VNode } from "../virtual-dom";
-import type { RNode } from "./types";
+import { registerClientReference } from "./types";
 
 describe(serializeNode, () => {
   it("basic", async () => {
-    const rnode = h.div(
-      { className: "flex", ariaCurrent: "" },
-      "hello",
-      h.span(
-        {
-          title: "foo",
-        },
-        "world"
-      )
+    const rnode = (
+      <div className="flex" ariaCurrent="page">
+        hello
+        <span title="foo">world</span>
+      </div>
     );
-    const { snode, referenceIds } = await serializeNode(rnode as RNode);
+    const { snode, referenceIds } = await serializeNode(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`[]`);
     expect(snode).toMatchInlineSnapshot(`
       {
         "key": undefined,
         "name": "div",
         "props": {
-          "ariaCurrent": "",
+          "ariaCurrent": "page",
           "children": [
             "hello",
             {
@@ -50,7 +45,7 @@ describe(serializeNode, () => {
         "key": undefined,
         "name": "div",
         "props": {
-          "ariaCurrent": "",
+          "ariaCurrent": "page",
           "children": [
             "hello",
             {
@@ -74,7 +69,7 @@ describe(serializeNode, () => {
     expect(node).toMatchInlineSnapshot(`
       <main>
         <div
-          ariacurrent=""
+          ariacurrent="page"
           class="flex"
         >
           hello
@@ -91,11 +86,14 @@ describe(serializeNode, () => {
   it("async", async () => {
     async function Custom(props: { value: number }) {
       await sleep(50);
-      return h.span({}, JSON.stringify({ prop: props.value }));
+      return <span>{JSON.stringify({ prop: props.value })}</span>;
     }
-    const rnode = h.div({}, h(Custom as any, { value: 123 }));
-
-    const { snode, referenceIds } = await serializeNode(rnode as RNode);
+    const rnode = (
+      <div>
+        <Custom value={123} />
+      </div>
+    );
+    const { snode, referenceIds } = await serializeNode(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`[]`);
     expect(snode).toMatchInlineSnapshot(`
       {
@@ -149,20 +147,16 @@ describe(serializeNode, () => {
 
   it("island", async () => {
     async function Server(props: { clientInner: VNode }) {
-      return h.div({ id: "server" }, props.clientInner);
+      return <div id="server">{props.clientInner}</div>;
     }
 
     function ClientInner(props: { inner: VNode }) {
-      return h.div({ id: "client-inner" }, props.inner);
+      return <div id="client-inner">{props.inner}</div>;
     }
+    registerClientReference(ClientInner, "#ClientInner");
 
-    Object.assign(ClientInner, { $$id: "#ClientInner" });
-
-    const rnode = h(Server as any, {
-      clientInner: h(ClientInner, { inner: h.span({}) }),
-    });
-
-    const { snode, referenceIds } = await serializeNode(rnode as RNode);
+    const rnode = <Server clientInner={<ClientInner inner={<span />} />} />;
+    const { snode, referenceIds } = await serializeNode(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`
       [
         "#ClientInner",
@@ -236,27 +230,25 @@ describe(serializeNode, () => {
 
   it("interleave", async () => {
     async function Server(props: { clientInner: VNode }) {
-      return h.div({ id: "server" }, props.clientInner);
+      return <div id="server">{props.clientInner}</div>;
     }
 
     function ClientOuter(props: { server: VNode }) {
-      return h.div({ id: "client-outer" }, props.server);
+      return <div id="client-outer">{props.server}</div>;
     }
 
     function ClientInner(props: { inner: VNode }) {
-      return h.div({ id: "client-inner" }, props.inner);
+      return <div id="client-inner">{props.inner}</div>;
     }
+    registerClientReference(ClientOuter, "#ClientOuter");
+    registerClientReference(ClientInner, "#ClientInner");
 
-    Object.assign(ClientOuter, { $$id: "#ClientOuter" });
-    Object.assign(ClientInner, { $$id: "#ClientInner" });
-
-    const rnode = h(ClientOuter, {
-      server: h(Server as any, {
-        clientInner: h(ClientInner, { inner: h.span({}) }),
-      }),
-    });
-
-    const { snode, referenceIds } = await serializeNode(rnode as RNode);
+    const rnode = (
+      <ClientOuter
+        server={<Server clientInner={<ClientInner inner={<span />} />} />}
+      />
+    );
+    const { snode, referenceIds } = await serializeNode(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`
       [
         "#ClientOuter",
@@ -352,21 +344,18 @@ describe(serializeNode, () => {
 
   it("client in client", async () => {
     function ClientOuter(props: { inner: VNode }) {
-      return h.div({ id: "client-outer" }, props.inner);
+      return <div id="client-outer">{props.inner}</div>;
     }
 
     function ClientInner(props: { inner: VNode }) {
-      return h.div({ id: "client-inner" }, props.inner);
+      return <div id="client-inner">{props.inner}</div>;
     }
 
-    Object.assign(ClientOuter, { $$id: "#ClientOuter" });
-    Object.assign(ClientInner, { $$id: "#ClientInner" });
+    registerClientReference(ClientOuter, "#ClientOuter");
+    registerClientReference(ClientInner, "#ClientInner");
 
-    const rnode = h(ClientOuter, {
-      inner: h(ClientInner, { inner: h.span({}) }),
-    });
-
-    const { snode, referenceIds } = await serializeNode(rnode as RNode);
+    const rnode = <ClientOuter inner={<ClientInner inner={<span />} />} />;
+    const { snode, referenceIds } = await serializeNode(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`
       [
         "#ClientOuter",
@@ -441,9 +430,8 @@ describe(serializeNode, () => {
   });
 
   it("function client prop error", async () => {
-    const rnode = h.div({ onclick: () => {} });
     await expect(() =>
-      serializeNode(rnode as RNode)
+      serializeNode(<div onclick={() => {}} />)
     ).rejects.toMatchInlineSnapshot(`[Error: Cannot serialize function]`);
   });
 });
