@@ -1,5 +1,3 @@
-// @vitest-environment node
-
 import { describe, expect, it } from "vitest";
 import { hmrTransform, hmrTransform2 } from "./transform";
 
