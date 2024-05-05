@@ -4,8 +4,9 @@ import type { HookContext } from "./hooks";
 // host/virtual/bundle node types and helper
 //
 
+export type UnknownProps = Record<string, unknown>;
 export type NodeKey = string | number;
-export type FC<P = {}> = (props: P) => VNode;
+export type FC<P = UnknownProps> = (props: P) => VNode;
 
 // host node
 export type HNode = Node;
@@ -18,6 +19,19 @@ export const NODE_TYPE_TAG = "tag" as const;
 export const NODE_TYPE_TEXT = "text" as const;
 export const NODE_TYPE_CUSTOM = "custom" as const;
 export const NODE_TYPE_FRAGMENT = "fragment" as const;
+
+export function isVNode(v: unknown): v is VNode {
+  return (
+    v != null &&
+    typeof v === "object" &&
+    "type" in v &&
+    (v.type === NODE_TYPE_EMPTY ||
+      v.type === NODE_TYPE_TEXT ||
+      v.type === NODE_TYPE_TAG ||
+      v.type === NODE_TYPE_CUSTOM ||
+      v.type === NODE_TYPE_FRAGMENT)
+  );
+}
 
 //
 // virtual node (immutable)
@@ -55,8 +69,8 @@ export type VText = {
 export type VCustom = {
   type: typeof NODE_TYPE_CUSTOM;
   key?: NodeKey;
-  props: {};
-  render: (props: {}) => VNode;
+  props: UnknownProps;
+  render: (props: UnknownProps) => VNode;
 };
 
 export type VFragment = {
@@ -180,7 +194,7 @@ export type ComponentChildren = ComponentChild | ComponentChildren[];
 
 export function createVNode(
   tag: ComponentType,
-  props: {},
+  props: UnknownProps,
   key?: NodeKey
 ): VNode {
   if (typeof tag === "string") {

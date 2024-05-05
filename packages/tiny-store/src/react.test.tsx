@@ -89,8 +89,8 @@ describe(useTinyStore, () => {
     expect([await getTestidText("demo1"), await getTestidText("demo2")])
       .toMatchInlineSnapshot(`
         [
-          "commit = 1, state = {\\"name\\":{\\"first\\":\\"Jane\\"},\\"birth\\":{\\"year\\":2000}}",
-          "commit = 1, state = {\\"first\\":\\"Jane\\"}",
+          "commit = 1, state = {"name":{"first":"Jane"},"birth":{"year":2000}}",
+          "commit = 1, state = {"first":"Jane"}",
         ]
       `);
 
@@ -98,19 +98,19 @@ describe(useTinyStore, () => {
     expect([await getTestidText("demo1"), await getTestidText("demo2")])
       .toMatchInlineSnapshot(`
         [
-          "commit = 2, state = {\\"name\\":{\\"first\\":\\"Jane\\"},\\"birth\\":{\\"year\\":2001}}",
-          "commit = 1, state = {\\"first\\":\\"Jane\\"}",
+          "commit = 2, state = {"name":{"first":"Jane"},"birth":{"year":2001}}",
+          "commit = 1, state = {"first":"Jane"}",
         ]
       `);
 
     await userEvent.click(await screen.findByTestId("button-name"));
     expect([await getTestidText("demo1"), await getTestidText("demo2")])
       .toMatchInlineSnapshot(`
-          [
-            "commit = 3, state = {\\"name\\":{\\"first\\":\\"John\\"},\\"birth\\":{\\"year\\":2001}}",
-            "commit = 2, state = {\\"first\\":\\"John\\"}",
-          ]
-        `);
+        [
+          "commit = 3, state = {"name":{"first":"John"},"birth":{"year":2001}}",
+          "commit = 2, state = {"first":"John"}",
+        ]
+      `);
   });
 
   it(createTinyStoreWithStorage, async () => {
@@ -137,10 +137,10 @@ describe(useTinyStore, () => {
         <Demo store={store} />
       </>
     );
-    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":0}"');
+    expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":0}"`);
 
     await userEvent.click(await screen.findByRole("button"));
-    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":1}"');
+    expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":1}"`);
 
     //
     // recreate store and rener
@@ -154,10 +154,10 @@ describe(useTinyStore, () => {
         <Demo store={store2} />
       </>
     );
-    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":1}"');
+    expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":1}"`);
 
     await userEvent.click(await screen.findByRole("button"));
-    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":2}"');
+    expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":2}"`);
   });
 
   it(useTinyStoreStorage, async () => {
@@ -182,9 +182,9 @@ describe(useTinyStore, () => {
         <Demo />
       </>
     );
-    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":0}"');
+    expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":0}"`);
     await userEvent.click(await screen.findByRole("button"));
-    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":1}"');
+    expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":1}"`);
 
     cleanup();
     render(
@@ -192,9 +192,9 @@ describe(useTinyStore, () => {
         <Demo />
       </>
     );
-    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":1}"');
+    expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":1}"`);
     await userEvent.click(await screen.findByRole("button"));
-    expect(await getTestidText("demo")).toMatchInlineSnapshot('"{\\"x\\":2}"');
+    expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":2}"`);
   });
 });
 

@@ -119,7 +119,7 @@ import * as $$runtime from "${runtime}";
 import * as $$refresh from "${refresh}";
 const $$registry = $$refresh.createHmrRegistry({
   createElement: $$runtime.createElement,
-  useState: $$runtime.useState,
+  useReducer: $$runtime.useReducer,
   useEffect: $$runtime.useEffect,
 }, ${debug});
 `;

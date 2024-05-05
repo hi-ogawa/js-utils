@@ -11,3 +11,4 @@ export * from "./regexp";
 export * from "./error";
 export * from "./cache";
 export * from "./colors";
+export { createDebug } from "./debug";

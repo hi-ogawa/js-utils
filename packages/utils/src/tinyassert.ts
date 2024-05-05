@@ -17,7 +17,7 @@ export function tinyassert(
 
 export class TinyAssertionError extends Error {
   constructor(message?: string, stackStartFunction?: Function) {
-    super(message);
+    super(message ?? "TinyAssertionError");
     if (stackStartFunction && "captureStackTrace" in Error) {
       // @ts-ignore
       Error.captureStackTrace(this, stackStartFunction);

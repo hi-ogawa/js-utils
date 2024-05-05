@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { InnerOther } from "./other-file";
+import { InnerOther, InnerShowHide } from "./other-file";
 
 export function Root() {
   return (
@@ -42,6 +42,13 @@ export function Outer() {
       <div className="border-t"></div>
       <div id="inner3">
         <InnerOther value={state} />
+      </div>
+      <div className="border-t"></div>
+      <div id="inner4">
+        <div className="flex gap-1">
+          show if "outer % 2 = 0" :{" "}
+          <div id="inner4-message">{state % 2 === 0 && <InnerShowHide />}</div>
+        </div>
       </div>
     </div>
   );

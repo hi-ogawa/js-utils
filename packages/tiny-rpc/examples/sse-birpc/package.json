@@ -1,0 +1,16 @@
+{
+  "name": "@hiogawa/tiny-rpc-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "@hattip/adapter-node": "^0.0.34",
+    "@hattip/compose": "^0.0.34",
+    "@hiogawa/tiny-rpc": "latest",
+    "@hiogawa/vite-plugin-ssr-middleware": "^0.0.2",
+    "birpc": "^0.2.16",
+    "vite": "^5.1.3"
+  }
+}

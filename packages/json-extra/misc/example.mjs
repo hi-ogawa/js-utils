@@ -1,8 +1,7 @@
 import fs from "node:fs";
 import { stringify as brilloutStringify } from "@brillout/json-serializer/stringify";
 import superjson from "superjson";
-import { createJsonExtra } from "../dist/index.js";
-import { tinyassert } from "@hiogawa/utils";
+import { createJsonExtra } from "../dist/reference.js";
 
 /*
 print example for README.md
@@ -11,6 +10,7 @@ usage:
   node ./packages/json-extra/misc/example.mjs input json-extra @brillout/json-serializer superjson
 */
 
+// INPUT_START
 const input = [
   // standard json value
   null,
@@ -43,17 +43,17 @@ const input = [
   // escape encoding collision
   ["!NaN", "collision"],
 ];
+// INPUT_END
 
 const args = process.argv.slice(2);
 
 if (args.includes("input")) {
-  const selfString = fs.readFileSync(new URL(import.meta.url), "utf-8");
-  const start = selfString.match(/^const input /m)?.index;
-  const end = selfString.match(/^\];/m)?.index;
-  tinyassert(typeof start === "number");
-  tinyassert(typeof end === "number");
-  const inputString = selfString.slice(start, end + 2);
-  console.log(inputString);
+  const data = fs.readFileSync(new URL(import.meta.url), "utf-8");
+  const re = new RegExp(
+    "// INPUT_START\nconst input = (.*);\n// INPUT_END",
+    "s"
+  );
+  console.log(data.match(re)[1]);
 }
 
 if (args.includes("json-extra")) {

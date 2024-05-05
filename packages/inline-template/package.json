@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/inline-template",
-  "version": "0.0.1-pre.4",
+  "version": "0.0.1-pre.5",
   "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/inline-template",
   "repository": {
     "type": "git",
@@ -18,13 +18,14 @@
     "build": "tsup",
     "cli": "node ./bin/cli.js",
     "cli-dev": "tsx ./src/cli.ts",
+    "docs-update": "inline-template ./README.md",
     "test": "vitest",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
     "@hiogawa/tiny-cli": "workspace:*",
     "@hiogawa/utils": "workspace:*",
-    "@types/node": "^18"
+    "@types/node": "^20.11.19"
   },
   "volta": {
     "extends": "../../package.json"

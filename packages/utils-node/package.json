@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/utils-node",
-  "version": "0.0.1-pre.5",
+  "version": "0.0.1-pre.14",
   "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/utils-node",
   "repository": {
     "type": "git",
@@ -25,11 +25,12 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest",
+    "prepack": "pnpm build",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",
-    "@types/node": "^20.5.6"
+    "@types/node": "^20.11.19"
   },
   "volta": {
     "extends": "../../package.json"

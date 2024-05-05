@@ -1,0 +1,249 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`old tests > basic 1`] = `
+"[
+  null,
+  true,
+  123,
+  "string",
+  [
+    "array"
+  ],
+  {
+    "k": "v"
+  },
+  [
+    "!undefined",
+    0
+  ],
+  [
+    "!Infinity",
+    0
+  ],
+  [
+    "!-Infinity",
+    0
+  ],
+  [
+    "!NaN",
+    0
+  ],
+  0,
+  [
+    "!-0",
+    0
+  ],
+  [
+    "!Date",
+    "2023-08-17T00:00:00.000Z"
+  ],
+  [
+    "!BigInt",
+    "1234"
+  ],
+  [
+    "!RegExp",
+    [
+      "^\\\\d+",
+      "gms"
+    ]
+  ],
+  [
+    "!Map",
+    [
+      [
+        0,
+        [
+          "!Date",
+          "1970-01-01T00:00:00.000Z"
+        ]
+      ],
+      [
+        [
+          "!BigInt",
+          "1"
+        ],
+        [
+          "!Set",
+          [
+            [
+              "!RegExp",
+              [
+                "a",
+                "g"
+              ]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ],
+  [
+    "!Set",
+    [
+      0,
+      [
+        "!Date",
+        "1970-01-01T00:00:00.000Z"
+      ],
+      [
+        "!Map",
+        [
+          [
+            [
+              "!BigInt",
+              "1"
+            ],
+            [
+              "!RegExp",
+              [
+                "a",
+                "g"
+              ]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ],
+  [
+    "!",
+    "!NaN",
+    "collision"
+  ]
+]"
+`;
+
+exports[`old tests > edge cases 1`] = `
+{
+  "deserialized": [
+    Symbol(unique),
+    Symbol(named),
+    {
+      "name": "hello",
+    },
+    {},
+    "zzz",
+    {
+      "toJSON": "www",
+    },
+    [Function],
+    [Function],
+  ],
+  "input": [
+    Symbol(unique),
+    Symbol(named),
+    X {
+      "name": "hello",
+    },
+    "foo",
+    "zzz",
+    {
+      "toJSON": "www",
+    },
+    [Function],
+    [Function],
+  ],
+  "parsed": [
+    null,
+    null,
+    {
+      "name": "hello",
+    },
+    {},
+    "zzz",
+    {
+      "toJSON": "www",
+    },
+    null,
+    null,
+  ],
+  "serialized": [
+    Symbol(unique),
+    Symbol(named),
+    {
+      "name": "hello",
+    },
+    {},
+    "zzz",
+    {
+      "toJSON": "www",
+    },
+    [Function],
+    [Function],
+  ],
+  "stringified": "[
+  null,
+  null,
+  {
+    "name": "hello"
+  },
+  {},
+  "zzz",
+  {
+    "toJSON": "www"
+  },
+  null,
+  null
+]",
+}
+`;
+
+exports[`old tests > escape collision 1`] = `
+{
+  "collision2": [
+    "!",
+    "!",
+    [
+      "!BigInt",
+      "1",
+    ],
+  ],
+  "collision3": [
+    "!",
+    "!",
+    [
+      "!",
+      "!",
+      0,
+    ],
+  ],
+  "collision4": [
+    "!",
+    "!",
+    [
+      "!",
+      "!",
+      [
+        "!BigInt",
+        "1",
+      ],
+      "!",
+    ],
+  ],
+  "collision5": [
+    [],
+    [
+      "!",
+    ],
+    [
+      "!",
+      "!",
+      0,
+    ],
+    [
+      "!",
+      "!",
+      0,
+      0,
+    ],
+    [
+      "!",
+      "!",
+      0,
+      0,
+      0,
+    ],
+  ],
+}
+`;

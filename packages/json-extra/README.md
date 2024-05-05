@@ -1,22 +1,22 @@
 # json-extra
 
-Simple and trivial alternative for
+Simple alternative for
 [`@brillout/json-serializer`](https://github.com/brillout/json-serializer/),
 [`superjson`](https://github.com/blitz-js/superjson), etc...
 
-Core ideas are based on [`@brillout/json-serializer`](https://github.com/brillout/json-serializer/)
+The basic idea is based on [`@brillout/json-serializer`](https://github.com/brillout/json-serializer/)
 but it employs an array-based encoding for special values,
 which makes it easy to support custom types
 and also provides human-readibility for custom containers.
-
-## examples
-
-See `./misc/example.mjs`.
 
 <!--
 
 -------------------------------------
 ---- %template-input-start:example% ----
+
+## example1
+
+See `./misc/example.mjs`
 
 ```js
 {%shell node ./misc/example.mjs input %}
@@ -46,6 +46,38 @@ See `./misc/example.mjs`.
 
 </details>
 
+## example2: cyclic reference
+
+See `./misc/reference.mjs`
+
+```js
+{%shell node ./misc/reference.mjs input %}
+```
+
+<details><summary>console.log</summary>
+
+```js
+{%shell node ./misc/reference.mjs console %}
+```
+
+</details>
+
+<details><summary>@hiogawa/json-extra</summary>
+
+```json
+{%shell node ./misc/reference.mjs json-extra %}
+```
+
+</details>
+
+<details><summary>devalue</summary>
+
+```json
+{%shell node ./misc/reference.mjs devalue %}
+```
+
+</details>
+
 ---- %template-input-end:example% ----
 -----------------------------------
 
@@ -53,8 +85,12 @@ See `./misc/example.mjs`.
 
 <!-- %template-output-start:example% -->
 
+## example1
+
+See `./misc/example.mjs`
+
 ```js
-const input = [
+[
   // standard json value
   null,
   true,
@@ -241,6 +277,81 @@ const input = [
     }
   }
 }
+```
+
+</details>
+
+## example2: cyclic reference
+
+See `./misc/reference.mjs`
+
+```js
+const parent = { children: new Map() };
+const child1 = { parent };
+const child2 = { parent, siblings: new Set([child1]) };
+parent.children.set("foo", child1);
+parent.children.set("bar", child2);
+```
+
+<details><summary>console.log</summary>
+
+```js
+<ref *1> {
+  children: Map(2) {
+    'foo' => { parent: [Circular *1] },
+    'bar' => { parent: [Circular *1], siblings: [Set] }
+  }
+}
+```
+
+</details>
+
+<details><summary>@hiogawa/json-extra</summary>
+
+```json
+{
+  "children": [
+    "!Map",
+    [
+      [
+        "foo",
+        {
+          "parent": ["!", 0]
+        }
+      ],
+      [
+        "bar",
+        {
+          "parent": ["!", 0],
+          "siblings": ["!Set", [["!", 3]]]
+        }
+      ]
+    ]
+  ]
+}
+```
+
+</details>
+
+<details><summary>devalue</summary>
+
+```json
+[
+  {
+    "children": 1
+  },
+  ["Map", 2, 3, 4, 5],
+  "foo",
+  {
+    "parent": 0
+  },
+  "bar",
+  {
+    "parent": 0,
+    "siblings": 6
+  },
+  ["Set", 3]
+]
 ```
 
 </details>
