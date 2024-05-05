@@ -20,7 +20,7 @@ test("hmr basic", async ({ page }) => {
   await increment();
   await checkInner(1, 100);
 
-  // updating 'Inner' keeps 'Outer' state
+  // updating 'Inner'
   await withEditFile(
     "src/app.tsx",
     (code) => code.replace("const add = 100;", "const add = 1000;"),
@@ -28,22 +28,21 @@ test("hmr basic", async ({ page }) => {
   );
   await checkInner(1, 100);
 
-  // updating 'Outer' resets state
+  // updating 'Outer'
   await withEditFile(
     "src/app.tsx",
     (code) => code.replace("<h1>outer</h1>", "<h2>outer</h2>"),
     async () => {
       await page.locator("h2").getByText("outer").click();
-      await checkInner(0, 100);
+      await checkInner(1, 100);
     }
   );
-  await checkInner(0, 100);
+  await checkInner(1, 100);
 
   // increment
   await increment();
   await checkInner(1, 100);
 
-  // add @hmr-unsafe
   await withEditFile(
     "src/app.tsx",
     (code) =>

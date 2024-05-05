@@ -10,6 +10,7 @@ namespace ReactTypes {
 }
 
 const REGISTRY_KEY = Symbol.for("tiny-refresh.react");
+const INITIAL_REGISTRY_KEY = Symbol.for("tiny-refresh.registry");
 
 // cf. https://github.com/solidjs/solid-refresh/blob/22d6a92c91013b6e5d71e520a3d1dcb47d491bba/src/runtime/index.ts
 export interface ViteHot {
@@ -18,15 +19,9 @@ export interface ViteHot {
   invalidate: (message?: string) => void;
 }
 
-interface WebpackHot {
-  data?: HotData;
-  accept: (cb?: () => void) => void;
-  dispose: (cb: (data: HotData) => void) => void;
-  invalidate: () => void;
-}
-
 interface HotData {
   [REGISTRY_KEY]?: HmrRegistry;
+  [INITIAL_REGISTRY_KEY]?: HmrRegistry;
 }
 
 interface HmrRegistry {
@@ -46,6 +41,7 @@ interface HmrComponentData {
   component: ReactTypes.FC;
   listeners: Set<() => void>;
   options: HmrComponentOptions;
+  WrapperFc: ReactTypes.FC;
 }
 
 export function createHmrRegistry(
@@ -69,23 +65,22 @@ export function createHmrComponent(
   registry: HmrRegistry,
   name: string,
   Fc: ReactTypes.FC,
-  options: HmrComponentOptions
+  options: HmrComponentOptions,
+  hot: ViteHot
 ) {
-  registry.componentMap.set(name, {
-    component: Fc,
-    listeners: new Set(),
-    options,
-  });
-
   const { createElement, useEffect, useReducer } = registry.runtime;
 
   const WrapperFc: ReactTypes.FC = (props) => {
+    // TODO
+    // check if this is in render context,
+    // so that we can bail out as a normal function?
+
     const data = (registry.initial ?? registry).componentMap.get(name);
 
-    const forceUpdate = useReducer<boolean, void>(
+    const [, forceUpdate] = useReducer<boolean, void>(
       (prev: boolean) => !prev,
       true
-    )[1];
+    );
 
     useEffect(() => {
       if (!data) {
@@ -102,31 +97,14 @@ export function createHmrComponent(
       return `!!! [tiny-refresh] missing '${name}' !!!`;
     }
 
-    //
-    // approach 1.
-    //
-    //   createElement(fc, props)
-    //
-    //   This renders component as a child, which makes it always re-mount on hot update since two functions are not identical.
-    //   Hook states are not preserved, but new component can add/remove hook usage since hook states reset anyways.
-    //
-    // approach 2.
-    //
-    //   fc(props)
-    //
     //   This directly calls into functional component and use it as implementation of `UnsafeWrapperFc`.
     //   This won't cause re-mount but it must ensure hook usage didn't change, otherwise it'll crash client.
     //   Ideally, to employ this approach, we need to detect the usage of hook and force remount when hook usage is changed.
-    //   For now, however, we allow this mode via explicit "// @hmr-unsafe" comment.
-    //
-
-    return data.options.remount
-      ? createElement(data.component, props)
-      : createElement(UnsafeWrapperFc, {
-          key: data.options.key,
-          data,
-          props,
-        });
+    return createElement(UnsafeWrapperFc, {
+      key: data.options.key,
+      data,
+      props,
+    });
   };
 
   const UnsafeWrapperFc: ReactTypes.FC = ({
@@ -140,12 +118,22 @@ export function createHmrComponent(
   };
 
   // patch Function.name for react error stacktrace
-  Object.defineProperty(WrapperFc, "name", { value: `${name}_refresh` });
-  Object.defineProperty(UnsafeWrapperFc, "name", {
-    value: `${name}_refresh_unsafe`,
+  Object.defineProperty(WrapperFc, "name", { value: `${name}@refresh` });
+  Object.defineProperty(UnsafeWrapperFc, "name", { value: name });
+
+  const WrapperFc2 =
+    hot.data[INITIAL_REGISTRY_KEY]?.componentMap.get(name)?.WrapperFc ??
+    WrapperFc;
+
+  registry.componentMap.set(name, {
+    component: Fc,
+    listeners: new Set(),
+    options,
+    WrapperFc: WrapperFc2,
   });
 
-  return WrapperFc;
+  return WrapperFc2;
+  // return WrapperFc;
 }
 
 function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
@@ -170,15 +158,15 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
     // when a constant defined in the same file has changed
     // and such constant is used by the component.
     // TODO: instead of completely skipping, we could still render with "unsafe" mode since no change in component implies there's no hook change.
-    const skip = initial.component.toString() === latest.component.toString();
+    // const skip = initial.component.toString() === latest.component.toString();
 
     // sync "latest" to "initial"
     initial.component = latest.component;
     initial.options = latest.options;
 
-    if (skip) {
-      continue;
-    }
+    // if (skip) {
+    //   continue;
+    // }
 
     // TODO: debounce re-rendering
     if (latestReg.debug) {
@@ -196,6 +184,7 @@ function patchRegistry(currentReg: HmrRegistry, latestReg: HmrRegistry) {
 
 export function setupHmrVite(hot: ViteHot, registry: HmrRegistry) {
   hot.data[REGISTRY_KEY] = registry;
+  hot.data[INITIAL_REGISTRY_KEY] ??= registry;
 
   // https://vitejs.dev/guide/api-hmr.html#hot-accept-cb
   hot.accept((newModule) => {
@@ -208,21 +197,4 @@ export function setupHmrVite(hot: ViteHot, registry: HmrRegistry) {
       hot.invalidate();
     }
   });
-}
-
-export function setupHmrWebpack(hot: WebpackHot, registry: HmrRegistry) {
-  // perspective flips for webpack since `hot.data` is passed by old module.
-  const lastRegistry = hot.data && hot.data[REGISTRY_KEY];
-  if (lastRegistry) {
-    const patchSuccess = patchRegistry(lastRegistry, registry);
-    if (!patchSuccess) {
-      hot.invalidate();
-    }
-  }
-
-  // https://webpack.js.org/api/hot-module-replacement/#dispose-or-adddisposehandler
-  hot.dispose((data) => {
-    data[REGISTRY_KEY] = registry;
-  });
-  hot.accept();
 }

@@ -155,10 +155,11 @@ const $$registry = $$refresh.createHmrRegistry(
 `;
   for (const { id, hooks } of result.entries) {
     footer += /* js */ `
-if (typeof ${id} === "function" && ${id}.length <= 1) {
+if (import.meta.hot && typeof ${id} === "function" && ${id}.length <= 1) {
   ${id} = $$refresh.createHmrComponent(
     $$registry, "${id}", ${id},
-    { key: ${JSON.stringify(hooks.join("/"))}, remount: false }
+    { key: ${JSON.stringify(hooks.join("/"))}, remount: false },
+    import.meta.hot,
   );
 }
 `;
@@ -193,6 +194,8 @@ const HOOK_CALL_RE = /\b(use\w*)\s*\(/g;
 async function analyzeCode(code: string) {
   const ast = await parseAstAsync(code);
   const errors: unknown[] = [];
+
+  // TODO: collect also non-exported functions with a capitalized names
   const entries: HotEntry[] = [];
 
   // replace "export const" with "export let"
