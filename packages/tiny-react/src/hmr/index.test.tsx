@@ -5,7 +5,6 @@ import {
   createHmrRegistry,
   setupHmrVite,
 } from ".";
-import { h } from "../helper/hyperscript";
 import { useEffect, useReducer } from "../hooks";
 import { render } from "../reconciler";
 import { sleepFrame } from "../test-utils";
@@ -26,7 +25,7 @@ describe(setupHmrVite, () => {
     let ChildExport: any;
 
     function Parent() {
-      return h(ChildExport, {});
+      return <ChildExport />;
     }
 
     const mockFn = vi.fn();
@@ -51,7 +50,7 @@ describe(setupHmrVite, () => {
               mockFn("effect-cleanup-1");
             };
           }, []);
-          return h.div({}, "1");
+          return <div>1</div>;
         },
         { remount: true }
       );
@@ -60,7 +59,7 @@ describe(setupHmrVite, () => {
       setupHmrVite(hot, registry);
     }
 
-    const vnode = h(Parent, {});
+    const vnode = <Parent />;
     const parent = document.createElement("main");
     render(vnode, parent);
     await sleepFrame();
@@ -95,7 +94,7 @@ describe(setupHmrVite, () => {
         registry,
         "Child",
         function Child() {
-          return h.div({}, "2");
+          return <div>2</div>;
         },
         { remount: true }
       );
@@ -145,7 +144,7 @@ describe(setupHmrVite, () => {
               mockFn("effect-cleanup-3");
             };
           }, []);
-          return h.div({}, "3");
+          return <div>3</div>;
         },
         { remount: true }
       );
