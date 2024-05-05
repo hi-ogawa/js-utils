@@ -44,6 +44,7 @@ async function testNavigation(page: Page, options: { js: boolean }) {
   await page.getByRole("link", { name: "Test" }).click();
   await page.waitForURL("/test");
   await page.getByRole("heading", { name: "Test page" }).click();
+  await page.getByText("Another Client Component").click();
   await expect(page.getByPlaceholder("test-input")).toHaveValue(
     options.js ? "hello" : ""
   );
