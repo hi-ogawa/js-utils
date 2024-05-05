@@ -11,19 +11,12 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
-    "./dist/vite": {
-      "import": "./dist/vite.js",
-      "require": "./dist/vite.cjs",
-      "types": "./dist/vite.d.ts"
-    },
-    "./dist/webpack": {
-      "import": "./dist/webpack.js",
-      "require": "./dist/webpack.cjs",
-      "types": "./dist/webpack.d.ts"
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "default": "./dist/vite.js"
     }
   },
   "main": "./dist/index.js",
