@@ -108,17 +108,17 @@ export type BCustom = {
   vnode: VCustom;
   child: BNode;
   hookContext: HookContext;
-  parent: BNodeParent | null;
-  slot: HNode | null;
+  hrange: [HNode, HNode] | null;
   hparent: HNode | null; // null after unmounted so that we can skip already scheduled re-rendering
+  parent: BNodeParent | null;
 };
 
 export type BFragment = {
   type: typeof NODE_TYPE_FRAGMENT;
   vnode: VFragment;
   children: BNode[];
+  hrange: [HNode, HNode] | null;
   parent: BNodeParent | null;
-  slot: HNode | null;
 };
 
 //
@@ -152,15 +152,14 @@ export function getBNodeKey(node: BNode): NodeKey | undefined {
   return;
 }
 
-// "slot" is the first HNode inside the BNode subtree
-export function getBNodeSlot(node: BNode): HNode | null {
+export function getBNodeRange(node: BNode): [HNode, HNode] | null {
   if (node.type === NODE_TYPE_EMPTY) {
     return null;
   }
   if (node.type === NODE_TYPE_TAG || node.type === NODE_TYPE_TEXT) {
-    return node.hnode;
+    return [node.hnode, node.hnode];
   }
-  return node.slot;
+  return node.hrange;
 }
 
 // bnode parent traversal is only for BCustom and BFragment

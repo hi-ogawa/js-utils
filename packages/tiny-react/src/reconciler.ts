@@ -1,5 +1,6 @@
 import { tinyassert } from "@hiogawa/utils";
 import { HookContext } from "./hooks";
+import { isEqualShallow } from "./utils";
 import {
   type BCustom,
   type BFragment,
@@ -19,7 +20,7 @@ import {
   type VTag,
   getBNodeKey,
   getBNodeParent,
-  getBNodeSlot,
+  getBNodeRange,
   getVNodeKey,
   isReservedTagProp,
   normalizeComponentChildren,
@@ -65,15 +66,20 @@ function reconcileNode(
   if (isHydrate) {
     tinyassert(bnode.type === NODE_TYPE_EMPTY);
     bnode = hydrateNode(vnode, hparent, hnextSibling);
-    hnextSibling = getBNodeSlot(bnode) ?? hnextSibling;
   }
   if (vnode.type === NODE_TYPE_EMPTY) {
+    //
+    // empty
+    //
     if (bnode.type === NODE_TYPE_EMPTY) {
     } else {
       unmount(bnode);
       bnode = EMPTY_NODE;
     }
   } else if (vnode.type === NODE_TYPE_TAG) {
+    //
+    // tag
+    //
     let queueRef = isHydrate; // ref callback on mount or hydrate;
     if (
       bnode.type === NODE_TYPE_TAG &&
@@ -95,7 +101,6 @@ function reconcileNode(
         effectManager,
         isHydrate
       );
-      placeChild(hparent, bnode.hnode, hnextSibling, false);
     } else {
       queueRef = true;
       unmount(bnode);
@@ -116,19 +121,21 @@ function reconcileNode(
         listeners: new Map(),
       } satisfies BTag;
       reconcileTagProps(bnode, vnode.props, {});
-      placeChild(hparent, bnode.hnode, hnextSibling, true);
+      hparent.insertBefore(hnode, hnextSibling);
     }
     if (queueRef) {
       effectManager.refNodes.push(bnode);
     }
     setBNodeParent(bnode.child, bnode);
   } else if (vnode.type === NODE_TYPE_TEXT) {
+    //
+    // text
+    //
     if (bnode.type === NODE_TYPE_TEXT) {
       if (bnode.vnode.data !== vnode.data) {
         bnode.hnode.data = vnode.data;
       }
       bnode.vnode = vnode;
-      placeChild(hparent, bnode.hnode, hnextSibling, false);
     } else {
       unmount(bnode);
       const hnode = document.createTextNode(vnode.data);
@@ -137,14 +144,15 @@ function reconcileNode(
         vnode,
         hnode,
       } satisfies BText;
-      placeChild(hparent, bnode.hnode, hnextSibling, true);
+      hparent.insertBefore(hnode, hnextSibling);
     }
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
-    // TODO: learn from
-    // https://github.com/yewstack/yew/blob/30e2d548ef57a4b738fb285251b986467ef7eb95/packages/yew/src/dom_bundle/blist.rs#L416
-    // https://github.com/snabbdom/snabbdom/blob/420fa78abe98440d24e2c5af2f683e040409e0a6/src/init.ts#L289
-    // https://github.com/WebReflection/udomdiff/blob/8923d4fac63a40c72006a46eb0af7bfb5fdef282/index.js
+    //
+    // fragment
+    //
+    let isMutation = false;
     if (bnode.type === NODE_TYPE_FRAGMENT && bnode.vnode.key === vnode.key) {
+      isMutation = true;
       const [newChildren, oldChildren] = alignChildrenByKey(
         vnode.children,
         bnode.children
@@ -161,11 +169,11 @@ function reconcileNode(
         vnode,
         children: [],
         parent: null,
-        slot: null,
+        hrange: null,
       } satisfies BFragment;
     }
     // reconcile vnode.children
-    bnode.slot = null;
+    bnode.hrange = null;
     for (let i = vnode.children.length - 1; i >= 0; i--) {
       const bchild = reconcileNode(
         vnode.children[i],
@@ -175,12 +183,25 @@ function reconcileNode(
         effectManager,
         isHydrate
       );
-      hnextSibling = getBNodeSlot(bchild) ?? hnextSibling;
-      bnode.slot = getBNodeSlot(bchild) ?? bnode.slot;
+      const hrange = getBNodeRange(bchild);
+      if (hrange) {
+        if (!bnode.hrange) {
+          bnode.hrange = [...hrange];
+        } else {
+          bnode.hrange[0] = hrange[0];
+        }
+        if (isMutation) {
+          reinsertHNodeRange(hrange, hparent, hnextSibling);
+        }
+        hnextSibling = hrange[0];
+      }
       bnode.children[i] = bchild;
       setBNodeParent(bchild, bnode);
     }
   } else if (vnode.type === NODE_TYPE_CUSTOM) {
+    //
+    // custom
+    //
     if (
       bnode.type === NODE_TYPE_CUSTOM &&
       bnode.vnode.key === vnode.key &&
@@ -214,14 +235,14 @@ function reconcileNode(
         vnode,
         child,
         hookContext,
+        hrange: null,
         hparent: null,
         parent: null,
-        slot: null,
       } satisfies BCustom;
     }
-    bnode.hparent = hparent;
     setBNodeParent(bnode.child, bnode);
-    bnode.slot = getBNodeSlot(bnode.child);
+    bnode.hparent = hparent;
+    bnode.hrange = getBNodeRange(bnode.child);
     effectManager.effectNodes.push(bnode);
 
     // expose self re-rendering for hooks
@@ -242,8 +263,14 @@ function hydrateNode(
   hnextSibling: HNode | null
 ): BNode {
   if (vnode.type === NODE_TYPE_EMPTY) {
+    //
+    // empty
+    //
     return EMPTY_NODE;
   } else if (vnode.type === NODE_TYPE_TAG) {
+    //
+    // tag
+    //
     const hnode = hnextSibling?.previousSibling ?? hparent.lastChild;
     // TODO: warning instead of hard error?
     // TODO: check props mismatch?
@@ -259,6 +286,9 @@ function hydrateNode(
       listeners: new Map(),
     } satisfies BTag;
   } else if (vnode.type === NODE_TYPE_TEXT) {
+    //
+    // text
+    //
     let hnode = hnextSibling?.previousSibling ?? hparent.lastChild;
     // no text node for empty text during SSR
     if (hnode === null && vnode.data === "") {
@@ -287,35 +317,51 @@ function hydrateNode(
     );
     return { type: vnode.type, vnode, hnode } satisfies BText;
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
+    //
+    // fragment
+    //
     return {
       type: vnode.type,
       vnode,
       children: [],
       parent: null,
-      slot: null,
+      hrange: null,
     } satisfies BFragment;
   } else if (vnode.type === NODE_TYPE_CUSTOM) {
+    //
+    // custom
+    //
     return {
       type: vnode.type,
       vnode,
       child: EMPTY_NODE,
       hookContext: new HookContext(updateCustomNodeUnsupported),
       hparent: null,
+      hrange: null,
       parent: null,
-      slot: null,
     } satisfies BCustom;
   }
   return vnode satisfies never;
 }
 
-function placeChild(
+function reinsertHNodeRange(
+  hrange: [HNode, HNode],
   hparent: HNode,
-  hnode: HNode,
-  hnextSibling: HNode | null,
-  init: boolean
+  hnextSibling: HNode | null
 ) {
-  if (init || hnode.nextSibling !== hnextSibling) {
-    hparent.insertBefore(hnode, hnextSibling);
+  let [first, hnode] = hrange;
+  if (hnode.nextSibling !== hnextSibling) {
+    while (true) {
+      // keep `previousSibling` before `insertBefore`
+      const prev = hnode.previousSibling;
+      hparent.insertBefore(hnode, hnextSibling);
+      if (hnode === first) {
+        break;
+      }
+      tinyassert(prev);
+      hnextSibling = hnode;
+      hnode = prev;
+    }
   }
 }
 
@@ -331,7 +377,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     return;
   }
 
-  const oldSlot = getBNodeSlot(bnode);
+  const oldRange = getBNodeRange(bnode);
 
   // traverse ancestors to find "slot"
   const hnextSibling = findNextSibling(bnode);
@@ -342,69 +388,77 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     vnode,
     bnode,
     bnode.hparent,
-    hnextSibling ?? null,
+    hnextSibling,
     effectManager,
     false
   );
   tinyassert(newBnode === bnode); // reconciled over itself without unmount (i.e. should be same `key` and `render`)
 
-  // fix up ancestors slot
-  const newSlot = getBNodeSlot(bnode);
-  if (oldSlot !== newSlot) {
-    updateParentSlot(bnode);
+  // fix up ancestors range
+  const newRange = getBNodeRange(bnode);
+  if (
+    oldRange !== newRange ||
+    (oldRange && newRange && !isEqualShallow(oldRange, newRange))
+  ) {
+    updateParentRange(bnode);
   }
 
   effectManager.run();
 }
 
-function findNextSibling(child: BNode): HNode | undefined {
+function findNextSibling(child: BNode): HNode | null {
   let parent = getBNodeParent(child);
   while (parent) {
     if (parent.type === NODE_TYPE_TAG) {
-      // no slot i.e. new node will be the first child within parent tag
-      return;
+      // new node will be the first child within parent tag
+      return null;
     }
     if (parent.type === NODE_TYPE_FRAGMENT) {
-      // TODO
-      // need faster look up within BFragment.children?
-      // though this wouldn't be so bad practically since we traverse up to only first BTag ancestor
-      let slot: HNode | undefined;
+      let hnode: HNode | undefined;
       for (let i = parent.children.length - 1; i >= 0; i--) {
         const c = parent.children[i];
         if (c === child) {
           // otherwise it didn't find previous slot within the fragment
           // so give up and go up to next parent
-          if (slot) {
-            return slot;
+          if (hnode) {
+            return hnode;
           }
           break;
         }
-        slot = getBNodeSlot(c) ?? slot;
+        const hrange = getBNodeRange(c);
+        if (hrange) {
+          hnode = hrange[0];
+        }
       }
     }
     // go up to parent also when parent.type === "custom"
     child = parent;
     parent = child.parent;
   }
-  return;
+  return null;
 }
 
-function updateParentSlot(child: BNode) {
+function updateParentRange(child: BNode) {
   let parent = getBNodeParent(child);
   while (parent) {
     if (parent.type === NODE_TYPE_TAG) {
       return;
     }
     if (parent.type === NODE_TYPE_CUSTOM) {
-      parent.slot = getBNodeSlot(child);
+      parent.hrange = getBNodeRange(child);
     }
     if (parent.type === NODE_TYPE_FRAGMENT) {
-      // TODO: could optimize something?
-      let slot: HNode | null = null;
+      parent.hrange = null;
       for (const c of parent.children) {
-        slot = getBNodeSlot(c) ?? slot;
+        const hrange = getBNodeRange(c);
+        if (hrange) {
+          if (!parent.hrange) {
+            parent.hrange = [...hrange];
+          } else {
+            parent.hrange[0] = hrange[0];
+          }
+        }
       }
-      parent.slot = slot;
     }
     child = parent;
     parent = child.parent;

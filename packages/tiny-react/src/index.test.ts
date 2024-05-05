@@ -17,7 +17,7 @@ import {
   Fragment,
   createElement,
   createVNode,
-  getBNodeSlot,
+  getBNodeRange,
 } from "./virtual-dom";
 
 describe(render, () => {
@@ -82,8 +82,15 @@ describe(render, () => {
               },
             },
           ],
+          "hrange": [
+            hello,
+            <span
+              class="text-red"
+            >
+              world
+            </span>,
+          ],
           "parent": [Circular],
-          "slot": hello,
           "type": "fragment",
           "vnode": {
             "children": [
@@ -234,10 +241,13 @@ describe(render, () => {
                 },
               },
             ],
+            "hrange": [
+              <span>
+                hello
+              </span>,
+              world,
+            ],
             "parent": [Circular],
-            "slot": <span>
-              hello
-            </span>,
             "type": "fragment",
             "vnode": {
               "children": [
@@ -300,13 +310,21 @@ describe(render, () => {
             world
           </div>
         </main>,
+        "hrange": [
+          <div>
+            <span>
+              hello
+            </span>
+            world
+          </div>,
+          <div>
+            <span>
+              hello
+            </span>
+            world
+          </div>,
+        ],
         "parent": null,
-        "slot": <div>
-          <span>
-            hello
-          </span>
-          world
-        </div>,
         "type": "custom",
         "vnode": {
           "key": undefined,
@@ -728,10 +746,15 @@ describe(updateCustomNode, () => {
         </span>
       </main>
     `);
-    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
-      <div>
-        x
-      </div>
+    expect(getBNodeRange(bnode)).toMatchInlineSnapshot(`
+      [
+        <div>
+          x
+        </div>,
+        <span>
+          y
+        </span>,
+      ]
     `);
 
     update1("p");
@@ -745,10 +768,15 @@ describe(updateCustomNode, () => {
         </span>
       </main>
     `);
-    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
-      <span>
-        y
-      </span>
+    expect(getBNodeRange(bnode)).toMatchInlineSnapshot(`
+      [
+        <span>
+          y
+        </span>,
+        <p>
+          x
+        </p>,
+      ]
     `);
 
     update2("b");
@@ -762,10 +790,15 @@ describe(updateCustomNode, () => {
         </b>
       </main>
     `);
-    expect(getBNodeSlot(bnode)).toMatchInlineSnapshot(`
-      <b>
-        y
-      </b>
+    expect(getBNodeRange(bnode)).toMatchInlineSnapshot(`
+      [
+        <b>
+          y
+        </b>,
+        <p>
+          x
+        </p>,
+      ]
     `);
   });
 });
