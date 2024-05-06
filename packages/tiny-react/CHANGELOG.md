@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.1
+
+- feat: update `@hiogawa/tiny-refresh` v0.1.0
+
 ## v0.1.0
 
 - feat: serialized vnode (aka. server component) ([#227](https://github.com/hi-ogawa/js-utils/pull/227))
