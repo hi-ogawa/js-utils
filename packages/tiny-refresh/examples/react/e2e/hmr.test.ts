@@ -5,93 +5,53 @@ import { type Page, expect, test } from "@playwright/test";
 test("basic", async ({ page }) => {
   await page.goto("/");
   await using _reloadChecker = await createReloadChecker(page);
+
+  await page.getByText("[Outer] = 0").click();
+  await page.locator("#inner1").getByText("Inner: [Outer] + 100 = 100").click();
+  await page.locator("#inner2").getByText("Inner: [Outer] + 100 = 100").click();
+
+  await page.getByRole("button", { name: "+" }).first().click();
+  await page.getByText("[Outer] = 1").click();
+  await page.locator("#inner1").getByText("Inner: [Outer] + 100 = 101").click();
+  await page.locator("#inner2").getByText("Inner: [Outer] + 100 = 101").click();
+
+  using file = createFileEditor("src/app.tsx");
+  file.edit((s) =>
+    s.replace("const innerAdd = 100;", "const innerAdd = 1000;")
+  );
+  await page
+    .locator("#inner1")
+    .getByText("Inner: [Outer] + 1000 = 1001")
+    .click();
+  await page
+    .locator("#inner2")
+    .getByText("Inner: [Outer] + 1000 = 1001")
+    .click();
+  await page.getByText("[Outer] = 1").click();
 });
 
 test("hook change", async ({ page }) => {
   await page.goto("/");
   await using _reloadChecker = await createReloadChecker(page);
-});
 
-test.skip("hmr basic", async ({ page }) => {
-  await page.goto("/");
-  await using _reloadChecker = await createReloadChecker(page);
+  await page.getByText("[Outer] = 0").click();
+  await page.locator("#inner1").getByText("Inner: [Outer] + 100 = 100").click();
+  await page.locator("#inner2").getByText("Inner: [Outer] + 100 = 100").click();
 
-  async function increment() {
-    await page.getByRole("button", { name: "+1" }).first().click();
-  }
+  await page.getByRole("button", { name: "+" }).first().click();
+  await page.getByText("[Outer] = 1").click();
+  await page.locator("#inner1").getByText("Inner: [Outer] + 100 = 101").click();
+  await page.locator("#inner2").getByText("Inner: [Outer] + 100 = 101").click();
 
-  async function checkInner(value: number, add: number) {
-    const text = `Inner: counter + ${add} = ${value + add}`;
-    await page.locator("#inner1").getByText(text).click();
-    await page.locator("#inner2").getByText(text).click();
-  }
-
-  await checkInner(0, 100);
-
-  // increment
-  await increment();
-  await checkInner(1, 100);
-
-  // updating 'Inner'
-  await withEditFile(
-    "src/app.tsx",
-    (code) => code.replace("const add = 100;", "const add = 1000;"),
-    () => checkInner(1, 1000)
+  using file = createFileEditor("src/app.tsx");
+  file.edit((s) =>
+    s
+      .replace("useState(0);", "useState(0);useState(0);")
+      .replace("[Outer] =", "[Outer(EDIT)] =")
   );
-  await checkInner(1, 100);
-
-  // updating 'Outer'
-  await withEditFile(
-    "src/app.tsx",
-    (code) => code.replace("<h1>outer</h1>", "<h2>outer</h2>"),
-    async () => {
-      await page.locator("h2").getByText("outer").click();
-      await checkInner(1, 100);
-    }
-  );
-  await checkInner(1, 100);
-
-  // increment
-  await increment();
-  await checkInner(1, 100);
-
-  await withEditFile(
-    "src/app.tsx",
-    (code) =>
-      code.replace(
-        "export function Outer()",
-        "// @hmr-unsafe\nexport function Outer()"
-      ),
-    async () => {
-      // reset
-      await checkInner(0, 100);
-
-      // increment
-      await increment();
-      await checkInner(1, 100);
-
-      // update 'Outer' (make increment double)
-      await withEditFile(
-        "src/app.tsx",
-        (code) => code.replace("(prev) => prev + 1", "(prev) => prev + 2"),
-        async () => {
-          // state is preserved
-          await checkInner(1, 100);
-
-          // increment
-          await increment();
-          await checkInner(3, 100);
-
-          // update 'Inner'
-          await withEditFile(
-            "src/app.tsx",
-            (code) => code.replace("const add = 100;", "const add = 1000;"),
-            () => checkInner(3, 1000)
-          );
-        }
-      );
-    }
-  );
+  await page.getByText("[Outer(EDIT)] = 0").click();
+  await page.locator("#inner1").getByText("Inner: [Outer] + 100 = 100").click();
+  await page.locator("#inner2").getByText("Inner: [Outer] + 100 = 100").click();
 });
 
 test("show/hide", async ({ page }) => {
@@ -115,27 +75,6 @@ test("show/hide", async ({ page }) => {
   await page.getByRole("button", { name: "show/hide" }).click();
   await expect(page.getByTestId("show-hide-message")).toHaveText("[]");
 });
-
-async function withEditFile(
-  filepath: string,
-  edit: (content: string) => string,
-  callback: () => void | Promise<void>
-) {
-  const revert = await editFile(filepath, edit);
-  try {
-    await callback();
-  } finally {
-    await revert();
-  }
-}
-
-async function editFile(filepath: string, edit: (content: string) => string) {
-  const content = await fs.promises.readFile(filepath, "utf-8");
-  await fs.promises.writeFile(filepath, edit(content));
-  return async () => {
-    await fs.promises.writeFile(filepath, content);
-  };
-}
 
 function createFileEditor(filepath: string) {
   let init = fs.readFileSync(filepath, "utf-8");

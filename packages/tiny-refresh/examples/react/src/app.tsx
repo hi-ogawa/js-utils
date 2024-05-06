@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { InnerOther, InnerShowHide } from "./other-file";
+import { InnerShowHide } from "./other-file";
 
 export function Root() {
   return (
     <div>
-      <input placeholder="test-input" />
+      <input style={{ marginBottom: "0.5rem" }} placeholder="test-input" />
       <Outer />
       <ShowHideContainer />
     </div>
@@ -26,9 +26,6 @@ function Outer() {
       <div id="inner2">
         <Inner value={state} />
       </div>
-      <div id="inner3">
-        <InnerOther value={state} />
-      </div>
     </div>
   );
 }
@@ -49,10 +46,10 @@ function ShowHideContainer() {
 }
 
 function Inner(props: { value: number }) {
-  const add = 100;
+  const innerAdd = 100;
   return (
     <pre>
-      Inner: [Outer] + {add} = {props.value + add}
+      Inner: [Outer] + {innerAdd} = {props.value + innerAdd}
     </pre>
   );
 }
