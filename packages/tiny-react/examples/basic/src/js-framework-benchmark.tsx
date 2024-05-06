@@ -2,7 +2,6 @@ import { memo, useCallback, useState } from "@hiogawa/tiny-react";
 import { range } from "@hiogawa/utils";
 
 // benchmark tasks from https://github.com/krausest/js-framework-benchmark
-// @hmr-unsafe
 export function JsFrameworkBenchmarkApp() {
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
@@ -125,7 +124,6 @@ export function JsFrameworkBenchmarkApp() {
   );
 }
 
-// @hmr-disable
 function ItemComponent({
   item,
   isSelected,
@@ -160,7 +158,6 @@ function ItemComponent({
   );
 }
 
-// @hmr-disable
 const MemoItemCompoment = memo(ItemComponent);
 
 interface ItemData {

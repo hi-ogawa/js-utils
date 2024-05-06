@@ -1,16 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  type ViteHot,
-  createHmrComponent,
-  createHmrRegistry,
-  setupHmrVite,
-} from ".";
+import { type ViteHot, createManager } from ".";
 import { useEffect, useReducer } from "../hooks";
 import { render } from "../reconciler";
 import { sleepFrame } from "../test-utils";
 import { createElement } from "../virtual-dom";
 
-describe(setupHmrVite, () => {
+describe("hmr", () => {
   it("basic", async () => {
     const acceptCallbacks: ((newModule?: unknown) => void)[] = [];
 
@@ -30,33 +25,29 @@ describe(setupHmrVite, () => {
 
     const mockFn = vi.fn();
 
+    const runtime = {
+      createElement,
+      useReducer,
+      useEffect,
+    };
+
     //
     // 1st version
     //
     {
-      const registry = createHmrRegistry({
-        createElement,
-        useReducer,
-        useEffect,
-      });
+      function Child() {
+        useEffect(() => {
+          mockFn("effect-setup-1");
+          return () => {
+            mockFn("effect-cleanup-1");
+          };
+        }, []);
+        return <div>1</div>;
+      }
 
-      const Child = createHmrComponent(
-        registry,
-        "Child",
-        function Child() {
-          useEffect(() => {
-            mockFn("effect-setup-1");
-            return () => {
-              mockFn("effect-cleanup-1");
-            };
-          }, []);
-          return <div>1</div>;
-        },
-        { remount: true }
-      );
-      ChildExport = Child;
-
-      setupHmrVite(hot, registry);
+      const manager = createManager(hot, runtime, false);
+      ChildExport = manager.wrap("Child", Child, "useEffect");
+      manager.setup();
     }
 
     const vnode = <Parent />;
@@ -80,26 +71,16 @@ describe(setupHmrVite, () => {
     `);
 
     //
-    // 2nd version (remount mode allows modifying hooks)
+    // 2nd version
     //
     {
-      const registry = createHmrRegistry({
-        createElement,
-        useReducer,
-        useEffect,
-      });
+      function Child() {
+        return <div>2</div>;
+      }
 
-      // this export itself doesn't affect original version of export
-      createHmrComponent(
-        registry,
-        "Child",
-        function Child() {
-          return <div>2</div>;
-        },
-        { remount: true }
-      );
-
-      setupHmrVite(hot, registry);
+      const manager = createManager(hot, runtime, false);
+      manager.wrap("Child", Child, "");
+      manager.setup();
     }
 
     // simulate 1st version's `hot.accept`
@@ -128,28 +109,19 @@ describe(setupHmrVite, () => {
     // 3rd version
     //
     {
-      const registry = createHmrRegistry({
-        createElement,
-        useReducer,
-        useEffect,
-      });
+      function Child() {
+        useEffect(() => {
+          mockFn("effect-setup-3");
+          return () => {
+            mockFn("effect-cleanup-3");
+          };
+        }, []);
+        return <div>3</div>;
+      }
 
-      createHmrComponent(
-        registry,
-        "Child",
-        function Child() {
-          useEffect(() => {
-            mockFn("effect-setup-3");
-            return () => {
-              mockFn("effect-cleanup-3");
-            };
-          }, []);
-          return <div>3</div>;
-        },
-        { remount: true }
-      );
-
-      setupHmrVite(hot, registry);
+      const manager = createManager(hot, runtime, false);
+      manager.wrap("Child", Child, "useEffect");
+      manager.setup();
     }
 
     acceptCallbacks[1]({});

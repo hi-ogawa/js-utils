@@ -2,219 +2,80 @@ import { describe, expect, it } from "vitest";
 import { hmrTransform } from "./transform";
 
 describe(hmrTransform, () => {
-  it("basic", () => {
-    const input = `\
-// @hmr
-export default function CompFn() {
-  return <div>hello</div>;
+  it("basic", async () => {
+    const input = /* js */ `\
+
+export default function FnDefault() {}
+
+export let FnLet = () => {
+  useState();
+  useEffect;
+  useRef();
+  // useCallback();
+  return "hello";
 }
 
-// @hmr
-export let CompLet = () => {
-  return <div>hello</div>;
-}
+export const FnConst = () => {}
 
-// @hmr-unsafe
-const CompConst = () => {
-  return <div>hello</div>;
-}
+const FnNonExport = () => {}
 
-function CompNooo() {
-  return <div>hello</div>;
-}
+function notCapitalFn() {}
+
+const NotFn = "hello";
+
+// TODO
+// export const FnExpr = function() {}
+// export const NotFn2 = "hello";
 `;
     expect(
-      hmrTransform(input, {
-        runtime: "react",
-        bundler: "vite",
-        autoDetect: false,
+      await hmrTransform(input, {
+        runtime: "/runtime",
+        refreshRuntime: "/refresh-runtime",
       })
     ).toMatchInlineSnapshot(`
       "
-      import * as $$runtime from "react";
-      import * as $$refresh from "@hiogawa/tiny-refresh";
-      const $$registry = $$refresh.createHmrRegistry({
-        createElement: $$runtime.createElement,
-        useReducer: $$runtime.useReducer,
-        useEffect: $$runtime.useEffect,
-      }, false);
+      export default function FnDefault() {}
 
-      // @hmr
-      export default function CompFn() {
-        return <div>hello</div>;
+      export let FnLet = () => {
+        useState();
+        useEffect;
+        useRef();
+        // useCallback();
+        return "hello";
       }
 
-      // @hmr
-      export let CompLet = () => {
-        return <div>hello</div>;
-      }
+      export let   FnConst = () => {}
 
-      // @hmr-unsafe
-      let CompConst = () => {
-        return <div>hello</div>;
-      }
+      let   FnNonExport = () => {}
 
-      function CompNooo() {
-        return <div>hello</div>;
-      }
+      function notCapitalFn() {}
 
+      let   NotFn = "hello";
 
-      if (typeof CompFn === "function" && CompFn.length <= 1) {
-        var $$tmp_CompFn = CompFn;
-        CompFn = $$refresh.createHmrComponent($$registry, "CompFn", $$tmp_CompFn, { remount: true });
-      }
+      // TODO
+      // export const FnExpr = function() {}
+      // export const NotFn2 = "hello";
 
-
-      if (typeof CompLet === "function" && CompLet.length <= 1) {
-        var $$tmp_CompLet = CompLet;
-        CompLet = $$refresh.createHmrComponent($$registry, "CompLet", $$tmp_CompLet, { remount: true });
-      }
-
-
-      if (typeof CompConst === "function" && CompConst.length <= 1) {
-        var $$tmp_CompConst = CompConst;
-        CompConst = $$refresh.createHmrComponent($$registry, "CompConst", $$tmp_CompConst, { remount: false });
-      }
-
-
+      import * as $$runtime from "/runtime";
+      import * as $$refresh from "/refresh-runtime";
       if (import.meta.hot) {
-        $$refresh.setupHmrVite(import.meta.hot, $$registry);
         () => import.meta.hot.accept();
+        const $$manager = $$refresh.createManager(
+          import.meta.hot,
+          {
+            createElement: $$runtime.createElement,
+            useReducer: $$runtime.useReducer,
+            useEffect: $$runtime.useEffect,
+          },
+          false,
+        );
+        FnDefault = $$manager.wrap("FnDefault", FnDefault, "");
+        FnLet = $$manager.wrap("FnLet", FnLet, "useState/useRef/useCallback");
+        FnConst = $$manager.wrap("FnConst", FnConst, "");
+        FnNonExport = $$manager.wrap("FnNonExport", FnNonExport, "");
+        $$manager.setup();
       }
       "
     `);
-  });
-
-  it("auto-detect", () => {
-    const input = `\
-export default function CompFn() {
-  return <div>hello</div>;
-}
-
-export let CompLet = () => {
-  return <div>hello</div>;
-}
-
-// @hmr-unsafe
-const CompConst = () => {
-  return <div>hello</div>;
-}
-
-function CompFn2() {
-  return <div>hello</div>;
-}
-
-// @hmr-disable
-function CompNooo() {
-  return <div>hello</div>;
-}
-
-
-const lower = 0;
-const UPPER = 1;
-
-`;
-    expect(
-      hmrTransform(input, {
-        runtime: "react",
-        bundler: "vite",
-        autoDetect: true,
-      })
-    ).toMatchInlineSnapshot(`
-      "
-      import * as $$runtime from "react";
-      import * as $$refresh from "@hiogawa/tiny-refresh";
-      const $$registry = $$refresh.createHmrRegistry({
-        createElement: $$runtime.createElement,
-        useReducer: $$runtime.useReducer,
-        useEffect: $$runtime.useEffect,
-      }, false);
-
-      export default function CompFn() {
-        return <div>hello</div>;
-      }
-
-      export let CompLet = () => {
-        return <div>hello</div>;
-      }
-
-      // @hmr-unsafe
-      let CompConst = () => {
-        return <div>hello</div>;
-      }
-
-      function CompFn2() {
-        return <div>hello</div>;
-      }
-
-      // @hmr-disable
-      function CompNooo() {
-        return <div>hello</div>;
-      }
-
-
-      const lower = 0;
-      let UPPER = 1;
-
-
-
-      if (typeof CompFn === "function" && CompFn.length <= 1) {
-        var $$tmp_CompFn = CompFn;
-        CompFn = $$refresh.createHmrComponent($$registry, "CompFn", $$tmp_CompFn, { remount: true });
-      }
-
-
-      if (typeof CompLet === "function" && CompLet.length <= 1) {
-        var $$tmp_CompLet = CompLet;
-        CompLet = $$refresh.createHmrComponent($$registry, "CompLet", $$tmp_CompLet, { remount: true });
-      }
-
-
-      if (typeof CompConst === "function" && CompConst.length <= 1) {
-        var $$tmp_CompConst = CompConst;
-        CompConst = $$refresh.createHmrComponent($$registry, "CompConst", $$tmp_CompConst, { remount: false });
-      }
-
-
-      if (typeof CompFn2 === "function" && CompFn2.length <= 1) {
-        var $$tmp_CompFn2 = CompFn2;
-        CompFn2 = $$refresh.createHmrComponent($$registry, "CompFn2", $$tmp_CompFn2, { remount: true });
-      }
-
-
-      if (typeof UPPER === "function" && UPPER.length <= 1) {
-        var $$tmp_UPPER = UPPER;
-        UPPER = $$refresh.createHmrComponent($$registry, "UPPER", $$tmp_UPPER, { remount: true });
-      }
-
-
-      if (import.meta.hot) {
-        $$refresh.setupHmrVite(import.meta.hot, $$registry);
-        () => import.meta.hot.accept();
-      }
-      "
-    `);
-  });
-
-  it("auto-detect", () => {
-    const input = `\
-// @hmr-disable-all
-
-export default function CompFn() {
-  return <div>hello</div>;
-}
-
-export let CompLet = () => {
-  return <div>hello</div>;
-}
-
-`;
-    expect(
-      hmrTransform(input, {
-        runtime: "react",
-        bundler: "vite",
-        autoDetect: true,
-      })
-    ).toMatchInlineSnapshot("undefined");
   });
 });
