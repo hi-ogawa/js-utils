@@ -58,50 +58,22 @@ const NotFn = "hello";
 
       import * as $$runtime from "/runtime";
       import * as $$refresh from "/refresh-runtime";
-      const $$registry = $$refresh.createHmrRegistry(
-        {
-          createElement: $$runtime.createElement,
-          useReducer: $$runtime.useReducer,
-          useEffect: $$runtime.useEffect,
-        },
-        false,
-      );
-
-      if (import.meta.hot && typeof FnDefault === "function") {
-        FnDefault = $$refresh.createHmrComponent(
-          $$registry, "FnDefault", FnDefault,
-          { key: "" },
-          import.meta.hot,
-        );
-      }
-
-      if (import.meta.hot && typeof FnLet === "function") {
-        FnLet = $$refresh.createHmrComponent(
-          $$registry, "FnLet", FnLet,
-          { key: "useState/useRef/useCallback" },
-          import.meta.hot,
-        );
-      }
-
-      if (import.meta.hot && typeof FnConst === "function") {
-        FnConst = $$refresh.createHmrComponent(
-          $$registry, "FnConst", FnConst,
-          { key: "" },
-          import.meta.hot,
-        );
-      }
-
-      if (import.meta.hot && typeof FnNonExport === "function") {
-        FnNonExport = $$refresh.createHmrComponent(
-          $$registry, "FnNonExport", FnNonExport,
-          { key: "" },
-          import.meta.hot,
-        );
-      }
-
       if (import.meta.hot) {
-        $$refresh.setupHmrVite(import.meta.hot, $$registry);
         () => import.meta.hot.accept();
+        const $$manager = $$refresh.createManager(
+          import.meta.hot,
+          {
+            createElement: $$runtime.createElement,
+            useReducer: $$runtime.useReducer,
+            useEffect: $$runtime.useEffect,
+          },
+          false,
+        );
+        FnDefault = $$manager.wrap("FnDefault", FnDefault, "");
+        FnLet = $$manager.wrap("FnLet", FnLet, "useState/useRef/useCallback");
+        FnConst = $$manager.wrap("FnConst", FnConst, "");
+        FnNonExport = $$manager.wrap("FnNonExport", FnNonExport, "");
+        $$refresh.setup();
       }
       "
     `);

@@ -15,30 +15,25 @@ export async function hmrTransform(code: string, options: HmrTransformOptions) {
   let footer = /* js */ `
 import * as $$runtime from "${options.runtime}";
 import * as $$refresh from "${options.refreshRuntime}";
-const $$registry = $$refresh.createHmrRegistry(
-  {
-    createElement: $$runtime.createElement,
-    useReducer: $$runtime.useReducer,
-    useEffect: $$runtime.useEffect,
-  },
-  ${options.debug ?? false},
-);
+if (import.meta.hot) {
+  () => import.meta.hot.accept();
+  const $$manager = $$refresh.createManager(
+    import.meta.hot,
+    {
+      createElement: $$runtime.createElement,
+      useReducer: $$runtime.useReducer,
+      useEffect: $$runtime.useEffect,
+    },
+    ${options.debug ?? false},
+  );
 `;
   for (const { id, hooks } of result.entries) {
-    footer += /* js */ `
-if (import.meta.hot && typeof ${id} === "function") {
-  ${id} = $$refresh.createHmrComponent(
-    $$registry, "${id}", ${id},
-    { key: ${JSON.stringify(hooks.join("/"))} },
-    import.meta.hot,
-  );
-}
+    footer += `\
+  ${id} = $$manager.wrap("${id}", ${id}, ${JSON.stringify(hooks.join("/"))});
 `;
   }
-  footer += `
-if (import.meta.hot) {
-  $$refresh.setupHmrVite(import.meta.hot, $$registry);
-  () => import.meta.hot.accept();
+  footer += `\
+  $$refresh.setup();
 }
 `;
   // no need to manipulate sourcemap since transform only appends
