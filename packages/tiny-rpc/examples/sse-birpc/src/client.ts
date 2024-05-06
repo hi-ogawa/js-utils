@@ -26,7 +26,6 @@ const serverRpcProxy = createBirpc<ServerRpc, ClientRpc>(clientRpc, {
 $("#hi-server").addEventListener("click", () => {
   hiServer();
 });
-
 ($("#hi-server-request") as HTMLInputElement).addEventListener("keyup", (e) => {
   if (e.key === "Enter") {
     hiServer();

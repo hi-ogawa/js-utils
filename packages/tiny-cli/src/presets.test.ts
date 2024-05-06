@@ -75,8 +75,9 @@ describe("presets", () => {
       `[Error: failed to parse <positionalNumberOptional>]`
     );
 
-    expect(cli.parse(["hello", "123", "456", "--testString", "hey"]))
-      .toMatchInlineSnapshot(`
+    expect(
+      cli.parse(["hello", "123", "456", "--testString", "hey"])
+    ).toMatchInlineSnapshot(`
       {
         "positionalNumberDefault": 123,
         "positionalNumberOptional": 456,
@@ -88,8 +89,9 @@ describe("presets", () => {
       }
     `);
 
-    expect(cli.parse(["--testString", "hey", "--testBoolean", "hello"]))
-      .toMatchInlineSnapshot(`
+    expect(
+      cli.parse(["--testString", "hey", "--testBoolean", "hello"])
+    ).toMatchInlineSnapshot(`
         {
           "positionalNumberDefault": 123,
           "positionalNumberOptional": undefined,

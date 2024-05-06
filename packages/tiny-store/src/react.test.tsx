@@ -86,8 +86,10 @@ describe(useTinyStore, () => {
         <Demo2 />
       </>
     );
-    expect([await getTestidText("demo1"), await getTestidText("demo2")])
-      .toMatchInlineSnapshot(`
+    expect([
+      await getTestidText("demo1"),
+      await getTestidText("demo2"),
+    ]).toMatchInlineSnapshot(`
         [
           "commit = 1, state = {"name":{"first":"Jane"},"birth":{"year":2000}}",
           "commit = 1, state = {"first":"Jane"}",
@@ -95,8 +97,10 @@ describe(useTinyStore, () => {
       `);
 
     await userEvent.click(await screen.findByTestId("button-birth"));
-    expect([await getTestidText("demo1"), await getTestidText("demo2")])
-      .toMatchInlineSnapshot(`
+    expect([
+      await getTestidText("demo1"),
+      await getTestidText("demo2"),
+    ]).toMatchInlineSnapshot(`
         [
           "commit = 2, state = {"name":{"first":"Jane"},"birth":{"year":2001}}",
           "commit = 1, state = {"first":"Jane"}",
@@ -104,8 +108,10 @@ describe(useTinyStore, () => {
       `);
 
     await userEvent.click(await screen.findByTestId("button-name"));
-    expect([await getTestidText("demo1"), await getTestidText("demo2")])
-      .toMatchInlineSnapshot(`
+    expect([
+      await getTestidText("demo1"),
+      await getTestidText("demo2"),
+    ]).toMatchInlineSnapshot(`
         [
           "commit = 3, state = {"name":{"first":"John"},"birth":{"year":2001}}",
           "commit = 2, state = {"first":"John"}",

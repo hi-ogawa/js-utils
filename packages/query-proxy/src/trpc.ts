@@ -9,7 +9,7 @@ import { createGetterProxy } from "./utils";
 export type TrpcClientQueryProxy<
   Router extends AnyRouter,
   I = inferRouterInputs<Router>,
-  O = inferRouterOutputs<Router>
+  O = inferRouterOutputs<Router>,
 > = {
   // TODO: infer procedureType to expose only query or mutation
   [K in keyof I & keyof O]: {

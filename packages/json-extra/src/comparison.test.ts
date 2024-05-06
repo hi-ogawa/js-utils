@@ -313,7 +313,6 @@ describe("brillout-json-serializer", () => {
     `);
     // -0 doesn't roundtrip
     expect(revivied).not.toEqual(original);
-
     (revivied as any)[13] = -0;
     expect(revivied).not.toEqual(original);
   });

@@ -2,9 +2,7 @@ import { Fragment } from "@hiogawa/tiny-react";
 
 export function _typeCheck() {
   <div />;
-
   <div key={0} />;
-
   <div key="">
     {0}
     {""}
@@ -28,12 +26,11 @@ export function _typeCheck() {
 
   // @ts-expect-error no svg support
   // prettier-ignore
-  <svg><path d=""></path></svg>;
-
+  <svg>
+    <path d=""></path>
+  </svg>;
   <Custom1 value="" opt={0} />;
-
   <Custom1 value=""></Custom1>;
-
   <div>
     <span />
     {/* @ts-expect-error constraint by JSX.ElementChildrenAttribute */}
@@ -45,7 +42,6 @@ export function _typeCheck() {
 
   // @ts-expect-error missing children props
   <Custom2 />;
-
   <Custom2>
     {0}
     {1}
@@ -59,9 +55,7 @@ export function _typeCheck() {
 
   // fragment
   <>x</>;
-
   <Fragment>x</Fragment>;
-
   <Fragment>
     x {0} {[0, 1]}
   </Fragment>;

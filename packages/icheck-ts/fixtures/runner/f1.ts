@@ -1,4 +1,4 @@
-import { x2 as y2, x4 } from "./f2";
+import { x4, x2 as y2 } from "./f2";
 export { x2 as z2 } from "./f2";
 import "./dir1/f3";
 import "./dir1/unknown";
