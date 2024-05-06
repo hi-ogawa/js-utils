@@ -1,4 +1,3 @@
-import "virtual:uno.css";
 import { tinyassert } from "@hiogawa/utils";
 import { createRoot } from "react-dom/client";
 import { Root } from "./app";

@@ -359,24 +359,15 @@ importers:
 
   packages/tiny-refresh/examples/react:
     devDependencies:
-      '@hiogawa/theme-script':
-        specifier: workspace:*
-        version: link:../../../theme-script
       '@hiogawa/tiny-react':
         specifier: workspace:*
         version: link:../../../tiny-react
       '@hiogawa/tiny-refresh':
         specifier: workspace:*
         version: link:../..
-      '@hiogawa/unocss-preset-antd':
-        specifier: 2.2.1-pre.3
-        version: 2.2.1-pre.3(@unocss/preset-uno@0.58.5)(unocss@0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19)))
       '@hiogawa/utils':
         specifier: workspace:*
         version: link:../../../utils
-      '@iconify-json/ri':
-        specifier: ^1.1.10
-        version: 1.1.10
       '@types/react':
         specifier: ^18.2.14
         version: 18.2.14
@@ -389,9 +380,6 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
-      unocss:
-        specifier: ^0.58.5
-        version: 0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
       vite:
         specifier: ^5.1.3
         version: 5.1.3(@types/node@20.11.19)
@@ -1145,12 +1133,6 @@ packages:
   '@hiogawa/tiny-rpc@0.2.3-pre.18':
     resolution: {integrity: sha512-BiNHrutG9G9yV622QvkxZxF+PhkaH2Aspp4/X1KYTfnaQTcg4fFUTBWf5Kf533swon2SuVJwi6U6H1LQbhVOQQ==}
 
-  '@hiogawa/unocss-preset-antd@2.2.1-pre.3':
-    resolution: {integrity: sha512-NjJ0uKIA6tqmDTXQkO52Hb83tBJjwjOCUx9cgodxiROjTCuEP+yfkmJyzMlDzfxRUl8DnHd8IijnZl2cAX7s9Q==}
-    peerDependencies:
-      '@unocss/preset-uno': '*'
-      unocss: '*'
-
   '@hiogawa/unocss-preset-antd@2.2.1-pre.7':
     resolution: {integrity: sha512-gwY0T8FpFzvHE3I2bShDFKRFAlf1dxgAeaLkfGy7VpNkVr7NkrS3hIUb3An95zAjQWSvgP90t+p1e8AaFW8oXw==}
     peerDependencies:
@@ -1584,9 +1566,6 @@ packages:
 
   '@unocss/preset-wind@0.58.5':
     resolution: {integrity: sha512-54RkjLmlqMUlC8o8nDCVzB25D1zzK4eth+/3uQzt739qU0U92NxuZKY21ADj9Rp/mVhKBV5FKuXPjmYc6yTQRQ==}
-
-  '@unocss/reset@0.48.5':
-    resolution: {integrity: sha512-+JJT3Btj1oNX4XwKBDPRUYre3NYBNmi0PsC3tqkHN2VphJG0iZl91XNfsveLz8pVpDJPUDdLH4xsqh52WmxU1g==}
 
   '@unocss/reset@0.58.5':
     resolution: {integrity: sha512-2wMrkCj3SSb5hrx9TKs5jZa34QIRkHv9FotbJutAPo7o8hx+XXn56ogzdoUrcFPJZJUx2R2nyOVbSlGMIjtFtw==}
@@ -2618,10 +2597,6 @@ packages:
   load-yaml-file@0.2.0:
     resolution: {integrity: sha512-OfCBkGEw4nN6JLtgRidPX6QxjBQGQf72q3si2uvqyFEMbycSFFHwAZeXx6cJgFM9wmLrf9zBwCP3Ivqa+LLZPw==}
     engines: {node: '>=6'}
-
-  local-pkg@0.4.3:
-    resolution: {integrity: sha512-SFppqq5p42fe2qcZQqqEOiVRXl+WCP1MdT6k7BDEW1j++sp5fIY+/fdRQitvKgB5BrBcmrs5m/L0v2FrU5MY1g==}
-    engines: {node: '>=14'}
 
   local-pkg@0.5.0:
     resolution: {integrity: sha512-ok6z3qlYyCDS4ZEU27HaU6x/xZa9Whf8jD4ptH5UZTQYZVYeb9bnZ3ojVhiJNLiXK1Hfc0GNbLXcmZ5plLDDBg==}
@@ -4392,13 +4367,6 @@ snapshots:
 
   '@hiogawa/tiny-rpc@0.2.3-pre.18': {}
 
-  '@hiogawa/unocss-preset-antd@2.2.1-pre.3(@unocss/preset-uno@0.58.5)(unocss@0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19)))':
-    dependencies:
-      '@unocss/preset-uno': 0.58.5
-      '@unocss/reset': 0.48.5
-      local-pkg: 0.4.3
-      unocss: 0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
-
   '@hiogawa/unocss-preset-antd@2.2.1-pre.7(unocss@0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19)))':
     dependencies:
       unocss: 0.58.5(postcss@8.4.35)(rollup@4.12.0)(vite@5.1.3(@types/node@20.11.19))
@@ -4858,8 +4826,6 @@ snapshots:
       '@unocss/core': 0.58.5
       '@unocss/preset-mini': 0.58.5
       '@unocss/rule-utils': 0.58.5
-
-  '@unocss/reset@0.48.5': {}
 
   '@unocss/reset@0.58.5': {}
 
@@ -6048,8 +6014,6 @@ snapshots:
       js-yaml: 3.14.1
       pify: 4.0.1
       strip-bom: 3.0.0
-
-  local-pkg@0.4.3: {}
 
   local-pkg@0.5.0:
     dependencies:

@@ -8,17 +8,13 @@
     "test-e2e": "playwright test"
   },
   "devDependencies": {
-    "@hiogawa/theme-script": "workspace:*",
     "@hiogawa/tiny-react": "workspace:*",
     "@hiogawa/tiny-refresh": "workspace:*",
-    "@hiogawa/unocss-preset-antd": "2.2.1-pre.3",
     "@hiogawa/utils": "workspace:*",
-    "@iconify-json/ri": "^1.1.10",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "unocss": "^0.58.5",
     "vite": "^5.1.3"
   },
   "volta": {

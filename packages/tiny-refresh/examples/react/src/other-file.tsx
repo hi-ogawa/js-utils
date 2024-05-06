@@ -2,26 +2,16 @@ import { useState } from "react";
 
 export function InnerOther(props: { value: number }) {
   const add = 100;
-  const [inner, setState] = useState(0);
+  const [state, setState] = useState(0);
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-2">
-        inner2 = {inner}
-        <button
-          className="antd-btn antd-btn-default px-1"
-          onClick={() => setState((prev) => prev - 1)}
-        >
-          -1
-        </button>
-        <button
-          className="antd-btn antd-btn-default px-1"
-          onClick={() => setState((prev) => prev + 1)}
-        >
-          +1
-        </button>
+    <div>
+      <div>
+        <span style={{ marginRight: "0.5rem" }}>[InnerOther] = {state}</span>
+        <button onClick={() => setState((prev) => prev - 1)}>-1</button>
+        <button onClick={() => setState((prev) => prev + 1)}>+1</button>
       </div>
       <pre>
-        (outer) + (inner2) + {add} = {props.value + inner + add}
+        [Outer] + [InnerOther] + {add} = {props.value + state + add}
       </pre>
     </div>
   );
@@ -29,5 +19,5 @@ export function InnerOther(props: { value: number }) {
 
 export function InnerShowHide() {
   const message = "hello";
-  return <div>{message}</div>;
+  return <div>[{message}]</div>;
 }

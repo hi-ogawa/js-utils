@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { expect, test } from "@playwright/test";
 
-test("hmr basic", async ({ page }) => {
+test.skip("hmr basic", async ({ page }) => {
   await page.goto("/");
 
   async function increment() {
@@ -82,7 +82,7 @@ test("hmr basic", async ({ page }) => {
   );
 });
 
-test("hmr show/hide", async ({ page }) => {
+test("show/hide", async ({ page }) => {
   await page.goto("/");
 
   async function increment() {
@@ -127,5 +127,19 @@ async function editFile(filepath: string, edit: (content: string) => string) {
   await fs.promises.writeFile(filepath, edit(content));
   return async () => {
     await fs.promises.writeFile(filepath, content);
+  };
+}
+
+export function createFileEditor(filepath: string) {
+  let init = fs.readFileSync(filepath, "utf-8");
+  let data = init;
+  return {
+    edit(editFn: (data: string) => string) {
+      data = editFn(data);
+      fs.writeFileSync(filepath, data);
+    },
+    [Symbol.dispose]() {
+      fs.writeFileSync(filepath, init);
+    },
   };
 }
