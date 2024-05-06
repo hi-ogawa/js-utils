@@ -3,11 +3,11 @@
 import { act, cleanup, render } from "@testing-library/react";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { type ViteHot, createManager, setupHmrVite } from "./runtime";
+import { type ViteHot, createManager } from "./runtime";
 
 afterEach(cleanup);
 
-describe(setupHmrVite, () => {
+describe("hmr", () => {
   it("basic 1", async () => {
     const acceptCallbacks: ((newModule?: unknown) => void)[] = [];
 
