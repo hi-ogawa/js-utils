@@ -13,6 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
         with:
           build: false
@@ -26,6 +27,7 @@ jobs:
   tiny-react:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - run: pnpm -C packages/tiny-react/examples/server test-e2e
       - run: pnpm -C packages/tiny-react/examples/server build
@@ -34,5 +36,6 @@ jobs:
   tiny-refresh:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - run: pnpm -C packages/tiny-refresh/examples/react test-e2e
