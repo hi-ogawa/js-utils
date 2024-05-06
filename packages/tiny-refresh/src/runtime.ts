@@ -1,14 +1,3 @@
-// inline minimal react typing
-namespace ReactTypes {
-  export type FC = (props: any) => unknown;
-  export type createElement = (...args: any[]) => unknown;
-  export type useReducer = <S, A>(
-    reducer: (prevState: S, action: A) => S,
-    initialState: S
-  ) => [S, (action: A) => void];
-  export type useEffect = (effect: () => void, deps?: unknown[]) => void;
-}
-
 const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
 
 export interface ViteHot {
@@ -19,19 +8,21 @@ export interface ViteHot {
   };
 }
 
+type FC = (props: any) => unknown;
+
 interface Runtime {
-  createElement: ReactTypes.createElement;
-  useReducer: ReactTypes.useReducer;
-  useEffect: ReactTypes.useEffect;
+  createElement: (...args: any[]) => unknown;
+  useReducer: (reducer: (...args: any[]) => any, init: unknown) => [any, any];
+  useEffect: (effect: () => void, deps?: unknown[]) => void;
 }
 
 interface ProxyEntry {
-  Component: ReactTypes.FC;
+  Component: FC;
   listeners: Set<() => void>;
 }
 
 interface ComponentEntry {
-  Component: ReactTypes.FC;
+  Component: FC;
   key: string;
 }
 
@@ -48,7 +39,7 @@ class Manager {
     }
   ) {}
 
-  wrap(name: string, Component: ReactTypes.FC, key: string): ReactTypes.FC {
+  wrap(name: string, Component: FC, key: string): FC {
     this.componentMap.set(name, { Component, key });
     let proxy = this.proxyMap.get(name);
     if (!proxy) {
@@ -106,10 +97,10 @@ function createProxyComponent(manager: Manager, name: string): ProxyEntry {
 
   const listeners = new Set<() => void>();
 
-  const Component: ReactTypes.FC = (props) => {
+  const Component: FC = (props) => {
     const data = manager.componentMap.get(name);
 
-    const [, forceUpdate] = useReducer<boolean, void>((prev) => !prev, true);
+    const [, forceUpdate] = useReducer((prev) => !prev, true);
 
     useEffect(() => {
       listeners.add(forceUpdate);
@@ -128,10 +119,8 @@ function createProxyComponent(manager: Manager, name: string): ProxyEntry {
     return createElement(InnerComponent, { key: data.key, data, props });
   };
 
-  const InnerComponent: ReactTypes.FC = (props: {
-    data: ComponentEntry;
-    props: any;
-  }) => props.data.Component(props.props);
+  const InnerComponent: FC = (props: { data: ComponentEntry; props: any }) =>
+    props.data.Component(props.props);
 
   // patch Function.name for react error stacktrace
   Object.defineProperty(Component, "name", { value: `${name}@refresh` });
