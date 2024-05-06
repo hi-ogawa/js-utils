@@ -214,7 +214,6 @@ function TestSetStateInEffect() {
 }
 
 // cf. https://github.com/adamhaile/surplus#example
-// @hmr-unsafe
 function TestTodoApp() {
   interface TodoItem {
     id: string;

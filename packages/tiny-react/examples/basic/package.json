@@ -1,6 +1,7 @@
 {
   "name": "tiny-react-examples-basic",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "pnpm run /^dev:/",
     "dev:vite": "vite --no-clearScreen",
