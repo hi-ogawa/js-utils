@@ -26,14 +26,14 @@ import {
 // cf. https://react.dev/reference/rsc/use-client#serializable-types
 
 export type SerializeResult = {
-  snode: SNode;
+  data: unknown;
   referenceIds: string[];
 };
 
-export async function serializeNode(rnode: RNode): Promise<SerializeResult> {
+export async function serialize<T>(rdata: T): Promise<SerializeResult> {
   const manager = new SerializeManager();
-  const snode = await manager.serialize(rnode);
-  return { snode, referenceIds: [...manager.referenceIds] };
+  const data = await manager.serializeUnknown(rdata);
+  return { data, referenceIds: [...manager.referenceIds] };
 }
 
 class SerializeManager {
@@ -118,11 +118,9 @@ class SerializeManager {
 
 export type ReferenceMap = Record<string, unknown>;
 
-export function deserializeNode(
-  snode: SNode,
-  referenceMap: ReferenceMap
-): VNode {
-  return new DeserializeManager(referenceMap).deserialize(snode);
+export function deserialize<T>(data: unknown, referenceMap: ReferenceMap): T {
+  const manager = new DeserializeManager(referenceMap);
+  return manager.deserializeUnknown(data) as T;
 }
 
 class DeserializeManager {

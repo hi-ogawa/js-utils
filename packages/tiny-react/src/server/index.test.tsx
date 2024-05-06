@@ -1,11 +1,12 @@
 import { sleep } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
-import { deserializeNode, serializeNode } from ".";
+import { deserialize, serialize } from ".";
+import type { JSX } from "../helper/jsx-runtime";
 import { render } from "../reconciler";
 import type { VNode } from "../virtual-dom";
-import { registerClientReference } from "./types";
+import { type RNode, registerClientReference } from "./types";
 
-describe(serializeNode, () => {
+describe(serialize, () => {
   it("basic", async () => {
     const rnode = (
       <div className="flex" ariaCurrent="page">
@@ -13,7 +14,7 @@ describe(serializeNode, () => {
         <span title="foo">world</span>
       </div>
     );
-    const { snode, referenceIds } = await serializeNode(rnode);
+    const { data: snode, referenceIds } = await serialize<RNode>(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`[]`);
     expect(snode).toMatchInlineSnapshot(`
       {
@@ -39,7 +40,7 @@ describe(serializeNode, () => {
       }
     `);
 
-    const vnode = deserializeNode(snode, {});
+    const vnode = deserialize<VNode>(snode, {});
     expect(vnode).toMatchInlineSnapshot(`
       {
         "key": undefined,
@@ -93,7 +94,7 @@ describe(serializeNode, () => {
         <Custom value={123} />
       </div>
     );
-    const { snode, referenceIds } = await serializeNode(rnode);
+    const { data: snode, referenceIds } = await serialize(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`[]`);
     expect(snode).toMatchInlineSnapshot(`
       {
@@ -113,7 +114,7 @@ describe(serializeNode, () => {
       }
     `);
 
-    const vnode = deserializeNode(snode, {});
+    const vnode = deserialize<VNode>(snode, {});
     expect(vnode).toMatchInlineSnapshot(`
       {
         "key": undefined,
@@ -156,7 +157,7 @@ describe(serializeNode, () => {
     registerClientReference(ClientInner, "#ClientInner");
 
     const rnode = <Server clientInner={<ClientInner inner={<span />} />} />;
-    const { snode, referenceIds } = await serializeNode(rnode);
+    const { data: snode, referenceIds } = await serialize(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`
       [
         "#ClientInner",
@@ -186,7 +187,7 @@ describe(serializeNode, () => {
       }
     `);
 
-    const vnode = deserializeNode(snode, { "#ClientInner": ClientInner });
+    const vnode = deserialize<VNode>(snode, { "#ClientInner": ClientInner });
     expect(vnode).toMatchInlineSnapshot(`
       {
         "key": undefined,
@@ -248,7 +249,7 @@ describe(serializeNode, () => {
         server={<Server clientInner={<ClientInner inner={<span />} />} />}
       />
     );
-    const { snode, referenceIds } = await serializeNode(rnode);
+    const { data: snode, referenceIds } = await serialize(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`
       [
         "#ClientOuter",
@@ -286,7 +287,7 @@ describe(serializeNode, () => {
       }
     `);
 
-    const vnode = deserializeNode(snode, {
+    const vnode = deserialize<VNode>(snode, {
       "#ClientOuter": ClientOuter,
       "#ClientInner": ClientInner,
     });
@@ -355,7 +356,7 @@ describe(serializeNode, () => {
     registerClientReference(ClientInner, "#ClientInner");
 
     const rnode = <ClientOuter inner={<ClientInner inner={<span />} />} />;
-    const { snode, referenceIds } = await serializeNode(rnode);
+    const { data: snode, referenceIds } = await serialize(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`
       [
         "#ClientOuter",
@@ -385,7 +386,7 @@ describe(serializeNode, () => {
       }
     `);
 
-    const vnode = deserializeNode(snode, {
+    const vnode = deserialize<VNode>(snode, {
       "#ClientOuter": ClientOuter,
       "#ClientInner": ClientInner,
     });
@@ -431,7 +432,7 @@ describe(serializeNode, () => {
 
   it("function client prop error", async () => {
     await expect(() =>
-      serializeNode(<div onclick={() => {}} />)
+      serialize(<div onclick={() => {}} />)
     ).rejects.toMatchInlineSnapshot(`[Error: Cannot serialize function]`);
   });
 
@@ -441,7 +442,7 @@ describe(serializeNode, () => {
     }
     registerClientReference(Custom, "#Custom");
 
-    const result = await serializeNode(
+    const result = await serialize(
       <Custom
         x={{
           type: "tag",
@@ -465,5 +466,191 @@ describe(serializeNode, () => {
         },
       }
     `);
+  });
+
+  it("multiple nodes", async () => {
+    async function Server(props: JSX.ElementChildrenAttribute) {
+      return <div id="server">{props.children}</div>;
+    }
+    function Client1(props: JSX.ElementChildrenAttribute) {
+      return <div id="client1">{props.children}</div>;
+    }
+    function Client2(props: JSX.ElementChildrenAttribute) {
+      return <div id="client2">{props.children}</div>;
+    }
+    registerClientReference(Client1, "#Client1");
+    registerClientReference(Client2, "#Client2");
+
+    const rdata = {
+      k1: (
+        <Server>
+          <span>
+            <Client1>hey</Client1>
+          </span>
+        </Server>
+      ),
+      k2: [
+        <Server>
+          <pre>
+            <Client2>yo</Client2>
+          </pre>
+        </Server>,
+      ],
+    };
+    const result = await serialize(rdata);
+    expect(result.referenceIds).toMatchInlineSnapshot(`
+      [
+        "#Client1",
+        "#Client2",
+      ]
+    `);
+    expect(result.data).toMatchInlineSnapshot(`
+      {
+        "k1": {
+          "key": undefined,
+          "name": "div",
+          "props": {
+            "children": {
+              "key": undefined,
+              "name": "span",
+              "props": {
+                "children": {
+                  "$$id": "#Client1",
+                  "key": undefined,
+                  "props": {
+                    "children": "hey",
+                  },
+                  "type": "custom",
+                },
+              },
+              "type": "tag",
+            },
+            "id": "server",
+          },
+          "type": "tag",
+        },
+        "k2": [
+          {
+            "key": undefined,
+            "name": "div",
+            "props": {
+              "children": {
+                "key": undefined,
+                "name": "pre",
+                "props": {
+                  "children": {
+                    "$$id": "#Client2",
+                    "key": undefined,
+                    "props": {
+                      "children": "yo",
+                    },
+                    "type": "custom",
+                  },
+                },
+                "type": "tag",
+              },
+              "id": "server",
+            },
+            "type": "tag",
+          },
+        ],
+      }
+    `);
+
+    const vnode = deserialize<typeof rdata>(result.data, {
+      "#Client1": Client1,
+      "#Client2": Client2,
+    });
+    expect(vnode).toMatchInlineSnapshot(`
+      {
+        "k1": {
+          "key": undefined,
+          "name": "div",
+          "props": {
+            "children": {
+              "key": undefined,
+              "name": "span",
+              "props": {
+                "children": {
+                  "key": undefined,
+                  "props": {
+                    "children": "hey",
+                  },
+                  "render": [Function],
+                  "type": "custom",
+                },
+              },
+              "type": "tag",
+            },
+            "id": "server",
+          },
+          "type": "tag",
+        },
+        "k2": [
+          {
+            "key": undefined,
+            "name": "div",
+            "props": {
+              "children": {
+                "key": undefined,
+                "name": "pre",
+                "props": {
+                  "children": {
+                    "key": undefined,
+                    "props": {
+                      "children": "yo",
+                    },
+                    "render": [Function],
+                    "type": "custom",
+                  },
+                },
+                "type": "tag",
+              },
+              "id": "server",
+            },
+            "type": "tag",
+          },
+        ],
+      }
+    `);
+
+    {
+      const node = document.createElement("main");
+      render(vnode.k1, node);
+      expect(node).toMatchInlineSnapshot(`
+        <main>
+          <div
+            id="server"
+          >
+            <span>
+              <div
+                id="client1"
+              >
+                hey
+              </div>
+            </span>
+          </div>
+        </main>
+      `);
+    }
+    {
+      const node = document.createElement("main");
+      render(vnode.k2[0], node);
+      expect(node).toMatchInlineSnapshot(`
+        <main>
+          <div
+            id="server"
+          >
+            <pre>
+              <div
+                id="client2"
+              >
+                yo
+              </div>
+            </pre>
+          </div>
+        </main>
+      `);
+    }
   });
 });
