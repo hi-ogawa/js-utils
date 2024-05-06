@@ -23,6 +23,8 @@ import {
 // serialize
 //
 
+// cf. https://react.dev/reference/rsc/use-client#serializable-types
+
 export type SerializeResult = {
   snode: SNode;
   referenceIds: string[];
