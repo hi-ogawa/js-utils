@@ -13,12 +13,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/setup
         with:
-          node-version: 20
-      - run: corepack enable
-      - run: pnpm i
+          build: false
+          playwright: false
       - run: pnpm lint-check
       - run: pnpm build
       - run: pnpm tsc
@@ -28,14 +26,13 @@ jobs:
   tiny-react:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: corepack enable
-      - run: pnpm i
-      - run: pnpm build
-      - run: npx playwright install chromium
+      - uses: ./.github/actions/setup
       - run: pnpm -C packages/tiny-react/examples/server test-e2e
       - run: pnpm -C packages/tiny-react/examples/server build
       - run: pnpm -C packages/tiny-react/examples/server test-e2e-preview
+
+  tiny-refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/setup
+      - run: pnpm -C packages/tiny-refresh/examples/react test-e2e
