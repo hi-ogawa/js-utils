@@ -33,7 +33,7 @@ if (import.meta.hot) {
 `;
   }
   footer += `\
-  $$refresh.setup();
+  $$manager.setup();
 }
 `;
   // no need to manipulate sourcemap since transform only appends
