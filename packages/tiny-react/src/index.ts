@@ -12,8 +12,8 @@ export * from "./hooks";
 export * from "./compat";
 export * from "./ssr/render";
 export {
-  serializeNode,
-  deserializeNode,
+  serialize,
+  deserialize,
   type SerializeResult,
   type ReferenceMap,
 } from "./server";

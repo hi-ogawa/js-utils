@@ -1,11 +1,11 @@
 import { sleep } from "@hiogawa/utils";
 import { describe, expect, it } from "vitest";
-import { deserializeNode, serializeNode } from ".";
+import { deserialize, serialize } from ".";
 import { render } from "../reconciler";
 import type { VNode } from "../virtual-dom";
-import { registerClientReference } from "./types";
+import { type RNode, registerClientReference } from "./types";
 
-describe(serializeNode, () => {
+describe(serialize, () => {
   it("basic", async () => {
     const rnode = (
       <div className="flex" ariaCurrent="page">
@@ -13,7 +13,7 @@ describe(serializeNode, () => {
         <span title="foo">world</span>
       </div>
     );
-    const { snode, referenceIds } = await serializeNode(rnode);
+    const { data: snode, referenceIds } = await serialize<RNode>(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`[]`);
     expect(snode).toMatchInlineSnapshot(`
       {
@@ -39,7 +39,7 @@ describe(serializeNode, () => {
       }
     `);
 
-    const vnode = deserializeNode(snode, {});
+    const vnode = deserialize<VNode>(snode, {});
     expect(vnode).toMatchInlineSnapshot(`
       {
         "key": undefined,
@@ -93,7 +93,7 @@ describe(serializeNode, () => {
         <Custom value={123} />
       </div>
     );
-    const { snode, referenceIds } = await serializeNode(rnode);
+    const { data: snode, referenceIds } = await serialize(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`[]`);
     expect(snode).toMatchInlineSnapshot(`
       {
@@ -113,7 +113,7 @@ describe(serializeNode, () => {
       }
     `);
 
-    const vnode = deserializeNode(snode, {});
+    const vnode = deserialize<VNode>(snode, {});
     expect(vnode).toMatchInlineSnapshot(`
       {
         "key": undefined,
@@ -156,7 +156,7 @@ describe(serializeNode, () => {
     registerClientReference(ClientInner, "#ClientInner");
 
     const rnode = <Server clientInner={<ClientInner inner={<span />} />} />;
-    const { snode, referenceIds } = await serializeNode(rnode);
+    const { data: snode, referenceIds } = await serialize(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`
       [
         "#ClientInner",
@@ -186,7 +186,7 @@ describe(serializeNode, () => {
       }
     `);
 
-    const vnode = deserializeNode(snode, { "#ClientInner": ClientInner });
+    const vnode = deserialize<VNode>(snode, { "#ClientInner": ClientInner });
     expect(vnode).toMatchInlineSnapshot(`
       {
         "key": undefined,
@@ -248,7 +248,7 @@ describe(serializeNode, () => {
         server={<Server clientInner={<ClientInner inner={<span />} />} />}
       />
     );
-    const { snode, referenceIds } = await serializeNode(rnode);
+    const { data: snode, referenceIds } = await serialize(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`
       [
         "#ClientOuter",
@@ -286,7 +286,7 @@ describe(serializeNode, () => {
       }
     `);
 
-    const vnode = deserializeNode(snode, {
+    const vnode = deserialize<VNode>(snode, {
       "#ClientOuter": ClientOuter,
       "#ClientInner": ClientInner,
     });
@@ -355,7 +355,7 @@ describe(serializeNode, () => {
     registerClientReference(ClientInner, "#ClientInner");
 
     const rnode = <ClientOuter inner={<ClientInner inner={<span />} />} />;
-    const { snode, referenceIds } = await serializeNode(rnode);
+    const { data: snode, referenceIds } = await serialize(rnode);
     expect(referenceIds).toMatchInlineSnapshot(`
       [
         "#ClientOuter",
@@ -385,7 +385,7 @@ describe(serializeNode, () => {
       }
     `);
 
-    const vnode = deserializeNode(snode, {
+    const vnode = deserialize<VNode>(snode, {
       "#ClientOuter": ClientOuter,
       "#ClientInner": ClientInner,
     });
@@ -431,7 +431,20 @@ describe(serializeNode, () => {
 
   it("function client prop error", async () => {
     await expect(() =>
-      serializeNode(<div onclick={() => {}} />)
+      serialize(<div onclick={() => {}} />)
     ).rejects.toMatchInlineSnapshot(`[Error: Cannot serialize function]`);
+  });
+
+  it("'type' collision", async () => {
+    function Custom(_props: { x: { type: "tag" } }) {
+      return <></>;
+    }
+    registerClientReference(Custom, "#Custom");
+
+    await expect(() =>
+      serialize(<Custom x={{ type: "tag" }} />)
+    ).rejects.toMatchInlineSnapshot(
+      `[TypeError: Cannot convert undefined or null to object]`
+    );
   });
 });

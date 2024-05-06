@@ -1,7 +1,8 @@
 import "./style.css";
 import {
   type SerializeResult,
-  deserializeNode,
+  type VNode,
+  deserialize,
   hydrateRoot,
 } from "@hiogawa/tiny-react";
 import { tinyassert } from "@hiogawa/utils";
@@ -14,8 +15,8 @@ async function main() {
 
   // hydrate with initial SNode
   const initResult: SerializeResult = (globalThis as any).__serialized;
-  const vnode = deserializeNode(
-    initResult.snode,
+  const vnode = deserialize<VNode>(
+    initResult.data,
     await createReferenceMap(initResult.referenceIds)
   );
   const el = document.getElementById("root");
@@ -29,8 +30,8 @@ async function main() {
     const res = await fetch(url);
     tinyassert(res.ok);
     const result: SerializeResult = await res.json();
-    const newVnode = deserializeNode(
-      result.snode,
+    const newVnode = deserialize<VNode>(
+      result.data,
       await createReferenceMap(result.referenceIds)
     );
     root.render(newVnode);
