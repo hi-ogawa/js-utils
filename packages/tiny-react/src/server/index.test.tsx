@@ -434,4 +434,36 @@ describe(serializeNode, () => {
       serializeNode(<div onclick={() => {}} />)
     ).rejects.toMatchInlineSnapshot(`[Error: Cannot serialize function]`);
   });
+
+  it("no 'type' collision", async () => {
+    function Custom(_props: { x: { type: "tag" } }) {
+      return <></>;
+    }
+    registerClientReference(Custom, "#Custom");
+
+    const result = await serializeNode(
+      <Custom
+        x={{
+          type: "tag",
+        }}
+      />
+    );
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "referenceIds": [
+          "#Custom",
+        ],
+        "snode": {
+          "$$id": "#Custom",
+          "key": undefined,
+          "props": {
+            "x": {
+              "type": "tag",
+            },
+          },
+          "type": Symbol(tiny-react.custom),
+        },
+      }
+    `);
+  });
 });
