@@ -1,4 +1,3 @@
-
 // inline minimal react typing
 namespace ReactTypes {
   export type FC = (props: any) => unknown;
@@ -123,8 +122,9 @@ function createProxyComponent(manager: Manager, name: string): ProxyEntry {
       return `!!! [tiny-refresh] not found '${name}' !!!`;
     }
 
-    // This directly calls into functional component and use it as implementation of `UnsafeWrapperFc`.
-    // We change `key` when hook count changes so that it will remount.
+    // directly calls into functional component
+    // and use it as implementation of `InnerFc`.
+    // We change `key` when hook count changes to make it remount.
     return createElement(InnerFc, { key: data.key, data, props });
   };
 
