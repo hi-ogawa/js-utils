@@ -15,7 +15,7 @@ export function jsonEscapeSymbol(v: unknown) {
 export function jsonUnescapeSymbol(s: string) {
   return JSON.parse(s, function (_k, v) {
     if (typeof v === "string" && v.startsWith("!s:")) {
-      return Symbol.for(s.slice(3));
+      return Symbol.for(v.slice(3));
     }
     if (typeof v === "string" && v.startsWith("!")) {
       return v.slice(1);
