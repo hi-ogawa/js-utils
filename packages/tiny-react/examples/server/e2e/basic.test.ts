@@ -60,12 +60,10 @@ test("hmr @dev", async ({ page }) => {
 
   await page.getByText("Hello Client Component").click();
 
-  // TODO: update prettier to use `using`
-  const file = createFileEditor("src/routes/_client.tsx");
+  using file = createFileEditor("src/routes/_client.tsx");
   file.edit((s) =>
     s.replace("Hello Client Component", "Hello [EDIT] Client Component")
   );
   await page.getByText("Hello [EDIT] Client Component").click();
   await page.getByText("Count: 1").click();
-  file[Symbol.dispose]();
 });
