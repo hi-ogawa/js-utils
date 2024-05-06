@@ -24,10 +24,7 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": [
-    "dist/index.*",
-    "dist/vite.*"
-  ],
+  "files": ["dist/index.*", "dist/vite.*"],
   "scripts": {
     "build": "BUILD_STEP=0 tsup && BUILD_STEP=1 tsup",
     "release": "pnpm publish --no-git-checks --access public"

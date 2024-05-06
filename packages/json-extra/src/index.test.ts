@@ -563,8 +563,9 @@ describe(createJsonExtra, () => {
       ]
     `);
 
-    expect(() => jsonExtra.stringify(original, null, 2))
-      .toThrowErrorMatchingInlineSnapshot(`
+    expect(() =>
+      jsonExtra.stringify(original, null, 2)
+    ).toThrowErrorMatchingInlineSnapshot(`
         [TypeError: Converting circular structure to JSON
             --> starting at object with constructor 'Array'
             --- index 0 closes the circle]

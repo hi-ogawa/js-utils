@@ -312,8 +312,9 @@ describe(TinyCliCommand, () => {
       "
     `);
 
-    expect(cli.parse(["x", "--boolFlag", "--num", "123", "--str", "hey"]))
-      .toMatchInlineSnapshot(`
+    expect(
+      cli.parse(["x", "--boolFlag", "--num", "123", "--str", "hey"])
+    ).toMatchInlineSnapshot(`
         {
           "arg": "x",
           "argOpt": undefined,

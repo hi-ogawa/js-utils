@@ -45,8 +45,9 @@ describe(promptAutocomplete, () => {
     const marker = "Select node builtin module";
     proc.child.stdin.write("promises");
     await waitForStable(proc.child.stdout);
-    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), marker))
-      .toMatchInlineSnapshot(`
+    expect(
+      getLinesFromLastMarker(cleanOutput(proc.stdout), marker)
+    ).toMatchInlineSnapshot(`
         "* Select node builtin module > promises
           > dns/promises
             fs/promises
@@ -59,8 +60,9 @@ describe(promptAutocomplete, () => {
 
     proc.child.stdin.write("\x1b[B".repeat(2));
     await waitForStable(proc.child.stdout);
-    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), marker))
-      .toMatchInlineSnapshot(`
+    expect(
+      getLinesFromLastMarker(cleanOutput(proc.stdout), marker)
+    ).toMatchInlineSnapshot(`
         "* Select node builtin module > promises
             dns/promises
             fs/promises
@@ -73,8 +75,9 @@ describe(promptAutocomplete, () => {
 
     proc.child.stdin.write("\n");
     await waitForStable(proc.child.stdout);
-    expect(getLinesFromLastMarker(cleanOutput(proc.stdout), marker))
-      .toMatchInlineSnapshot(`
+    expect(
+      getLinesFromLastMarker(cleanOutput(proc.stdout), marker)
+    ).toMatchInlineSnapshot(`
         "o Select node builtin module > readline/promises
         [answer] { input: 'promises', value: 'readline/promises' }
         "

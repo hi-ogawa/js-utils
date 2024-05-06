@@ -18,7 +18,7 @@ export const arg = {
 
   string: <
     Optional extends true | undefined = undefined,
-    Default extends string | undefined = undefined
+    Default extends string | undefined = undefined,
   >(
     description?: string,
     config?: { positional?: boolean; optional?: Optional; default?: Default }
@@ -41,7 +41,7 @@ export const arg = {
 
   number: <
     Optional extends true | undefined = undefined,
-    Default extends number | undefined = undefined
+    Default extends number | undefined = undefined,
   >(
     description?: string,
     config?: { positional?: boolean; optional?: Optional; default?: Default }
@@ -80,14 +80,14 @@ export const arg = {
 type InferParse<
   K,
   Optional extends true | undefined,
-  Default extends K | undefined
+  Default extends K | undefined,
 > = Optional extends true
   ? Default extends K
     ? K
     : K | undefined
   : Default extends K
-  ? K // { default: "some-value" } implies { optional: true }
-  : K;
+    ? K // { default: "some-value" } implies { optional: true }
+    : K;
 
 const parser = {
   string: (v: unknown) => {

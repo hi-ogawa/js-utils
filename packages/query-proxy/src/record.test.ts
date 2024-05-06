@@ -79,8 +79,9 @@ describe(createFnRecordQueryProxy, () => {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     });
 
-    expect((await infiniteQueryObserver.fetchNextPage()).data)
-      .toMatchInlineSnapshot(`
+    expect(
+      (await infiniteQueryObserver.fetchNextPage()).data
+    ).toMatchInlineSnapshot(`
       {
         "pageParams": [
           undefined,
@@ -100,8 +101,9 @@ describe(createFnRecordQueryProxy, () => {
       }
     `);
 
-    expect((await infiniteQueryObserver.fetchNextPage()).data)
-      .toMatchInlineSnapshot(`
+    expect(
+      (await infiniteQueryObserver.fetchNextPage()).data
+    ).toMatchInlineSnapshot(`
       {
         "pageParams": [
           undefined,
@@ -132,8 +134,9 @@ describe(createFnRecordQueryProxy, () => {
       }
     `);
 
-    expect((await infiniteQueryObserver.fetchNextPage()).data)
-      .toMatchInlineSnapshot(`
+    expect(
+      (await infiniteQueryObserver.fetchNextPage()).data
+    ).toMatchInlineSnapshot(`
       {
         "pageParams": [
           undefined,
@@ -278,6 +281,6 @@ describe(createFnRecordQueryProxy, () => {
 
         // @ts-expect-error
         bad: (x: number, y: number) => x + y,
-      } satisfies FnRecord);
+      }) satisfies FnRecord;
   });
 });

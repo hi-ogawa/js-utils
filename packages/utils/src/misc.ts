@@ -11,7 +11,7 @@ export const typedBoolean = Boolean as unknown as <T>(
 // cf. https://github.com/colinhacks/zod/blob/cfbc7b3f6714ced250dd4053822faf472bf1828e/src/types.ts#L3958
 export function arrayToEnum<
   T extends keyof any,
-  Ts extends Readonly<[T, ...T[]]>
+  Ts extends Readonly<[T, ...T[]]>,
 >(
   values: Ts
 ): {

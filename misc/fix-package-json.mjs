@@ -1,6 +1,6 @@
-import { $ } from "@hiogawa/utils-node";
 import fs from "node:fs";
 import process from "node:process";
+import { $ } from "@hiogawa/utils-node";
 
 // usage:
 //   node misc/fix-package-json.mjs

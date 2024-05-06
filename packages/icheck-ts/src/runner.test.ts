@@ -42,11 +42,11 @@ describe(runner, () => {
         ],
         "f2.tsx" => [
           {
-            "name": "x2",
+            "name": "x4",
             "type": "named",
           },
           {
-            "name": "x4",
+            "name": "x2",
             "type": "named",
           },
           {
@@ -230,7 +230,7 @@ describe(runner, () => {
               "type": "internal",
             },
             "usage": {
-              "name": "x2",
+              "name": "x4",
               "type": "named",
             },
           },
@@ -247,7 +247,7 @@ describe(runner, () => {
               "type": "internal",
             },
             "usage": {
-              "name": "x4",
+              "name": "x2",
               "type": "named",
             },
           },
