@@ -106,7 +106,7 @@ function createProxyComponent(manager: Manager, name: string): ProxyEntry {
 
   const listeners = new Set<() => void>();
 
-  const Fc: ReactTypes.FC = (props) => {
+  const Component: ReactTypes.FC = (props) => {
     const data = manager.componentMap.get(name);
 
     const [, forceUpdate] = useReducer<boolean, void>((prev) => !prev, true);
@@ -123,19 +123,19 @@ function createProxyComponent(manager: Manager, name: string): ProxyEntry {
     }
 
     // directly calls into functional component
-    // and use it as implementation of `InnerFc`.
+    // and use it as implementation of `InnerComponent`.
     // We change `key` when hook count changes to make it remount.
-    return createElement(InnerFc, { key: data.key, data, props });
+    return createElement(InnerComponent, { key: data.key, data, props });
   };
 
-  const InnerFc: ReactTypes.FC = (props: {
+  const InnerComponent: ReactTypes.FC = (props: {
     data: ComponentEntry;
     props: any;
   }) => props.data.Component(props.props);
 
   // patch Function.name for react error stacktrace
-  Object.defineProperty(Fc, "name", { value: `${name}@refresh` });
-  Object.defineProperty(InnerFc, "name", { value: name });
+  Object.defineProperty(Component, "name", { value: `${name}@refresh` });
+  Object.defineProperty(InnerComponent, "name", { value: name });
 
-  return { Component: Fc, listeners };
+  return { Component, listeners };
 }
