@@ -6,6 +6,5 @@ miscellaneous utility packages
 # development
 pnpm i
 pnpm build
-pnpm dev
 pnpm test
 ```

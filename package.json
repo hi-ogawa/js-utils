@@ -2,11 +2,9 @@
   "name": "@hiogawa/utils-monorepo",
   "private": true,
   "scripts": {
-    "clean": "rm -rf packages/*/dist",
-    "dev": "pnpm run /^dev:/",
     "build": "pnpm -r '--filter=!*example*' build",
     "tsc": "tsc -b packages/*/tsconfig.json packages/*/examples/*/tsconfig.json",
-    "dev:tsc": "pnpm tsc --watch --preserveWatchOutput",
+    "tsc-dev": "pnpm tsc --watch --preserveWatchOutput",
     "test": "pnpm -r --sequential test run",
     "sort-package-json": "sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path' | xargs -i echo {}/package.json)",
     "lint": "pnpm run --sequential /^lint:/",
