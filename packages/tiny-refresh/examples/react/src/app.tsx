@@ -4,6 +4,7 @@ import { InnerOther, InnerShowHide } from "./other-file";
 export function Root() {
   return (
     <div>
+      <input placeholder="test-input" />
       <Outer />
       <ShowHideContainer />
     </div>
@@ -36,8 +37,13 @@ function ShowHideContainer() {
   const [show, setShow] = useState(false);
   return (
     <div>
-      <button onClick={() => setShow((prev) => !prev)}>show/hide</button>
-      {show && <InnerShowHide />}
+      <button
+        style={{ marginRight: "0.5rem" }}
+        onClick={() => setShow((prev) => !prev)}
+      >
+        show/hide
+      </button>
+      <span data-testid="show-hide-message">[{show && <InnerShowHide />}]</span>
     </div>
   );
 }

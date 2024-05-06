@@ -1,8 +1,20 @@
 import fs from "node:fs";
-import { expect, test } from "@playwright/test";
+import { sleep } from "@hiogawa/utils";
+import { type Page, expect, test } from "@playwright/test";
+
+test("basic", async ({ page }) => {
+  await page.goto("/");
+  await using _reloadChecker = await createReloadChecker(page);
+});
+
+test("hook change", async ({ page }) => {
+  await page.goto("/");
+  await using _reloadChecker = await createReloadChecker(page);
+});
 
 test.skip("hmr basic", async ({ page }) => {
   await page.goto("/");
+  await using _reloadChecker = await createReloadChecker(page);
 
   async function increment() {
     await page.getByRole("button", { name: "+1" }).first().click();
@@ -84,29 +96,24 @@ test.skip("hmr basic", async ({ page }) => {
 
 test("show/hide", async ({ page }) => {
   await page.goto("/");
+  await using _reloadChecker = await createReloadChecker(page);
 
-  async function increment() {
-    await page.getByRole("button", { name: "+1" }).first().click();
-  }
-
-  await expect(page.locator("#inner4-message")).toHaveText("hello");
-  await increment();
-  await expect(page.locator("#inner4-message")).toHaveText("");
-  await increment();
-  await expect(page.locator("#inner4-message")).toHaveText("hello");
+  await expect(page.getByTestId("show-hide-message")).toHaveText("[]");
+  await page.getByRole("button", { name: "show/hide" }).click();
+  await expect(page.getByTestId("show-hide-message")).toHaveText("[hello]");
+  await page.getByRole("button", { name: "show/hide" }).click();
+  await expect(page.getByTestId("show-hide-message")).toHaveText("[]");
 
   // update message
-  await withEditFile(
-    "src/other-file.tsx",
-    (code) => code.replace(`const message = "hello"`, `const message = "hey"`),
-    async () => {
-      await expect(page.locator("#inner4-message")).toHaveText("hey");
-      await increment();
-      await expect(page.locator("#inner4-message")).toHaveText("");
-      await increment();
-      await expect(page.locator("#inner4-message")).toHaveText("hey");
-    }
+  using file = createFileEditor("src/other-file.tsx");
+  file.edit((s) =>
+    s.replace(`const message = "hello"`, `const message = "hey"`)
   );
+  await expect(page.getByTestId("show-hide-message")).toHaveText("[]");
+  await page.getByRole("button", { name: "show/hide" }).click();
+  await expect(page.getByTestId("show-hide-message")).toHaveText("[hey]");
+  await page.getByRole("button", { name: "show/hide" }).click();
+  await expect(page.getByTestId("show-hide-message")).toHaveText("[]");
 });
 
 async function withEditFile(
@@ -130,7 +137,7 @@ async function editFile(filepath: string, edit: (content: string) => string) {
   };
 }
 
-export function createFileEditor(filepath: string) {
+function createFileEditor(filepath: string) {
   let init = fs.readFileSync(filepath, "utf-8");
   let data = init;
   return {
@@ -141,5 +148,30 @@ export function createFileEditor(filepath: string) {
     [Symbol.dispose]() {
       fs.writeFileSync(filepath, init);
     },
+  };
+}
+
+async function createReloadChecker(page: Page) {
+  async function reset() {
+    await page.evaluate(() => {
+      const el = document.createElement("meta");
+      el.setAttribute("name", "x-reload-check");
+      document.head.append(el);
+    });
+  }
+
+  async function check() {
+    await sleep(300);
+    await expect(page.locator(`meta[name="x-reload-check"]`)).toBeAttached({
+      timeout: 1,
+    });
+  }
+
+  await reset();
+
+  return {
+    check,
+    reset,
+    [Symbol.asyncDispose]: check,
   };
 }

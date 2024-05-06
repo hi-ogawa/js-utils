@@ -19,5 +19,5 @@ export function InnerOther(props: { value: number }) {
 
 export function InnerShowHide() {
   const message = "hello";
-  return <div>[{message}]</div>;
+  return <span>{message}</span>;
 }
