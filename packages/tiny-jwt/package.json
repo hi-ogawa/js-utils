@@ -25,10 +25,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": "./bin/cli.js",
-  "files": [
-    "bin",
-    "dist"
-  ],
+  "files": ["bin", "dist"],
   "scripts": {
     "build": "tsup",
     "test": "vitest",

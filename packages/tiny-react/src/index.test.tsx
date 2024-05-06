@@ -638,7 +638,6 @@ describe(render, () => {
         {"inner":0,"prop":0}
       </main>
     `);
-
     (parent.querySelector("#outer") as HTMLElement).click();
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -652,7 +651,6 @@ describe(render, () => {
         {"inner":0,"prop":1}
       </main>
     `);
-
     (parent.querySelector("#inner") as HTMLElement).click();
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -666,7 +664,6 @@ describe(render, () => {
         {"inner":1,"prop":1}
       </main>
     `);
-
     (parent.querySelector("#outer") as HTMLElement).click();
     expect(parent).toMatchInlineSnapshot(`
       <main>
@@ -680,7 +677,6 @@ describe(render, () => {
         {"inner":1,"prop":2}
       </main>
     `);
-
     (parent.querySelector("#inner") as HTMLElement).click();
     expect(parent).toMatchInlineSnapshot(`
       <main>

@@ -10,10 +10,7 @@
   "license": "MIT",
   "type": "module",
   "bin": "./bin/cli.js",
-  "files": [
-    "dist",
-    "bin"
-  ],
+  "files": ["dist", "bin"],
   "scripts": {
     "build": "tsup",
     "cli": "node ./bin/cli.js",

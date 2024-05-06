@@ -27,7 +27,7 @@ export function _typeCheck() {
   <xxx />;
 
   // @ts-expect-error no svg support
-  // prettier-ignore
+  // biome-ignore format:
   <svg><path d=""></path></svg>;
 
   <Custom1 value="" opt={0} />;

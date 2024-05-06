@@ -14,11 +14,9 @@ describe(createDebug, () => {
     const debug = createDebug("react-server:plugin");
     debug("test");
     expect(lastCll()).toMatchInlineSnapshot(`undefined`);
-
     (globalThis as any).__DEBUG = "react-server";
     debug("test");
     expect(lastCll()).toMatchInlineSnapshot(`undefined`);
-
     (globalThis as any).__DEBUG = "react-server:plugin";
     debug("test");
     expect(lastCll()).toMatchInlineSnapshot(`
@@ -27,7 +25,6 @@ describe(createDebug, () => {
         "test",
       ]
     `);
-
     (globalThis as any).__DEBUG = "react-server:*";
     debug("test");
     expect(lastCll()).toMatchInlineSnapshot(`
@@ -36,11 +33,9 @@ describe(createDebug, () => {
         "test",
       ]
     `);
-
     (globalThis as any).__DEBUG = "noooo:react-server:*";
     debug("test");
     expect(lastCll()).toMatchInlineSnapshot(`undefined`);
-
     (globalThis as any).__DEBUG = "react-server:plugin:*";
     debug("test");
     expect(lastCll()).toMatchInlineSnapshot(`undefined`);

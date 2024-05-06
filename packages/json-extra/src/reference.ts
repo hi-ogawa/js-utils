@@ -12,8 +12,8 @@ export function createJsonExtra(config: JsonExtraConfig = {}) {
     ...(config.builtins === true
       ? builtinPlugins
       : Array.isArray(config.builtins)
-      ? objectPick(builtinPlugins, config.builtins)
-      : {}),
+        ? objectPick(builtinPlugins, config.builtins)
+        : {}),
     ...config.plugins,
   };
 

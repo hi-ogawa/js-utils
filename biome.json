@@ -1,0 +1,22 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.7.2/schema.json",
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "ignore": [
+      "**/node_modules",
+      "**/dist",
+      "**/pnpm-lock.yaml",
+      "**/pkg",
+      "**/.vercel",
+      "**/.wrangler"
+    ]
+  },
+  "organizeImports": { "enabled": true },
+  "linter": { "enabled": false },
+  "javascript": {
+    "formatter": {
+      "trailingComma": "es5"
+    }
+  }
+}

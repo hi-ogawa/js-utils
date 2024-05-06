@@ -1,7 +1,7 @@
-import process from "node:process";
-import { tinyassert, colors, formatError } from "@hiogawa/utils";
-import { $, promptQuestion, promptAutocomplete } from "@hiogawa/utils-node";
 import fs from "node:fs";
+import process from "node:process";
+import { colors, formatError, tinyassert } from "@hiogawa/utils";
+import { $, promptAutocomplete, promptQuestion } from "@hiogawa/utils-node";
 
 // usage:
 //   node misc/pre-release.mjs packages/utils-node
