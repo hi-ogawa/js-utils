@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { deserialize, serialize } from ".";
 import type { JSX } from "../helper/jsx-runtime";
 import { render } from "../reconciler";
-import type { ComponentChildren, VNode } from "../virtual-dom";
+import type { VNode } from "../virtual-dom";
 import { type RNode, registerClientReference } from "./types";
 
 describe(serialize, () => {
