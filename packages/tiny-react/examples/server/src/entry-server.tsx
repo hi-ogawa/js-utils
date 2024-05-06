@@ -1,7 +1,8 @@
 import {
-  deserializeNode,
+  type VNode,
+  deserialize,
   renderToString,
-  serializeNode,
+  serialize,
 } from "@hiogawa/tiny-react";
 import type { ViteDevServer } from "vite";
 import { createReferenceMap } from "./integration/client-reference/runtime";
@@ -10,7 +11,7 @@ import Layout from "./routes/layout";
 export async function handler(request: Request) {
   // serialize server component
   const url = new URL(request.url);
-  const serialized = await serializeNode(<Router url={url} />);
+  const serialized = await serialize(<Router url={url} />);
 
   // to CSR
   if (url.searchParams.has("__serialize")) {
@@ -22,8 +23,8 @@ export async function handler(request: Request) {
   }
 
   // to SSR
-  const vnode = deserializeNode(
-    serialized.snode,
+  const vnode = deserialize<VNode>(
+    serialized.data,
     await createReferenceMap(serialized.referenceIds)
   );
   const ssrHtml = renderToString(vnode);
