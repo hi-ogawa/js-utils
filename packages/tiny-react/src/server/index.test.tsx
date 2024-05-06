@@ -30,12 +30,12 @@ describe(serializeNode, () => {
                 "children": "world",
                 "title": "foo",
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
           ],
           "className": "flex",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -55,12 +55,12 @@ describe(serializeNode, () => {
                 "children": "world",
                 "title": "foo",
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
           ],
           "className": "flex",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -106,10 +106,10 @@ describe(serializeNode, () => {
             "props": {
               "children": "{"prop":123}",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -125,10 +125,10 @@ describe(serializeNode, () => {
             "props": {
               "children": "{"prop":123}",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -175,14 +175,14 @@ describe(serializeNode, () => {
                 "key": undefined,
                 "name": "span",
                 "props": {},
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             },
-            "type": "custom",
+            "type": Symbol(tiny-react.custom),
           },
           "id": "server",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -199,15 +199,15 @@ describe(serializeNode, () => {
                 "key": undefined,
                 "name": "span",
                 "props": {},
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             },
             "render": [Function],
-            "type": "custom",
+            "type": Symbol(tiny-react.custom),
           },
           "id": "server",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -272,17 +272,17 @@ describe(serializeNode, () => {
                     "key": undefined,
                     "name": "span",
                     "props": {},
-                    "type": "tag",
+                    "type": Symbol(tiny-react.tag),
                   },
                 },
-                "type": "custom",
+                "type": Symbol(tiny-react.custom),
               },
               "id": "server",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         },
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
 
@@ -305,19 +305,19 @@ describe(serializeNode, () => {
                     "key": undefined,
                     "name": "span",
                     "props": {},
-                    "type": "tag",
+                    "type": Symbol(tiny-react.tag),
                   },
                 },
                 "render": [Function],
-                "type": "custom",
+                "type": Symbol(tiny-react.custom),
               },
               "id": "server",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         },
         "render": [Function],
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
 
@@ -375,13 +375,13 @@ describe(serializeNode, () => {
                 "key": undefined,
                 "name": "span",
                 "props": {},
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             },
-            "type": "custom",
+            "type": Symbol(tiny-react.custom),
           },
         },
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
 
@@ -400,15 +400,15 @@ describe(serializeNode, () => {
                 "key": undefined,
                 "name": "span",
                 "props": {},
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             },
             "render": [Function],
-            "type": "custom",
+            "type": Symbol(tiny-react.custom),
           },
         },
         "render": [Function],
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
 

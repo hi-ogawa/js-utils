@@ -49,19 +49,19 @@ describe(render, () => {
           "children": [
             {
               "hnode": hello,
-              "type": "text",
+              "type": Symbol(tiny-react.text),
               "vnode": {
                 "data": "hello",
-                "type": "text",
+                "type": Symbol(tiny-react.text),
               },
             },
             {
               "child": {
                 "hnode": world,
-                "type": "text",
+                "type": Symbol(tiny-react.text),
                 "vnode": {
                   "data": "world",
-                  "type": "text",
+                  "type": Symbol(tiny-react.text),
                 },
               },
               "hnode": <span
@@ -70,7 +70,7 @@ describe(render, () => {
                 world
               </span>,
               "listeners": Map {},
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
               "vnode": {
                 "key": undefined,
                 "name": "span",
@@ -78,7 +78,7 @@ describe(render, () => {
                   "children": "world",
                   "className": "text-red",
                 },
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             },
           ],
@@ -88,12 +88,12 @@ describe(render, () => {
           >
             world
           </span>,
-          "type": "fragment",
+          "type": Symbol(tiny-react.fragment),
           "vnode": {
             "children": [
               {
                 "data": "hello",
-                "type": "text",
+                "type": Symbol(tiny-react.text),
               },
               {
                 "key": undefined,
@@ -102,10 +102,10 @@ describe(render, () => {
                   "children": "world",
                   "className": "text-red",
                 },
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             ],
-            "type": "fragment",
+            "type": Symbol(tiny-react.fragment),
           },
         },
         "hnode": <div
@@ -119,7 +119,7 @@ describe(render, () => {
           </span>
         </div>,
         "listeners": Map {},
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
         "vnode": {
           "key": undefined,
           "name": "div",
@@ -133,12 +133,12 @@ describe(render, () => {
                   "children": "world",
                   "className": "text-red",
                 },
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             ],
             "className": "flex items-center gap-2",
           },
-          "type": "tag",
+          "type": Symbol(tiny-react.tag),
         },
       }
     `);
@@ -157,10 +157,10 @@ describe(render, () => {
       {
         "child": {
           "hnode": reconcile,
-          "type": "text",
+          "type": Symbol(tiny-react.text),
           "vnode": {
             "data": "reconcile",
-            "type": "text",
+            "type": Symbol(tiny-react.text),
           },
         },
         "hnode": <div
@@ -169,7 +169,7 @@ describe(render, () => {
           reconcile
         </div>,
         "listeners": Map {},
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
         "vnode": {
           "key": undefined,
           "name": "div",
@@ -177,7 +177,7 @@ describe(render, () => {
             "children": "reconcile",
             "className": "flex items-center gap-2",
           },
-          "type": "tag",
+          "type": Symbol(tiny-react.tag),
         },
       }
     `);
@@ -209,38 +209,38 @@ describe(render, () => {
               {
                 "child": {
                   "hnode": hello,
-                  "type": "text",
+                  "type": Symbol(tiny-react.text),
                   "vnode": {
                     "data": "hello",
-                    "type": "text",
+                    "type": Symbol(tiny-react.text),
                   },
                 },
                 "hnode": <span>
                   hello
                 </span>,
                 "listeners": Map {},
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
                 "vnode": {
                   "key": undefined,
                   "name": "span",
                   "props": {
                     "children": "hello",
                   },
-                  "type": "tag",
+                  "type": Symbol(tiny-react.tag),
                 },
               },
               {
                 "hnode": world,
-                "type": "text",
+                "type": Symbol(tiny-react.text),
                 "vnode": {
                   "data": "world",
-                  "type": "text",
+                  "type": Symbol(tiny-react.text),
                 },
               },
             ],
             "parent": [Circular],
             "slot": world,
-            "type": "fragment",
+            "type": Symbol(tiny-react.fragment),
             "vnode": {
               "children": [
                 {
@@ -249,14 +249,14 @@ describe(render, () => {
                   "props": {
                     "children": "hello",
                   },
-                  "type": "tag",
+                  "type": Symbol(tiny-react.tag),
                 },
                 {
                   "data": "world",
-                  "type": "text",
+                  "type": Symbol(tiny-react.text),
                 },
               ],
-              "type": "fragment",
+              "type": Symbol(tiny-react.fragment),
             },
           },
           "hnode": <div>
@@ -266,7 +266,7 @@ describe(render, () => {
             world
           </div>,
           "listeners": Map {},
-          "type": "tag",
+          "type": Symbol(tiny-react.tag),
           "vnode": {
             "key": undefined,
             "name": "div",
@@ -278,12 +278,12 @@ describe(render, () => {
                   "props": {
                     "children": "hello",
                   },
-                  "type": "tag",
+                  "type": Symbol(tiny-react.tag),
                 },
                 "world",
               ],
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         },
         "hookContext": HookContext {
@@ -309,14 +309,14 @@ describe(render, () => {
           </span>
           world
         </div>,
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
         "vnode": {
           "key": undefined,
           "props": {
             "value": "hello",
           },
           "render": [Function],
-          "type": "custom",
+          "type": Symbol(tiny-react.custom),
         },
       }
     `);
@@ -1598,7 +1598,7 @@ describe("custom-children", () => {
                 "children": "hello",
               },
               "render": [Function],
-              "type": "custom",
+              "type": Symbol(tiny-react.custom),
             },
             {
               "key": "key2",
@@ -1606,11 +1606,11 @@ describe("custom-children", () => {
                 "children": "hello",
               },
               "render": [Function],
-              "type": "custom",
+              "type": Symbol(tiny-react.custom),
             },
           ],
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
     expect(parent).toMatchInlineSnapshot(`

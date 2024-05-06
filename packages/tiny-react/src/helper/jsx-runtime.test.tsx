@@ -22,7 +22,7 @@ test("basic", () => {
               "children": "yay",
               "className": "hehe",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
           {
             "key": undefined,
@@ -35,17 +35,17 @@ test("basic", () => {
                   "props": {
                     "children": "ment",
                   },
-                  "type": "tag",
+                  "type": Symbol(tiny-react.tag),
                 },
               ],
             },
             "render": [Function],
-            "type": "custom",
+            "type": Symbol(tiny-react.custom),
           },
         ],
         "id": "hi",
       },
-      "type": "tag",
+      "type": Symbol(tiny-react.tag),
     }
   `);
 });
