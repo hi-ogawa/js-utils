@@ -451,10 +451,7 @@ describe(serialize, () => {
     );
     expect(result).toMatchInlineSnapshot(`
       {
-        "referenceIds": [
-          "#Custom",
-        ],
-        "snode": {
+        "data": {
           "$$id": "#Custom",
           "key": undefined,
           "props": {
@@ -464,6 +461,9 @@ describe(serialize, () => {
           },
           "type": Symbol(tiny-react.custom),
         },
+        "referenceIds": [
+          "#Custom",
+        ],
       }
     `);
   });
@@ -520,14 +520,14 @@ describe(serialize, () => {
                   "props": {
                     "children": "hey",
                   },
-                  "type": "custom",
+                  "type": Symbol(tiny-react.custom),
                 },
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
             "id": "server",
           },
-          "type": "tag",
+          "type": Symbol(tiny-react.tag),
         },
         "k2": [
           {
@@ -544,14 +544,14 @@ describe(serialize, () => {
                     "props": {
                       "children": "yo",
                     },
-                    "type": "custom",
+                    "type": Symbol(tiny-react.custom),
                   },
                 },
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
               "id": "server",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         ],
       }
@@ -577,14 +577,14 @@ describe(serialize, () => {
                     "children": "hey",
                   },
                   "render": [Function],
-                  "type": "custom",
+                  "type": Symbol(tiny-react.custom),
                 },
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
             "id": "server",
           },
-          "type": "tag",
+          "type": Symbol(tiny-react.tag),
         },
         "k2": [
           {
@@ -601,14 +601,14 @@ describe(serialize, () => {
                       "children": "yo",
                     },
                     "render": [Function],
-                    "type": "custom",
+                    "type": Symbol(tiny-react.custom),
                   },
                 },
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
               "id": "server",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         ],
       }
