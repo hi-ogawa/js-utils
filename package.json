@@ -12,7 +12,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.7.2",
-    "@changesets/cli": "^2.26.2",
     "@hiogawa/changelog": "workspace:*",
     "@hiogawa/icheck-ts": "workspace:*",
     "@hiogawa/inline-template": "workspace:*",
