@@ -3,14 +3,7 @@
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
-    "ignore": [
-      "**/node_modules",
-      "**/dist",
-      "**/pnpm-lock.yaml",
-      "**/pkg",
-      "**/.vercel",
-      "**/.wrangler"
-    ]
+    "ignore": ["**/dist/**", "**/.vercel/**", "**/.wrangler/**"]
   },
   "organizeImports": { "enabled": true },
   "linter": { "enabled": false },
