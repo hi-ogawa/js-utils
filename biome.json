@@ -3,7 +3,7 @@
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
-    "ignore": ["**/dist/**", "**/.vercel/**", "**/.wrangler/**"]
+    "ignore": ["dist", ".vercel", ".wrangler"]
   },
   "organizeImports": { "enabled": true },
   "linter": { "enabled": false },
