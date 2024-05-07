@@ -17,7 +17,7 @@ test("basic", async ({ page }) => {
 
   using file = createFileEditor("src/app.tsx");
   file.edit((s) =>
-    s.replace("const innerAdd = 100;", "const innerAdd = 1000;")
+    s.replace("const innerAdd = 100;", "const innerAdd = 1000;"),
   );
   await page
     .locator("#inner1")
@@ -47,7 +47,7 @@ test("hook change", async ({ page }) => {
   file.edit((s) =>
     s
       .replace("useState(0);", "useState(0);useState(0);")
-      .replace("[Outer] =", "[Outer(EDIT)] =")
+      .replace("[Outer] =", "[Outer(EDIT)] ="),
   );
   await page.getByText("[Outer(EDIT)] = 0").click();
   await page.locator("#inner1").getByText("Inner: [Outer] + 100 = 100").click();
@@ -67,7 +67,7 @@ test("show/hide", async ({ page }) => {
   // update message
   using file = createFileEditor("src/other-file.tsx");
   file.edit((s) =>
-    s.replace(`const message = "hello"`, `const message = "hey"`)
+    s.replace(`const message = "hello"`, `const message = "hey"`),
   );
   await expect(page.getByTestId("show-hide-message")).toHaveText("[]");
   await page.getByRole("button", { name: "show/hide" }).click();

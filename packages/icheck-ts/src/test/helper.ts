@@ -15,7 +15,7 @@ export async function collectFiles(dir: string) {
 
 async function visitFiles(
   dir: string,
-  callback: (filepath: string, e: fs.Dirent) => void
+  callback: (filepath: string, e: fs.Dirent) => void,
 ) {
   const entries = await fs.promises.readdir(dir, { withFileTypes: true });
   for (const e of entries) {

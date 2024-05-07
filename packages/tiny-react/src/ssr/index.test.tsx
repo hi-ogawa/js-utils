@@ -13,7 +13,7 @@ describe(hydrate, () => {
     );
     const vnodeSsr = renderToString(vnode);
     expect(vnodeSsr).toMatchInlineSnapshot(
-      '"<div>hello<span>world</span></div>"'
+      '"<div>hello<span>world</span></div>"',
     );
 
     const parent = document.createElement("main");
@@ -52,9 +52,9 @@ describe(hydrate, () => {
     const parent = document.createElement("main");
     parent.innerHTML = `<span></span>`;
     expect(() =>
-      hydrate(<div></div>, parent)
+      hydrate(<div></div>, parent),
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: tag hydration mismatch (actual: 'SPAN', expected: 'div')]`
+      `[Error: tag hydration mismatch (actual: 'SPAN', expected: 'div')]`,
     );
   });
 
@@ -62,9 +62,9 @@ describe(hydrate, () => {
     const parent = document.createElement("main");
     parent.innerHTML = `<div><span></span></div>`;
     expect(() =>
-      hydrate(<div>hello</div>, parent)
+      hydrate(<div>hello</div>, parent),
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: text hydration mismatch (actual: 'SPAN', expected: '#text')]`
+      `[Error: text hydration mismatch (actual: 'SPAN', expected: '#text')]`,
     );
   });
 
@@ -119,7 +119,7 @@ describe(hydrate, () => {
 
     const vnodeSsr = renderToString(vnode);
     expect(vnodeSsr).toMatchInlineSnapshot(
-      `"<div id="x">hello<button>world</button></div>"`
+      `"<div id="x">hello<button>world</button></div>"`,
     );
 
     const parent = document.createElement("main");

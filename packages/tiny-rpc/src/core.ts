@@ -41,7 +41,7 @@ export function exposeTinyRpc<T>({
     const fn = objectHas(routes, path) && routes[path];
     tinyassert(
       typeof fn === "function",
-      new TinyRpcError("invalid path", { cause: path })
+      new TinyRpcError("invalid path", { cause: path }),
     );
     return fn.apply(routes, args);
   });
@@ -58,7 +58,7 @@ export function proxyTinyRpc<R>({
       get(_target, path, _receiver) {
         tinyassert(
           typeof path === "string",
-          new TinyRpcError("invalid path", { cause: path })
+          new TinyRpcError("invalid path", { cause: path }),
         );
         return async (...args: unknown[]) => {
           // automatically wrap all client error as RpcError
@@ -69,7 +69,7 @@ export function proxyTinyRpc<R>({
           }
         };
       },
-    }
+    },
   ) as any;
 }
 

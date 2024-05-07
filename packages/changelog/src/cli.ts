@@ -72,7 +72,7 @@ async function main() {
       [`log`, `--pretty=%H`, `-1`, `${changelogPath}`],
       {
         cwd: args.dir,
-      }
+      },
     );
     args.from = stdout.trim() || undefined;
   }
@@ -133,7 +133,7 @@ async function getGitlogs(opts: {
     ],
     {
       cwd: opts.dir,
-    }
+    },
   );
   return stdout
     .split("---START---")
@@ -143,14 +143,14 @@ async function getGitlogs(opts: {
       v
         .trim()
         .split("---SEP---")
-        .map((v) => v.trim())
+        .map((v) => v.trim()),
     )
     .map(([hash, subject]) => ({ hash, subject }));
 }
 
 function formatMessage(
   s: string,
-  opts: { removeScope?: boolean; repo?: string }
+  opts: { removeScope?: boolean; repo?: string },
 ) {
   // format PR url
   //   (#184)  ⇒  ([#184](https://github.com/hi-ogawa/vite-plugins/pull/184))

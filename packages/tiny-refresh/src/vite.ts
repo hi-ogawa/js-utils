@@ -11,7 +11,7 @@ export function vitePluginTinyRefresh(options?: {
   // cf. https://github.com/vitejs/vite-plugin-react/blob/2c3330b9aa40d263e50e8359eca481099700ca9e/packages/plugin-react/src/index.ts#L168-L171
   const filter = createFilter(
     options?.include ?? /\.[tj]sx$/,
-    options?.exclude ?? /\/node_modules\//
+    options?.exclude ?? /\/node_modules\//,
   );
   return {
     name: "@hiogawa/tiny-refresh/react/vite",

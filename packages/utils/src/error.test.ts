@@ -46,7 +46,7 @@ describe(formatError, () => {
     `);
 
     expect(
-      reduceStacktrace(formatError(e2, { noCause: true }))
+      reduceStacktrace(formatError(e2, { noCause: true })),
     ).toMatchInlineSnapshot(`
       "
       [41m ERROR [49m e2
@@ -65,7 +65,7 @@ describe(formatError, () => {
     `);
 
     expect(
-      reduceStacktrace(formatError(e2, { noColor: true }))
+      reduceStacktrace(formatError(e2, { noColor: true })),
     ).toMatchInlineSnapshot(`
       "
       [ERROR] e2

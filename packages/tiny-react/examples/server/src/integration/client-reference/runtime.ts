@@ -2,7 +2,7 @@ import type { ReferenceMap } from "@hiogawa/tiny-react";
 
 export async function createReferenceMap(ids: string[]): Promise<ReferenceMap> {
   return Object.fromEntries(
-    await Promise.all(ids.map(async (id) => [id, await resolveReference(id)]))
+    await Promise.all(ids.map(async (id) => [id, await resolveReference(id)])),
   );
 }
 

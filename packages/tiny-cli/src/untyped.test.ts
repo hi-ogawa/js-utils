@@ -81,7 +81,7 @@ describe(parseToUntypedArgs, () => {
   it("flags", () => {
     const input = "a --k1 --k2 b --k3=x --k4=y -c d";
     expect(
-      parseToUntypedArgs(input.split(" "), { flags: ["k2"] })
+      parseToUntypedArgs(input.split(" "), { flags: ["k2"] }),
     ).toMatchInlineSnapshot(`
       {
         "flags": [

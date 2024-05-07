@@ -1,5 +1,5 @@
 export function createGetterProxy(
-  propHandler: (prop: string | symbol) => unknown
+  propHandler: (prop: string | symbol) => unknown,
 ): unknown {
   return new Proxy(
     {},
@@ -7,6 +7,6 @@ export function createGetterProxy(
       get(_target, prop, _receiver) {
         return propHandler(prop);
       },
-    }
+    },
   );
 }

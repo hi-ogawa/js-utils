@@ -27,7 +27,7 @@ describe(zArg, () => {
           mode: number;
         }>();
         return args;
-      }
+      },
     );
 
     expect(cli.help()).toMatchInlineSnapshot(`

@@ -10,7 +10,7 @@ export interface TinyRpcMessagePortNode {
 type NodeMessageHandler = (data: unknown) => void;
 
 export function messagePortNodeCompat(
-  port: TinyRpcMessagePortNode
+  port: TinyRpcMessagePortNode,
 ): TinyRpcMessagePort {
   const map = new WeakMap();
 

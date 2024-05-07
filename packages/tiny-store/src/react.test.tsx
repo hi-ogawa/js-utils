@@ -25,7 +25,7 @@ describe(useTinyStore, () => {
     render(
       <>
         <Demo />
-      </>
+      </>,
     );
     expect(await getTestidText("demo")).toMatchInlineSnapshot('"1"');
 
@@ -84,7 +84,7 @@ describe(useTinyStore, () => {
       <>
         <Demo1 />
         <Demo2 />
-      </>
+      </>,
     );
     expect([
       await getTestidText("demo1"),
@@ -141,7 +141,7 @@ describe(useTinyStore, () => {
     render(
       <>
         <Demo store={store} />
-      </>
+      </>,
     );
     expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":0}"`);
 
@@ -158,7 +158,7 @@ describe(useTinyStore, () => {
     render(
       <>
         <Demo store={store2} />
-      </>
+      </>,
     );
     expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":1}"`);
 
@@ -186,7 +186,7 @@ describe(useTinyStore, () => {
     render(
       <>
         <Demo />
-      </>
+      </>,
     );
     expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":0}"`);
     await userEvent.click(await screen.findByRole("button"));
@@ -196,7 +196,7 @@ describe(useTinyStore, () => {
     render(
       <>
         <Demo />
-      </>
+      </>,
     );
     expect(await getTestidText("demo")).toMatchInlineSnapshot(`"{"x":1}"`);
     await userEvent.click(await screen.findByRole("button"));

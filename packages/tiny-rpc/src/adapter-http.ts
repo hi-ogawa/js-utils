@@ -36,7 +36,7 @@ export function httpServerAdapter(opts: {
             request.method === method,
             new TinyRpcError("invalid method", {
               cause: request.method,
-            }).setStatus(405)
+            }).setStatus(405),
           );
           let args: unknown[];
           if (method === "GET") {
@@ -88,7 +88,7 @@ export function httpClientAdapter(opts: {
       let req: Request;
       if (method === "GET") {
         req = new Request(
-          url + "?" + new URLSearchParams({ [GET_PAYLOAD_PARAM]: payload })
+          url + "?" + new URLSearchParams({ [GET_PAYLOAD_PARAM]: payload }),
         );
       } else {
         req = new Request(url, {

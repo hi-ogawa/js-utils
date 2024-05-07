@@ -33,7 +33,7 @@ export function parseImportExport({
 
   if (transpileOutput.diagnostics && transpileOutput.diagnostics?.length > 0) {
     const diagnostics = transpileOutput.diagnostics.map((d) =>
-      typeof d.messageText === "string" ? d.messageText : "(unknown)"
+      typeof d.messageText === "string" ? d.messageText : "(unknown)",
     );
     return Err({ diagnostics });
   }

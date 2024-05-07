@@ -25,7 +25,7 @@ export async function handler(request: Request) {
   // to SSR
   const vnode = deserialize<VNode>(
     serialized.data,
-    await createReferenceMap(serialized.referenceIds)
+    await createReferenceMap(serialized.referenceIds),
   );
   const ssrHtml = renderToString(vnode);
 
@@ -35,14 +35,14 @@ export async function handler(request: Request) {
     "<head>",
     () =>
       `<head><script>globalThis.__serialized = ${JSON.stringify(
-        serialized
-      )}</script>`
+        serialized,
+      )}</script>`,
   );
   // dev only FOUC fix
   if (import.meta.env.DEV) {
     html = html.replace(
       "<head>",
-      `<head><link rel="stylesheet" href="/src/style.css?direct" />`
+      `<head><link rel="stylesheet" href="/src/style.css?direct" />`,
     );
   }
   return new Response(html, {

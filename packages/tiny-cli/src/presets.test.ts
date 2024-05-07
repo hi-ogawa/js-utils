@@ -37,7 +37,7 @@ describe("presets", () => {
           testStringOptDefault: string;
         };
         return args;
-      }
+      },
     );
 
     expect(cli.help()).toMatchInlineSnapshot(`
@@ -60,23 +60,23 @@ describe("presets", () => {
     `);
 
     expect(() => cli.parse([])).toThrowErrorMatchingInlineSnapshot(
-      `[Error: failed to parse <positionalString>]`
+      `[Error: failed to parse <positionalString>]`,
     );
 
     expect(() =>
-      cli.parse(["hello", "not-a-number"])
+      cli.parse(["hello", "not-a-number"]),
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: failed to parse <positionalNumberDefault>]`
+      `[Error: failed to parse <positionalNumberDefault>]`,
     );
 
     expect(() =>
-      cli.parse(["hello", "123", "not-a-number"])
+      cli.parse(["hello", "123", "not-a-number"]),
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: failed to parse <positionalNumberOptional>]`
+      `[Error: failed to parse <positionalNumberOptional>]`,
     );
 
     expect(
-      cli.parse(["hello", "123", "456", "--testString", "hey"])
+      cli.parse(["hello", "123", "456", "--testString", "hey"]),
     ).toMatchInlineSnapshot(`
       {
         "positionalNumberDefault": 123,
@@ -90,7 +90,7 @@ describe("presets", () => {
     `);
 
     expect(
-      cli.parse(["--testString", "hey", "--testBoolean", "hello"])
+      cli.parse(["--testString", "hey", "--testBoolean", "hello"]),
     ).toMatchInlineSnapshot(`
         {
           "positionalNumberDefault": 123,
@@ -116,7 +116,7 @@ describe("presets", () => {
           testArray: string[];
         };
         return args;
-      }
+      },
     );
 
     expect(cli.help()).toMatchInlineSnapshot(`
@@ -160,7 +160,7 @@ describe("presets", () => {
           testArray: number[];
         };
         return args;
-      }
+      },
     );
 
     expect(cli.help()).toMatchInlineSnapshot(`
@@ -181,9 +181,9 @@ describe("presets", () => {
     `);
 
     expect(() =>
-      cli.parse(["a", "b", "1", "2"])
+      cli.parse(["a", "b", "1", "2"]),
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: failed to parse <testArray...>]`
+      `[Error: failed to parse <testArray...>]`,
     );
 
     expect(cli.parse(["1", "2"])).toMatchInlineSnapshot(`

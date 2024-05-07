@@ -192,7 +192,7 @@ function analyzeFunction(
   node:
     | estree.FunctionDeclaration
     | estree.ArrowFunctionExpression
-    | estree.MaybeNamedFunctionDeclaration
+    | estree.MaybeNamedFunctionDeclaration,
 ) {
   // we could do this runtime via `fn.toString()`,
   // but that will impact performance on each render.
@@ -206,7 +206,7 @@ function replaceCode(
   code: string,
   start: number,
   end: number,
-  content: string
+  content: string,
 ) {
   return code.slice(0, start) + content + code.slice(end);
 }

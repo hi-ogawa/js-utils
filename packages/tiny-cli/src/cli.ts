@@ -22,7 +22,7 @@ export class TinyCli {
       description?: string;
       noDefaultOptions?: boolean;
       log?: (v: string) => void;
-    } = {}
+    } = {},
   ) {}
 
   get program() {
@@ -39,7 +39,7 @@ export class TinyCli {
       description?: string;
       args: R;
     },
-    action: TypedArgsAction<R>
+    action: TypedArgsAction<R>,
   ) {
     const command = new TinyCliCommand(
       {
@@ -53,7 +53,7 @@ export class TinyCli {
         description: config.description,
         args: config.args,
       },
-      action
+      action,
     );
     this.commandMap.set(config.name, command);
   }
@@ -133,7 +133,7 @@ export class TinyCliCommand<R extends ArgSchemaRecord> {
       log?: (v: string) => void;
       args: R;
     },
-    private action: TypedArgsAction<R>
+    private action: TypedArgsAction<R>,
   ) {
     validateArgsSchema(config.args);
   }

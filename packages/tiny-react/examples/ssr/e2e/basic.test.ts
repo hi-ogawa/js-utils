@@ -30,7 +30,7 @@ test("ssr", async ({ request }) => {
 
     const text = await res.text();
     expect(text).toContain(
-      `<input class="antd-input px-1" placeholder="?q=..." value=""/>`
+      `<input class="antd-input px-1" placeholder="?q=..." value=""/>`,
     );
   }
 
@@ -40,7 +40,7 @@ test("ssr", async ({ request }) => {
 
     const text = await res.text();
     expect(text).toContain(
-      `<input class="antd-input px-1" placeholder="?q=..." value="hello"/>`
+      `<input class="antd-input px-1" placeholder="?q=..." value="hello"/>`,
     );
   }
 });

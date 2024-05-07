@@ -6,7 +6,7 @@ import { sleep } from "@hiogawa/utils";
 export default function handler(
   req: IncomingMessage,
   res: OutgoingMessage,
-  next: () => void
+  next: () => void,
 ) {
   if (req.url === "/api") {
     const stream = stringifyStream([

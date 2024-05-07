@@ -24,7 +24,7 @@ describe("token expiration", () => {
       key,
     });
     expect(token).toMatchInlineSnapshot(
-      '"eyJhbGciOiJIUzI1NiIsImV4cCI6OTAwfQ.eyJoZXkiOiJ5b3UifQ.WEXMeyfyRgoQHtZN8ZWuaG4ZoXKhSXDtGqq-icTmWvs"'
+      '"eyJhbGciOiJIUzI1NiIsImV4cCI6OTAwfQ.eyJoZXkiOiJ5b3UifQ.WEXMeyfyRgoQHtZN8ZWuaG4ZoXKhSXDtGqq-icTmWvs"',
     );
 
     const verified = await jwsVerify({
@@ -51,7 +51,7 @@ describe("token expiration", () => {
     // invalid after 20 min
     vi.setSystemTime(20 * 60 * 1000);
     expect(() =>
-      checkExpirationTime(verified.header)
+      checkExpirationTime(verified.header),
     ).toThrowErrorMatchingInlineSnapshot(`[Error: token expired]`);
   });
 });

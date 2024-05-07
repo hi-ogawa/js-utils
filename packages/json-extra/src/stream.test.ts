@@ -35,7 +35,7 @@ describe("stream", () => {
         write(chunk) {
           result += chunk;
         },
-      })
+      }),
     );
     expect(result).toMatchInlineSnapshot(`
       "["!__promise__","!__promise__","!__promise__","!__promise__"]

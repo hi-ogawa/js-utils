@@ -11,12 +11,12 @@ export function createTinyStoreWithStorage<T>(
   key: string,
   defaultValue: T,
   parse = JSON.parse,
-  stringify = JSON.stringify
+  stringify = JSON.stringify,
 ): TinyStoreApi<T> {
   return tinyStoreTransform<string | null, T>(
     new TinyStore(new TinyStoreLocalStorageAdapter(key)),
     (s: string | null): T => (s === null ? defaultValue : parse(s)),
-    (t: T): string | null => stringify(t)
+    (t: T): string | null => stringify(t),
   );
 }
 
@@ -67,7 +67,7 @@ class TinyStoreLocalStorageAdapter implements TinyStoreAdapter<string | null> {
         if (e.key === this.key || e.key === null) {
           this.listeners.forEach((f) => f());
         }
-      }
+      },
     );
   }
 

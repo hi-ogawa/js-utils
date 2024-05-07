@@ -5,7 +5,7 @@
 export function toImmutableSetState<T, Method extends (...args: any[]) => void>(
   setState: React.Dispatch<React.SetStateAction<T>>,
   mutableMethod: Method,
-  shallowCopy: (value: T) => T
+  shallowCopy: (value: T) => T,
 ): OmitThisParameter<Method> {
   const wrapper = (...args: Parameters<Method>) => {
     setState((prev) => {
@@ -19,7 +19,7 @@ export function toImmutableSetState<T, Method extends (...args: any[]) => void>(
 
 // cf. https://github.com/streamich/react-use/blob/master/docs/useList.md
 export function toArraySetState<T>(
-  setState: React.Dispatch<React.SetStateAction<T[]>>
+  setState: React.Dispatch<React.SetStateAction<T[]>>,
 ) {
   // alias prototype for typing
   const pt = Array.prototype as T[];
@@ -32,13 +32,13 @@ export function toArraySetState<T>(
     toggle: toImmutableSetState(
       setState,
       toggleArray as typeof toggleArray<T>,
-      copy
+      copy,
     ),
   };
 }
 
 export function toSetSetState<T>(
-  setState: React.Dispatch<React.SetStateAction<Set<T>>>
+  setState: React.Dispatch<React.SetStateAction<Set<T>>>,
 ) {
   // alias prototype for typing
   const pt = Set.prototype as Set<T>;
@@ -51,7 +51,7 @@ export function toSetSetState<T>(
     toggle: toImmutableSetState(
       setState,
       toggleSet as typeof toggleSet<T>,
-      copy
+      copy,
     ),
   };
 }

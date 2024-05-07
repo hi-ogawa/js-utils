@@ -76,8 +76,8 @@ class SerializeManager {
         Object.entries(props).map(async ([k, v]) => [
           k,
           await this.serializeUnknown(v),
-        ])
-      )
+        ]),
+      ),
     );
   }
 
@@ -106,8 +106,8 @@ class SerializeManager {
         Object.entries(v).map(async ([k, v]) => [
           k,
           await this.serializeUnknown(v),
-        ])
-      )
+        ]),
+      ),
     );
   }
 }
@@ -158,7 +158,7 @@ class DeserializeManager {
 
   deserializeProps(props: Record<string, unknown>) {
     return Object.fromEntries(
-      Object.entries(props).map(([k, v]) => [k, this.deserializeUnknown(v)])
+      Object.entries(props).map(([k, v]) => [k, this.deserializeUnknown(v)]),
     );
   }
 
@@ -182,7 +182,7 @@ class DeserializeManager {
       return v.map((v) => this.deserializeUnknown(v));
     }
     return Object.fromEntries(
-      Object.entries(v).map(([k, v]) => [k, this.deserializeUnknown(v)])
+      Object.entries(v).map(([k, v]) => [k, this.deserializeUnknown(v)]),
     );
   }
 }

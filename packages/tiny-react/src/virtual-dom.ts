@@ -196,7 +196,7 @@ export type ComponentChildren = ComponentChild | ComponentChildren[];
 export function createVNode(
   tag: ComponentType,
   props: UnknownProps,
-  key?: NodeKey
+  key?: NodeKey,
 ): VNode {
   if (typeof tag === "string") {
     return {
@@ -242,7 +242,7 @@ export function Fragment(props: { children?: ComponentChildren }): VNode {
 }
 
 export function normalizeComponentChildren(
-  children?: ComponentChildren
+  children?: ComponentChildren,
 ): VNode {
   if (Array.isArray(children)) {
     return {

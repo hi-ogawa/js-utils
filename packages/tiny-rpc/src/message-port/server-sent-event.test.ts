@@ -144,13 +144,13 @@ describe(createTwoWaySseHandler, () => {
     expect(await rpcProxy.incrementCounter({})).toMatchInlineSnapshot("1");
     expect(await rpcProxy.getCounter()).toMatchInlineSnapshot("1");
     expect(await rpcProxy.incrementCounter({ delta: 2 })).toMatchInlineSnapshot(
-      `3`
+      `3`,
     );
     expect(await rpcProxy.getCounter()).toMatchInlineSnapshot("3");
 
     {
       const error = await getError(() =>
-        rpcProxy.incrementCounter({ delta: "2" as any })
+        rpcProxy.incrementCounter({ delta: "2" as any }),
       );
       tinyassert(error instanceof TinyRpcError);
       expect(error).toMatchInlineSnapshot(`

@@ -9,7 +9,7 @@ export class TypedEventTarget<T> {
 
   removeEventListener<K extends keyof T>(
     type: K,
-    listener: (ev: T[K]) => void
+    listener: (ev: T[K]) => void,
   ) {
     this.listeners.get(type).delete(listener);
   }
@@ -24,7 +24,7 @@ export class TypedEventTarget<T> {
 export function subscribe<K extends keyof EventSourceEventMap>(
   target: EventSource,
   type: K,
-  listener: (ev: EventSourceEventMap[K]) => void
+  listener: (ev: EventSourceEventMap[K]) => void,
 ) {
   target.addEventListener(type, listener);
   return () => {

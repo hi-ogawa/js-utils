@@ -56,7 +56,7 @@ export async function runner(
   options?: {
     parse?: typeof parseImportExport;
     useImportMetaResolve?: boolean;
-  }
+  },
 ) {
   // normalize relative path to match with `resolveImportSource` (e.g. "./x.ts" => "x.ts")
   inputFiles = inputFiles.map((f) => path.normalize(f));
@@ -131,7 +131,7 @@ export async function runner(
         .get(file)
         .some(
           (e) =>
-            e.type === "namespace" || (e.type === "named" && e.name === name)
+            e.type === "namespace" || (e.type === "named" && e.name === name),
         )
     );
   }
@@ -187,7 +187,7 @@ export async function runner(
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#importmetaresolvespecifier
 function resolveImportSourceV2(
   containingFile: string,
-  source: string
+  source: string,
 ): ImportSource {
   const baseDir = process.cwd(); // TODO: baseDir as cli option?
 
@@ -237,7 +237,7 @@ function resolveImportSourceV2(
 // https://www.typescriptlang.org/tsconfig#moduleResolution
 export async function resolveImportSource(
   containingFile: string,
-  source: string
+  source: string,
 ): Promise<ImportSource> {
   // TODO: memoize fs check?
 
@@ -256,7 +256,7 @@ export async function resolveImportSource(
 
   // normalize relative path
   let tmpSource = path.normalize(
-    path.join(path.dirname(containingFile), source)
+    path.join(path.dirname(containingFile), source),
   );
 
   // "." => "./index"
@@ -335,7 +335,7 @@ export function findCircularImport(relations: ImportRelations) {
 
 export function formatCircularImportError(
   backEdge: ImportEdge,
-  parentMap: Map<string, ImportEdge>
+  parentMap: Map<string, ImportEdge>,
 ) {
   const cycle: [string, ImportTarget][] = [];
   const root = backEdge[1].source.name;
@@ -352,7 +352,7 @@ export function formatCircularImportError(
   const lines: string[] = [];
   for (const [v, target] of cycle) {
     const line = `${v}:${target.node.position[0]} - ${formatImportUsage(
-      target.usage
+      target.usage,
     )}`;
     lines.push(line);
   }

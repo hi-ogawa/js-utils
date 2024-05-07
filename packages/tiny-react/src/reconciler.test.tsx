@@ -9,7 +9,7 @@ test("fragment", () => {
       <div>a1</div>
       <div>a2</div>
       <div>a3</div>
-    </div>
+    </div>,
   );
   expect(el).toMatchInlineSnapshot(`
     <main>
@@ -31,7 +31,7 @@ test("fragment", () => {
     <div>
       <div>x1</div>
       <div>x2</div>
-    </div>
+    </div>,
   );
   expect(el).toMatchInlineSnapshot(`
     <main>
@@ -51,7 +51,7 @@ test("fragment", () => {
       <div>y1</div>
       <div>y2</div>
       <div>y3</div>
-    </div>
+    </div>,
   );
   expect(el).toMatchInlineSnapshot(`
     <main>

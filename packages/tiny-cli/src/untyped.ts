@@ -12,7 +12,7 @@ export interface UntypedArgs {
 
 export function parseToUntypedArgs(
   rawArgs: string[],
-  config?: { flags: string[] }
+  config?: { flags: string[] },
 ): UntypedArgs {
   const result: UntypedArgs = {
     positionals: [],

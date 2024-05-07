@@ -23,7 +23,7 @@ export type TrpcClientQueryProxy<
       options: {
         getNextPageParam: GetNextPageParamFunction<O[K]>;
         setPageParam: (input: I[K], pageParam: unknown) => I[K];
-      }
+      },
     ) => {
       queryKey: unknown[];
       queryFn: (context: unknown) => Promise<O[K]>;
@@ -38,7 +38,7 @@ export type TrpcClientQueryProxy<
 };
 
 export function createTrpcClientQueryProxy<Router extends AnyRouter>(
-  client: any
+  client: any,
 ): TrpcClientQueryProxy<Router> {
   return createGetterProxy((k) =>
     createGetterProxy((prop) => {
@@ -63,13 +63,13 @@ export function createTrpcClientQueryProxy<Router extends AnyRouter>(
         });
       }
       throw new Error("invalid proxy usage", { cause: { k, prop } });
-    })
+    }),
   ) as any;
 }
 
 // strip deprecated query/mutation/subscription api which is incompatible with `FnRecord`
 export function trpcCallerFnRecordCompat<Caller>(
-  caller: Caller
+  caller: Caller,
 ): Omit<Caller, "query" | "mutation" | "subscription"> {
   return caller as any;
 }

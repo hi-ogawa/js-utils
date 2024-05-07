@@ -41,7 +41,7 @@ describe("adapter-message-port", () => {
     expect(await client.getCounter()).toMatchInlineSnapshot("1");
 
     expect(await client.incrementCounter({ delta: 2 })).toMatchInlineSnapshot(
-      "3"
+      "3",
     );
     expect(await client.getCounter()).toMatchInlineSnapshot("3");
 
@@ -51,7 +51,7 @@ describe("adapter-message-port", () => {
 
     // input validation
     await expect(
-      client.incrementCounter({ delta: "2" as any as number })
+      client.incrementCounter({ delta: "2" as any as number }),
     ).rejects.toSatisfy((e) => {
       tinyassert(e instanceof TinyRpcError);
       expect(e).toMatchInlineSnapshot(`
@@ -81,7 +81,7 @@ describe("adapter-message-port", () => {
         expect(e).toMatchInlineSnapshot("[Error: invalid path]");
         expect(e.cause).toMatchInlineSnapshot('"incrementCounterXXX"');
         return true;
-      }
+      },
     );
 
     // runtime erorr
@@ -127,7 +127,7 @@ describe("adapter-message-port", () => {
       const data = new Uint8Array([100]);
       expect(data.byteLength).toMatchInlineSnapshot(`1`);
       expect(
-        await client.testRequest(messagePortWrapTransfer(data, [data.buffer]))
+        await client.testRequest(messagePortWrapTransfer(data, [data.buffer])),
       ).toMatchInlineSnapshot(`100`);
       expect(data.byteLength).toMatchInlineSnapshot(`0`);
     }
@@ -183,10 +183,10 @@ describe("adapter-message-port", () => {
     });
 
     expect(await bobProxy.hey("alice")).toMatchInlineSnapshot(
-      `"Hey alice, I am Bob"`
+      `"Hey alice, I am Bob"`,
     );
     expect(await aliceProxy.hi("bob")).toMatchInlineSnapshot(
-      `"Hi bob, I am Alice"`
+      `"Hi bob, I am Alice"`,
     );
   });
 

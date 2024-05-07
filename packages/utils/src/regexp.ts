@@ -12,8 +12,8 @@ export function regExpRaw(
   return new RegExp(
     String.raw(
       strings,
-      ...params.map((p) => (typeof p === "string" ? p : p.source))
-    )
+      ...params.map((p) => (typeof p === "string" ? p : p.source)),
+    ),
   );
 }
 
@@ -27,7 +27,7 @@ export function mapRegExp(
   input: string,
   regex: RegExp,
   onMatch: (match: RegExpMatchArray) => void,
-  onNonMatch: (part: string) => void
+  onNonMatch: (part: string) => void,
 ) {
   let lastIndex = 0;
   for (const m of input.matchAll(regex)) {

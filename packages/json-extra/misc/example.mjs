@@ -51,7 +51,7 @@ if (args.includes("input")) {
   const data = fs.readFileSync(new URL(import.meta.url), "utf-8");
   const re = new RegExp(
     "// INPUT_START\nconst input = (.*);\n// INPUT_END",
-    "s"
+    "s",
   );
   console.log(data.match(re)[1]);
 }

@@ -151,7 +151,7 @@ function mathRandomId() {
     .map((bits) =>
       Math.floor(Math.random() * 2 ** bits)
         .toString(16)
-        .padStart(bits / 4, "0")
+        .padStart(bits / 4, "0"),
     )
     .join("-");
 }
@@ -169,7 +169,7 @@ class WrapepdTransfer {
 
 export function messagePortWrapTransfer<T>(
   value: T,
-  transferables: unknown[]
+  transferables: unknown[],
 ): T {
   return new WrapepdTransfer([value, transferables]) as any;
 }

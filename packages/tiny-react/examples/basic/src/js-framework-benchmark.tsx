@@ -11,12 +11,12 @@ export function JsFrameworkBenchmarkApp() {
 
   const selectItem = useCallback(
     (id: number) => setSelected((prev) => (prev === id ? undefined : id)),
-    []
+    [],
   );
 
   const deleteItem = useCallback(
     (id: number) => setItems((prev) => prev.filter((other) => other.id !== id)),
-    []
+    [],
   );
 
   return (
@@ -78,8 +78,8 @@ export function JsFrameworkBenchmarkApp() {
           onclick={() => {
             setItems(
               items.map((item, i) =>
-                i % 10 === 0 ? { ...item, label: item.label + " !!!" } : item
-              )
+                i % 10 === 0 ? { ...item, label: item.label + " !!!" } : item,
+              ),
             );
           }}
         >
@@ -140,7 +140,7 @@ function ItemComponent({
       key={item.id}
       className={cls(
         "flex items-center p-2 px-4 first:border-t-0 border-t hover:bg-colorFillTertiary duration-300",
-        isSelected && "!bg-colorFillSecondary"
+        isSelected && "!bg-colorFillSecondary",
       )}
     >
       <span className="flex-none text-sm text-colorTextSecondary w-[100px]">

@@ -52,13 +52,13 @@ describe(tinyassert, () => {
 
   it("error without message", () => {
     expect(() => tinyassert(false)).toThrowErrorMatchingInlineSnapshot(
-      `[Error: TinyAssertionError]`
+      `[Error: TinyAssertionError]`,
     );
   });
 
   it("error with message", () => {
     expect(() => tinyassert(false, "boom")).toThrowErrorMatchingInlineSnapshot(
-      `[Error: boom]`
+      `[Error: boom]`,
     );
   });
 });

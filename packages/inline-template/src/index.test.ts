@@ -16,7 +16,7 @@ anything here will be overwritten
 `;
     const logFn = vi.fn();
     const output = await new InlineTemplateProcessor({ log: logFn }).process(
-      input
+      input,
     );
     expect(output).toMatchInlineSnapshot(`
       "<!--
@@ -53,7 +53,7 @@ anything here will be overwritten
 `;
     const logFn = vi.fn();
     const output = await new InlineTemplateProcessor({ log: logFn }).process(
-      input
+      input,
     );
     expect(output).toMatchInlineSnapshot(`
       "<!--

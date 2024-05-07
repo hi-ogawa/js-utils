@@ -4,7 +4,7 @@ import { name, version } from "../package.json";
 import RULE from "./scrape-output.json";
 
 const RULE_MAP = Object.fromEntries(
-  Object.entries(RULE).map(([k, v]) => [v, Number(k)])
+  Object.entries(RULE).map(([k, v]) => [v, Number(k)]),
 );
 
 const HELP = `\
@@ -38,8 +38,8 @@ function sortPackageJson(infile: string): boolean {
   const original = JSON.parse(fs.readFileSync(infile, "utf-8"));
   const sorted = Object.fromEntries(
     Object.entries(original).sort(
-      ([k1], [k2]) => (RULE_MAP[k1] ?? 1e8) - (RULE_MAP[k2] ?? 1e8)
-    )
+      ([k1], [k2]) => (RULE_MAP[k1] ?? 1e8) - (RULE_MAP[k2] ?? 1e8),
+    ),
   );
   if (
     JSON.stringify(Object.keys(original)) ===

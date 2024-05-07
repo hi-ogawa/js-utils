@@ -49,14 +49,14 @@ export function groupBy<T, K>(ls: T[], f: (x: T) => K): Map<K, T[]> {
 
 export function mapKeys<K, V, K2>(
   map: Map<K, V>,
-  f: (v: V, k: K) => K2
+  f: (v: V, k: K) => K2,
 ): Map<K2, V> {
   return new Map([...map].map(([k, v]) => [f(v, k), v]));
 }
 
 export function mapValues<K, V, V2>(
   map: Map<K, V>,
-  f: (v: V, k: K) => V2
+  f: (v: V, k: K) => V2,
 ): Map<K, V2> {
   return new Map([...map].map(([k, v]) => [k, f(v, k)]));
 }
@@ -64,14 +64,14 @@ export function mapValues<K, V, V2>(
 export function mapGroupBy<T, K, V>(
   ls: T[],
   keyFn: (v: T) => K,
-  valueFn: (vs: T[], k: K) => V
+  valueFn: (vs: T[], k: K) => V,
 ) {
   return mapValues(groupBy(ls, keyFn), valueFn);
 }
 
 export function pickBy<K, V>(
   map: Map<K, V>,
-  f: (v: V, k: K) => boolean
+  f: (v: V, k: K) => boolean,
 ): Map<K, V> {
   return new Map([...map].filter(([k, v]) => f(v, k)));
 }
@@ -102,14 +102,14 @@ export function partition<T>(ls: T[], f: (x: T) => boolean): [T[], T[]] {
 
 export function zip<T1, T2>(
   ls1: readonly T1[],
-  ls2: readonly T2[]
+  ls2: readonly T2[],
 ): [T1, T2][] {
   return range(Math.min(ls1.length, ls2.length)).map((i) => [ls1[i], ls2[i]]);
 }
 
 export function zipMax<T1, T2>(
   ls1: readonly T1[],
-  ls2: readonly T2[]
+  ls2: readonly T2[],
 ): [T1 | undefined, T2 | undefined][] {
   return range(Math.max(ls1.length, ls2.length)).map((i) => [ls1[i], ls2[i]]);
 }
@@ -180,7 +180,7 @@ export function memoize<F extends (...args: any[]) => any>(
       get(k: unknown): ReturnType<F> | undefined;
       set(k: unknown, v: ReturnType<F>): void;
     };
-  }
+  },
 ): F {
   // by default, use 1st argument as a cache key which is same as lodash
   const keyFn = options?.keyFn ?? ((...args) => args[0]);
@@ -211,7 +211,7 @@ export function debounce<F extends (...args: any[]) => void>(
     onStart?: () => void;
     onFinish?: () => void;
     onCancel?: () => void;
-  }
+  },
 ): F & { cancel: () => void } {
   let subscription: number | undefined;
 
@@ -238,7 +238,7 @@ export function debounce<F extends (...args: any[]) => void>(
 
 export function delay<F extends (...args: any[]) => void>(
   f: F,
-  ms: number
+  ms: number,
 ): F & { cancel: () => void } {
   const subscriptions = new Set<number>();
 
@@ -267,28 +267,28 @@ export function delay<F extends (...args: any[]) => void>(
 
 export function objectPick<T extends object, K extends keyof T>(
   o: T,
-  keys: K[]
+  keys: K[],
 ): Pick<T, K> {
   return objectPickBy(o, (_v, k) => keys.includes(k)) as any;
 }
 
 export function objectOmit<T extends object, K extends keyof T>(
   o: T,
-  keys: K[]
+  keys: K[],
 ): Omit<T, K> {
   return objectPickBy(o, (_v, k) => !keys.includes(k)) as any;
 }
 
 export function objectPickBy<K extends PropertyKey, V>(
   o: Record<K, V>,
-  f: (v: V, k: K) => boolean
+  f: (v: V, k: K) => boolean,
 ): Record<K, V> {
   return objectFromEntries(objectEntries(o).filter(([k, v]) => f(v, k as any)));
 }
 
 export function objectOmitBy<K extends PropertyKey, V>(
   o: Record<K, V>,
-  f: (v: V, k: K) => boolean
+  f: (v: V, k: K) => boolean,
 ): Record<K, V> {
   return objectPickBy(o, (v, k) => !f(v, k));
 }
@@ -304,34 +304,34 @@ export function objectEntries<T extends object>(o: T): ObjectEntry<T>[] {
 type ObjectEntry<T extends object> = { [K in keyof T]: [K, T[K]] }[keyof T];
 
 export function objectFromEntries<K extends PropertyKey, V>(
-  kvs: [K, V][]
+  kvs: [K, V][],
 ): Record<K, V> {
   return Object.fromEntries(kvs) as any;
 }
 function objectMapEntries<T extends object, K2 extends PropertyKey, V2>(
   o: T,
-  f: (kv: ObjectEntry<T>) => [K2, V2]
+  f: (kv: ObjectEntry<T>) => [K2, V2],
 ): Record<K2, V2> {
   return objectFromEntries(objectEntries(o).map((kv) => f(kv)));
 }
 
 export function objectMapValues<T extends object, V>(
   o: T,
-  f: (v: T[keyof T], k: keyof T) => V
+  f: (v: T[keyof T], k: keyof T) => V,
 ): { [k in keyof T]: V } {
   return objectMapEntries(o, ([k, v]) => [k, f(v, k)]);
 }
 
 export function objectMapKeys<T extends object, K extends PropertyKey>(
   o: T,
-  f: (v: T[keyof T], k: keyof T) => K
+  f: (v: T[keyof T], k: keyof T) => K,
 ): Record<K, T[keyof T]> {
   return objectMapEntries(o, ([k, v]) => [f(v, k), v]);
 }
 
 export function objectHas<Prop extends keyof any>(
   v: unknown,
-  prop: Prop
+  prop: Prop,
 ): v is { [prop in Prop]: unknown } {
   return Boolean(v && typeof v === "object" && prop in v);
 }
@@ -343,7 +343,7 @@ export function objectHas<Prop extends keyof any>(
 function sortByMap<T, V>(
   ls: T[],
   mapFn: (x: T) => V,
-  compareFn: (x: V, y: V) => number
+  compareFn: (x: V, y: V) => number,
 ): T[] {
   const mapped = ls.map(mapFn);
 

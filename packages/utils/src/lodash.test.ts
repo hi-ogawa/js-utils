@@ -145,7 +145,7 @@ describe(mapKeys, () => {
   it("basic", () => {
     const result = mapKeys(
       groupBy(range(8), (x) => x % 3),
-      (_v, k) => k + 10
+      (_v, k) => k + 10,
     );
     expect(result).toMatchInlineSnapshot(`
       Map {
@@ -172,7 +172,7 @@ describe(mapValues, () => {
   it("basic", () => {
     const result = mapValues(
       groupBy(range(8), (x) => x % 3),
-      (v) => v.length
+      (v) => v.length,
     );
     expect(result).toMatchInlineSnapshot(`
       Map {
@@ -190,8 +190,8 @@ describe(mapGroupBy, () => {
       mapGroupBy(
         range(8),
         (x) => x % 3,
-        (xs) => xs.length
-      )
+        (xs) => xs.length,
+      ),
     ).toMatchInlineSnapshot(`
       Map {
         0 => 3,
@@ -206,7 +206,7 @@ describe(pickBy, () => {
   it("basic", () => {
     const result = pickBy(
       groupBy(range(8), (x) => x % 3),
-      (_v, k) => k % 2 === 0
+      (_v, k) => k % 2 === 0,
     );
     expect(result).toMatchInlineSnapshot(`
       Map {
@@ -251,8 +251,8 @@ describe(sortBy, () => {
       sortBy(
         range(8),
         (x) => x % 3,
-        (x) => -x
-      )
+        (x) => -x,
+      ),
     ).toMatchInlineSnapshot(`
       [
         6,
@@ -365,7 +365,7 @@ describe(objectPickBy, () => {
   it("basic", () => {
     const result = objectPickBy(
       Object.fromEntries(groupBy(range(8), (x) => x % 3)),
-      (_v, k) => Number(k) % 2 === 0
+      (_v, k) => Number(k) % 2 === 0,
     );
     expect(result).toMatchInlineSnapshot(`
       {
@@ -387,7 +387,7 @@ describe(objectOmitBy, () => {
   it("basic", () => {
     const result = objectOmitBy(
       Object.fromEntries(groupBy(range(8), (x) => x % 3)),
-      (_v, k) => Number(k) % 2 === 0
+      (_v, k) => Number(k) % 2 === 0,
     );
     expect(result).toMatchInlineSnapshot(`
       {
@@ -640,7 +640,7 @@ describe(memoize, () => {
       ]
     `);
     expect(memoG.apply({ ...context, x: 1000 }, [20])).toMatchInlineSnapshot(
-      `1020`
+      `1020`,
     );
     expect(f.mock.calls).toMatchInlineSnapshot(`
       [

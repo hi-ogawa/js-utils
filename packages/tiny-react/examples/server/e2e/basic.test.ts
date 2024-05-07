@@ -12,7 +12,7 @@ test("basic @js", async ({ page }) => {
   await page.getByText("typeof window: undefined").click();
   await page
     .getByText(
-      "[props.serverNode: [props.clientNode: [props.serverNode: [props.clientNode: ]]]]"
+      "[props.serverNode: [props.clientNode: [props.serverNode: [props.clientNode: ]]]]",
     )
     .click();
 });
@@ -23,7 +23,7 @@ testNoJs("basic @nojs", async ({ page }) => {
   await page.getByText("typeof window: undefined").click();
   await page
     .getByText(
-      "[props.serverNode: [props.clientNode: [props.serverNode: [props.clientNode: ]]]]"
+      "[props.serverNode: [props.clientNode: [props.serverNode: [props.clientNode: ]]]]",
     )
     .click();
 });
@@ -46,7 +46,7 @@ async function testNavigation(page: Page, options: { js: boolean }) {
   await page.getByRole("heading", { name: "Test page" }).click();
   await page.getByText("Another Client Component").click();
   await expect(page.getByPlaceholder("test-input")).toHaveValue(
-    options.js ? "hello" : ""
+    options.js ? "hello" : "",
   );
 }
 
@@ -62,7 +62,7 @@ test("hmr @dev", async ({ page }) => {
 
   using file = createFileEditor("src/routes/_client.tsx");
   file.edit((s) =>
-    s.replace("Hello Client Component", "Hello [EDIT] Client Component")
+    s.replace("Hello Client Component", "Hello [EDIT] Client Component"),
   );
   await page.getByText("Hello [EDIT] Client Component").click();
   await page.getByText("Count: 1").click();

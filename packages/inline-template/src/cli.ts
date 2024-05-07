@@ -30,7 +30,7 @@ const cli = new TinyCliCommand(
     } else {
       await fs.promises.writeFile(args.file, output);
     }
-  }
+  },
 );
 
 tinyCliMain(cli);

@@ -7,7 +7,7 @@ test("basic", () => {
       <>
         frag<pre>ment</pre>
       </>
-    </div>
+    </div>,
   ).toMatchInlineSnapshot(`
     {
       "key": undefined,

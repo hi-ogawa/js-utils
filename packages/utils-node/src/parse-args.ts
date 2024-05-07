@@ -56,10 +56,10 @@ function padColumns(rows: string[][]): string[][] {
   }
   const ncol = Math.max(...rows.map((row) => row.length));
   const widths = range(ncol).map((c) =>
-    Math.max(...rows.map((row) => row[c]?.length ?? 0))
+    Math.max(...rows.map((row) => row[c]?.length ?? 0)),
   );
   const newRows = rows.map((row) =>
-    row.map((v, i) => v.padEnd(widths[i], " "))
+    row.map((v, i) => v.padEnd(widths[i], " ")),
   );
   return newRows;
 }

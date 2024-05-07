@@ -25,7 +25,7 @@ describe(render, () => {
     let vnode = h.div(
       { className: "flex items-center gap-2" },
       "hello",
-      h.span({ className: "text-red" }, "world")
+      h.span({ className: "text-red" }, "world"),
     );
     const parent = document.createElement("main");
     let bnode = render(vnode, parent);
@@ -500,7 +500,7 @@ describe(render, () => {
       Fragment,
       {},
       h(Fragment, { key: "x" }, "1", "2"),
-      h(Fragment, { key: "y" }, "3", "4")
+      h(Fragment, { key: "y" }, "3", "4"),
     );
     const parent = document.createElement("main");
 
@@ -518,7 +518,7 @@ describe(render, () => {
       Fragment,
       {},
       h(Fragment, { key: "y" }, "3", "4"),
-      h(Fragment, { key: "x" }, "1", "2")
+      h(Fragment, { key: "x" }, "1", "2"),
     );
     bnode = render(vnode, parent, bnode);
 
@@ -603,7 +603,7 @@ describe(render, () => {
           },
         }),
         JSON.stringify({ outer: state }),
-        h(Inner, { value: state })
+        h(Inner, { value: state }),
       );
     }
 
@@ -619,7 +619,7 @@ describe(render, () => {
             setState((prev) => prev + 1);
           },
         }),
-        JSON.stringify({ inner: state, prop: props.value })
+        JSON.stringify({ inner: state, prop: props.value }),
       );
     }
 
@@ -779,7 +779,7 @@ describe("hooks", () => {
           onclick: () => {
             setState((prev) => prev + 1);
           },
-        })
+        }),
       );
     }
 
@@ -832,15 +832,15 @@ describe("hooks", () => {
           onclick: () => {
             setState((prev) => prev + 1);
           },
-        })
+        }),
       );
     }
 
     const parent = document.createElement("main");
     expect(() =>
-      render(h(Custom, {}), parent)
+      render(h(Custom, {}), parent),
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: Unsupported force-update during render]`
+      `[Error: Unsupported force-update during render]`,
     );
   });
 
@@ -855,7 +855,7 @@ describe("hooks", () => {
             setState((prev) => prev + 1);
             setState((prev) => prev + 1);
           },
-        })
+        }),
       );
     }
 
@@ -898,7 +898,7 @@ describe("hooks", () => {
             setState((prev) => prev.repeat(2));
             setState2((prev) => prev.repeat(2));
           },
-        })
+        }),
       );
     }
 
@@ -944,7 +944,7 @@ describe("hooks", () => {
           onClick: () => {
             setState((prev) => prev.repeat(2));
           },
-        })
+        }),
       );
     }
 
@@ -959,7 +959,7 @@ describe("hooks", () => {
             setState2((prev) => prev.repeat(2));
             props.onClick();
           },
-        })
+        }),
       );
     }
 
@@ -1006,7 +1006,7 @@ describe("hooks", () => {
             onClick: () => {
               setState((prev) => prev.repeat(2));
             },
-          })
+          }),
       );
     }
 
@@ -1020,7 +1020,7 @@ describe("hooks", () => {
             setState2((prev) => prev.repeat(2));
             props.onClick();
           },
-        })
+        }),
       );
     }
 
@@ -1065,7 +1065,7 @@ describe("hooks", () => {
             onClick: () => {
               setState((prev) => prev.repeat(2));
             },
-          })
+          }),
       );
     }
 
@@ -1079,7 +1079,7 @@ describe("hooks", () => {
             props.onClick();
             setState2((prev) => prev.repeat(2));
           },
-        })
+        }),
       );
     }
 
@@ -1120,7 +1120,7 @@ describe("hooks", () => {
 
       return h.div(
         {},
-        h[ref.current % 2 === 0 ? "span" : "div"]({}, ref.current)
+        h[ref.current % 2 === 0 ? "span" : "div"]({}, ref.current),
       );
     }
 
@@ -1167,7 +1167,7 @@ describe("hooks", () => {
           onclick: () => {
             setState(state + 1);
           },
-        })
+        }),
       );
     }
 
@@ -1251,7 +1251,7 @@ describe("hooks", () => {
           onclick: () => {
             setState(state + 1);
           },
-        })
+        }),
       );
     }
 
@@ -1372,7 +1372,7 @@ describe("hooks", () => {
           onclick: () => {
             setState(state + 1);
           },
-        })
+        }),
       );
     }
 
@@ -1497,13 +1497,13 @@ describe("ref", () => {
               mockFn(el?.tagName ?? null);
             }, []),
           },
-          state
+          state,
         ),
         h.button({
           onclick: () => {
             setState(state + 1);
           },
-        })
+        }),
       );
     }
 
@@ -1583,7 +1583,7 @@ describe("custom-children", () => {
     const vnode = h.div(
       {},
       createVNode(Custom, { children: "hello" }, "key1"),
-      createElement(Custom, { key: "key2" }, "hello")
+      createElement(Custom, { key: "key2" }, "hello"),
     );
     root.render(vnode);
     expect(vnode).toMatchInlineSnapshot(`
@@ -1656,8 +1656,8 @@ describe(memo, () => {
         Fragment,
         {},
         h(Custom, { label: "x-hi", value: 0 }),
-        h(Custom, { label: "y-hi", value: 0 })
-      )
+        h(Custom, { label: "y-hi", value: 0 }),
+      ),
     );
     await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
@@ -1687,8 +1687,8 @@ describe(memo, () => {
         Fragment,
         {},
         h(Custom, { label: "x-hi", value: 0 }),
-        h(Custom, { label: "y-hi", value: 0 })
-      )
+        h(Custom, { label: "y-hi", value: 0 }),
+      ),
     );
     await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
@@ -1711,8 +1711,8 @@ describe(memo, () => {
         Fragment,
         {},
         h(Custom, { label: "x-hello", value: 0 }),
-        h(Custom, { label: "y-hi", value: 0 })
-      )
+        h(Custom, { label: "y-hi", value: 0 }),
+      ),
     );
     await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
@@ -1739,8 +1739,8 @@ describe(memo, () => {
         Fragment,
         {},
         h(Custom, { label: "x-hi", value: 0 }),
-        h(Custom, { label: "y-hi", value: 0 })
-      )
+        h(Custom, { label: "y-hi", value: 0 }),
+      ),
     );
     await sleepFrame();
     expect(parent).toMatchInlineSnapshot(`
@@ -1767,8 +1767,8 @@ describe(memo, () => {
         Fragment,
         {},
         h(Custom, { label: "x-hi", value: 1 }),
-        h(Custom, { label: "y-hi", value: 0 })
-      )
+        h(Custom, { label: "y-hi", value: 0 }),
+      ),
     );
     expect(parent).toMatchInlineSnapshot(`
       <main>

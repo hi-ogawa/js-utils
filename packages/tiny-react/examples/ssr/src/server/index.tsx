@@ -7,6 +7,6 @@ export function createHattipApp() {
   return compose(
     createLoggerHandler(),
     requestContextStorageHandler(),
-    ssrHandler()
+    ssrHandler(),
   );
 }

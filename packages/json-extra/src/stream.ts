@@ -31,15 +31,15 @@ export function stringifyStream(input: unknown): ReadableStream<string> {
             if (cancelled) return;
             // TODO: recursively encode data
             controller.enqueue(
-              JSON.stringify({ type: "resolve", i, data }) + "\n"
+              JSON.stringify({ type: "resolve", i, data }) + "\n",
             );
           },
           (data) => {
             if (cancelled) return;
             controller.enqueue(
-              JSON.stringify({ type: "reject", i, data }) + "\n"
+              JSON.stringify({ type: "reject", i, data }) + "\n",
             );
-          }
+          },
         );
       });
 
@@ -55,7 +55,7 @@ export function stringifyStream(input: unknown): ReadableStream<string> {
 }
 
 export async function parseStream(
-  stream: ReadableStream<string>
+  stream: ReadableStream<string>,
 ): Promise<[unknown, Promise<void>, Promise<unknown>[]]> {
   // read line by line
   stream = stream.pipeThrough(splitLineTransform());

@@ -12,7 +12,7 @@ export function vitePluginClientReference(): PluginOption {
           code,
           `import { registerClientReference as $$register } from "@hiogawa/tiny-react";`,
           ...[...exportNames].map(
-            (name) => `$$register(${name}, "${id}#${name}");`
+            (name) => `$$register(${name}, "${id}#${name}");`,
           ),
         ].join("\n");
         return { code: outCode, map: null };

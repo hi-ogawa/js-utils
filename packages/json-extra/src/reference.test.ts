@@ -684,7 +684,7 @@ describe("fuzzing", () => {
         const result = runJsonExtra(data);
         expect(result.parsed).toEqual(data);
         expect(result.deserialized).toEqual(data);
-      })
+      }),
     );
   });
 
@@ -701,8 +701,8 @@ describe("fuzzing", () => {
           const result = runJsonExtra(data);
           expect(result.parsed).toEqual(data);
           expect(result.deserialized).toEqual(data);
-        }
-      )
+        },
+      ),
     );
   });
 });

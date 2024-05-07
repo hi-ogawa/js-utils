@@ -105,7 +105,7 @@ export class HookContext {
 
   useReducer = <S, A>(
     reducer: (prevState: S, action: A) => S,
-    initialState: InitialState<S>
+    initialState: InitialState<S>,
   ): [S, (action: A) => void] => {
     // init hook state
     if (this.initial) {
@@ -175,7 +175,7 @@ export function useEffect(effect: EffectFn, deps?: unknown[]) {
 export function useState<T>(initialState: InitialState<T>) {
   return useReducer<T, NextState<T>>(
     (prev, next) => resolveNextState(prev, next),
-    initialState
+    initialState,
   );
 }
 
@@ -199,7 +199,7 @@ export function useMemo<T>(callback: () => T, deps: unknown[]) {
 
 export function useCallback<F extends (...args: any[]) => any>(
   callback: F,
-  deps: unknown[]
+  deps: unknown[],
 ) {
   return useMemo(() => callback, deps);
 }

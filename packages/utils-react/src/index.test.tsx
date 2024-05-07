@@ -82,7 +82,7 @@ describe(useStableCallback, () => {
   it("basic", async () => {
     function useDocumentEvent<K extends keyof DocumentEventMap>(
       type: K,
-      handler: (e: DocumentEventMap[K]) => void
+      handler: (e: DocumentEventMap[K]) => void,
     ) {
       const stableHandler = useStableCallback(handler);
 
@@ -197,13 +197,13 @@ describe(useMergeRefs, () => {
     const DemoInner = React.forwardRef(
       (
         props: { label: string },
-        forwarded: React.ForwardedRef<HTMLElement>
+        forwarded: React.ForwardedRef<HTMLElement>,
       ) => {
         const mut = React.useRef<HTMLElement>();
 
         const fun = React.useCallback<(el: HTMLElement | null) => void>(
           (el) => fn(props.label, "fun", el),
-          []
+          [],
         );
 
         React.useEffect(() => {
@@ -214,14 +214,14 @@ describe(useMergeRefs, () => {
         const ref = useMergeRefs(mut, fun, forwarded);
 
         return <main ref={ref}></main>;
-      }
+      },
     );
 
     function Demo() {
       const mut = React.useRef<HTMLElement>(null);
       const fun = React.useCallback<(el: HTMLElement | null) => void>(
         (el) => fn("outer-fun", el),
-        []
+        [],
       );
 
       React.useEffect(() => {
@@ -296,7 +296,7 @@ describe(usePrevious, () => {
         const prev = usePrevious(value);
         return { value, prev };
       },
-      { initialProps: { value: 0 } }
+      { initialProps: { value: 0 } },
     );
     expect(result.current).toMatchInlineSnapshot(`
       {
