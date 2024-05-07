@@ -1,9 +1,11 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.7.2/schema.json",
+  "files": {
+    "ignore": ["dist", ".vercel", ".wrangler"]
+  },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space",
-    "ignore": ["**/dist/**", "**/.vercel/**", "**/.wrangler/**"]
+    "indentStyle": "space"
   },
   "organizeImports": { "enabled": true },
   "linter": { "enabled": false },
