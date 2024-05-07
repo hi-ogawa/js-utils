@@ -23,8 +23,8 @@ runs:
 
     - run: pnpm build
       shell: bash
-      if: ${{ inputs.build }} == true
+      if: ${{ inputs.build }}
 
     - run: npx playwright install chromium
       shell: bash
-      if: ${{ inputs.playwright }} == true
+      if: ${{ inputs.playwright }}
