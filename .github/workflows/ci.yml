@@ -18,6 +18,7 @@ jobs:
         with:
           build: false
           playwright: false
+      - run: pnpm lint-check
       - run: pnpm build
       - run: pnpm tsc
       - run: pnpm test
