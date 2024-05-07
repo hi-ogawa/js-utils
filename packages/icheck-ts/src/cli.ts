@@ -34,12 +34,12 @@ const command = new TinyCliCommand(
         "RegExp pattern to ignore unresolved import",
         {
           optional: true,
-        },
+        }
       ),
       noCheckCircular: arg.boolean("Disable checking circular import"),
       noCheckUnresolved: arg.boolean("Disable checking unresolved import"),
       useImportMetaResolve: arg.boolean(
-        "Use import.meta.resolve for module resolution",
+        "Use import.meta.resolve for module resolution"
       ),
     },
   },
@@ -64,7 +64,7 @@ const command = new TinyCliCommand(
       return Boolean(
         e.used ||
           (ignoreRegExp && e.name.match(ignoreRegExp)) ||
-          e.node.comment.includes(ignoreComment),
+          e.node.comment.includes(ignoreComment)
       );
     }
 
@@ -89,7 +89,7 @@ const command = new TinyCliCommand(
     let unresolvedImports = [...result.importRelations]
       .map(
         ([file, targets]) =>
-          [file, targets.filter((e) => isUnresolveImport(e))] as const,
+          [file, targets.filter((e) => isUnresolveImport(e))] as const
       )
       .filter(([_file, targets]) => targets.length > 0);
 
@@ -132,13 +132,13 @@ const command = new TinyCliCommand(
         }));
         const groups = groupBy(
           sortBy(edgeWithKeys, (e) => e.key),
-          (e) => e.key,
+          (e) => e.key
         );
         const uniqEdges = [...groups.values()].map((group) => group[0].edge);
         for (const edge of uniqEdges) {
           const formatted = formatCircularImportError(
             edge,
-            circularResult.parentMap,
+            circularResult.parentMap
           );
           formatted.lines.forEach((line, i) => {
             const prefix = i > 0 ? "    ".repeat(i - 1) + " -> " : "";
@@ -148,7 +148,7 @@ const command = new TinyCliCommand(
         process.exitCode = 1;
       }
     }
-  },
+  }
 );
 
 colors._enable(process.stdout.isTTY);

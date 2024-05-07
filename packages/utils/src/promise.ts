@@ -33,7 +33,7 @@ export function newPromiseWithResolvers<T>() {
 export async function* mapToAsyncGenerator<T1, T2>(
   values: Iterable<T1>,
   f: (value: T1, index: number) => T2 | PromiseLike<T2>,
-  { concurrency }: { concurrency: number },
+  { concurrency }: { concurrency: number }
 ): AsyncGenerator<T2> {
   const pendings: Promise<() => T2>[] = [];
 
@@ -61,7 +61,7 @@ export async function* mapToAsyncGenerator<T1, T2>(
 }
 
 export async function arrayFromAsyncGenerator<T>(
-  generator: AsyncGenerator<T>,
+  generator: AsyncGenerator<T>
 ): Promise<T[]> {
   const result: T[] = [];
   for await (const v of generator) {

@@ -464,7 +464,7 @@ describe(findCircularImport, () => {
 
     const cycle = formatCircularImportError(
       circularResult.backEdges[0],
-      circularResult.parentMap,
+      circularResult.parentMap
     );
     expect(cycle).toMatchInlineSnapshot(`
       {

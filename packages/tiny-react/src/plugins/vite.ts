@@ -18,7 +18,7 @@ interface TinyReactVitePluginOptions {
 }
 
 export function tinyReactVitePlugin(
-  options?: TinyReactVitePluginOptions,
+  options?: TinyReactVitePluginOptions
 ): PluginOption {
   return [
     !options?.hmr?.disable &&

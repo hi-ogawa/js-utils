@@ -432,7 +432,7 @@ describe(serialize, () => {
 
   it("function client prop error", async () => {
     await expect(() =>
-      serialize(<div onclick={() => {}} />),
+      serialize(<div onclick={() => {}} />)
     ).rejects.toMatchInlineSnapshot(`[Error: Cannot serialize function]`);
   });
 
@@ -443,9 +443,9 @@ describe(serialize, () => {
     registerClientReference(Custom, "#Custom");
 
     await expect(() =>
-      serialize(<Custom x={{ type: "tag" }} />),
+      serialize(<Custom x={{ type: "tag" }} />)
     ).rejects.toMatchInlineSnapshot(
-      `[TypeError: Cannot convert undefined or null to object]`,
+      `[TypeError: Cannot convert undefined or null to object]`
     );
   });
 

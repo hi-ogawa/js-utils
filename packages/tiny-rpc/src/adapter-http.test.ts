@@ -29,8 +29,8 @@ describe("adapter-http", () => {
           routes,
           adapter: httpServerAdapter({ endpoint, pathsForGET }),
         }),
-        () => new Response("tiny-rpc-skipped"),
-      ),
+        () => new Response("tiny-rpc-skipped")
+      )
     );
     const { url } = await startTestServer(server);
 
@@ -66,7 +66,7 @@ describe("adapter-http", () => {
     expect(await client.getCounter()).toMatchInlineSnapshot("1");
 
     expect(await client.incrementCounter({ delta: 2 })).toMatchInlineSnapshot(
-      "3",
+      "3"
     );
     expect(await client.getCounter()).toMatchInlineSnapshot("3");
 
@@ -83,7 +83,7 @@ describe("adapter-http", () => {
 
     // input validation
     await expect(
-      client.incrementCounter({ delta: "2" as any as number }),
+      client.incrementCounter({ delta: "2" as any as number })
     ).rejects.toSatisfy((e) => {
       expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("400");
       tinyassert(e instanceof TinyRpcError);
@@ -123,7 +123,7 @@ describe("adapter-http", () => {
 
     // how error is wrapped on server side as a comparison
     expect(
-      (async () => routes.incrementCounter({ delta: "2" as any as number }))(),
+      (async () => routes.incrementCounter({ delta: "2" as any as number }))()
     ).rejects.toSatisfy((e) => {
       tinyassert(e instanceof TinyRpcError);
       expect(e).toMatchInlineSnapshot(`
@@ -163,7 +163,7 @@ describe("adapter-http", () => {
         tinyassert(e instanceof TinyRpcError);
         expect(e).toMatchInlineSnapshot("[Error: invalid path]");
         return true;
-      },
+      }
     );
 
     // runtime erorr
@@ -176,20 +176,20 @@ describe("adapter-http", () => {
 
     // ignore non-endpoint
     expect(
-      await fetch(url + "/non-endpoint").then((res) => res.text()),
+      await fetch(url + "/non-endpoint").then((res) => res.text())
     ).toMatchInlineSnapshot('"tiny-rpc-skipped"');
 
     // invalid method
     expect(
       await fetch(url + endpoint + "/getCounter", {
         method: "POST",
-      }).then((res) => res.status),
+      }).then((res) => res.status)
     ).toMatchInlineSnapshot("405");
 
     expect(
       await fetch(url + endpoint + "/incrementCounter", {
         method: "GET",
-      }).then((res) => res.status),
+      }).then((res) => res.status)
     ).toMatchInlineSnapshot("405");
 
     server.close();
@@ -244,8 +244,8 @@ describe("adapter-http", () => {
               JSON: jsonExtra,
             }),
           }),
-          () => new Response("tiny-rpc-skipped"),
-        ),
+          () => new Response("tiny-rpc-skipped")
+        )
       );
       const { url } = await startTestServer(server);
 
@@ -329,8 +329,8 @@ describe("adapter-http", () => {
               JSON: brilloutJSON,
             }),
           }),
-          () => new Response("tiny-rpc-skipped"),
-        ),
+          () => new Response("tiny-rpc-skipped")
+        )
       );
       const { url } = await startTestServer(server);
 
@@ -349,7 +349,7 @@ describe("adapter-http", () => {
       // error
       await expect(client.validate(123.456)).rejects.toSatisfy((e) => {
         expect(e).toMatchInlineSnapshot(
-          "[Error: Unexpected end of JSON input]",
+          "[Error: Unexpected end of JSON input]"
         );
         return true;
       });
@@ -376,8 +376,8 @@ describe("adapter-http", () => {
               JSON: superjson,
             }),
           }),
-          () => new Response("tiny-rpc-skipped"),
-        ),
+          () => new Response("tiny-rpc-skipped")
+        )
       );
       const { url } = await startTestServer(server);
 
@@ -431,7 +431,7 @@ describe("adapter-http", () => {
           serialize: (v) => ({ issues: v.issues }),
           deserialize: (v) => new ZodError(v.issues),
         },
-        ZodError.name,
+        ZodError.name
       );
 
       await expect(client.validate(123.456)).rejects.toSatisfy((e) => {

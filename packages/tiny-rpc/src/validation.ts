@@ -6,7 +6,7 @@ import { TinyRpcError } from "./core";
 
 export function validateFn<Schema>(schema: Schema) {
   return function decorate<Out>(
-    fn: (input: InferIO<Schema>["o"]) => Out,
+    fn: (input: InferIO<Schema>["o"]) => Out
   ): (inputRaw: InferIO<Schema>["i"]) => Out {
     return function wrapper(inputRaw) {
       const parser = getParser(schema);

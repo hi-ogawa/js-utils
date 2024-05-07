@@ -4,7 +4,7 @@ export function assertUnreachable(value: never): never {
 
 // convenient typing for array.filter(typedBoolean) (cf. https://github.com/microsoft/TypeScript/issues/31164)
 export const typedBoolean = Boolean as unknown as <T>(
-  value: T,
+  value: T
 ) => value is Exclude<T, false | 0 | "" | null | undefined>;
 
 // similar convenience as z.enum but supports any key (number | string | symbol)
@@ -13,7 +13,7 @@ export function arrayToEnum<
   T extends keyof any,
   Ts extends Readonly<[T, ...T[]]>,
 >(
-  values: Ts,
+  values: Ts
 ): {
   [K in Ts[number]]: K;
 } {
@@ -27,7 +27,7 @@ export function includesGuard<T>(ls: readonly T[], v: unknown): v is T {
 
 /** silence "error TSTS2322" but practically this is safer and more convenient than resorting to `any` in a random place */
 export function safeFunctionCast<F extends (...args: any[]) => any>(
-  f: (...args: Parameters<F>) => ReturnType<F>,
+  f: (...args: Parameters<F>) => ReturnType<F>
 ): F {
   // @ts-expect-error
   //   error TS2322: Type '(...args: Parameters<F>) => ReturnType<F>' is not assignable to type 'F'.
@@ -39,16 +39,16 @@ export function safeFunctionCast<F extends (...args: any[]) => any>(
 export function subscribeEventListenerFactory<EventMap>(target: {
   addEventListener(
     eventType: string,
-    listener: (event: any) => unknown,
+    listener: (event: any) => unknown
   ): unknown;
   removeEventListener(
     eventType: string,
-    listener: (event: any) => unknown,
+    listener: (event: any) => unknown
   ): unknown;
 }) {
   return function subscribeEventListener<K extends keyof EventMap & string>(
     k: K,
-    listener: (e: EventMap[K]) => unknown,
+    listener: (e: EventMap[K]) => unknown
   ) {
     target.addEventListener(k, listener);
     return () => {

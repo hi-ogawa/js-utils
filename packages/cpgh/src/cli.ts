@@ -37,7 +37,7 @@ async function main() {
   // TODO: decode url?
   let [url, outDir] = args;
   const match = url.match(
-    new RegExp(String.raw`^https://github.com/([^/]+)/([^/]+)/tree/(.*)$`),
+    new RegExp(String.raw`^https://github.com/([^/]+)/([^/]+)/tree/(.*)$`)
   );
   if (!match) {
     console.log(HELP);
@@ -59,7 +59,7 @@ async function main() {
   if (fs.existsSync(outDir)) {
     if (!force) {
       console.log(
-        `⊳ '${outDir}' already exists. --force is required to overwrite.`,
+        `⊳ '${outDir}' already exists. --force is required to overwrite.`
       );
       process.exit(1);
     }
@@ -84,7 +84,7 @@ async function main() {
       `--branch`,
       branch,
       `https://github.com/${user}/${repo}`,
-      tmpDir,
+      tmpDir
     );
     await $("git", "-C", tmpDir, "sparse-checkout", "add", subDir);
     await $("git", "-C", tmpDir, "checkout");
@@ -97,7 +97,7 @@ async function main() {
       `--branch`,
       branch,
       `https://github.com/${user}/${repo}`,
-      tmpDir,
+      tmpDir
     );
   }
 

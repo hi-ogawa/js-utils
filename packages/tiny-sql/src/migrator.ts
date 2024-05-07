@@ -95,7 +95,7 @@ export class Migrator<T = unknown> {
     if (missings.length > 0) {
       this.logger(
         "[warning:migrator] already applied migrations are not provided: " +
-          missings.map((s) => s.name).join(", "),
+          missings.map((s) => s.name).join(", ")
       );
     }
 
@@ -106,7 +106,7 @@ export class Migrator<T = unknown> {
       const e2 = pairs[i + 1];
       if (!e1.state && e2.state) {
         this.logger(
-          `[warning:migrator] you have unapplied migration '${e1.request.name}' before applied migration '${e2.request.name}'`,
+          `[warning:migrator] you have unapplied migration '${e1.request.name}' before applied migration '${e2.request.name}'`
         );
         break;
       }
@@ -119,7 +119,7 @@ export class Migrator<T = unknown> {
 
   private async runMany(
     requests: MigrationRequest<T>[],
-    direction: "up" | "down",
+    direction: "up" | "down"
   ) {
     const resultSet: MigrationResultSet = { results: [] };
     for (const request of requests) {
@@ -145,7 +145,7 @@ export class Migrator<T = unknown> {
 
   private async runSingle(
     request: MigrationRequest<T>,
-    direction: "up" | "down",
+    direction: "up" | "down"
   ) {
     if (direction === "up") {
       await this.options.driver.run(request.up);

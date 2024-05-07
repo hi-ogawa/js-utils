@@ -17,7 +17,7 @@ describe("fuzz", () => {
       return h(
         Fragment,
         {},
-        values.map((value) => h(Inner, { key: value, value })),
+        values.map((value) => h(Inner, { key: value, value }))
       );
     }
 
@@ -39,7 +39,7 @@ describe("fuzz", () => {
         values = newValues;
         outerUpdate();
         expect(parent.textContent).toBe(values.join(""));
-      }),
+      })
     );
 
     expect(mountCount).toMatchInlineSnapshot("5");
@@ -56,7 +56,7 @@ describe("fuzz", () => {
       return h(
         Fragment,
         {},
-        values.map((value) => h(Inner, { key: value, value })),
+        values.map((value) => h(Inner, { key: value, value }))
       );
     }
 
@@ -111,8 +111,8 @@ describe("fuzz", () => {
           expect(parent.textContent).toBe(values.join(""));
           innerUpdateMap.get(i2)!();
           expect(parent.textContent).toBe(values.join(""));
-        },
-      ),
+        }
+      )
     );
 
     expect(mountCount).toMatchInlineSnapshot("5");
@@ -131,7 +131,7 @@ describe("fuzz", () => {
       return h(
         Fragment,
         {},
-        groupIds.map((groupId) => h(Inner, { key: groupId, groupId })),
+        groupIds.map((groupId) => h(Inner, { key: groupId, groupId }))
       );
     }
 
@@ -143,7 +143,7 @@ describe("fuzz", () => {
       return h(
         Fragment,
         {},
-        groups[groupId].map((v) => h.span({ key: v }, v)),
+        groups[groupId].map((v) => h.span({ key: v }, v))
       );
     }
 
@@ -181,8 +181,8 @@ describe("fuzz", () => {
           groups[i2].reverse();
           innerUpdateMap.get(i2)!();
           expect(parent.textContent).toBe(getExpected());
-        },
-      ),
+        }
+      )
     );
 
     expect(mountCount).toMatchInlineSnapshot("3");
@@ -202,7 +202,7 @@ describe("fuzz", () => {
       return h(
         Fragment,
         {},
-        groupIds.map((groupId) => h(Inner, { key: groupId, groupId })),
+        groupIds.map((groupId) => h(Inner, { key: groupId, groupId }))
       );
     }
 
@@ -214,7 +214,7 @@ describe("fuzz", () => {
       return h(
         Fragment,
         {},
-        groups[groupId].map((v) => h.span({ key: v }, v)),
+        groups[groupId].map((v) => h.span({ key: v }, v))
       );
     }
     const Inner = memo(InnerOriginal);
@@ -253,8 +253,8 @@ describe("fuzz", () => {
           groups[i2].reverse();
           innerUpdateMap.get(i2)!();
           expect(parent.textContent).toBe(getExpected());
-        },
-      ),
+        }
+      )
     );
 
     expect(mountCount).toMatchInlineSnapshot("3");

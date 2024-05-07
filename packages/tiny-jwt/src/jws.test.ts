@@ -17,7 +17,7 @@ describe("jws", () => {
       key,
     });
     expect(token).toMatchInlineSnapshot(
-      '"eyJhbGciOiJIUzI1NiJ9.eyJoZWxsbyI6IndvcmxkIiwidXRmIjoi7L2Y7IaU8J-QiCJ9.z4iDuntu12oPP1N9LheUyXWmjn11EE4pDQFCMlB1Uok"',
+      '"eyJhbGciOiJIUzI1NiJ9.eyJoZWxsbyI6IndvcmxkIiwidXRmIjoi7L2Y7IaU8J-QiCJ9.z4iDuntu12oPP1N9LheUyXWmjn11EE4pDQFCMlB1Uok"'
     );
     const verified = await jwsVerify({ token, key, algorithms: ["HS256"] });
     expect(verified).toMatchInlineSnapshot(`

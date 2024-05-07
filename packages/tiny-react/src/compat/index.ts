@@ -17,7 +17,7 @@ import {
 export function useSyncExternalStore<T>(
   subscribe: (onStoreChange: () => void) => () => void,
   getSnapshot: () => T,
-  _getServerSnapshot?: () => T,
+  _getServerSnapshot?: () => T
 ): T {
   const [value, setValue] = useState(() => getSnapshot());
 
@@ -63,7 +63,7 @@ export function hydrateRoot(container: Element, vnode: VNode) {
 // https://react.dev/reference/react/memo
 export function memo<P extends {}>(
   Fc: FC<P>,
-  isEqualProps: (prev: {}, next: {}) => boolean = objectShallowEqual,
+  isEqualProps: (prev: {}, next: {}) => boolean = objectShallowEqual
 ): FC<P> {
   // TODO: broken. wait for https://github.com/hi-ogawa/js-utils/pull/173
   function Memo(props: P) {

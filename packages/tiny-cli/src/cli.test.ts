@@ -29,7 +29,7 @@ describe(TinyCli, () => {
           port: number;
         }>();
         return args;
-      },
+      }
     );
 
     cli.defineCommand(
@@ -48,7 +48,7 @@ describe(TinyCli, () => {
         args satisfies {
           file?: string;
           outDir: string;
-        },
+        }
     );
 
     // invalid usage
@@ -60,10 +60,10 @@ describe(TinyCli, () => {
             a: { parse: () => "", positional: true, flag: true },
           },
         },
-        () => {},
-      ),
+        () => {}
+      )
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: argument must be either one of 'positional', 'flag', or 'key-value']`,
+      `[Error: argument must be either one of 'positional', 'flag', or 'key-value']`
     );
 
     // version
@@ -160,11 +160,11 @@ describe(TinyCli, () => {
 
     // error
     expect(() => cli.parse([])).toThrowErrorMatchingInlineSnapshot(
-      `[Error: missing command]`,
+      `[Error: missing command]`
     );
 
     expect(() => cli.parse(["publish"])).toThrowErrorMatchingInlineSnapshot(
-      `[Error: invalid command: 'publish']`,
+      `[Error: invalid command: 'publish']`
     );
 
     // dev
@@ -181,7 +181,7 @@ describe(TinyCli, () => {
       }
     `);
     expect(() =>
-      cli.parse(["dev", "--port", "one-two-three"]),
+      cli.parse(["dev", "--port", "one-two-three"])
     ).toThrowErrorMatchingInlineSnapshot(`[Error: failed to parse --port]`);
 
     // build
@@ -219,7 +219,7 @@ describe(TinyCliCommand, () => {
         args satisfies {
           host: string;
           port: number;
-        },
+        }
     );
 
     // version
@@ -256,7 +256,7 @@ describe(TinyCliCommand, () => {
       }
     `);
     expect(() =>
-      cli.parse(["--port", "one-two-three"]),
+      cli.parse(["--port", "one-two-three"])
     ).toThrowErrorMatchingInlineSnapshot(`[Error: failed to parse --port]`);
   });
 
@@ -290,7 +290,7 @@ describe(TinyCliCommand, () => {
           boolFlag: boolean;
         };
         return args;
-      },
+      }
     );
 
     expect(cli.help()).toMatchInlineSnapshot(`
@@ -313,7 +313,7 @@ describe(TinyCliCommand, () => {
     `);
 
     expect(
-      cli.parse(["x", "--boolFlag", "--num", "123", "--str", "hey"]),
+      cli.parse(["x", "--boolFlag", "--num", "123", "--str", "hey"])
     ).toMatchInlineSnapshot(`
         {
           "arg": "x",
@@ -327,21 +327,21 @@ describe(TinyCliCommand, () => {
       `);
 
     expect(() => cli.parse(["x", "y", "z"])).toThrowErrorMatchingInlineSnapshot(
-      `[Error: too many arguments: x, y, z]`,
+      `[Error: too many arguments: x, y, z]`
     );
 
     expect(() =>
-      cli.parse(["x", "--hehe", "he", "--foo"]),
+      cli.parse(["x", "--hehe", "he", "--foo"])
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: unknown options: --hehe, --foo]`,
+      `[Error: unknown options: --hehe, --foo]`
     );
 
     expect(() =>
-      cli.parse(["x", "--hehe", "--hehe"]),
+      cli.parse(["x", "--hehe", "--hehe"])
     ).toThrowErrorMatchingInlineSnapshot(`[Error: duplicate options: --hehe]`);
 
     expect(() => cli.parse(["x"])).toThrowErrorMatchingInlineSnapshot(
-      `[Error: failed to parse --num]`,
+      `[Error: failed to parse --num]`
     );
 
     expect(cli.parse(["--help"])).toMatchInlineSnapshot("undefined");
@@ -393,7 +393,7 @@ describe(TinyCliCommand, () => {
             fix: boolean;
           };
           return args;
-        },
+        }
       );
 
       expect(example.help()).toMatchInlineSnapshot(`
@@ -450,10 +450,10 @@ describe(TinyCliCommand, () => {
               rest: string[];
             };
             return args;
-          },
+          }
         );
       expect(() => example()).toThrowErrorMatchingInlineSnapshot(
-        `[Error: variadic command with multiple positionals are unsupported]`,
+        `[Error: variadic command with multiple positionals are unsupported]`
       );
     });
   });
@@ -468,11 +468,11 @@ describe(TinyCliCommand, () => {
           },
         },
       },
-      ({ args }) => args,
+      ({ args }) => args
     );
 
     expect(() => command.parse([])).toThrowErrorMatchingInlineSnapshot(
-      `[Error: failed to parse <arg>]`,
+      `[Error: failed to parse <arg>]`
     );
   });
 });

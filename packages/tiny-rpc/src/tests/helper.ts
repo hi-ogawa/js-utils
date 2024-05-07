@@ -55,7 +55,7 @@ export function defineTestRpcRoutes() {
         expectTypeOf(input).toEqualTypeOf<{ delta: number }>();
         counter += input.delta;
         return counter;
-      },
+      }
     ),
 
     // access context

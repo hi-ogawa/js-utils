@@ -17,7 +17,7 @@ export class TwoWaySseClient implements TinyRpcMessagePort {
   constructor(
     public source: EventSource,
     public endpoint: string,
-    public id: string,
+    public id: string
   ) {}
 
   static async create({ endpoint }: { endpoint: string }) {
@@ -32,7 +32,7 @@ export class TwoWaySseClient implements TinyRpcMessagePort {
     const dispose2 = subscribe(source, "error", (e) => {
       console.error("[TwoWaySseClient.create]", e);
       promise.reject(
-        new Error("[TwoWaySseClient.create] failed to open EventSource"),
+        new Error("[TwoWaySseClient.create] failed to open EventSource")
       );
     });
     try {

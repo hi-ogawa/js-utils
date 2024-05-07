@@ -212,7 +212,7 @@ const builtinPlugins = {
       tinyassert(
         Array.isArray(v) &&
           v.length === 2 &&
-          v.every((s) => typeof s === "string"),
+          v.every((s) => typeof s === "string")
       );
       const [source, flags] = v;
       return new RegExp(source, flags);

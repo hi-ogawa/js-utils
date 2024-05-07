@@ -39,7 +39,7 @@ export function validateArgsSchema(argsSchema: ArgSchemaRecord) {
   // either positional, flag, or key-value
   if (entries.some((e) => e[1].positional && e[1].flag)) {
     throw new Error(
-      "argument must be either one of 'positional', 'flag', or 'key-value'",
+      "argument must be either one of 'positional', 'flag', or 'key-value'"
     );
   }
 
@@ -49,7 +49,7 @@ export function validateArgsSchema(argsSchema: ArgSchemaRecord) {
   }
   if (variadics.length > 0 && positionals.length > 1) {
     throw new Error(
-      "variadic command with multiple positionals are unsupported",
+      "variadic command with multiple positionals are unsupported"
     );
   }
 }
@@ -68,7 +68,7 @@ export function normalizeArgsSchema(argsSchema: ArgSchemaRecord) {
 
 export function parseToTypedArgs<R extends ArgSchemaRecord>(
   argsSchema: R,
-  rawArgs: string[],
+  rawArgs: string[]
 ): TypedArgs<R> {
   // normalize structure for convenience
   const normalized = normalizeArgsSchema(argsSchema);
@@ -92,23 +92,23 @@ export function parseToTypedArgs<R extends ArgSchemaRecord>(
   const dupKeys = [
     ...pickBy(
       groupBy(untypedKeyValueFlags, (k) => k[0]),
-      (v) => v.length >= 2,
+      (v) => v.length >= 2
     ).keys(),
   ];
   if (dupKeys.length > 0) {
     throw new TinyCliParseError(
-      "duplicate options: " + dupKeys.map((k) => "--" + k).join(", "),
+      "duplicate options: " + dupKeys.map((k) => "--" + k).join(", ")
     );
   }
 
   // check unknown keys
   const unusedKeys = difference(
     untypedKeyValueFlags.map((e) => e[0]),
-    normalized.keyValueFlags.map((e) => e[0]),
+    normalized.keyValueFlags.map((e) => e[0])
   );
   if (unusedKeys.length > 0) {
     throw new TinyCliParseError(
-      "unknown options: " + unusedKeys.map((k) => "--" + k).join(", "),
+      "unknown options: " + unusedKeys.map((k) => "--" + k).join(", ")
     );
   }
 
@@ -118,7 +118,7 @@ export function parseToTypedArgs<R extends ArgSchemaRecord>(
     untypedArgs.positionals.length > normalized.positionals.length
   ) {
     throw new TinyCliParseError(
-      "too many arguments: " + untypedArgs.positionals.join(", "),
+      "too many arguments: " + untypedArgs.positionals.join(", ")
     );
   }
 
@@ -133,18 +133,18 @@ export function parseToTypedArgs<R extends ArgSchemaRecord>(
     const value = untypedArgs.positionals;
     typedArgs[key] = TinyCliParseError.wrapFn(
       `failed to parse <${key}...>`,
-      () => schema.parse(value),
+      () => schema.parse(value)
     );
   } else {
     for (const [e, value] of zipMax(
       normalized.positionals,
-      untypedArgs.positionals,
+      untypedArgs.positionals
     )) {
       tinyassert(e, "unreachable");
       const [key, schema] = e;
       typedArgs[key] = TinyCliParseError.wrapFn(
         `failed to parse <${key}>`,
-        () => schema.parse(value),
+        () => schema.parse(value)
       );
     }
   }
@@ -152,7 +152,7 @@ export function parseToTypedArgs<R extends ArgSchemaRecord>(
   const untypedKeyValuesMap = new Map(untypedKeyValueFlags);
   for (const [key, schema] of new Map(normalized.keyValueFlags)) {
     typedArgs[key] = TinyCliParseError.wrapFn(`failed to parse --${key}`, () =>
-      schema.parse(untypedKeyValuesMap.get(key)),
+      schema.parse(untypedKeyValuesMap.get(key))
     );
   }
 
@@ -180,7 +180,7 @@ export function helpArgsSchema(config: {
     config.program ?? DEFAULT_PROGRAM,
     optionsHelp.length > 0 && "[options]",
     ...normalized.positionals.map(
-      (e) => `<${e[0]}${e[1].variadic ? "..." : ""}>`,
+      (e) => `<${e[0]}${e[1].variadic ? "..." : ""}>`
     ),
   ].filter(Boolean);
 

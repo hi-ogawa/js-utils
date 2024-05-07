@@ -11,7 +11,7 @@ describe(renderToString, () => {
       </div>
     );
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      `"<div class="flex" aria-current="page">hello<span title="foo">world</span></div>"`,
+      `"<div class="flex" aria-current="page">hello<span title="foo">world</span></div>"`
     );
   });
 
@@ -24,7 +24,7 @@ describe(renderToString, () => {
       </div>
     );
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<div><input/><span></span><br/></div>"',
+      '"<div><input/><span></span><br/></div>"'
     );
   });
 
@@ -50,7 +50,7 @@ describe(renderToString, () => {
       }
     `);
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      `"<div title="a &amp; b">&lt;hehe /&gt;&#x27;&quot;</div>"`,
+      `"<div title="a &amp; b">&lt;hehe /&gt;&#x27;&quot;</div>"`
     );
   });
 
@@ -65,7 +65,7 @@ describe(renderToString, () => {
       </div>
     );
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<div><span>{&quot;prop&quot;:123,&quot;state&quot;:&quot;init&quot;}</span></div>"',
+      '"<div><span>{&quot;prop&quot;:123,&quot;state&quot;:&quot;init&quot;}</span></div>"'
     );
   });
 
@@ -74,14 +74,14 @@ describe(renderToString, () => {
     // cf. https://github.com/preactjs/preact-render-to-string/blob/ba4f4eb1f81e01ac15aef377ae609059e9b2ffce/src/util.js#L4
     const vnode = <input maxLength={0} readOnly inputMode="numeric" />;
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      `"<input maxlength="0" readonly="true" inputmode="numeric"/>"`,
+      `"<input maxlength="0" readonly="true" inputmode="numeric"/>"`
     );
   });
 
   it("tag-textarea", () => {
     const vnode = <textarea value="hello" />;
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      '"<textarea>hello</textarea>"',
+      '"<textarea>hello</textarea>"'
     );
   });
 
@@ -93,7 +93,7 @@ describe(renderToString, () => {
       </select>
     );
     expect(renderToString(vnode)).toMatchInlineSnapshot(
-      `"<select><option value="a">x</option><option selected="true" value="b">y</option></select>"`,
+      `"<select><option value="a">x</option><option selected="true" value="b">y</option></select>"`
     );
   });
 });

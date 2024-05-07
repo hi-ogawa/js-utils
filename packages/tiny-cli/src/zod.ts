@@ -6,7 +6,7 @@ export function zArg<T>(
     parse: (value?: unknown) => T;
     description?: string | undefined;
   },
-  meta?: Omit<ArgSchema<unknown>, "parse">,
+  meta?: Omit<ArgSchema<unknown>, "parse">
 ): ArgSchema<T> {
   return {
     parse: schema.parse,

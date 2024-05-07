@@ -21,7 +21,7 @@ export const arg = {
     Default extends string | undefined = undefined,
   >(
     description?: string,
-    config?: { positional?: boolean; optional?: Optional; default?: Default },
+    config?: { positional?: boolean; optional?: Optional; default?: Default }
   ): ArgSchema<InferParse<string, Optional, Default>> => ({
     positional: config?.positional,
     description,
@@ -44,7 +44,7 @@ export const arg = {
     Default extends number | undefined = undefined,
   >(
     description?: string,
-    config?: { positional?: boolean; optional?: Optional; default?: Default },
+    config?: { positional?: boolean; optional?: Optional; default?: Default }
   ): ArgSchema<InferParse<number, Optional, Default>> => ({
     positional: config?.positional,
     description,

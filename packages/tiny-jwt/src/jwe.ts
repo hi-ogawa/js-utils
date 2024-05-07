@@ -130,7 +130,7 @@ async function cryptoEncrypt({
     keyData,
     CRYPTO_ALGORITHM,
     false,
-    ["encrypt"],
+    ["encrypt"]
   );
   const encrypted = await crypto.subtle.encrypt(encryptParam, key, data);
 
@@ -172,7 +172,7 @@ async function cryptoDecrypt({
     keyData,
     CRYPTO_ALGORITHM,
     false,
-    ["decrypt"],
+    ["decrypt"]
   );
   return crypto.subtle.decrypt(encryptParam, key, data);
 }

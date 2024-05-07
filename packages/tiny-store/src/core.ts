@@ -16,7 +16,7 @@ export interface TinyStoreApi<T, RO extends boolean = false> {
 export function tinyStoreTransform<T1, T2>(
   store: TinyStoreApi<T1>,
   decode: (v1: T1) => T2,
-  encode: (v2: T2) => T1,
+  encode: (v2: T2) => T1
 ): TinyStoreApi<T2> {
   const decodeMemo = memoizeOne(decode);
   return {
@@ -32,7 +32,7 @@ export function tinyStoreTransform<T1, T2>(
 // transform readonly (for memoized selection)
 export function tinyStoreSelect<T1, T2>(
   store: Omit<TinyStoreApi<T1>, "set">,
-  decode: (v: T1) => T2,
+  decode: (v: T1) => T2
 ): TinyStoreApi<T2, true> {
   // `subscribe` based on original store, but as long as `get` returns memoized value,
   // `useSyncExternalStore` won't cause re-rendering

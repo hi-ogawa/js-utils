@@ -36,12 +36,12 @@ export function rawSqlMigrationProvider(options: {
         name: nameDir.name,
         up: await fs.promises.readFile(
           path.join(nameDirPath, foundUp),
-          "utf-8",
+          "utf-8"
         ),
         down: foundDown
           ? await fs.promises.readFile(
               path.join(nameDirPath, foundDown),
-              "utf-8",
+              "utf-8"
             )
           : undefined,
       });
@@ -71,7 +71,7 @@ export function rawSqlMigrationDriver(options: {
     select: async () => {
       try {
         const rows = await options.execute(
-          `SELECT * FROM ${options.table} ORDER BY name`,
+          `SELECT * FROM ${options.table} ORDER BY name`
         );
         return rows as MigrationState[];
       } catch (e) {
@@ -81,13 +81,13 @@ export function rawSqlMigrationDriver(options: {
 
     insert: async (state) => {
       await options.execute(
-        `INSERT INTO ${options.table} (name, executed_at) VALUES ('${state.name}', '${state.executed_at}')`,
+        `INSERT INTO ${options.table} (name, executed_at) VALUES ('${state.name}', '${state.executed_at}')`
       );
     },
 
     delete: async (state) => {
       await options.execute(
-        `DELETE FROM ${options.table} WHERE name = '${state.name}'`,
+        `DELETE FROM ${options.table} WHERE name = '${state.name}'`
       );
     },
 

@@ -56,15 +56,15 @@ describe(createFnRecordQueryProxy, () => {
     };
 
     expect(
-      await queryClient.fetchQuery(fnRecordQuery.checkId.queryOptions("bad")),
+      await queryClient.fetchQuery(fnRecordQuery.checkId.queryOptions("bad"))
     ).toMatchInlineSnapshot("false");
 
     expect(
-      await queryClient.fetchQuery(fnRecordQuery.checkId.queryOptions("good")),
+      await queryClient.fetchQuery(fnRecordQuery.checkId.queryOptions("good"))
     ).toMatchInlineSnapshot("true");
 
     expect(
-      await queryClient.fetchQuery(fnRecordQuery.getCounter.queryOptions()),
+      await queryClient.fetchQuery(fnRecordQuery.getCounter.queryOptions())
     ).toMatchInlineSnapshot("0");
 
     //
@@ -80,7 +80,7 @@ describe(createFnRecordQueryProxy, () => {
     });
 
     expect(
-      (await infiniteQueryObserver.fetchNextPage()).data,
+      (await infiniteQueryObserver.fetchNextPage()).data
     ).toMatchInlineSnapshot(`
       {
         "pageParams": [
@@ -102,7 +102,7 @@ describe(createFnRecordQueryProxy, () => {
     `);
 
     expect(
-      (await infiniteQueryObserver.fetchNextPage()).data,
+      (await infiniteQueryObserver.fetchNextPage()).data
     ).toMatchInlineSnapshot(`
       {
         "pageParams": [
@@ -135,7 +135,7 @@ describe(createFnRecordQueryProxy, () => {
     `);
 
     expect(
-      (await infiniteQueryObserver.fetchNextPage()).data,
+      (await infiniteQueryObserver.fetchNextPage()).data
     ).toMatchInlineSnapshot(`
       {
         "pageParams": [
@@ -179,7 +179,7 @@ describe(createFnRecordQueryProxy, () => {
       queryClient
         .getQueryCache()
         .getAll()
-        .map((e) => ({ queryKey: e.queryKey, data: e.state.data })),
+        .map((e) => ({ queryKey: e.queryKey, data: e.state.data }))
     ).toMatchInlineSnapshot(`
       [
         {
@@ -263,12 +263,12 @@ describe(createFnRecordQueryProxy, () => {
 
     const mutationObserver = new MutationObserver(
       queryClient,
-      fnRecordQuery.updateCounter.mutationOptions(),
+      fnRecordQuery.updateCounter.mutationOptions()
     );
     expect(await mutationObserver.mutate(1)).toMatchInlineSnapshot("1");
 
     expect(
-      await queryClient.fetchQuery(fnRecordQuery.getCounter.queryOptions()),
+      await queryClient.fetchQuery(fnRecordQuery.getCounter.queryOptions())
     ).toMatchInlineSnapshot("1");
   });
 

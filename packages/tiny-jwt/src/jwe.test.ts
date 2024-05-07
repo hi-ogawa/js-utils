@@ -41,10 +41,10 @@ describe("jwe", () => {
 
     // each token should be different due to "iv" (initialization vector)
     expect(token).toMatchInlineSnapshot(
-      '"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..AAAAAAAAAAAAAAAA.3o6Vw6RfwfDV89a5cQmApxsS52iPP4ZxnNqjpgSMJchoWA.9cWxaNtVez7PpfzFkLexnQ"',
+      '"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..AAAAAAAAAAAAAAAA.3o6Vw6RfwfDV89a5cQmApxsS52iPP4ZxnNqjpgSMJchoWA.9cWxaNtVez7PpfzFkLexnQ"'
     );
     expect(token2).toMatchInlineSnapshot(
-      '"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..AQEBAQEBAQEBAQEB.O9Mhj210k_ROwP3woiC2jrhWFlEf_ZlR2g1xkTccDKcH7g.dDcdAnisfjLMWBwy4P3eAg"',
+      '"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..AQEBAQEBAQEBAQEB.O9Mhj210k_ROwP3woiC2jrhWFlEf_ZlR2g1xkTccDKcH7g.dDcdAnisfjLMWBwy4P3eAg"'
     );
 
     const decrypted = await jweDecrypt({

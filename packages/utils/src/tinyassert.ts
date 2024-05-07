@@ -4,7 +4,7 @@
 
 export function tinyassert(
   value: unknown,
-  message?: string | Error,
+  message?: string | Error
 ): asserts value {
   if (value) {
     return;

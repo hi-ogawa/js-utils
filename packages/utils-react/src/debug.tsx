@@ -1,7 +1,7 @@
 import React from "react";
 
 export function Debug(
-  props: { debug: unknown } & JSX.IntrinsicElements["details"],
+  props: { debug: unknown } & JSX.IntrinsicElements["details"]
 ) {
   const { debug, ...rest } = props;
   return (

@@ -17,7 +17,7 @@ export default [
     splitting: false,
     define: {
       __DEFINE_MAIN_CODE: JSON.stringify(
-        fs.readFileSync("./dist/main.global.js", "utf-8"),
+        fs.readFileSync("./dist/main.global.js", "utf-8")
       ),
     },
   })),

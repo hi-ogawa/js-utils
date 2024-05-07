@@ -2,7 +2,7 @@
 
 export function mapOption<T, U>(
   x: T,
-  f: (x: Exclude<T, undefined>) => U,
+  f: (x: Exclude<T, undefined>) => U
 ): U | undefined {
   return typeof x === "undefined" ? x : f(x as Exclude<T, undefined>);
 }

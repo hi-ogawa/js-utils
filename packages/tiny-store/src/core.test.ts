@@ -27,7 +27,7 @@ describe(tinyStoreTransform, () => {
     const store2 = tinyStoreTransform<string, number>(
       store1,
       JSON.parse,
-      JSON.stringify,
+      JSON.stringify
     );
 
     const onStoreChangeFn1 = vi.fn();
@@ -71,7 +71,7 @@ describe(tinyStoreTransform, () => {
     const store = tinyStoreTransform<string, { x: number }>(
       createTinyStore(JSON.stringify({ x: 0 })),
       JSON.parse,
-      JSON.stringify,
+      JSON.stringify
     );
 
     const res = [store.get()];

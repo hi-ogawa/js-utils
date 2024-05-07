@@ -31,7 +31,7 @@ const NotFn = "hello";
       await hmrTransform(input, {
         runtime: "/runtime",
         refreshRuntime: "/refresh-runtime",
-      }),
+      })
     ).toMatchInlineSnapshot(`
       "
       export default function FnDefault() {}

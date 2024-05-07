@@ -62,17 +62,17 @@ describe("base64", () => {
   it("special cases", () => {
     expect(toBase64(new Uint8Array([]))).toMatchInlineSnapshot("Uint8Array []");
     expect(fromBase64(new Uint8Array([]))).toMatchInlineSnapshot(
-      "Uint8Array []",
+      "Uint8Array []"
     );
   });
 
   it("error", () => {
     expect(() =>
-      fromBase64(new Uint8Array([0])),
+      fromBase64(new Uint8Array([0]))
     ).toThrowErrorMatchingInlineSnapshot(`[Error: invalid length]`);
 
     expect(() =>
-      fromBase64(new Uint8Array([0, 0, 0, 0])),
+      fromBase64(new Uint8Array([0, 0, 0, 0]))
     ).toThrowErrorMatchingInlineSnapshot(`[Error: invalid data]`);
   });
 
@@ -103,7 +103,7 @@ describe("base64", () => {
       const input = new Uint8Array(crypto.randomBytes(len));
       const output = toBase64(input);
       expect(textDecoder.decode(output)).toEqual(
-        Buffer.from(input).toString("base64"),
+        Buffer.from(input).toString("base64")
       );
     }
   });

@@ -65,7 +65,7 @@ export namespace JSX {
     [K in keyof GlobalEventHandlersEventMap as `on${K}`]+?: (
       event: Omit<GlobalEventHandlersEventMap[K], "currentTarget"> & {
         readonly currentTarget: T;
-      },
+      }
     ) => void;
   };
 

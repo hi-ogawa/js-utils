@@ -6,5 +6,10 @@
     "ignore": ["**/dist/**", "**/.vercel/**", "**/.wrangler/**"]
   },
   "organizeImports": { "enabled": true },
-  "linter": { "enabled": false }
+  "linter": { "enabled": false },
+  "javascript": {
+    "formatter": {
+      "trailingComma": "es5"
+    }
+  }
 }

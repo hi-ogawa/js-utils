@@ -4,7 +4,7 @@ import { useStableCallback } from "./utils";
 
 export function useDebounce<F extends (...args: any[]) => void>(
   f: F,
-  ms: number,
+  ms: number
 ) {
   f = useStableCallback(f);
 
@@ -16,7 +16,7 @@ export function useDebounce<F extends (...args: any[]) => void>(
       onFinish: () => setIsPending(false),
       onCancel: () => setIsPending(false),
     }),
-    [ms],
+    [ms]
   );
 
   React.useEffect(() => () => debounced.cancel(), [debounced]);

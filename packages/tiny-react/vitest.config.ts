@@ -7,7 +7,7 @@ export default defineConfig({
     environment: "jsdom",
     alias: {
       "@hiogawa/tiny-react/jsx-dev-runtime": resolve(
-        "src/helper/jsx-runtime.ts",
+        "src/helper/jsx-runtime.ts"
       ),
     },
   },

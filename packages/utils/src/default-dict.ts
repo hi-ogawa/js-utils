@@ -11,6 +11,6 @@ export function defaultDict<T>(defaultFactory: () => T): Record<string, T> {
         }
         return target[p];
       },
-    },
+    }
   );
 }

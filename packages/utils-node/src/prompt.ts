@@ -61,7 +61,7 @@ export async function promptAutocomplete(options: {
     suggestionIndex += dir;
     suggestionIndex = Math.min(
       Math.max(suggestionIndex, 0),
-      suggestions.length - 1,
+      suggestions.length - 1
     );
     value = suggestions[suggestionIndex];
 
@@ -100,7 +100,7 @@ export async function promptAutocomplete(options: {
         (v, i) =>
           "  " +
           (i + offset === suggestionIndex ? `> ${v}` : `  ${colors.dim(v)}`) +
-          "\n",
+          "\n"
       )
       .join("");
 

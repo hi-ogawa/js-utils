@@ -20,7 +20,7 @@ describe("hyperscript", () => {
       h.span({}, 0),
       h.span({}, 0, 1),
       h.span({}, [0]),
-      h.span({}, [0, 1]),
+      h.span({}, [0, 1])
     );
     expect(vnode).toMatchInlineSnapshot(`
       {

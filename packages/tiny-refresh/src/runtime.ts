@@ -36,7 +36,7 @@ class Manager {
       hot: ViteHot;
       runtime: Runtime;
       debug?: boolean;
-    },
+    }
   ) {}
 
   wrap(name: string, Component: FC, key: string): FC {
@@ -73,7 +73,7 @@ class Manager {
       }
       if (this.options.debug) {
         console.debug(
-          `[tiny-refresh] refresh '${name}' (key = ${current.key}, listeners.size = ${proxy.listeners.size})`,
+          `[tiny-refresh] refresh '${name}' (key = ${current.key}, listeners.size = ${proxy.listeners.size})`
         );
       }
       for (const setState of proxy.listeners) {
@@ -87,7 +87,7 @@ class Manager {
 export function createManager(
   hot: ViteHot,
   runtime: Runtime,
-  debug?: boolean,
+  debug?: boolean
 ): Manager {
   return (hot.data[MANAGER_KEY] ??= new Manager({ hot, runtime, debug }));
 }

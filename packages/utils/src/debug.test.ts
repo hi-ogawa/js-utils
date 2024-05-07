@@ -43,17 +43,17 @@ describe(createDebug, () => {
 
   it(createDebugPattern, () => {
     expect(createDebugPattern("react-server").source).toMatchInlineSnapshot(
-      `"(^|,)(react\\-server)($|,)"`,
+      `"(^|,)(react\\-server)($|,)"`
     );
     expect(
-      createDebugPattern("react-server:plugin").source,
+      createDebugPattern("react-server:plugin").source
     ).toMatchInlineSnapshot(
-      `"(^|,)(react\\-server:plugin|react\\-server:\\*)($|,)"`,
+      `"(^|,)(react\\-server:plugin|react\\-server:\\*)($|,)"`
     );
     expect(
-      createDebugPattern("react-server:plugin:browser").source,
+      createDebugPattern("react-server:plugin:browser").source
     ).toMatchInlineSnapshot(
-      `"(^|,)(react\\-server:plugin:browser|react\\-server:\\*|react\\-server:plugin:\\*)($|,)"`,
+      `"(^|,)(react\\-server:plugin:browser|react\\-server:\\*|react\\-server:plugin:\\*)($|,)"`
     );
   });
 });

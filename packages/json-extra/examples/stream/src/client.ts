@@ -19,7 +19,7 @@ $("#api").addEventListener("click", async () => {
         raw += chunk;
         $("#output-raw").textContent = raw;
       },
-    }),
+    })
   );
 
   // parse and update as it resolves
@@ -39,7 +39,7 @@ $("#api").addEventListener("click", async () => {
       (v) => {
         status = `<rejected>: ${v}`;
         render();
-      },
+      }
     );
   }
 

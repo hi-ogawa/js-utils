@@ -56,7 +56,7 @@ export function useUrl() {
   const url = useSyncExternalStore(
     windowUrlStore.subscribe,
     windowUrlStore.get,
-    windowUrlStore.get,
+    windowUrlStore.get
   );
   return [url, windowUrlStore.set] as const;
 }

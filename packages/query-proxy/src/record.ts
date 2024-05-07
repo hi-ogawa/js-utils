@@ -24,7 +24,7 @@ export type FnRecordQueryProxy<T extends FnRecord> = {
       // `context` is supposed to be `import("@tanstack/query-core").QueryFunctionContext`
       // but we don't exactly specify the type to avoid restricting tanstack query version.
       // Assuming the use case of infinite query is limited, having "unknown" here won't degrade DX so bad.
-      inputFn: (context?: unknown) => FnIn<T[K]>,
+      inputFn: (context?: unknown) => FnIn<T[K]>
     ) => {
       queryKey: unknown[];
       queryFn: (context: unknown) => Promise<FnOut<T[K]>>;
@@ -38,7 +38,7 @@ export type FnRecordQueryProxy<T extends FnRecord> = {
 };
 
 export function createFnRecordQueryProxy<T extends FnRecord>(
-  fnRecord: T,
+  fnRecord: T
 ): FnRecordQueryProxy<T> {
   return createGetterProxy((k) =>
     createGetterProxy((prop) => {
@@ -64,6 +64,6 @@ export function createFnRecordQueryProxy<T extends FnRecord>(
         });
       }
       throw new Error("invalid proxy usage", { cause: { k, prop } });
-    }),
+    })
   ) as any;
 }

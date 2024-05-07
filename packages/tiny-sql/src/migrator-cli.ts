@@ -39,7 +39,7 @@ export class MigratorCli {
       }
     }
     throw new Error(
-      `unknown command '${command}' (supported commands: 'init', 'status', 'up', 'down', 'latest', 'init-latest')`,
+      `unknown command '${command}' (supported commands: 'init', 'status', 'up', 'down', 'latest', 'init-latest')`
     );
   }
 }

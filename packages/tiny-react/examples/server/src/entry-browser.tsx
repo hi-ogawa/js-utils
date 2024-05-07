@@ -28,7 +28,7 @@ async function main() {
         const result: SerializeResult = await res.json();
         const newVnode = deserialize<VNode>(
           result.data,
-          await createReferenceMap(result.referenceIds),
+          await createReferenceMap(result.referenceIds)
         );
         setData(newVnode);
       });
@@ -41,7 +41,7 @@ async function main() {
   const initResult: SerializeResult = (globalThis as any).__serialized;
   const vnode = deserialize<VNode>(
     initResult.data,
-    await createReferenceMap(initResult.referenceIds),
+    await createReferenceMap(initResult.referenceIds)
   );
   const el = document.getElementById("root");
   tinyassert(el);

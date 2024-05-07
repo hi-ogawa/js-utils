@@ -30,7 +30,7 @@ export function render(
   vnode: VNode,
   parent: HNode,
   bnode: BNode = EMPTY_NODE,
-  hydration: boolean = false,
+  hydration: boolean = false
 ) {
   const effectManager = new EffectManager();
   const newBnode = reconcileNode(
@@ -39,7 +39,7 @@ export function render(
     parent,
     undefined,
     effectManager,
-    hydration,
+    hydration
   );
   effectManager.run();
   return newBnode;
@@ -60,7 +60,7 @@ function reconcileNode(
   hparent: HNode,
   preSlot: HNode | undefined,
   effectManager: EffectManager,
-  isHydrate: boolean,
+  isHydrate: boolean
 ): BNode {
   if (isHydrate) {
     tinyassert(bnode.type === NODE_TYPE_EMPTY);
@@ -93,7 +93,7 @@ function reconcileNode(
         bnode.hnode,
         undefined,
         effectManager,
-        isHydrate,
+        isHydrate
       );
       placeChild(bnode.hnode, hparent, preSlot, false);
     } else {
@@ -106,7 +106,7 @@ function reconcileNode(
         hnode,
         undefined,
         effectManager,
-        isHydrate,
+        isHydrate
       );
       bnode = {
         type: vnode.type,
@@ -147,7 +147,7 @@ function reconcileNode(
     if (bnode.type === NODE_TYPE_FRAGMENT && bnode.vnode.key === vnode.key) {
       const [newChildren, oldChildren] = alignChildrenByKey(
         vnode.children,
-        bnode.children,
+        bnode.children
       );
       bnode.children = newChildren;
       for (const bnode of oldChildren) {
@@ -173,7 +173,7 @@ function reconcileNode(
         hparent,
         preSlot,
         effectManager,
-        isHydrate,
+        isHydrate
       );
       preSlot = getBNodeSlot(bchild) ?? preSlot;
       bnode.slot = getBNodeSlot(bchild) ?? bnode.slot;
@@ -194,7 +194,7 @@ function reconcileNode(
         hparent,
         preSlot,
         effectManager,
-        isHydrate,
+        isHydrate
       );
       bnode.vnode = vnode;
     } else {
@@ -207,7 +207,7 @@ function reconcileNode(
         hparent,
         preSlot,
         effectManager,
-        isHydrate,
+        isHydrate
       );
       bnode = {
         type: vnode.type,
@@ -239,7 +239,7 @@ function reconcileNode(
 function hydrateNode(
   vnode: VNode,
   hparent: HNode,
-  preSlot: HNode | undefined,
+  preSlot: HNode | undefined
 ): BNode {
   if (vnode.type === NODE_TYPE_EMPTY) {
     return EMPTY_NODE;
@@ -249,7 +249,7 @@ function hydrateNode(
     // TODO: check props mismatch?
     tinyassert(
       hnode instanceof Element && hnode.tagName.toLowerCase() === vnode.name,
-      `tag hydration mismatch (actual: '${hnode?.nodeName}', expected: '${vnode.name}')`,
+      `tag hydration mismatch (actual: '${hnode?.nodeName}', expected: '${vnode.name}')`
     );
     return {
       type: vnode.type,
@@ -278,11 +278,11 @@ function hydrateNode(
     }
     tinyassert(
       hnode instanceof Text,
-      `text hydration mismatch (actual: '${hnode?.nodeName}', expected: '#text')`,
+      `text hydration mismatch (actual: '${hnode?.nodeName}', expected: '#text')`
     );
     tinyassert(
       hnode.data === vnode.data,
-      `text hydration mismatch (actual: '${hnode.data}', expected: '${vnode.data}')`,
+      `text hydration mismatch (actual: '${hnode.data}', expected: '${vnode.data}')`
     );
     return { type: vnode.type, vnode, hnode } satisfies BText;
   } else if (vnode.type === NODE_TYPE_FRAGMENT) {
@@ -312,7 +312,7 @@ function placeChild(
   hnode: HNode,
   hparent: HNode,
   preSlot: HNode | undefined,
-  init: boolean,
+  init: boolean
 ) {
   const slotNext = getSlotTargetNode(hparent, preSlot);
   if (init || !(hnode === slotNext || hnode.nextSibling === slotNext)) {
@@ -322,7 +322,7 @@ function placeChild(
 
 function getSlotTargetNode(
   hparent: HNode,
-  preSlot: HNode | undefined,
+  preSlot: HNode | undefined
 ): HNode | null {
   return preSlot ? preSlot.nextSibling : hparent.firstChild;
 }
@@ -352,7 +352,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
     bnode.hparent,
     preSlot,
     effectManager,
-    false,
+    false
   );
   tinyassert(newBnode === bnode); // reconciled over itself without unmount (i.e. should be same `key` and `render`)
 
@@ -420,7 +420,7 @@ function updateParentSlot(child: BNode) {
 
 function alignChildrenByKey(
   vnodes: VNode[],
-  bnodes: BNode[],
+  bnodes: BNode[]
 ): [BNode[], BNode[]] {
   const keyMap = new Map<NodeKey, number>();
 
@@ -462,7 +462,7 @@ function alignChildrenByKey(
 function reconcileTagProps(
   bnode: BTag,
   props: VTag["props"],
-  oldProps: VTag["props"],
+  oldProps: VTag["props"]
 ) {
   for (const k in oldProps) {
     if (!(k in props)) {
@@ -500,7 +500,7 @@ function setTagProp(bnode: BTag, key: string, value: unknown) {
     if (value != null) {
       tinyassert(
         typeof value === "function",
-        `Invalid event listener prop for '${eventType}'`,
+        `Invalid event listener prop for '${eventType}'`
       );
       listeners.set(eventType, value as any);
       hnode.addEventListener(eventType, value as any);

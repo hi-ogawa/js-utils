@@ -14,14 +14,14 @@ function defaultCostFn(x: unknown, y: unknown) {
 export function solveEditDistance<T>(
   xs: T[],
   ys: T[],
-  costFn: (x: T | undefined, y: T | undefined) => number = defaultCostFn,
+  costFn: (x: T | undefined, y: T | undefined) => number = defaultCostFn
 ) {
   const n = xs.length;
   const m = ys.length;
 
   // dp[i][j] = [(total cost), (last op), (last delta)]
   const dp = range(n + 1).map(() =>
-    range(m + 1).map(() => [0, EDIT_OP.none, -1]),
+    range(m + 1).map(() => [0, EDIT_OP.none, -1])
   );
 
   for (const i of range(n)) {

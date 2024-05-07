@@ -35,7 +35,7 @@ export const colors = /* @__PURE__ */ (() => {
       codes.map(([name, start, end]) => [
         name,
         (v: string) => (enabled ? `\u001B[${start}m${v}\u001B[${end}m` : v),
-      ]),
+      ])
     ) as Record<(typeof codes)[number][0], (v: string) => string>),
   };
 })();
