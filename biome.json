@@ -1,13 +1,14 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.7.2/schema.json",
-  "files": {
-    "ignore": ["dist", ".vercel", ".wrangler"]
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space"
   },
-  "organizeImports": { "enabled": true },
   "linter": { "enabled": false },
   "javascript": {
     "formatter": {
