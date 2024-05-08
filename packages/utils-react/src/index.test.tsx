@@ -247,17 +247,17 @@ describe(useMergeRefs, () => {
     render(<Demo />);
     expect(fn.mock.calls.map((c) => c.join(":"))).toMatchInlineSnapshot(`
       [
-        "inner-none:fun:[object HTMLElement]",
-        "inner-mut:fun:[object HTMLElement]",
-        "inner-fun:fun:[object HTMLElement]",
-        "outer-fun:[object HTMLElement]",
-        "inner-none:mut:[object HTMLElement]",
+        "inner-none:fun:<main></main>",
+        "inner-mut:fun:<main></main>",
+        "inner-fun:fun:<main></main>",
+        "outer-fun:<main></main>",
+        "inner-none:mut:<main></main>",
         "inner-none:forwarded:",
-        "inner-mut:mut:[object HTMLElement]",
+        "inner-mut:mut:<main></main>",
         "inner-mut:forwarded:[object Object]",
-        "inner-fun:mut:[object HTMLElement]",
+        "inner-fun:mut:<main></main>",
         "inner-fun:forwarded:(el) => fn("outer-fun", el)",
-        "outer-mut:[object HTMLElement]",
+        "outer-mut:<main></main>",
       ]
     `);
     fn.mockReset();
@@ -274,15 +274,15 @@ describe(useMergeRefs, () => {
     await userEvent.click(screen.getByRole("button"));
     expect(fn.mock.calls.map((c) => c.join(":"))).toMatchInlineSnapshot(`
       [
-        "inner-none:fun:[object HTMLElement]",
-        "inner-mut:fun:[object HTMLElement]",
-        "inner-fun:fun:[object HTMLElement]",
-        "outer-fun:[object HTMLElement]",
-        "inner-none:mut:[object HTMLElement]",
+        "inner-none:fun:<main></main>",
+        "inner-mut:fun:<main></main>",
+        "inner-fun:fun:<main></main>",
+        "outer-fun:<main></main>",
+        "inner-none:mut:<main></main>",
         "inner-none:forwarded:",
-        "inner-mut:mut:[object HTMLElement]",
+        "inner-mut:mut:<main></main>",
         "inner-mut:forwarded:[object Object]",
-        "inner-fun:mut:[object HTMLElement]",
+        "inner-fun:mut:<main></main>",
         "inner-fun:forwarded:(el) => fn("outer-fun", el)",
       ]
     `);
