@@ -30,8 +30,8 @@
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
-    "@types/node": "^20.11.19",
-    "vite": "^5.1.3"
+    "@types/node": "^20.12.11",
+    "vite": "^5.2.11"
   },
   "peerDependencies": {
     "vite": "*"
