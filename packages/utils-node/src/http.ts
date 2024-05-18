@@ -83,14 +83,13 @@ function sendResponse(response: Response, res: http.ServerResponse) {
   }
   res.writeHead(response.status, response.statusText, headers);
 
-  const body = response.body;
-  if (body) {
+  if (response.body) {
     const abortController = new AbortController();
     res.once("close", () => abortController.abort());
-    const nodeBody = Readable.fromWeb(body as any, {
+    res.once("error", () => abortController.abort());
+    Readable.fromWeb(response.body as any, {
       signal: abortController.signal,
-    });
-    nodeBody.pipe(res);
+    }).pipe(res);
   } else {
     res.end();
   }

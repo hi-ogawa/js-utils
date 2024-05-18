@@ -25,7 +25,7 @@ describe(webToNodeHandler, () => {
     expect(await res.text()).toMatchInlineSnapshot(`"hello = /abc"`);
   });
 
-  test("stream", async () => {
+  test("stream abort", async () => {
     // https://github.com/hi-ogawa/reproductions/pull/9
 
     const trackFn = vi.fn();
@@ -98,6 +98,59 @@ describe(webToNodeHandler, () => {
         ],
       ]
     `);
+    expect(server.nextFn.mock.calls).toMatchInlineSnapshot(`[]`);
+  });
+
+  test("stream close itself", async () => {
+    const trackFn = vi.fn();
+    const abortPromise = createManualPromise<void>();
+    const cancelPromise = createManualPromise<void>();
+    async function handler(req: Request) {
+      req.signal.addEventListener("abort", () => {
+        trackFn("abort");
+        abortPromise.resolve();
+      });
+
+      const stream = new ReadableStream<string>({
+        async start(controller) {
+          for (let i = 0; i < 3; i++) {
+            controller.enqueue(`i = ${i}\n`);
+            await new Promise((resolve) => setTimeout(resolve, 200));
+          }
+          controller.close();
+        },
+        cancel() {
+          trackFn("cancel");
+          cancelPromise.resolve();
+        },
+      });
+
+      return new Response(stream.pipeThrough(new TextEncoderStream()));
+    }
+
+    await using server = await testWebHandler(handler);
+    const res = await fetch(server.url);
+    tinyassert(res.ok);
+    tinyassert(res.body);
+    const chunks: string[] = [];
+    await res.body.pipeThrough(new TextDecoderStream()).pipeTo(
+      new WritableStream({
+        write(chunk) {
+          chunks.push(chunk);
+        },
+      })
+    );
+    expect(chunks).toMatchInlineSnapshot(`
+      [
+        "i = 0
+      ",
+        "i = 1
+      ",
+        "i = 2
+      ",
+      ]
+    `);
+    expect(trackFn.mock.calls).toMatchInlineSnapshot(`[]`);
     expect(server.nextFn.mock.calls).toMatchInlineSnapshot(`[]`);
   });
 });
