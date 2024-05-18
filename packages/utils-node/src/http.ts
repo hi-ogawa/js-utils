@@ -57,10 +57,13 @@ function createRequest(
   }
 
   return new Request(
-    new URL(req.url || "/", req.headers.host || "https://test.local"),
+    new URL(req.url || "/", `http://${req.headers.host || "unknown.local"}`),
     {
       method: req.method,
-      body: Readable.toWeb(req) as any,
+      body:
+        req.method === "GET" || req.method === "HEAD"
+          ? null
+          : (Readable.toWeb(req) as any),
       headers,
       signal: abortController.signal,
       // @ts-ignore required for undici ReadableStream body

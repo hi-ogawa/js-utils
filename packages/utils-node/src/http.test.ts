@@ -6,16 +6,23 @@ import { webToNodeHandler } from "./http";
 describe(webToNodeHandler, () => {
   test("basic", async () => {
     const handler = webToNodeHandler((request) => {
-      return new Response("hello = " + request.url, {
+      return new Response("hello = " + new URL(request.url).pathname, {
         headers: { "content-type": "text/x-hello" },
       });
     });
     await using server = await testServer(
-      createServer((req, res) => handler(req, res, () => res.end("[next]")))
+      createServer((req, res) =>
+        handler(req, res, (e) => {
+          console.error(e);
+          res.end("[next]");
+        })
+      )
     );
-    const res = await fetch(server.url);
-    expect(res.headers.get("content-type")).toMatchInlineSnapshot(`null`);
-    expect(await res.text()).toMatchInlineSnapshot(`"[next]"`);
+    const res = await fetch(server.url + "/abc");
+    expect(res.headers.get("content-type")).toMatchInlineSnapshot(
+      `"text/x-hello"`
+    );
+    expect(await res.text()).toMatchInlineSnapshot(`"hello = /abc"`);
   });
 });
 
