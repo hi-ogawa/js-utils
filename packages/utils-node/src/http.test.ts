@@ -49,7 +49,6 @@ describe(webToNodeHandler, () => {
           controller.close();
         },
         cancel() {
-          // cancel is not called
           trackFn("cancel");
           cancelPromise.resolve();
           cancelled = true;
@@ -88,11 +87,14 @@ describe(webToNodeHandler, () => {
       ",
       ]
     `);
-    await abortPromise;
+    await Promise.all([abortPromise, cancelPromise]);
     expect(trackFn.mock.calls).toMatchInlineSnapshot(`
       [
         [
           "abort",
+        ],
+        [
+          "cancel",
         ],
       ]
     `);

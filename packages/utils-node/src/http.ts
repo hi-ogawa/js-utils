@@ -36,13 +36,15 @@ function createRequest(
   req: http.IncomingMessage,
   res: http.ServerResponse
 ): Request {
+  // cf. hono
   const abortController = new AbortController();
-  res.on("close", () => {
+  res.once("close", () => {
     if (req.destroyed) {
       abortController.abort();
     }
   });
 
+  // cf. hattip, remix
   const headers = new Headers();
   for (const [k, v] of Object.entries(req.headers)) {
     // skip http2 pseudo header since it breaks undici
@@ -73,6 +75,7 @@ function createRequest(
 }
 
 function sendResponse(response: Response, res: http.ServerResponse) {
+  // cf. hydrogen
   const headers = Object.fromEntries(response.headers);
   if (headers["set-cookie"]) {
     delete headers["set-cookie"];
@@ -80,8 +83,14 @@ function sendResponse(response: Response, res: http.ServerResponse) {
   }
   res.writeHead(response.status, response.statusText, headers);
 
-  if (response.body) {
-    Readable.fromWeb(response.body as any).pipe(res);
+  const body = response.body;
+  if (body) {
+    const abortController = new AbortController();
+    res.once("close", () => abortController.abort());
+    const nodeBody = Readable.fromWeb(body as any, {
+      signal: abortController.signal,
+    });
+    nodeBody.pipe(res);
   } else {
     res.end();
   }
