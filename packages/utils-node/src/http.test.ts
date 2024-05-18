@@ -106,14 +106,11 @@ describe(webToNodeHandler, () => {
     const abortPromise = createManualPromise<void>();
     const cancelPromise = createManualPromise<void>();
     async function handler(req: Request) {
-      let aborted = false;
       req.signal.addEventListener("abort", () => {
         trackFn("abort");
         abortPromise.resolve();
-        aborted = true;
       });
 
-      let cancelled = false;
       const stream = new ReadableStream<string>({
         async start(controller) {
           for (let i = 0; i < 3; i++) {
@@ -125,7 +122,6 @@ describe(webToNodeHandler, () => {
         cancel() {
           trackFn("cancel");
           cancelPromise.resolve();
-          cancelled = true;
         },
       });
 
