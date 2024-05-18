@@ -38,7 +38,7 @@ function createRequest(
 ): Request {
   const abortController = new AbortController();
   res.on("close", () => {
-    if (!req.destroyed) {
+    if (req.destroyed) {
       abortController.abort();
     }
   });

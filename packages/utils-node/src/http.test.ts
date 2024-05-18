@@ -1,32 +1,111 @@
 import { createServer } from "node:http";
-import { tinyassert } from "@hiogawa/utils";
-import { describe, expect, test } from "vitest";
-import { webToNodeHandler } from "./http";
+import { createManualPromise, tinyassert } from "@hiogawa/utils";
+import { describe, expect, test, vi } from "vitest";
+import { type WebHandler, webToNodeHandler } from "./http";
 
 describe(webToNodeHandler, () => {
   test("basic", async () => {
-    const handler = webToNodeHandler((request) => {
-      return new Response("hello = " + new URL(request.url).pathname, {
+    const abortFn = vi.fn();
+    await using server = await testWebHandler((request) => {
+      request.signal.addEventListener("abort", () => {
+        abortFn("abort");
+      });
+      const body = "hello = " + new URL(request.url).pathname;
+      return new Response(body, {
         headers: { "content-type": "text/x-hello" },
       });
     });
-    await using server = await testServer(
-      createServer((req, res) =>
-        handler(req, res, (e) => {
-          console.error(e);
-          res.end("[next]");
-        })
-      )
-    );
     const res = await fetch(server.url + "/abc");
+
+    expect(server.nextFn.mock.calls).toMatchInlineSnapshot(`[]`);
+    expect(abortFn.mock.calls).toMatchInlineSnapshot(`[]`);
     expect(res.headers.get("content-type")).toMatchInlineSnapshot(
       `"text/x-hello"`
     );
     expect(await res.text()).toMatchInlineSnapshot(`"hello = /abc"`);
   });
+
+  test("stream", async () => {
+    // https://github.com/hi-ogawa/reproductions/pull/9
+
+    const trackFn = vi.fn();
+    const abortPromise = createManualPromise<void>();
+    const cancelPromise = createManualPromise<void>();
+    async function handler(req: Request) {
+      let aborted = false;
+      req.signal.addEventListener("abort", () => {
+        trackFn("abort");
+        abortPromise.resolve();
+        aborted = true;
+      });
+
+      let cancelled = false;
+      const stream = new ReadableStream<string>({
+        async start(controller) {
+          for (let i = 0; !aborted && !cancelled; i++) {
+            controller.enqueue(`i = ${i}\n`);
+            await new Promise((resolve) => setTimeout(resolve, 200));
+          }
+          controller.close();
+        },
+        cancel() {
+          // cancel is not called
+          trackFn("cancel");
+          cancelPromise.resolve();
+          cancelled = true;
+        },
+      });
+
+      return new Response(stream.pipeThrough(new TextEncoderStream()));
+    }
+
+    await using server = await testWebHandler(handler);
+    const abortController = new AbortController();
+    const res = await fetch(server.url, { signal: abortController.signal });
+    tinyassert(res.ok);
+    tinyassert(res.body);
+    const chunks: string[] = [];
+    const promise = res.body.pipeThrough(new TextDecoderStream()).pipeTo(
+      new WritableStream({
+        write(chunk) {
+          chunks.push(chunk);
+          if (chunk.includes("i = 2")) {
+            abortController.abort();
+          }
+        },
+      })
+    );
+    await expect(promise).rejects.toMatchInlineSnapshot(
+      `[AbortError: This operation was aborted]`
+    );
+    expect(chunks).toMatchInlineSnapshot(`
+      [
+        "i = 0
+      ",
+        "i = 1
+      ",
+        "i = 2
+      ",
+      ]
+    `);
+    await abortPromise;
+    expect(trackFn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "abort",
+        ],
+      ]
+    `);
+    expect(server.nextFn.mock.calls).toMatchInlineSnapshot(`[]`);
+  });
 });
 
-export async function testServer(server: import("node:http").Server) {
+async function testWebHandler(handler: WebHandler) {
+  // node server
+  const nextFn = vi.fn();
+  const nodeHandler = webToNodeHandler(handler);
+  const server = createServer((req, res) => nodeHandler(req, res, nextFn));
+
   // listen
   await new Promise<void>((resolve) => server.listen(() => resolve()));
 
@@ -37,8 +116,8 @@ export async function testServer(server: import("node:http").Server) {
   const url = `http://localhost:${address.port}`;
 
   return {
-    server,
     url,
+    nextFn,
     [Symbol.asyncDispose]: () => server[Symbol.asyncDispose](),
   };
 }
