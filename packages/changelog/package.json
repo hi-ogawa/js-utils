@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/changelog",
-  "version": "0.0.0-pre.0",
+  "version": "0.0.0",
   "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/changelog",
   "repository": {
     "type": "git",
@@ -17,8 +17,7 @@
     "cli": "tsx ./src/cli.ts",
     "test": "vitest",
     "docs-update": "inline-template ./README.md && prettier -w ./README.md",
-    "prepack": "tsup --clean && pnpm docs-update",
-    "release": "pnpm publish --no-git-checks --access public"
+    "prepack": "tsup --clean && pnpm docs-update"
   },
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",

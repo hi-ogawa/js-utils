@@ -19,7 +19,7 @@ $ npx @hiogawa/changelog --help
 
 ```txt
 $ npx @hiogawa/changelog --help
-changelog/0.0.0-pre.0
+changelog/0.0.0
 
 Usage:
   $ changelog [options]
@@ -30,6 +30,7 @@ Options:
   --dir <path>       directory to write CHANGELOG.md (default: process.cwd())
   --from <commit>    (default: last commit modified CHANGELOG.md)
   --to <commit>      (default: HEAD)
+  --repo <url>       repository url for PR link formatting
   --dry
   --removeScope
   -h, --help
