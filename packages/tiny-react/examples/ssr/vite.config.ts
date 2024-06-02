@@ -2,7 +2,10 @@ import { themeScriptPlugin } from "@hiogawa/theme-script/dist/vite";
 import { tinyReactVitePlugin } from "@hiogawa/tiny-react/vite";
 import { importDevServerPlugin } from "@hiogawa/vite-import-dev-server";
 import { viteNullExportPlugin } from "@hiogawa/vite-null-export";
-import { vitePluginSsrMiddleware, vitePluginLogger } from "@hiogawa/vite-plugin-ssr-middleware";
+import {
+  vitePluginLogger,
+  vitePluginSsrMiddleware,
+} from "@hiogawa/vite-plugin-ssr-middleware";
 import unocss from "unocss/vite";
 import { defineConfig } from "vite";
 
