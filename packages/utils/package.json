@@ -23,8 +23,7 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest",
-    "prepack": "tsup --clean",
-    "release": "pnpm publish --no-git-checks --access public"
+    "prepack": "tsup --clean"
   },
   "volta": {
     "extends": "../../package.json"
