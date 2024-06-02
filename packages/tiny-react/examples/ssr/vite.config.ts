@@ -10,6 +10,7 @@ import unocss from "unocss/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig((ctx) => ({
+  clearScreen: false,
   plugins: [
     unocss(),
     tinyReactVitePlugin(),

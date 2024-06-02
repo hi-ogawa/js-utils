@@ -3,9 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm run /^dev:/",
-    "dev:vite": "vite --no-clearScreen",
-    "dev:tsc": "tsc --watch --preserveWatchOutput",
+    "dev": "vite",
     "build": "SERVER_ENTRY=./src/server/adapter-vercel-edge.ts pnpm run --seq /^build:/",
     "build:vite": "vite build && vite build --ssr",
     "build:vercel": "bash misc/vercel/build.sh",
