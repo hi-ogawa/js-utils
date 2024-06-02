@@ -1,4 +1,3 @@
-import { once } from "@hiogawa/utils";
 import { useEffect, useRef, useState } from "../hooks";
 import { hydrate, render } from "../reconciler";
 import {
@@ -63,40 +62,18 @@ export function hydrateRoot(container: Element, vnode: VNode) {
 // https://react.dev/reference/react/memo
 export function memo<P extends {}>(
   Fc: FC<P>,
-  isEqualProps: (prev: {}, next: {}) => boolean = objectShallowEqual
+  propsAreEqual: (prevProps: {}, nextProps: {}) => boolean = objectShallowEqual
 ): FC<P> {
-  // TODO: broken. wait for https://github.com/hi-ogawa/js-utils/pull/173
   function Memo(props: P) {
-    // we need to make `VCustom.render` stable,
-    // but `once(Fc)` has to be invalidated on props change.
-    // after "identical vnode" optimization is implemented,
-    // it can be simplified to
-    //   {
-    //     type: NODE_TYPE_CUSTOM,
-    //     render: Fc,
-    //     props,
-    //   }
-    const [state] = useState(() => {
-      const state: {
-        render: FC;
-        current?: { vnode: VCustom; onceFc: FC };
-      } = {
-        render: (props: any) => state.current!.onceFc(props),
-      };
-      return state;
-    });
-
-    if (!state.current || !isEqualProps(state.current.vnode.props, props)) {
-      state.current = {
-        vnode: {
-          type: NODE_TYPE_CUSTOM,
-          render: state.render,
-          props,
-        },
-        onceFc: once(Fc) as FC,
+    const ref = useRef<VCustom | undefined>(undefined);
+    if (!ref.current || !propsAreEqual(ref.current.props, props)) {
+      ref.current = {
+        type: NODE_TYPE_CUSTOM,
+        render: Fc as FC<any>,
+        props,
       };
     }
-    return state.current.vnode;
+    return ref.current;
   }
   Object.defineProperty(Memo, "name", { value: `Memo(${Fc.name})` });
   return Memo;

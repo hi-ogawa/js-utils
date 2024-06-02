@@ -63,6 +63,10 @@ function reconcileNode(
   effectManager: EffectManager,
   isHydrate: boolean
 ): BNode {
+  // bail out early for "identical vnode" (e.g. `memo` component, reused children prop, etc...)
+  if ("vnode" in bnode && bnode.vnode === vnode) {
+    return bnode;
+  }
   if (isHydrate) {
     tinyassert(bnode.type === NODE_TYPE_EMPTY);
     bnode = hydrateNode(vnode, hparent, hnextSibling);
@@ -384,6 +388,7 @@ export function updateCustomNode(vnode: VCustom, bnode: BCustom) {
 
   // reconcile
   const effectManager = new EffectManager();
+  bnode.vnode = { ...vnode }; // break "identical vnode" optimization to force re-render
   const newBnode = reconcileNode(
     vnode,
     bnode,
