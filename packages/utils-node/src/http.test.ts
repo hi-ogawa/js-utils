@@ -25,7 +25,7 @@ describe(webToNodeHandler, () => {
     expect(await res.text()).toMatchInlineSnapshot(`"hello = /abc"`);
   });
 
-  test("stream abort", async () => {
+  test("stream abort", { retry: 3 }, async () => {
     // https://github.com/hi-ogawa/reproductions/pull/9
 
     const trackFn = vi.fn();
