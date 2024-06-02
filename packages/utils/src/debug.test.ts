@@ -1,5 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { createDebug, createDebugPattern } from "./debug";
+
+beforeAll(() => {
+  process.stderr.isTTY = false;
+});
 
 describe(createDebug, () => {
   it("basic", () => {
