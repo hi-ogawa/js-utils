@@ -66,8 +66,9 @@ if (import.meta.webpackHot) {
     debug: ${options.debug ?? false},
   });
   hot.dispose(data => {
-    data[MANAGER_KEY] = manager;
+    data[MANAGER_KEY] = $$manager;
   });
+  hot.accept();
 `;
   for (const { id, hooks } of result.entries) {
     footer += `\
