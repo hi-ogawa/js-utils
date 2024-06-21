@@ -1,12 +1,12 @@
-export const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
+const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
 
-export interface ViteHot {
+interface ViteHot {
   accept: (onNewModule: (newModule?: unknown) => void) => void;
   invalidate: (message?: string) => void;
   data: HotData;
 }
 
-export interface WebpackHot {
+interface WebpackHot {
   accept: (cb?: () => void) => void;
   invalidate: () => void;
   dispose: (cb: (data: HotData) => void) => void;
