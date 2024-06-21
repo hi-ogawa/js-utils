@@ -60,7 +60,7 @@ const NotFn = "hello";
       import * as $$refresh from "/refresh-runtime";
       if (import.meta.hot) {
         () => import.meta.hot.accept(); // need a fake "accept" for Vite to notice
-        const $$manager = $$runtime.setupVite(
+        const $$manager = $$refresh.setupVite(
           import.meta.hot,
           $$runtime,
           false
