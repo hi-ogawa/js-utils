@@ -19,7 +19,7 @@ import * as $$runtime from "${options.runtime}";
 import * as $$refresh from "${options.refreshRuntime}";
 if (import.meta.hot) {
   () => import.meta.hot.accept(); // need a fake "accept" for Vite to notice
-  const $$manager = $$runtime.setupVite(
+  const $$manager = $$refresh.setupVite(
     import.meta.hot,
     $$runtime,
     ${options.debug ?? false}
@@ -49,7 +49,7 @@ export async function transformWebpack(
 import * as $$runtime from "${options.runtime}";
 import * as $$refresh from "${options.refreshRuntime}";
 if (import.meta.webpackHot) {
-  const [$$manager, $$finish] = $$runtime.setupWebpack(
+  const [$$manager, $$finish] = $$refresh.setupWebpack(
     import.meta.webpackHot,
     $$runtime,
     ${options.debug ?? false},
