@@ -3,10 +3,19 @@ const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
 export interface ViteHot {
   accept: (onNewModule: (newModule?: unknown) => void) => void;
   invalidate: (message?: string) => void;
-  data: {
-    [MANAGER_KEY]?: Manager;
-  };
+  data: HotData;
 }
+
+export interface WebpackHot {
+  accept: (cb?: () => void) => void;
+  invalidate: () => void;
+  dispose: (cb: (data: HotData) => void) => void;
+  data?: HotData;
+}
+
+type HotData = {
+  [MANAGER_KEY]?: Manager;
+};
 
 type FC = (props: any) => unknown;
 

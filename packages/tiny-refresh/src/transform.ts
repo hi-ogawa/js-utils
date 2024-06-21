@@ -40,6 +40,8 @@ if (import.meta.hot) {
   return result.outCode + footer;
 }
 
+export async function hmrTransformWebpack() {}
+
 // extend types for rollup ast with node position
 declare module "estree" {
   interface BaseNode {
