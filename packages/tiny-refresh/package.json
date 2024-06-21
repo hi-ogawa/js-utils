@@ -21,6 +21,10 @@
     "./vite": {
       "types": "./dist/vite.d.ts",
       "default": "./dist/vite.js"
+    },
+    "./webpack": {
+      "types": "./dist/webpack.d.ts",
+      "default": "./dist/webpack.js"
     }
   },
   "main": "./dist/index.js",
@@ -39,7 +43,8 @@
     "@types/estree": "^1.0.5",
     "@types/react": "^18.2.14",
     "react": "^18.2.0",
-    "vite": "^5.1.3"
+    "vite": "^5.1.3",
+    "webpack": "^5.92.0"
   },
   "peerDependencies": {
     "vite": "*"

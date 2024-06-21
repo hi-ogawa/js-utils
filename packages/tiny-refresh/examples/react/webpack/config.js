@@ -28,7 +28,7 @@ export default () => {
           test: /\.[jt]sx$/,
           use: [
             {
-              loader: path.resolve("./webpack/loader.js"),
+              loader: "@hiogawa/tiny-refresh/webpack",
             },
             {
               loader: "esbuild-loader",
