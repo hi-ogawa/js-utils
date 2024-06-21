@@ -3,19 +3,10 @@ const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
 export interface ViteHot {
   accept: (onNewModule: (newModule?: unknown) => void) => void;
   invalidate: (message?: string) => void;
-  data: HotData;
+  data: {
+    [MANAGER_KEY]?: Manager;
+  };
 }
-
-export interface WebpackHot {
-  accept: (cb?: () => void) => void;
-  invalidate: () => void;
-  dispose: (cb: (data: HotData) => void) => void;
-  data?: HotData;
-}
-
-type HotData = {
-  [MANAGER_KEY]?: Manager;
-};
 
 type FC = (props: any) => unknown;
 
@@ -99,21 +90,6 @@ export function createManager(
   debug?: boolean
 ): Manager {
   return (hot.data[MANAGER_KEY] ??= new Manager({ hot, runtime, debug }));
-}
-
-export function createManagerWebpack(
-  hot: WebpackHot,
-  runtime: Runtime,
-  debug?: boolean
-) {
-  // `hot.data` is passed from old module via hot.dispose(data)
-  // https://webpack.js.org/api/hot-module-replacement/#dispose-or-adddisposehandler
-  const manager =
-    hot.data?.[MANAGER_KEY] ?? new Manager({ hot: hot as any, runtime, debug });
-  hot.dispose((data) => {
-    data[MANAGER_KEY] = manager;
-  });
-  return manager;
 }
 
 function createProxyComponent(manager: Manager, name: string): ProxyEntry {
