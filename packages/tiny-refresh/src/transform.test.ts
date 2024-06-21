@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { hmrTransform } from "./transform";
+import { transformVite } from "./transform";
 
-describe(hmrTransform, () => {
+describe(transformVite, () => {
   it("basic", async () => {
     const input = /* js */ `\
 
@@ -28,7 +28,7 @@ const NotFn = "hello";
 // export const NotFn2 = "hello";
 `;
     expect(
-      await hmrTransform(input, {
+      await transformVite(input, {
         runtime: "/runtime",
         refreshRuntime: "/refresh-runtime",
       })
