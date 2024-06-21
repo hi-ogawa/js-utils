@@ -11,7 +11,7 @@ export default () => {
     entry: "./src/index.tsx",
     plugins: [
       new HtmlWebpackPlugin({
-        template: "index.webpack.html",
+        template: "./webpack/index.html",
       }),
     ],
     output: {
@@ -25,13 +25,18 @@ export default () => {
     module: {
       rules: [
         {
-          test: /\.tsx$/,
-          use: {
-            loader: "esbuild-loader",
-            options: {
-              target: "es2022",
+          test: /\.[jt]sx$/,
+          use: [
+            {
+              loader: path.resolve("./webpack/loader.js"),
             },
-          },
+            {
+              loader: "esbuild-loader",
+              options: {
+                target: "es2022",
+              },
+            },
+          ],
         },
       ],
     },
