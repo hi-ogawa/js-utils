@@ -1,13 +1,13 @@
 import type * as estree from "estree";
 import { parseAstAsync } from "vite";
 
-interface HmrTransformOptions {
+interface TransformOptions {
   runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
   refreshRuntime: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
   debug?: boolean;
 }
 
-export async function transformVite(code: string, options: HmrTransformOptions) {
+export async function transformVite(code: string, options: TransformOptions) {
   const result = await analyzeCode(code);
   if (result.errors.length || result.entries.length === 0) {
     return;
@@ -43,7 +43,7 @@ if (import.meta.hot) {
 // TODO: refactor with transformVite/Webpack
 export async function transformWebpack(
   code: string,
-  options: HmrTransformOptions
+  options: TransformOptions
 ) {
   const result = await analyzeCode(code);
   if (result.errors.length || result.entries.length === 0) {
