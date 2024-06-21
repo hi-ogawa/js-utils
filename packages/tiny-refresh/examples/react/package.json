@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "dev-webpack": "webpack serve -c ./webpack/config.js",
+    "dev-webpack": "webpack serve",
     "test-e2e": "playwright test",
     "test-e2e-webpack": "E2E_WEBPACK=1 playwright test"
   },
