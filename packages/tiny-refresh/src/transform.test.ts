@@ -59,23 +59,17 @@ const NotFn = "hello";
       import * as $$runtime from "/runtime";
       import * as $$refresh from "/refresh-runtime";
       if (import.meta.hot) {
-        () => import.meta.hot.accept();
-        const $$manager = $$refresh.createManager(
+        () => import.meta.hot.accept(); // need a fake "accept" for Vite to notice
+        const $$manager = $$runtime.setupVite(
           import.meta.hot,
-          {
-            createElement: $$runtime.createElement,
-            useReducer: $$runtime.useReducer,
-            useEffect: $$runtime.useEffect,
-          },
-          false,
+          $$runtime,
+          false
         );
         FnDefault = $$manager.wrap("FnDefault", FnDefault, "");
         FnLet = $$manager.wrap("FnLet", FnLet, "useState/useRef/useCallback");
         FnConst = $$manager.wrap("FnConst", FnConst, "");
         FnNonExport = $$manager.wrap("FnNonExport", FnNonExport, "");
-        $$manager.setup();
-      }
-      "
+      }"
     `);
   });
 });
