@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite dev",
     "dev-webpack": "webpack serve -c ./webpack/config.js",
-    "test-e2e": "playwright test"
+    "test-e2e": "playwright test",
+    "test-e2e-webpack": "E2E_WEBPACK=1 playwright test"
   },
   "devDependencies": {
     "@hiogawa/tiny-react": "workspace:*",
