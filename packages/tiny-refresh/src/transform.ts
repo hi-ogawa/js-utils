@@ -7,7 +7,7 @@ interface HmrTransformOptions {
   debug?: boolean;
 }
 
-export async function hmrTransform(code: string, options: HmrTransformOptions) {
+export async function transformVite(code: string, options: HmrTransformOptions) {
   const result = await analyzeCode(code);
   if (result.errors.length || result.entries.length === 0) {
     return;
