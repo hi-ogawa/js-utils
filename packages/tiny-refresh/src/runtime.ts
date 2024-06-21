@@ -1,12 +1,21 @@
-const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
+export const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
 
 export interface ViteHot {
   accept: (onNewModule: (newModule?: unknown) => void) => void;
   invalidate: (message?: string) => void;
-  data: {
-    [MANAGER_KEY]?: Manager;
-  };
+  data: HotData;
 }
+
+export interface WebpackHot {
+  accept: (cb?: () => void) => void;
+  invalidate: () => void;
+  dispose: (cb: (data: HotData) => void) => void;
+  data?: HotData;
+}
+
+type HotData = {
+  [MANAGER_KEY]?: Manager;
+};
 
 type FC = (props: any) => unknown;
 
@@ -27,13 +36,12 @@ interface ComponentEntry {
 }
 
 // singleton per file
-export class Manager {
+class Manager {
   public proxyMap = new Map<string, ProxyEntry>();
   public componentMap = new Map<string, ComponentEntry>();
 
   constructor(
     public options: {
-      hot: ViteHot;
       runtime: Runtime;
       debug?: boolean;
     }
@@ -47,16 +55,6 @@ export class Manager {
       this.proxyMap.set(name, proxy);
     }
     return proxy.Component;
-  }
-
-  setup() {
-    // https://vitejs.dev/guide/api-hmr.html#hot-accept-cb
-    this.options.hot.accept((newModule) => {
-      const ok = newModule && this.patch();
-      if (!ok) {
-        this.options.hot.invalidate();
-      }
-    });
   }
 
   patch() {
@@ -82,14 +80,6 @@ export class Manager {
     }
     return true;
   }
-}
-
-export function createManager(
-  hot: ViteHot,
-  runtime: Runtime,
-  debug?: boolean
-): Manager {
-  return (hot.data[MANAGER_KEY] ??= new Manager({ hot, runtime, debug }));
 }
 
 function createProxyComponent(manager: Manager, name: string): ProxyEntry {
@@ -127,4 +117,42 @@ function createProxyComponent(manager: Manager, name: string): ProxyEntry {
   Object.defineProperty(InnerComponent, "name", { value: name });
 
   return { Component, listeners };
+}
+
+export function setupVite(hot: ViteHot, runtime: Runtime, debug?: boolean) {
+  const manager = (hot.data[MANAGER_KEY] ??= new Manager({ runtime, debug }));
+
+  // https://vitejs.dev/guide/api-hmr.html#hot-accept-cb
+  hot.accept((newModule) => {
+    const ok = newModule && manager.patch();
+    if (!ok) {
+      hot.invalidate();
+    }
+  });
+
+  return manager;
+}
+
+export function setupWebpack(
+  hot: WebpackHot,
+  runtime: Runtime,
+  debug?: boolean
+) {
+  // 'hot.data' is passed from old module via hot.dispose(data)
+  // https://webpack.js.org/api/hot-module-replacement/#dispose-or-adddisposehandler
+  const prevData = hot.data?.[MANAGER_KEY];
+  const manager = prevData ?? new Manager({ runtime, debug });
+
+  hot.dispose((data) => {
+    data[MANAGER_KEY] = manager;
+  });
+  hot.accept();
+
+  function onFinished() {
+    if (prevData && !manager.patch()) {
+      hot.invalidate();
+    }
+  }
+
+  return [manager, onFinished];
 }

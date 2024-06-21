@@ -2,8 +2,10 @@ import type * as estree from "estree";
 import { parseAstAsync } from "vite";
 
 interface TransformOptions {
-  runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
-  refreshRuntime: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
+  // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
+  runtime: string;
+  // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
+  refreshRuntime: string;
   debug?: boolean;
 }
 
@@ -16,15 +18,11 @@ export async function transformVite(code: string, options: TransformOptions) {
 import * as $$runtime from "${options.runtime}";
 import * as $$refresh from "${options.refreshRuntime}";
 if (import.meta.hot) {
-  () => import.meta.hot.accept();
-  const $$manager = $$refresh.createManager(
+  () => import.meta.hot.accept(); // need a fake "accept" for Vite to notice
+  const $$manager = $$runtime.setupVite(
     import.meta.hot,
-    {
-      createElement: $$runtime.createElement,
-      useReducer: $$runtime.useReducer,
-      useEffect: $$runtime.useEffect,
-    },
-    ${options.debug ?? false},
+    $$runtime,
+    ${options.debug ?? false}
   );
 `;
   for (const { id, hooks } of result.entries) {
@@ -32,10 +30,6 @@ if (import.meta.hot) {
   ${id} = $$manager.wrap("${id}", ${id}, ${JSON.stringify(hooks.join("/"))});
 `;
   }
-  footer += `\
-  $$manager.setup();
-}
-`;
   // no need to manipulate sourcemap since transform only appends
   return result.outCode + footer;
 }
@@ -53,23 +47,11 @@ export async function transformWebpack(
 import * as $$runtime from "${options.runtime}";
 import * as $$refresh from "${options.refreshRuntime}";
 if (import.meta.webpackHot) {
-  // 'hot.data' is passed from old module via hot.dispose(data)
-  // https://webpack.js.org/api/hot-module-replacement/#dispose-or-adddisposehandler
-  const hot = import.meta.webpackHot;
-  const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
-  const $$manager = hot.data?.[MANAGER_KEY] ?? new $$refresh.Manager({
-    hot: {},
-    runtime: {
-      createElement: $$runtime.createElement,
-      useReducer: $$runtime.useReducer,
-      useEffect: $$runtime.useEffect,
-    },
-    debug: ${options.debug ?? false},
-  });
-  hot.dispose(data => {
-    data[MANAGER_KEY] = $$manager;
-  });
-  hot.accept();
+  const [$$manager, $$finish] = $$runtime.setupWebpack(
+    import.meta.webpackHot,
+    $$runtime,
+    ${options.debug ?? false},
+  )
 `;
   for (const { id, hooks } of result.entries) {
     footer += `\
@@ -77,11 +59,7 @@ if (import.meta.webpackHot) {
 `;
   }
   footer += `\
-  if (hot.data?.[MANAGER_KEY]) {
-    if (!$$manager.patch()) {
-      hot.invalidate();
-    }
-  }
+  $$fininsh();
 }
 `;
   return result.outCode + footer;
