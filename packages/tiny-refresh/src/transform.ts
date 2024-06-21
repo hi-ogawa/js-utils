@@ -30,6 +30,8 @@ if (import.meta.hot) {
   ${id} = $$manager.wrap("${id}", ${id}, ${JSON.stringify(hooks.join("/"))});
 `;
   }
+  footer += `\
+}`;
   // no need to manipulate sourcemap since transform only appends
   return result.outCode + footer;
 }
