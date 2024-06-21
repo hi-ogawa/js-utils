@@ -36,7 +36,7 @@ interface ComponentEntry {
 }
 
 // singleton per file
-class Manager {
+export class Manager {
   public proxyMap = new Map<string, ProxyEntry>();
   public componentMap = new Map<string, ComponentEntry>();
 
@@ -68,7 +68,7 @@ class Manager {
     });
   }
 
-  private patch() {
+  patch() {
     // TODO: debounce re-rendering?
     const componentNames = new Set([
       ...this.proxyMap.keys(),
@@ -99,6 +99,21 @@ export function createManager(
   debug?: boolean
 ): Manager {
   return (hot.data[MANAGER_KEY] ??= new Manager({ hot, runtime, debug }));
+}
+
+export function createManagerWebpack(
+  hot: WebpackHot,
+  runtime: Runtime,
+  debug?: boolean
+) {
+  // `hot.data` is passed from old module via hot.dispose(data)
+  // https://webpack.js.org/api/hot-module-replacement/#dispose-or-adddisposehandler
+  const manager =
+    hot.data?.[MANAGER_KEY] ?? new Manager({ hot: hot as any, runtime, debug });
+  hot.dispose((data) => {
+    data[MANAGER_KEY] = manager;
+  });
+  return manager;
 }
 
 function createProxyComponent(manager: Manager, name: string): ProxyEntry {

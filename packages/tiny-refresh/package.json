@@ -14,6 +14,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./transform": {
+      "types": "./dist/transform.d.ts",
+      "default": "./dist/transform.js"
+    },
     "./vite": {
       "types": "./dist/vite.d.ts",
       "default": "./dist/vite.js"
