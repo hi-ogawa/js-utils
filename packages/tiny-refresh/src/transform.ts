@@ -40,6 +40,7 @@ if (import.meta.hot) {
   return result.outCode + footer;
 }
 
+// TODO: refactor with transformVite/Webpack
 export async function transformWebpack(
   code: string,
   options: HmrTransformOptions
