@@ -11,7 +11,7 @@ export default () => {
     entry: "./src/index.tsx",
     plugins: [
       new HtmlWebpackPlugin({
-        template: "index.html",
+        template: "index.webpack.html",
       }),
     ],
     output: {
