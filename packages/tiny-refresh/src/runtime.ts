@@ -1,6 +1,6 @@
 const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
 
-interface ViteHot {
+export interface ViteHot {
   accept: (onNewModule: (newModule?: unknown) => void) => void;
   invalidate: (message?: string) => void;
   data: HotData;

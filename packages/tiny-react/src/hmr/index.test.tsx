@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { type ViteHot, createManager } from ".";
+import { type ViteHot, setupVite } from ".";
 import { useEffect, useReducer } from "../hooks";
 import { render } from "../reconciler";
 import { sleepFrame } from "../test-utils";
@@ -45,9 +45,8 @@ describe("hmr", () => {
         return <div>1</div>;
       }
 
-      const manager = createManager(hot, runtime, false);
+      const manager = setupVite(hot, runtime, false);
       ChildExport = manager.wrap("Child", Child, "useEffect");
-      manager.setup();
     }
 
     const vnode = <Parent />;
@@ -78,9 +77,8 @@ describe("hmr", () => {
         return <div>2</div>;
       }
 
-      const manager = createManager(hot, runtime, false);
+      const manager = setupVite(hot, runtime, false);
       manager.wrap("Child", Child, "");
-      manager.setup();
     }
 
     // simulate 1st version's `hot.accept`
@@ -119,9 +117,8 @@ describe("hmr", () => {
         return <div>3</div>;
       }
 
-      const manager = createManager(hot, runtime, false);
+      const manager = setupVite(hot, runtime, false);
       manager.wrap("Child", Child, "useEffect");
-      manager.setup();
     }
 
     acceptCallbacks[1]({});
