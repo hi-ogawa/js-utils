@@ -39,6 +39,7 @@ describe("hmr", () => {
 
       const manager = setupVite(hot, React, false);
       ChildExport = manager.wrap("Child", Child, "useEffect");
+      manager.setup();
     }
 
     function Parent() {
@@ -71,6 +72,7 @@ describe("hmr", () => {
       }
       const manager = setupVite(hot, React, false);
       manager.wrap("Child", Child, "");
+      manager.setup();
     }
 
     // simulate last version's `hot.accept`
@@ -111,6 +113,7 @@ describe("hmr", () => {
 
       const manager = setupVite(hot, React, false);
       manager.wrap("Child", Child, "useEffect");
+      manager.setup();
     }
 
     act(() => acceptCallbacks[1]({}));
@@ -153,6 +156,7 @@ describe("hmr", () => {
 
       const manager = setupVite(hot, React, false);
       manager.wrap("Child", Child, "useEffect");
+      manager.setup();
     }
 
     act(() => acceptCallbacks[1]({}));
@@ -189,6 +193,7 @@ describe("hmr", () => {
 
       const manager = setupVite(hot, React, false);
       manager.wrap("Child", Child, "");
+      manager.setup();
     }
 
     act(() => acceptCallbacks[1]({}));
