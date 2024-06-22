@@ -28,7 +28,7 @@ export async function transform(code: string, options: TransformOptions2) {
   const wrap = result.entries
     .map((e) => {
       const key = JSON.stringify(e.hooks.join("/"));
-      return `${e.id} = $$manager.wrap("${e.id}", ${e.id}, ${key});\n`;
+      return `  ${e.id} = $$manager.wrap("${e.id}", ${e.id}, ${key});\n`;
     })
     .join("");
   const footer = `
@@ -41,6 +41,7 @@ if (${hot}) {
     $$runtime,
     ${JSON.stringify(options)}
   );
+
 ${wrap}
   $$manager.setup();
 }

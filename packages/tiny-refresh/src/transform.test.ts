@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { transformVite } from "./transform";
+import { transform } from "./transform";
 
-describe(transformVite, () => {
+describe(transform, () => {
   it("basic", async () => {
     const input = /* js */ `\
 
@@ -28,9 +28,11 @@ const NotFn = "hello";
 // export const NotFn2 = "hello";
 `;
     expect(
-      await transformVite(input, {
+      await transform(input, {
         runtime: "/runtime",
         refreshRuntime: "/refresh-runtime",
+        mode: "vite",
+        debug: false,
       })
     ).toMatchInlineSnapshot(`
       "
@@ -59,18 +61,21 @@ const NotFn = "hello";
       import * as $$runtime from "/runtime";
       import * as $$refresh from "/refresh-runtime";
       if (import.meta.hot) {
-        () => import.meta.hot.accept(); // need a fake "accept" for Vite to notice
-        const $$manager = $$refresh.setupVite(
+        (() => import.meta.hot.accept());
+        const $$manager = $$refresh.initialize(
           import.meta.hot,
           $$runtime,
-          false
+          {"runtime":"/runtime","refreshRuntime":"/refresh-runtime","mode":"vite","debug":false}
         );
+
         FnDefault = $$manager.wrap("FnDefault", FnDefault, "");
         FnLet = $$manager.wrap("FnLet", FnLet, "useState/useRef/useCallback");
         FnConst = $$manager.wrap("FnConst", FnConst, "");
         FnNonExport = $$manager.wrap("FnNonExport", FnNonExport, "");
+
         $$manager.setup();
-      }"
+      }
+      "
     `);
   });
 });
