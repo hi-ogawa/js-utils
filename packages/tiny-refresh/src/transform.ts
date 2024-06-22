@@ -61,7 +61,7 @@ if (import.meta.webpackHot) {
 `;
   }
   footer += `\
-  $$fininsh();
+  $$finish();
 }
 `;
   return result.outCode + footer;
