@@ -31,6 +31,7 @@ if (import.meta.hot) {
 `;
   }
   footer += `\
+  $$manager.finish();
 }`;
   // no need to manipulate sourcemap since transform only appends
   return result.outCode + footer;
@@ -48,7 +49,7 @@ export async function transformWebpack(
 import * as $$runtime from "${options.runtime}";
 import * as $$refresh from "${options.refreshRuntime}";
 if (import.meta.webpackHot) {
-  const [$$manager, $$finish] = $$refresh.setupWebpack(
+  const $$manager = $$refresh.setupWebpack(
     import.meta.webpackHot,
     $$runtime,
     ${options.debug ?? false},
@@ -60,7 +61,7 @@ if (import.meta.webpackHot) {
 `;
   }
   footer += `\
-  $$finish();
+  $$manager.finish();
 }
 `;
   return result.outCode + footer;

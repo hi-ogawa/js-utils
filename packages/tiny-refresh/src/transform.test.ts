@@ -69,6 +69,7 @@ const NotFn = "hello";
         FnLet = $$manager.wrap("FnLet", FnLet, "useState/useRef/useCallback");
         FnConst = $$manager.wrap("FnConst", FnConst, "");
         FnNonExport = $$manager.wrap("FnNonExport", FnNonExport, "");
+        $$manager.finish();
       }"
     `);
   });
