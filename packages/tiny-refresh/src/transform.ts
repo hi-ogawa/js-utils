@@ -31,7 +31,7 @@ if (import.meta.hot) {
 `;
   }
   footer += `\
-  $$manager.finish();
+  $$manager.setup();
 }`;
   // no need to manipulate sourcemap since transform only appends
   return result.outCode + footer;
@@ -61,7 +61,7 @@ if (import.meta.webpackHot) {
 `;
   }
   footer += `\
-  $$manager.finish();
+  $$manager.setup();
 }
 `;
   return result.outCode + footer;
