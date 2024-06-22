@@ -1,8 +1,10 @@
 # tiny-refresh
 
-Simple Vite plugin and Webpack loader for component HMR
+Simple Vite plugin and Webpack loader to enable component HMR for React-like UI libraries
 
 ## usages
+
+See [`./examples/react`]
 
 ```tsx
 // vite.config.ts
@@ -16,4 +18,22 @@ export default defineConfig({
     }),
   ],
 });
+
+// webpack.config.js
+export default {
+  resolve: {
+    extensions: [".tsx", ".ts", "..."],
+  },
+  module: {
+    rules: [
+      {
+        test: /\.[jt]sx$/,
+        use: [
+          "@hiogawa/tiny-refresh/webpack",
+          "esbuild-loader",
+        ],
+      },
+    ],
+  },
+}
 ```
