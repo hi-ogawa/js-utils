@@ -1,3 +1,5 @@
+import type { RefreshRuntimeOptions } from "./transform";
+
 const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
 
 export interface ViteHot {
@@ -42,10 +44,8 @@ class Manager {
   public setup = () => {};
 
   constructor(
-    public options: {
-      runtime: Runtime;
-      debug?: boolean;
-    }
+    public runtime: Runtime,
+    public options: RefreshRuntimeOptions
   ) {}
 
   wrap(name: string, Component: FC, key: string): FC {
@@ -84,7 +84,7 @@ class Manager {
 }
 
 function createProxyComponent(manager: Manager, name: string): ProxyEntry {
-  const { createElement, useEffect, useReducer } = manager.options.runtime;
+  const { createElement, useEffect, useReducer } = manager.runtime;
 
   const listeners = new Set<() => void>();
 
@@ -121,11 +121,29 @@ function createProxyComponent(manager: Manager, name: string): ProxyEntry {
 }
 
 //
-// hmr api integration
+// HMR API integration
 //
 
-export function setupVite(hot: ViteHot, runtime: Runtime, debug?: boolean) {
-  const manager = (hot.data[MANAGER_KEY] ??= new Manager({ runtime, debug }));
+export function initialize(
+  hot: ViteHot | WebpackHot,
+  runtime: Runtime,
+  options: RefreshRuntimeOptions
+) {
+  if (options.mode === "vite") {
+    return initializeVite(hot as any, runtime, options);
+  }
+  if (options.mode === "webpack") {
+    return initializeWebpack(hot as any, runtime, options);
+  }
+  return options.mode satisfies never;
+}
+
+function initializeVite(
+  hot: ViteHot,
+  runtime: Runtime,
+  options: RefreshRuntimeOptions
+) {
+  const manager = (hot.data[MANAGER_KEY] ??= new Manager(runtime, options));
 
   // https://vitejs.dev/guide/api-hmr.html#hot-accept-cb
   hot.accept((newModule) => {
@@ -138,15 +156,15 @@ export function setupVite(hot: ViteHot, runtime: Runtime, debug?: boolean) {
   return manager;
 }
 
-export function setupWebpack(
+function initializeWebpack(
   hot: WebpackHot,
   runtime: Runtime,
-  debug?: boolean
+  options: RefreshRuntimeOptions
 ) {
   // 'hot.data' is passed from old module via hot.dispose(data)
   // https://webpack.js.org/api/hot-module-replacement/#dispose-or-adddisposehandler
   const prevData = hot.data?.[MANAGER_KEY];
-  const manager = prevData ?? new Manager({ runtime, debug });
+  const manager = prevData ?? new Manager(runtime, options);
 
   hot.accept();
   hot.dispose((data) => {

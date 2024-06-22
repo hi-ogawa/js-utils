@@ -1,69 +1,46 @@
 import type * as estree from "estree";
 import { parseAstAsync } from "vite";
 
-interface TransformOptions {
-  // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
+export interface TransformOptions {
+  // "react", "preact/compat", "@hiogawa/tiny-react"
   runtime: string;
   // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
   refreshRuntime: string;
-  debug?: boolean;
+  mode: "vite" | "webpack";
+  debug: boolean;
 }
 
-export async function transformVite(code: string, options: TransformOptions) {
+export type RefreshRuntimeOptions = Pick<TransformOptions, "mode" | "debug">;
+
+export async function transform(code: string, options: TransformOptions) {
   const result = await analyzeCode(code);
   if (result.errors.length || result.entries.length === 0) {
     return;
   }
-  let footer = /* js */ `
+  const hot =
+    options.mode === "vite" ? "import.meta.hot" : "import.meta.webpackHot";
+  const wrap = result.entries
+    .map((e) => {
+      const key = JSON.stringify(e.hooks.join("/"));
+      return `  ${e.id} = $$manager.wrap("${e.id}", ${e.id}, ${key});\n`;
+    })
+    .join("");
+  const footer = `
 import * as $$runtime from "${options.runtime}";
 import * as $$refresh from "${options.refreshRuntime}";
-if (import.meta.hot) {
-  () => import.meta.hot.accept(); // need a fake "accept" for Vite to notice
-  const $$manager = $$refresh.setupVite(
-    import.meta.hot,
+if (${hot}) {
+  (() => ${hot}.accept());
+  const $$manager = $$refresh.initialize(
+    ${hot},
     $$runtime,
-    ${options.debug ?? false}
+    ${JSON.stringify(options)}
   );
-`;
-  for (const { id, hooks } of result.entries) {
-    footer += `\
-  ${id} = $$manager.wrap("${id}", ${id}, ${JSON.stringify(hooks.join("/"))});
-`;
-  }
-  footer += `\
-  $$manager.setup();
-}`;
-  // no need to manipulate sourcemap since transform only appends
-  return result.outCode + footer;
-}
 
-export async function transformWebpack(
-  code: string,
-  options: TransformOptions
-) {
-  const result = await analyzeCode(code);
-  if (result.errors.length || result.entries.length === 0) {
-    return;
-  }
-  let footer = /* js */ `
-import * as $$runtime from "${options.runtime}";
-import * as $$refresh from "${options.refreshRuntime}";
-if (import.meta.webpackHot) {
-  const $$manager = $$refresh.setupWebpack(
-    import.meta.webpackHot,
-    $$runtime,
-    ${options.debug ?? false},
-  )
-`;
-  for (const { id, hooks } of result.entries) {
-    footer += `\
-  ${id} = $$manager.wrap("${id}", ${id}, ${JSON.stringify(hooks.join("/"))});
-`;
-  }
-  footer += `\
+${wrap}
   $$manager.setup();
 }
 `;
+  // no need to manipulate sourcemap since transform only appends
   return result.outCode + footer;
 }
 

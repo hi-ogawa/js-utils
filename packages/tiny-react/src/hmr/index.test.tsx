@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { type ViteHot, setupVite } from ".";
+import { type ViteHot, initialize } from ".";
 import { useEffect, useReducer } from "../hooks";
 import { render } from "../reconciler";
 import { sleepFrame } from "../test-utils";
@@ -45,7 +45,7 @@ describe("hmr", () => {
         return <div>1</div>;
       }
 
-      const manager = setupVite(hot, runtime, false);
+      const manager = initialize(hot, runtime, { mode: "vite", debug: false });
       ChildExport = manager.wrap("Child", Child, "useEffect");
       manager.setup();
     }
@@ -78,7 +78,7 @@ describe("hmr", () => {
         return <div>2</div>;
       }
 
-      const manager = setupVite(hot, runtime, false);
+      const manager = initialize(hot, runtime, { mode: "vite", debug: false });
       manager.wrap("Child", Child, "");
       manager.setup();
     }
@@ -119,7 +119,7 @@ describe("hmr", () => {
         return <div>3</div>;
       }
 
-      const manager = setupVite(hot, runtime, false);
+      const manager = initialize(hot, runtime, { mode: "vite", debug: false });
       manager.wrap("Child", Child, "useEffect");
       manager.setup();
     }
