@@ -36,7 +36,6 @@ if (import.meta.hot) {
   return result.outCode + footer;
 }
 
-// TODO: refactor with transformVite/Webpack
 export async function transformWebpack(
   code: string,
   options: TransformOptions
@@ -90,8 +89,6 @@ const COMPONENT_RE = /^[A-Z]/;
 async function analyzeCode(code: string) {
   const ast = await parseAstAsync(code);
   const errors: unknown[] = [];
-
-  // TODO: collect also non-exported functions with a capitalized names
   const entries: ParsedEntry[] = [];
 
   // replace "export const" with "export let"
