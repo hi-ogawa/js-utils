@@ -39,6 +39,7 @@ interface ComponentEntry {
 class Manager {
   public proxyMap = new Map<string, ProxyEntry>();
   public componentMap = new Map<string, ComponentEntry>();
+  public finish = () => {};
 
   constructor(
     public options: {
@@ -152,11 +153,11 @@ export function setupWebpack(
     data[MANAGER_KEY] = manager;
   });
 
-  function onFinished() {
+  manager.finish = () => {
     if (prevData && !manager.patch()) {
       hot.invalidate();
     }
-  }
+  };
 
-  return [manager, onFinished];
+  return manager;
 }
