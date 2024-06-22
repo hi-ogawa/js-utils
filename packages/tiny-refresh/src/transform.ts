@@ -1,15 +1,7 @@
 import type * as estree from "estree";
 import { parseAstAsync } from "vite";
 
-interface TransformOptions {
-  // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
-  runtime: string;
-  // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
-  refreshRuntime: string;
-  debug?: boolean;
-}
-
-export interface TransformOptions2 {
+export interface TransformOptions {
   // "react", "preact/compat", "@hiogawa/tiny-react"
   runtime: string;
   // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
@@ -18,9 +10,9 @@ export interface TransformOptions2 {
   debug: boolean;
 }
 
-export type RefreshRuntimeOptions = Pick<TransformOptions2, "mode" | "debug">;
+export type RefreshRuntimeOptions = Pick<TransformOptions, "mode" | "debug">;
 
-export async function transform(code: string, options: TransformOptions2) {
+export async function transform(code: string, options: TransformOptions) {
   const result = await analyzeCode(code);
   if (result.errors.length || result.entries.length === 0) {
     return;
@@ -49,64 +41,6 @@ ${wrap}
 }
 `;
   // no need to manipulate sourcemap since transform only appends
-  return result.outCode + footer;
-}
-
-export async function transformVite(code: string, options: TransformOptions) {
-  const result = await analyzeCode(code);
-  if (result.errors.length || result.entries.length === 0) {
-    return;
-  }
-  let footer = /* js */ `
-import * as $$runtime from "${options.runtime}";
-import * as $$refresh from "${options.refreshRuntime}";
-if (import.meta.hot) {
-  () => import.meta.hot.accept(); // need a fake "accept" for Vite to notice
-  const $$manager = $$refresh.setupVite(
-    import.meta.hot,
-    $$runtime,
-    ${options.debug ?? false}
-  );
-`;
-  for (const { id, hooks } of result.entries) {
-    footer += `\
-  ${id} = $$manager.wrap("${id}", ${id}, ${JSON.stringify(hooks.join("/"))});
-`;
-  }
-  footer += `\
-  $$manager.setup();
-}`;
-  // no need to manipulate sourcemap since transform only appends
-  return result.outCode + footer;
-}
-
-export async function transformWebpack(
-  code: string,
-  options: TransformOptions
-) {
-  const result = await analyzeCode(code);
-  if (result.errors.length || result.entries.length === 0) {
-    return;
-  }
-  let footer = /* js */ `
-import * as $$runtime from "${options.runtime}";
-import * as $$refresh from "${options.refreshRuntime}";
-if (import.meta.webpackHot) {
-  const $$manager = $$refresh.setupWebpack(
-    import.meta.webpackHot,
-    $$runtime,
-    ${options.debug ?? false},
-  )
-`;
-  for (const { id, hooks } of result.entries) {
-    footer += `\
-  ${id} = $$manager.wrap("${id}", ${id}, ${JSON.stringify(hooks.join("/"))});
-`;
-  }
-  footer += `\
-  $$manager.setup();
-}
-`;
   return result.outCode + footer;
 }
 
