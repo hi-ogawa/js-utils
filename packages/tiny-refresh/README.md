@@ -4,7 +4,7 @@ Simple Vite plugin and Webpack loader to enable component HMR for React-like lib
 
 ## usages
 
-See [`./examples/react`]
+See [`./examples/react`](./examples/react)
 
 ```tsx
 // vite.config.ts
