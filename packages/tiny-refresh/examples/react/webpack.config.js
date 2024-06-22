@@ -20,23 +20,22 @@ export default () => {
       clean: true,
     },
     resolve: {
-      extensions: [".tsx", ".ts", "..."],
+      extensions: [".tsx", ".ts", ".jsx", "..."],
     },
     module: {
       rules: [
         {
           test: /\.[jt]sx$/,
-          use: [
-            {
-              loader: "@hiogawa/tiny-refresh/webpack",
+          use: "@hiogawa/tiny-refresh/webpack",
+        },
+        {
+          test: /\.(ts|tsx|jsx)$/,
+          use: {
+            loader: "esbuild-loader",
+            options: {
+              target: "es2022",
             },
-            {
-              loader: "esbuild-loader",
-              options: {
-                target: "es2022",
-              },
-            },
-          ],
+          },
         },
       ],
     },

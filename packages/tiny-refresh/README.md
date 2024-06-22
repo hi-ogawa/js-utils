@@ -21,17 +21,11 @@ export default defineConfig({
 
 // webpack.config.js
 export default {
-  resolve: {
-    extensions: [".tsx", ".ts", "..."],
-  },
   module: {
     rules: [
       {
         test: /\.[jt]sx$/,
-        use: [
-          "@hiogawa/tiny-refresh/webpack",
-          "esbuild-loader",
-        ],
+        use: "@hiogawa/tiny-refresh/webpack",
       },
     ],
   },
