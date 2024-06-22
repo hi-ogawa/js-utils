@@ -3,7 +3,7 @@
 import { act, cleanup, render } from "@testing-library/react";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { type ViteHot, setupVite } from "./runtime";
+import { type ViteHot, initialize } from "./runtime";
 
 afterEach(cleanup);
 
@@ -37,7 +37,7 @@ describe("hmr", () => {
         return <div>1</div>;
       }
 
-      const manager = setupVite(hot, React, false);
+      const manager = initialize(hot, React, { mode: "vite", debug: false });
       ChildExport = manager.wrap("Child", Child, "useEffect");
       manager.setup();
     }
@@ -70,7 +70,7 @@ describe("hmr", () => {
       function Child() {
         return <div>2</div>;
       }
-      const manager = setupVite(hot, React, false);
+      const manager = initialize(hot, React, { mode: "vite", debug: false });
       manager.wrap("Child", Child, "");
       manager.setup();
     }
@@ -111,7 +111,7 @@ describe("hmr", () => {
         return <div>3</div>;
       }
 
-      const manager = setupVite(hot, React, false);
+      const manager = initialize(hot, React, { mode: "vite", debug: false });
       manager.wrap("Child", Child, "useEffect");
       manager.setup();
     }
@@ -154,7 +154,7 @@ describe("hmr", () => {
         return <div>4</div>;
       }
 
-      const manager = setupVite(hot, React, false);
+      const manager = initialize(hot, React, { mode: "vite", debug: false });
       manager.wrap("Child", Child, "useEffect");
       manager.setup();
     }
@@ -191,7 +191,7 @@ describe("hmr", () => {
         return <div>5</div>;
       }
 
-      const manager = setupVite(hot, React, false);
+      const manager = initialize(hot, React, { mode: "vite", debug: false });
       manager.wrap("Child", Child, "");
       manager.setup();
     }

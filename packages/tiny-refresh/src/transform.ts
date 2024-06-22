@@ -18,6 +18,8 @@ export interface TransformOptions2 {
   debug: boolean;
 }
 
+export type RefreshRuntimeOptions = Pick<TransformOptions2, "mode" | "debug">;
+
 export async function transform(code: string, options: TransformOptions2) {
   const result = await analyzeCode(code);
   if (result.errors.length || result.entries.length === 0) {
