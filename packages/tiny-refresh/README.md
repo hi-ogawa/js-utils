@@ -1,6 +1,6 @@
 # tiny-refresh
 
-Simple Vite plugin and Webpack loader to enable component HMR for React-like UI libraries
+Simple Vite plugin and Webpack loader to enable component HMR for React-like libraries
 
 ## usages
 
