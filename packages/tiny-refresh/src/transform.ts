@@ -9,6 +9,46 @@ interface TransformOptions {
   debug?: boolean;
 }
 
+export interface TransformOptions2 {
+  // "react", "preact/compat", "@hiogawa/tiny-react"
+  runtime: string;
+  // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
+  refreshRuntime: string;
+  mode: "vite" | "webpack";
+  debug: boolean;
+}
+
+export async function transform(code: string, options: TransformOptions2) {
+  const result = await analyzeCode(code);
+  if (result.errors.length || result.entries.length === 0) {
+    return;
+  }
+  const hot =
+    options.mode === "vite" ? "import.meta.hot" : "import.meta.webpackHot";
+  const wrap = result.entries
+    .map((e) => {
+      const key = JSON.stringify(e.hooks.join("/"));
+      return `${e.id} = $$manager.wrap("${e.id}", ${e.id}, ${key});\n`;
+    })
+    .join("");
+  const footer = `
+import * as $$runtime from "${options.runtime}";
+import * as $$refresh from "${options.refreshRuntime}";
+if (${hot}) {
+  (() => ${hot}.accept());
+  const $$manager = $$refresh.initialize(
+    ${hot},
+    $$runtime,
+    ${JSON.stringify(options)}
+  );
+${wrap}
+  $$manager.setup();
+}
+`;
+  // no need to manipulate sourcemap since transform only appends
+  return result.outCode + footer;
+}
+
 export async function transformVite(code: string, options: TransformOptions) {
   const result = await analyzeCode(code);
   if (result.errors.length || result.entries.length === 0) {

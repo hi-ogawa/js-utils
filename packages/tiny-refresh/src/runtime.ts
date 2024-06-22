@@ -1,3 +1,5 @@
+import type { TransformOptions2 } from "./transform";
+
 const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
 
 export interface ViteHot {
@@ -123,6 +125,16 @@ function createProxyComponent(manager: Manager, name: string): ProxyEntry {
 //
 // hmr api integration
 //
+
+export function initialize(
+  hot: ViteHot | WebpackHot,
+  runtime: Runtime,
+  options: TransformOptions2
+) {
+  options.mode === "vite";
+  hot;
+  runtime;
+}
 
 export function setupVite(hot: ViteHot, runtime: Runtime, debug?: boolean) {
   const manager = (hot.data[MANAGER_KEY] ??= new Manager({ runtime, debug }));
