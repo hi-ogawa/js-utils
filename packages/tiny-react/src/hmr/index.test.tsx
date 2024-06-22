@@ -47,6 +47,7 @@ describe("hmr", () => {
 
       const manager = setupVite(hot, runtime, false);
       ChildExport = manager.wrap("Child", Child, "useEffect");
+      manager.setup();
     }
 
     const vnode = <Parent />;
@@ -79,6 +80,7 @@ describe("hmr", () => {
 
       const manager = setupVite(hot, runtime, false);
       manager.wrap("Child", Child, "");
+      manager.setup();
     }
 
     // simulate 1st version's `hot.accept`
@@ -119,6 +121,7 @@ describe("hmr", () => {
 
       const manager = setupVite(hot, runtime, false);
       manager.wrap("Child", Child, "useEffect");
+      manager.setup();
     }
 
     acceptCallbacks[1]({});
