@@ -3,7 +3,7 @@
 import { act, cleanup, render } from "@testing-library/react";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { type ViteHot, createManager } from "./runtime";
+import { type ViteHot, setupVite } from "./runtime";
 
 afterEach(cleanup);
 
@@ -37,9 +37,8 @@ describe("hmr", () => {
         return <div>1</div>;
       }
 
-      const manager = createManager(hot, React, false);
+      const manager = setupVite(hot, React, false);
       ChildExport = manager.wrap("Child", Child, "useEffect");
-      manager.setup();
     }
 
     function Parent() {
@@ -70,9 +69,8 @@ describe("hmr", () => {
       function Child() {
         return <div>2</div>;
       }
-      const manager = createManager(hot, React, false);
+      const manager = setupVite(hot, React, false);
       manager.wrap("Child", Child, "");
-      manager.setup();
     }
 
     // simulate last version's `hot.accept`
@@ -111,9 +109,8 @@ describe("hmr", () => {
         return <div>3</div>;
       }
 
-      const manager = createManager(hot, React, false);
+      const manager = setupVite(hot, React, false);
       manager.wrap("Child", Child, "useEffect");
-      manager.setup();
     }
 
     act(() => acceptCallbacks[1]({}));
@@ -154,9 +151,8 @@ describe("hmr", () => {
         return <div>4</div>;
       }
 
-      const manager = createManager(hot, React, false);
+      const manager = setupVite(hot, React, false);
       manager.wrap("Child", Child, "useEffect");
-      manager.setup();
     }
 
     act(() => acceptCallbacks[1]({}));
@@ -191,9 +187,8 @@ describe("hmr", () => {
         return <div>5</div>;
       }
 
-      const manager = createManager(hot, React, false);
+      const manager = setupVite(hot, React, false);
       manager.wrap("Child", Child, "");
-      manager.setup();
     }
 
     act(() => acceptCallbacks[1]({}));
