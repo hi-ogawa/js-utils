@@ -1,6 +1,6 @@
 # tiny-refresh
 
-Simple Vite plugin for React-like component HMR
+Simple Vite plugin and Webpack loader for component HMR
 
 ## usages
 
@@ -12,7 +12,7 @@ import { vitePluginTinyRefresh } from "@hiogawa/tiny-refresh/vite";
 export default defineConfig({
   plugins: [
     vitePluginTinyRefresh({
-      runtime: "react", // "preact/compat", "@hiogawa/tiny-react"
+      runtime: "react", // "preact/compat", "@hiogawa/tiny-react", "hono/jsx"
     }),
   ],
 });
