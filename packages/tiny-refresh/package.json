@@ -17,6 +17,10 @@
     "./vite": {
       "types": "./dist/vite.d.ts",
       "default": "./dist/vite.js"
+    },
+    "./webpack": {
+      "types": "./dist/webpack.d.ts",
+      "default": "./dist/webpack.js"
     }
   },
   "main": "./dist/index.js",
@@ -27,8 +31,7 @@
     "dev": "tsup --watch",
     "build": "tsup",
     "test": "vitest",
-    "prepack": "tsup --clean",
-    "release": "pnpm publish --no-git-checks --access public"
+    "prepack": "tsup --clean"
   },
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",

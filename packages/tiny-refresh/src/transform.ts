@@ -40,6 +40,56 @@ if (import.meta.hot) {
   return result.outCode + footer;
 }
 
+export async function transformWebpack(
+  code: string,
+  options: HmrTransformOptions
+) {
+  const result = await analyzeCode(code);
+  if (result.errors.length || result.entries.length === 0) {
+    return;
+  }
+  let footer = /* js */ `
+import * as $$runtime from "${options.runtime}";
+import * as $$refresh from "${options.refreshRuntime}";
+if (import.meta.webpackHot) {
+  // 'hot.data' is passed from old module via hot.dispose(data)
+  // https://webpack.js.org/api/hot-module-replacement/#dispose-or-adddisposehandler
+  const hot = import.meta.webpackHot;
+  const MANAGER_KEY = Symbol.for("tiny-refresh.manager");
+  const $$manager = hot.data?.[MANAGER_KEY] ?? new $$refresh.Manager({
+    hot: {},
+    runtime: {
+      createElement: $$runtime.createElement,
+      useReducer: $$runtime.useReducer,
+      useEffect: $$runtime.useEffect,
+    },
+    debug: ${options.debug ?? false},
+  });
+  hot.dispose(data => {
+    data[MANAGER_KEY] = $$manager;
+  });
+  hot.accept();
+`;
+  for (const { id, hooks } of result.entries) {
+    footer += `\
+  ${id} = $$manager.wrap("${id}", ${id}, ${JSON.stringify(hooks.join("/"))});
+`;
+  }
+  footer += `\
+  if (hot.data?.[MANAGER_KEY]) {
+    if (!$$manager.patch()) {
+      hot.invalidate();
+    }
+  }
+}
+`;
+  return result.outCode + footer;
+}
+
+//
+// extract component declarations
+//
+
 // extend types for rollup ast with node position
 declare module "estree" {
   interface BaseNode {

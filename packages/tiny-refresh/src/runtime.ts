@@ -27,7 +27,7 @@ interface ComponentEntry {
 }
 
 // singleton per file
-class Manager {
+export class Manager {
   public proxyMap = new Map<string, ProxyEntry>();
   public componentMap = new Map<string, ComponentEntry>();
 
@@ -59,7 +59,7 @@ class Manager {
     });
   }
 
-  private patch() {
+  patch() {
     // TODO: debounce re-rendering?
     const componentNames = new Set([
       ...this.proxyMap.keys(),
