@@ -119,6 +119,10 @@ function createProxyComponent(manager: Manager, name: string): ProxyEntry {
   return { Component, listeners };
 }
 
+//
+// hmr api integration
+//
+
 export function setupVite(hot: ViteHot, runtime: Runtime, debug?: boolean) {
   const manager = (hot.data[MANAGER_KEY] ??= new Manager({ runtime, debug }));
 
@@ -143,10 +147,10 @@ export function setupWebpack(
   const prevData = hot.data?.[MANAGER_KEY];
   const manager = prevData ?? new Manager({ runtime, debug });
 
+  hot.accept();
   hot.dispose((data) => {
     data[MANAGER_KEY] = manager;
   });
-  hot.accept();
 
   function onFinished() {
     if (prevData && !manager.patch()) {
