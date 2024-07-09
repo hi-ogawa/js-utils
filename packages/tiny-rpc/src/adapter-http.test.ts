@@ -75,7 +75,7 @@ describe("adapter-http", () => {
     expect(await client.checkAuth()).toMatchInlineSnapshot("true");
     headers["x-auth"] = "bad";
     expect(await client.checkAuth()).toMatchInlineSnapshot("false");
-    expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("200");
+    expect(logStatus.mock.lastCall?.[0]).toMatchInlineSnapshot("200");
 
     //
     // error
@@ -85,7 +85,7 @@ describe("adapter-http", () => {
     await expect(
       client.incrementCounter({ delta: "2" as any as number })
     ).rejects.toSatisfy((e) => {
-      expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("400");
+      expect(logStatus.mock.lastCall?.[0]).toMatchInlineSnapshot("400");
       tinyassert(e instanceof TinyRpcError);
       expect(e).toMatchInlineSnapshot(`
         [Error: [
@@ -159,7 +159,7 @@ describe("adapter-http", () => {
     // invalid path
     await expect((client as any).incrementCounterXXX()).rejects.toSatisfy(
       (e) => {
-        expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("500");
+        expect(logStatus.mock.lastCall?.[0]).toMatchInlineSnapshot("500");
         tinyassert(e instanceof TinyRpcError);
         expect(e).toMatchInlineSnapshot("[Error: invalid path]");
         return true;
@@ -168,7 +168,7 @@ describe("adapter-http", () => {
 
     // runtime erorr
     await expect(client.checkIdThrow("bad")).rejects.toSatisfy((e) => {
-      expect(logStatus.mock.lastCall[0]).toMatchInlineSnapshot("500");
+      expect(logStatus.mock.lastCall?.[0]).toMatchInlineSnapshot("500");
       tinyassert(e instanceof TinyRpcError);
       expect(e).toMatchInlineSnapshot("[Error: Invalid ID]");
       return true;
