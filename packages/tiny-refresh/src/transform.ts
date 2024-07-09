@@ -1,44 +1,52 @@
 import type * as estree from "estree";
 import { parseAstAsync } from "vite";
 
-interface HmrTransformOptions {
-  runtime: string; // e.g. "react", "preact/compat", "@hiogawa/tiny-react"
-  refreshRuntime: string; // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
-  debug?: boolean;
+export interface TransformOptions {
+  // "react", "preact/compat", "@hiogawa/tiny-react"
+  runtime: string;
+  // allow "@hiogawa/tiny-react" to re-export refresh runtime by itself to simplify dependency
+  refreshRuntime: string;
+  mode: "vite" | "webpack";
+  debug: boolean;
 }
 
-export async function hmrTransform(code: string, options: HmrTransformOptions) {
+export type RefreshRuntimeOptions = Pick<TransformOptions, "mode" | "debug">;
+
+export async function transform(code: string, options: TransformOptions) {
   const result = await analyzeCode(code);
   if (result.errors.length || result.entries.length === 0) {
     return;
   }
-  let footer = /* js */ `
+  const hot =
+    options.mode === "vite" ? "import.meta.hot" : "import.meta.webpackHot";
+  const wrap = result.entries
+    .map((e) => {
+      const key = JSON.stringify(e.hooks.join("/"));
+      return `  ${e.id} = $$manager.wrap("${e.id}", ${e.id}, ${key});\n`;
+    })
+    .join("");
+  const footer = `
 import * as $$runtime from "${options.runtime}";
 import * as $$refresh from "${options.refreshRuntime}";
-if (import.meta.hot) {
-  () => import.meta.hot.accept();
-  const $$manager = $$refresh.createManager(
-    import.meta.hot,
-    {
-      createElement: $$runtime.createElement,
-      useReducer: $$runtime.useReducer,
-      useEffect: $$runtime.useEffect,
-    },
-    ${options.debug ?? false},
+if (${hot}) {
+  (() => ${hot}.accept());
+  const $$manager = $$refresh.initialize(
+    ${hot},
+    $$runtime,
+    ${JSON.stringify(options)}
   );
-`;
-  for (const { id, hooks } of result.entries) {
-    footer += `\
-  ${id} = $$manager.wrap("${id}", ${id}, ${JSON.stringify(hooks.join("/"))});
-`;
-  }
-  footer += `\
+
+${wrap}
   $$manager.setup();
 }
 `;
   // no need to manipulate sourcemap since transform only appends
   return result.outCode + footer;
 }
+
+//
+// extract component declarations
+//
 
 // extend types for rollup ast with node position
 declare module "estree" {
@@ -59,8 +67,6 @@ const COMPONENT_RE = /^[A-Z]/;
 async function analyzeCode(code: string) {
   const ast = await parseAstAsync(code);
   const errors: unknown[] = [];
-
-  // TODO: collect also non-exported functions with a capitalized names
   const entries: ParsedEntry[] = [];
 
   // replace "export const" with "export let"

@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.1
+
+- refactor: unify code for vite and webpack ([#262](https://github.com/hi-ogawa/js-utils/pull/262))
+- feat: support webpack ([#261](https://github.com/hi-ogawa/js-utils/pull/261))
+
 ## v0.1.0
 
 - feat: remount only when hook changes ([#238](https://github.com/hi-ogawa/js-utils/pull/238))

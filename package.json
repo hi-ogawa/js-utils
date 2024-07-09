@@ -6,6 +6,7 @@
     "tsc": "tsc -b packages/*/tsconfig.json packages/*/examples/*/tsconfig.json",
     "tsc-dev": "pnpm tsc --watch --preserveWatchOutput",
     "test": "pnpm -r --sequential test run",
+    "changelog": "changelog --repo https://github.com/hi-ogawa/js-utils",
     "sort-package-json": "sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path' | xargs -i echo {}/package.json)",
     "lint": "biome check --apply .",
     "lint-check": "biome check ."
@@ -21,17 +22,17 @@
     "@playwright/test": "^1.41.2",
     "@tsconfig/strictest": "^2.0.3",
     "@types/node": "^20.11.19",
-    "@vitest/ui": "2.0.0-beta.2",
+    "@vitest/ui": "2.0.1",
     "esbuild": "^0.20.0",
     "happy-dom": "^14.10.1",
     "tsup": "^8.0.2",
     "tsx": "^4.7.1",
     "typedoc": "^0.25.8",
     "typescript": "^5.3.3",
-    "vitest": "2.0.0-beta.2"
+    "vitest": "2.0.1"
   },
-  "packageManager": "pnpm@9.0.6+sha512.f6d863130973207cb7a336d6b439a242a26ac8068077df530d6a86069419853dc1ffe64029ec594a9c505a3a410d19643c870aba6776330f5cfddcf10a9c1617",
+  "packageManager": "pnpm@9.1.4+sha512.9df9cf27c91715646c7d675d1c9c8e41f6fce88246f1318c1aa6a1ed1aeb3c4f032fcdf4ba63cc69c4fe6d634279176b5358727d8f2cc1e65b65f43ce2f8bfb0",
   "volta": {
-    "node": "20.12.2"
+    "node": "20.14.0"
   }
 }

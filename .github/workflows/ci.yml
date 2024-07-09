@@ -39,3 +39,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - run: pnpm -C packages/tiny-refresh/examples/react test-e2e
+      - run: pnpm -C packages/tiny-refresh/examples/react test-e2e-webpack
