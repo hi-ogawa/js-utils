@@ -64,7 +64,7 @@ async function main() {
     process.exit(0);
   }
 
-  // find last commit modified changelog
+  // find last commit which modified changelog
   const changelogPath = resolve(args.dir, "CHANGELOG.md");
   if (!args.from && fs.existsSync(changelogPath)) {
     const { stdout } = await $(
@@ -85,7 +85,8 @@ async function main() {
   });
 
   // format markdown
-  let result = "## v?.?.?\n\n";
+  const date = new Date().toISOString().slice(0, 10);
+  let result = `## v?.?.? (${date})\n\n`;
   for (const e of entries) {
     result += "- " + formatMessage(e.subject, args) + "\n";
   }
