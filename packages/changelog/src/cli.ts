@@ -64,7 +64,7 @@ async function main() {
     process.exit(0);
   }
 
-  // find last commit modified changelog
+  // find last commit which modified changelog
   const changelogPath = resolve(args.dir, "CHANGELOG.md");
   if (!args.from && fs.existsSync(changelogPath)) {
     const { stdout } = await $(
