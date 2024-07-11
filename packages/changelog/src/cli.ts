@@ -85,7 +85,8 @@ async function main() {
   });
 
   // format markdown
-  let result = "## v?.?.?\n\n";
+  const date = new Date().toISOString().slice(0, 10);
+  let result = `## v?.?.? (${date})\n\n`;
   for (const e of entries) {
     result += "- " + formatMessage(e.subject, args) + "\n";
   }
