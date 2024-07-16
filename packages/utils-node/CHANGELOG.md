@@ -1,6 +1,11 @@
 # Changelog
 
-## v0.0.1
+## v0.0.2 (2024-07-16)
+
+- fix: check x-forwarded-proto for https
+- fix: cancel stream on error ([#255](https://github.com/hi-ogawa/js-utils/pull/255))
+
+## v0.0.1 (2024-05-18)
 
 - feat: add `webToNodeHandler` ([#252](https://github.com/hi-ogawa/js-utils/pull/252))
 - feat: improve `parseArgs` help ([#226](https://github.com/hi-ogawa/js-utils/pull/226))
