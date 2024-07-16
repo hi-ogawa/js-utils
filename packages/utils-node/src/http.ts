@@ -59,7 +59,12 @@ function createRequest(
   }
 
   return new Request(
-    new URL(req.url || "/", `http://${req.headers.host || "unknown.local"}`),
+    new URL(
+      req.url || "/",
+      `${headers.get("x-forwarded-proto") ?? "http"}://${
+        req.headers.host || "unknown.local"
+      }`
+    ),
     {
       method: req.method,
       body:
