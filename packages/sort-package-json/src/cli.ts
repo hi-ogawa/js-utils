@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import path from "node:path";
 import process from "node:process";
 import { name, version } from "../package.json";
 import RULE from "./scrape-output.json";
@@ -11,11 +12,11 @@ const HELP = `\
 ${name}@${version}
 
 Usage:
-  sort-package-json [package.json files...]
+  sort-package-json [paths to directories or package.json files]
 
 Examples:
   # Sort all package.json files in pnpm workspace
-  sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path' | xargs -I '{}' echo '{}/package.json')
+  sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path')
 `;
 
 function main() {
@@ -28,7 +29,10 @@ function main() {
     console.log(HELP);
     return;
   }
-  for (const infile of infiles) {
+  for (let infile of infiles) {
+    if (fs.statSync(infile, { throwIfNoEntry: false })?.isDirectory()) {
+      infile = path.join(infile, "package.json");
+    }
     const fixed = sortPackageJson(infile);
     console.log(fixed ? "[fixed]" : "[no-change]", infile);
   }
