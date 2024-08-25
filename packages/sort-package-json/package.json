@@ -12,6 +12,7 @@
   "bin": "./bin/cli.js",
   "files": ["dist", "bin"],
   "scripts": {
+    "dev": "tsup --watch",
     "build": "tsup",
     "cli": "node ./bin/cli.js",
     "cli-dev": "tsx ./src/cli.ts",
