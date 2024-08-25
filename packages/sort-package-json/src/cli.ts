@@ -36,19 +36,44 @@ function main() {
 
 function sortPackageJson(infile: string): boolean {
   const original = JSON.parse(fs.readFileSync(infile, "utf-8"));
+
+  // sort top level keys
   const sorted = Object.fromEntries(
     Object.entries(original).sort(
       ([k1], [k2]) => (RULE_MAP[k1] ?? 1e8) - (RULE_MAP[k2] ?? 1e8)
     )
   );
-  if (
-    JSON.stringify(Object.keys(original)) ===
-    JSON.stringify(Object.keys(sorted))
-  ) {
-    return false;
+  let changed = !isEqual(Object.keys(original), Object.keys(sorted));
+
+  // sort dependencies
+  for (const depKey of [
+    "dependencies",
+    "devDependencies",
+    "dependenciesMeta",
+    "peerDependencies",
+    "peerDependenciesMeta",
+    "optionalDependencies",
+    "bundledDependencies",
+    "bundleDependencies",
+  ]) {
+    const deps = sorted[depKey];
+    if (deps && typeof deps === "object") {
+      const sortedDeps = Object.fromEntries(
+        Object.entries(deps).sort(([k1], [k2]) => k1.localeCompare(k2))
+      );
+      changed ||= !isEqual(Object.keys(deps), Object.keys(sortedDeps));
+    }
   }
-  fs.writeFileSync(infile, JSON.stringify(sorted, null, 2) + "\n");
-  return true;
+
+  // write if changed
+  if (changed) {
+    fs.writeFileSync(infile, JSON.stringify(sorted, null, 2) + "\n");
+  }
+  return changed;
+}
+
+function isEqual(x: object, y: object) {
+  return JSON.stringify(x) === JSON.stringify(y);
 }
 
 main();
