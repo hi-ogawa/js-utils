@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/sort-package-json",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/sort-package-json",
   "repository": {
     "type": "git",
@@ -14,12 +14,12 @@
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup",
+    "prepack": "tsup --clean && pnpm docs-update",
     "test": "vitest",
     "cli": "node ./bin/cli.js",
     "cli-dev": "tsx ./src/cli.ts",
     "docs-update": "inline-template ./README.md",
-    "scrape": "tsx src/scrape.ts > src/scrape-output.json",
-    "release": "pnpm publish --no-git-checks --access public"
+    "scrape": "tsx src/scrape.ts > src/scrape-output.json"
   },
   "devDependencies": {
     "@hiogawa/utils": "workspace:*",

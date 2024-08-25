@@ -19,14 +19,14 @@ $ sort-package-json --help
 
 ```txt
 $ sort-package-json --help
-@hiogawa/sort-package-json@0.0.1
+@hiogawa/sort-package-json@0.0.2
 
 Usage:
-  sort-package-json [package.json files...]
+  sort-package-json [paths to directories or package.json files]
 
 Examples:
-  # Sort package.json files in pnpm workspace
-  sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path' | xargs -I '{}' echo '{}/package.json')
+  # Sort all package.json files in pnpm workspace
+  sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path')
 ```
 
 <!-- %template-output-end:help% -->
