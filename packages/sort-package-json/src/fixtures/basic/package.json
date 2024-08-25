@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "dependencies": {
+    "b": "^0",
+    "a": "^1"
+  },
+  "type": "module",
+  "name": "test"
+}
