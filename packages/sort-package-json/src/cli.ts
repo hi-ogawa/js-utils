@@ -14,7 +14,7 @@ Usage:
   sort-package-json [package.json files...]
 
 Examples:
-  # Sort package.json files in pnpm workspace
+  # Sort all package.json files in pnpm workspace
   sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path' | xargs -I '{}' echo '{}/package.json')
 `;
 
