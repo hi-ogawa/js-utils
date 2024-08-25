@@ -7,7 +7,7 @@
     "tsc-dev": "pnpm tsc --watch --preserveWatchOutput",
     "test": "pnpm -r --sequential test run",
     "changelog": "changelog --repo https://github.com/hi-ogawa/js-utils",
-    "sort-package-json": "sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path' | xargs -i echo {}/package.json)",
+    "sort-package-json": "sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path')",
     "lint": "biome check --apply .",
     "lint-check": "biome check ."
   },
