@@ -58,10 +58,13 @@ function sortPackageJson(infile: string): boolean {
   ]) {
     const deps = sorted[depKey];
     if (deps && typeof deps === "object") {
-      const sortedDeps = Object.fromEntries(
+      sorted[depKey] = Object.fromEntries(
         Object.entries(deps).sort(([k1], [k2]) => k1.localeCompare(k2))
       );
-      changed ||= !isEqual(Object.keys(deps), Object.keys(sortedDeps));
+      changed ||= !isEqual(
+        Object.keys(deps),
+        Object.keys(sorted[depKey] as any)
+      );
     }
   }
 
