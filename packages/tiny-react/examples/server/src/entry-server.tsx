@@ -6,6 +6,7 @@ import {
 } from "@hiogawa/tiny-react";
 import type { ViteDevServer } from "vite";
 import { createReferenceMap } from "./integration/client-reference/runtime";
+import { jsonEscapeSymbol } from "./integration/serialization";
 import Layout from "./routes/layout";
 
 export async function handler(request: Request) {
@@ -15,7 +16,7 @@ export async function handler(request: Request) {
 
   // to CSR
   if (url.searchParams.has("__serialize")) {
-    return new Response(JSON.stringify(serialized), {
+    return new Response(jsonEscapeSymbol(serialized), {
       headers: {
         "content-type": "application/json",
       },
@@ -35,7 +36,7 @@ export async function handler(request: Request) {
     "<head>",
     () =>
       `<head><script>globalThis.__serialized = ${JSON.stringify(
-        serialized
+        jsonEscapeSymbol(serialized)
       )}</script>`
   );
   // dev only FOUC fix
