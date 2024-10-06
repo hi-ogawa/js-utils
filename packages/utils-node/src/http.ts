@@ -13,11 +13,11 @@ export type WebHandler = (
 export type NodeHandler = (
   req: http.IncomingMessage,
   res: http.ServerResponse,
-  next: (error?: unknown) => void
+  next?: (error?: unknown) => void
 ) => void;
 
 export function webToNodeHandler(handler: WebHandler): NodeHandler {
-  return async (req, res, next) => {
+  return async (req, res, next = createDefaultNext(res)) => {
     try {
       const request = createRequest(req, res);
       const response = await handler(request);
@@ -28,6 +28,19 @@ export function webToNodeHandler(handler: WebHandler): NodeHandler {
       }
     } catch (e) {
       next(e);
+    }
+  };
+}
+
+function createDefaultNext(res: http.ServerResponse) {
+  return (e?: unknown) => {
+    if (e) {
+      console.error(e);
+      res.statusCode = 500;
+      res.end("Internal server error");
+    } else {
+      res.statusCode = 404;
+      res.end("Not found");
     }
   };
 }
