@@ -25,6 +25,42 @@ describe(webToNodeHandler, () => {
     expect(await res.text()).toMatchInlineSnapshot(`"hello = /abc"`);
   });
 
+  test("default next fn", async () => {
+    await using server = await testWebHandler(
+      (request) => {
+        const url = new URL(request.url);
+        if (url.pathname === "/undefined") {
+          return undefined;
+        }
+        if (url.pathname === "/error") {
+          throw new Error("boom!");
+        }
+        return new Response("ok");
+      },
+      {
+        noNextFn: true,
+      }
+    );
+
+    {
+      const res = await server.fetch("/ok");
+      expect(res.status).toMatchInlineSnapshot(`200`);
+      expect(await res.text()).toMatchInlineSnapshot(`"ok"`);
+    }
+
+    {
+      const res = await server.fetch("/error");
+      expect(res.status).toMatchInlineSnapshot(`500`);
+      expect(await res.text()).toMatchInlineSnapshot(`"Internal server error"`);
+    }
+
+    {
+      const res = await server.fetch("/undefined");
+      expect(res.status).toMatchInlineSnapshot(`404`);
+      expect(await res.text()).toMatchInlineSnapshot(`"Not found"`);
+    }
+  });
+
   test("stream abort", { retry: 3 }, async () => {
     // https://github.com/hi-ogawa/reproductions/pull/9
 
@@ -155,11 +191,18 @@ describe(webToNodeHandler, () => {
   });
 });
 
-async function testWebHandler(handler: WebHandler) {
+async function testWebHandler(
+  handler: WebHandler,
+  options?: { noNextFn: boolean }
+) {
   // node server
   const nextFn = vi.fn();
   const nodeHandler = webToNodeHandler(handler);
-  const server = createServer((req, res) => nodeHandler(req, res, nextFn));
+  const server = createServer(
+    options?.noNextFn
+      ? nodeHandler
+      : (req, res) => nodeHandler(req, res, nextFn)
+  );
 
   // listen
   await new Promise<void>((resolve) => server.listen(() => resolve()));
@@ -173,6 +216,8 @@ async function testWebHandler(handler: WebHandler) {
   return {
     url,
     nextFn,
+    fetch: (urlPart: string, init?: RequestInit) =>
+      fetch(new URL(urlPart, url), init),
     [Symbol.asyncDispose]: () => server[Symbol.asyncDispose](),
   };
 }
