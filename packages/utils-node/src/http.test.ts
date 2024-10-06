@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { createManualPromise, tinyassert } from "@hiogawa/utils";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, onTestFinished, test, vi } from "vitest";
 import { type WebHandler, webToNodeHandler } from "./http";
 
 describe(webToNodeHandler, () => {
@@ -26,6 +26,9 @@ describe(webToNodeHandler, () => {
   });
 
   test("default next fn", async () => {
+    const spyFn = vi.spyOn(console, "error").mockImplementation(() => {});
+    onTestFinished(() => spyFn.mockRestore());
+
     await using server = await testWebHandler(
       (request) => {
         const url = new URL(request.url);
