@@ -45,8 +45,8 @@ importers:
         specifier: ^0.24.0
         version: 0.24.0
       happy-dom:
-        specifier: ^15.11.6
-        version: 15.11.6
+        specifier: 14.10.1
+        version: 14.10.1
       tsup:
         specifier: ^8.3.5
         version: 8.3.5(@swc/core@1.9.3)(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.7.2)(yaml@2.6.1)
@@ -58,7 +58,7 @@ importers:
         version: 5.7.2
       vitest:
         specifier: 2.1.5
-        version: 2.1.5(@types/node@22.9.3)(@vitest/ui@2.1.5)(happy-dom@15.11.6)(jsdom@25.0.1)(terser@5.36.0)
+        version: 2.1.5(@types/node@22.9.3)(@vitest/ui@2.1.5)(happy-dom@14.10.1)(jsdom@25.0.1)(terser@5.36.0)
 
   packages/changelog:
     devDependencies:
@@ -2416,9 +2416,9 @@ packages:
   handle-thing@2.0.1:
     resolution: {integrity: sha512-9Qn4yBxelxoh2Ow62nP+Ka/kMnOXRi8BXnRaUwezLNhqelnN49xKz4F/dPP8OYLxLxq6JDtZb2i9XznUQbNPTg==}
 
-  happy-dom@15.11.6:
-    resolution: {integrity: sha512-elX7iUTu+5+3b2+NGQc0L3eWyq9jKhuJJ4GpOMxxT/c2pg9O3L5H3ty2VECX0XXZgRmmRqXyOK8brA2hDI6LsQ==}
-    engines: {node: '>=18.0.0'}
+  happy-dom@14.10.1:
+    resolution: {integrity: sha512-GRbrZYIezi8+tTtffF4v2QcF8bk1h2loUTO5VYQz3GZdrL08Vk0fI+bwf/vFEBf4C/qVf/easLJ/MY1wwdhytA==}
+    engines: {node: '>=16.0.0'}
 
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
@@ -4684,7 +4684,7 @@ snapshots:
       sirv: 3.0.0
       tinyglobby: 0.2.10
       tinyrainbow: 1.2.0
-      vitest: 2.1.5(@types/node@22.9.3)(@vitest/ui@2.1.5)(happy-dom@15.11.6)(jsdom@25.0.1)(terser@5.36.0)
+      vitest: 2.1.5(@types/node@22.9.3)(@vitest/ui@2.1.5)(happy-dom@14.10.1)(jsdom@25.0.1)(terser@5.36.0)
 
   '@vitest/utils@2.1.5':
     dependencies:
@@ -5588,7 +5588,7 @@ snapshots:
 
   handle-thing@2.0.1: {}
 
-  happy-dom@15.11.6:
+  happy-dom@14.10.1:
     dependencies:
       entities: 4.5.0
       webidl-conversions: 7.0.0
@@ -6808,7 +6808,7 @@ snapshots:
       fsevents: 2.3.3
       terser: 5.36.0
 
-  vitest@2.1.5(@types/node@22.9.3)(@vitest/ui@2.1.5)(happy-dom@15.11.6)(jsdom@25.0.1)(terser@5.36.0):
+  vitest@2.1.5(@types/node@22.9.3)(@vitest/ui@2.1.5)(happy-dom@14.10.1)(jsdom@25.0.1)(terser@5.36.0):
     dependencies:
       '@vitest/expect': 2.1.5
       '@vitest/mocker': 2.1.5(vite@5.4.11(@types/node@22.9.3)(terser@5.36.0))
@@ -6833,7 +6833,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.9.3
       '@vitest/ui': 2.1.5(vitest@2.1.5)
-      happy-dom: 15.11.6
+      happy-dom: 14.10.1
       jsdom: 25.0.1
     transitivePeerDependencies:
       - less
