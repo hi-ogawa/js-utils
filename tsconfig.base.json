@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/strictest/tsconfig.json",
   "compilerOptions": {
+    "isolatedDeclarations": true,
     "resolveJsonModule": true,
     "noUncheckedIndexedAccess": false,
     "exactOptionalPropertyTypes": false,
