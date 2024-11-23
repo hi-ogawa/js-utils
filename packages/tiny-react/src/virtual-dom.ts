@@ -13,12 +13,12 @@ export type HNode = Node;
 export type HTag = Element;
 export type HText = Text;
 
-// node type (TODO: check perf between string, number, symbol)
-export const NODE_TYPE_EMPTY = "empty" as const;
-export const NODE_TYPE_TAG = "tag" as const;
-export const NODE_TYPE_TEXT = "text" as const;
-export const NODE_TYPE_CUSTOM = "custom" as const;
-export const NODE_TYPE_FRAGMENT = "fragment" as const;
+// node type
+export const NODE_TYPE_EMPTY = Symbol.for("tiny-react.empty");
+export const NODE_TYPE_TAG = Symbol.for("tiny-react.tag");
+export const NODE_TYPE_TEXT = Symbol.for("tiny-react.text");
+export const NODE_TYPE_CUSTOM = Symbol.for("tiny-react.custom");
+export const NODE_TYPE_FRAGMENT = Symbol.for("tiny-react.fragment");
 
 export function isVNode(v: unknown): v is VNode {
   return (
