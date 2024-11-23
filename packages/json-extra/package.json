@@ -46,10 +46,5 @@
   },
   "volta": {
     "extends": "../../package.json"
-  },
-  "typedoc": {
-    "displayName": "@hiogawa/json-extra",
-    "readmeFile": "./README.md",
-    "entryPoint": "./src/index.ts"
   }
 }

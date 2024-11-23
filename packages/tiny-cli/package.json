@@ -31,10 +31,5 @@
   },
   "volta": {
     "extends": "../../package.json"
-  },
-  "typedoc": {
-    "displayName": "@hiogawa/tiny-cli",
-    "readmeFile": "./README.md",
-    "entryPoint": "./src/index.ts"
   }
 }
