@@ -8,7 +8,7 @@
     "test": "pnpm -r --sequential test run",
     "changelog": "changelog --repo https://github.com/hi-ogawa/js-utils",
     "sort-package-json": "sort-package-json $(pnpm ls --filter '*' --depth -1 --json | jq -r '.[] | .path')",
-    "lint": "biome check --apply .",
+    "lint": "biome check --write .",
     "lint-check": "biome check ."
   },
   "devDependencies": {
