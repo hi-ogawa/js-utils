@@ -11,8 +11,8 @@
   "devDependencies": {
     "@hiogawa/tiny-sql": "workspace:*",
     "@hiogawa/utils": "workspace:*",
-    "@types/better-sqlite3": "^7.6.9",
-    "better-sqlite3": "^9.4.1"
+    "@types/better-sqlite3": "^7.6.12",
+    "better-sqlite3": "^11.5.0"
   },
   "volta": {
     "extends": "../../package.json"

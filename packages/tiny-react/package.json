@@ -51,8 +51,8 @@
   "devDependencies": {
     "@hiogawa/tiny-refresh": "workspace:*",
     "@hiogawa/utils": "workspace:*",
-    "fast-check": "^3.12.0",
-    "vite": "^5.1.3"
+    "fast-check": "^3.23.1",
+    "vite": "^5.4.11"
   },
   "peerDependencies": {
     "vite": "*"
