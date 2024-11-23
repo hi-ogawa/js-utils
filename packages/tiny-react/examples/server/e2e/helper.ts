@@ -2,6 +2,7 @@ import fs from "node:fs";
 import test, { type Page, expect } from "@playwright/test";
 
 export const testNoJs = test.extend({
+  // @ts-ignore `pnpm tsc-dev` complains though it's fine on vscode
   javaScriptEnabled: ({}, use) => use(false),
 });
 
