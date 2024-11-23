@@ -25,7 +25,10 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": "./bin/cli.js",
-  "files": ["bin", "dist"],
+  "files": [
+    "bin",
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "test": "vitest",
@@ -35,7 +38,7 @@
   "devDependencies": {
     "@hiogawa/tiny-cli": "workspace:*",
     "@hiogawa/utils": "workspace:*",
-    "@types/node": "^20.11.19"
+    "@types/node": "^22.9.3"
   },
   "volta": {
     "extends": "../../package.json"

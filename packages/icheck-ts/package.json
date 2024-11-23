@@ -10,7 +10,10 @@
   "license": "MIT",
   "type": "module",
   "bin": "./bin/cli.js",
-  "files": ["dist", "bin"],
+  "files": [
+    "dist",
+    "bin"
+  ],
   "scripts": {
     "build": "tsup",
     "cli": "node --experimental-import-meta-resolve ./bin/cli.js",
@@ -25,7 +28,7 @@
     "@hiogawa/tiny-cli": "workspace:*",
     "@hiogawa/utils": "workspace:*",
     "@hiogawa/utils-node": "workspace:*",
-    "@types/node": "^20.11.19"
+    "@types/node": "^22.9.3"
   },
   "peerDependencies": {
     "typescript": "*"

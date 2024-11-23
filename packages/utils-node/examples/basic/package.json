@@ -6,6 +6,6 @@
     "start": "node ./index.mjs"
   },
   "dependencies": {
-    "@hiogawa/utils-node": "latest"
+    "@hiogawa/utils-node": "^0.0.2"
   }
 }
