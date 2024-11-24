@@ -11,29 +11,29 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "default": "./dist/index.js"
     },
     "./jsx-runtime": {
-      "import": "./dist/helper/jsx-runtime.js",
+      "types": "./dist/helper/jsx-runtime.d.ts",
       "require": "./dist/helper/jsx-runtime.cjs",
-      "types": "./dist/helper/jsx-runtime.d.ts"
+      "default": "./dist/helper/jsx-runtime.js"
     },
     "./jsx-dev-runtime": {
-      "import": "./dist/helper/jsx-runtime.js",
+      "types": "./dist/helper/jsx-runtime.d.ts",
       "require": "./dist/helper/jsx-runtime.cjs",
-      "types": "./dist/helper/jsx-runtime.d.ts"
+      "default": "./dist/helper/jsx-runtime.js"
     },
     "./hmr": {
-      "import": "./dist/hmr/index.js",
+      "types": "./dist/hmr/index.d.ts",
       "require": "./dist/hmr/index.cjs",
-      "types": "./dist/hmr/index.d.ts"
+      "default": "./dist/hmr/index.js"
     },
     "./vite": {
-      "import": "./dist/plugins/vite.js",
+      "types": "./dist/plugins/vite.d.ts",
       "require": "./dist/plugins/vite.cjs",
-      "types": "./dist/plugins/vite.d.ts"
+      "default": "./dist/plugins/vite.js"
     }
   },
   "main": "./dist/index.js",

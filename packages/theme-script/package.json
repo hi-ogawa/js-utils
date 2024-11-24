@@ -11,14 +11,14 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "default": "./dist/index.js"
     },
     "./dist/vite": {
-      "import": "./dist/vite.js",
+      "types": "./dist/vite.d.ts",
       "require": "./dist/vite.cjs",
-      "types": "./dist/vite.d.ts"
+      "default": "./dist/vite.js"
     }
   },
   "main": "./dist/index.js",

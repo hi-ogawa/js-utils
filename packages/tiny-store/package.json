@@ -11,14 +11,14 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "default": "./dist/index.js"
     },
     "./dist/react": {
-      "import": "./dist/react.js",
+      "types": "./dist/react.d.ts",
       "require": "./dist/react.cjs",
-      "types": "./dist/react.d.ts"
+      "default": "./dist/react.js"
     }
   },
   "main": "./dist/index.js",

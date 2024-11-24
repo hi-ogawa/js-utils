@@ -11,19 +11,19 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "default": "./dist/index.js"
     },
     "./reference": {
-      "import": "./dist/reference.js",
+      "types": "./dist/reference.d.ts",
       "require": "./dist/reference.cjs",
-      "types": "./dist/reference.d.ts"
+      "default": "./dist/reference.js"
     },
     "./stream": {
-      "import": "./dist/stream.js",
+      "types": "./dist/stream.d.ts",
       "require": "./dist/stream.cjs",
-      "types": "./dist/stream.d.ts"
+      "default": "./dist/stream.js"
     }
   },
   "main": "./dist/index.js",
