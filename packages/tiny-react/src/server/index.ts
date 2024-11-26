@@ -25,6 +25,11 @@ import {
 
 // cf. https://react.dev/reference/rsc/use-client#serializable-types
 
+// TOOD: we can probably use general framework to do RNode serialization such as
+// packages/json-extra
+// devalue
+// turbo-stream
+
 export type SerializeResult = {
   data: unknown;
   referenceIds: string[];
