@@ -22,7 +22,7 @@ $ npx gh-bin --help
 gh-bin@0.0.0
 
 Usage:
-  npx gh-bin https://github.com/<user>/<repo>
+  npx gh-bin https://github.com/<owner>/<repo>
   npx gh-bin https://github.com/yt-dlp/yt-dlp
   npx gh-bin https://github.com/yt-dlp/yt-dlp/releases/tag/2025.01.15
 ```
