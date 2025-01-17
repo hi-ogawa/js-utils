@@ -19,16 +19,10 @@ $ npx gh-bin --help
 
 ```txt
 $ npx gh-bin --help
-cpgh@0.0.3-pre.0
+gh-bin@0.0.0
 
 Usage:
-  npx gh-bin https://github.com/<user>/<repo>/tree/<branch>/<subdir> <outdir>
-
-Options:
-  --force      Overwrite <outdir> if it exists
-  -h, --help   Show help
-
-Examples:
+  npx gh-bin https://github.com/<user>/<repo>
   npx gh-bin https://github.com/yt-dlp/yt-dlp
   npx gh-bin https://github.com/yt-dlp/yt-dlp/releases/tag/2025.01.15
 ```
