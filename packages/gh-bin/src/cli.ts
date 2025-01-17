@@ -74,7 +74,7 @@ async function main() {
   downloadSpinner.start(`Downloading ${selectedAsset}`);
   let tmpAssetPath = path.join(
     os.tmpdir(),
-    `/gh-bin-asset-${owner}-${repo}${path.extname(selectedAsset)}`
+    `gh-bin-asset-${owner}-${repo}${path.extname(selectedAsset)}`
   );
   try {
     const res = await fetch(selectedAsset);
@@ -106,7 +106,7 @@ async function main() {
     }
     let tmpZipEntryPath = path.join(
       os.tmpdir(),
-      `/gh-bin-asset-${owner}-${repo}-zip-${selectedEntry.name}${path.extname(selectedEntry.name)}`
+      `gh-bin-asset-${owner}-${repo}-zip-${selectedEntry.name}${path.extname(selectedEntry.name)}`
     );
     fs.promises.writeFile(tmpZipEntryPath, selectedEntry.getData());
     tmpAssetPath = tmpZipEntryPath;
