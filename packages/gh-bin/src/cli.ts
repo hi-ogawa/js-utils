@@ -4,6 +4,7 @@ import path from "node:path";
 import process from "node:process";
 import { Readable } from "node:stream";
 import * as prompts from "@clack/prompts";
+import AdmZip from "adm-zip";
 import { name, version } from "../package.json";
 
 const HELP = `\
@@ -68,19 +69,12 @@ async function main() {
     return;
   }
 
-  // TODO
-  // if .zip or .tar.gz, unpack and prompt again which file to use
-  if (selectedAsset.endsWith(".zip") || selectedAsset.endsWith(".tar.gz")) {
-    console.log("[ERROR] .zip and .tar.gz are unsupported (todo)");
-    process.exit(1);
-  }
-
   // download a selected asset
   const downloadSpinner = prompts.spinner();
   downloadSpinner.start(`Downloading ${selectedAsset}`);
   let tmpAssetPath = path.join(
     os.tmpdir(),
-    `/gh-bin-asset-${owner}-${repo}.${path.extname(selectedAsset) || "bin"}`
+    `/gh-bin-asset-${owner}-${repo}${path.extname(selectedAsset)}`
   );
   try {
     const res = await fetch(selectedAsset);
@@ -96,10 +90,29 @@ async function main() {
     downloadSpinner.stop(`Downloaded ${selectedAsset}`);
   }
 
-  // TODO
   // if .zip or .tar.gz, unpack and prompt again which file to use
   if (selectedAsset.endsWith(".zip")) {
+    var zip = new AdmZip(tmpAssetPath);
+    var zipEntries = zip.getEntries();
+    const selectedEntry = await prompts.select({
+      message: "Select an entry to extract from zip",
+      options: zipEntries.map((entry) => ({
+        label: entry.name,
+        value: entry,
+      })),
+    });
+    if (prompts.isCancel(selectedEntry)) {
+      return;
+    }
+    let tmpZipEntryPath = path.join(
+      os.tmpdir(),
+      `/gh-bin-asset-${owner}-${repo}-zip-${selectedEntry.name}${path.extname(selectedEntry.name)}`
+    );
+    fs.promises.writeFile(tmpZipEntryPath, selectedEntry.getData());
+    tmpAssetPath = tmpZipEntryPath;
   } else if (selectedAsset.endsWith(".tar.gz")) {
+    console.log("[ERROR] .tar.gz unsupported (todo)");
+    process.exit(1);
   }
 
   // prompt an executable name
