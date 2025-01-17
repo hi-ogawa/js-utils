@@ -40,7 +40,7 @@ async function main() {
   }
 
   // find release assets
-  // https://docs.github.com/en/rest/releases/assets
+  // https://docs.github.com/en/rest/releases/assets?apiVersion=2022-11-28#list-release-assets
   const release = await fetchGhApi(
     `https://api.github.com/repos/${owner}/${repo}/releases/tags/${tag}`
   );
@@ -50,10 +50,10 @@ async function main() {
     process.exit(1);
   }
 
-  // prompt which files from asset lists
+  // prompt which files to download from assets
   // TODO: Implement prompt logic here
 
-  // download a chosen file
+  // download a selected asset
   // TODO: Implement download logic here
 
   // if .zip or .tar.gz, unpack and prompt again which file to use
