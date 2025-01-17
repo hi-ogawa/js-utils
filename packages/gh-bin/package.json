@@ -1,11 +1,11 @@
 {
-  "name": "cpgh",
-  "version": "0.0.3-pre.0",
-  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/cpgh",
+  "name": "gh-bin",
+  "version": "0.0.0",
+  "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/gh-bin",
   "repository": {
     "type": "git",
     "url": "https://github.com/hi-ogawa/js-utils",
-    "directory": "packages/cpgh"
+    "directory": "packages/gh-bin"
   },
   "license": "MIT",
   "type": "module",
@@ -16,8 +16,7 @@
     "cli": "tsx ./src/cli.ts",
     "test": "vitest",
     "docs-update": "inline-template ./README.md && prettier -w ./README.md",
-    "prepack": "tsup --clean",
-    "release": "pnpm publish --no-git-checks --access public"
+    "prepack": "tsup --clean"
   },
   "volta": {
     "extends": "../../package.json"

@@ -71,6 +71,8 @@ importers:
 
   packages/cpgh: {}
 
+  packages/gh-bin: {}
+
   packages/icheck-ts:
     dependencies:
       typescript:
