@@ -1,4 +1,9 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import process from "node:process";
+import { Readable } from "node:stream";
+import * as prompts from "@clack/prompts";
 import { name, version } from "../package.json";
 
 const HELP = `\
@@ -16,7 +21,7 @@ const GITHUB_RELEASE_RE = new RegExp(
 
 async function main() {
   const args = process.argv.slice(2);
-  if (args.includes("-h") || args.includes("--help")) {
+  if (args.includes("-h") || args.includes("--help") || args.length !== 1) {
     console.log(HELP);
     return;
   }
@@ -37,6 +42,7 @@ async function main() {
       `https://api.github.com/repos/${owner}/${repo}/releases/latest`
     );
     tag = latestRelease.tag_name;
+    console.log(`Found the latest release ${tag}`);
   }
 
   // find release assets
@@ -51,22 +57,66 @@ async function main() {
   }
 
   // prompt which files to download from assets
-  // TODO: Implement prompt logic here
+  const selectedAsset = await prompts.select<string>({
+    message: "Select an asset to download",
+    options: assets.map((asset: any) => ({
+      label: asset.name,
+      value: asset.browser_download_url,
+    })),
+  });
+  if (prompts.isCancel(selectedAsset)) {
+    return;
+  }
+
+  // TODO
+  // if .zip or .tar.gz, unpack and prompt again which file to use
+  if (selectedAsset.endsWith(".zip") || selectedAsset.endsWith(".tar.gz")) {
+    console.log("[ERROR] .zip and .tar.gz are unsupported (todo)");
+    process.exit(1);
+  }
 
   // download a selected asset
-  // TODO: Implement download logic here
+  const downloadSpinner = prompts.spinner();
+  downloadSpinner.start(`Downloading ${selectedAsset}`);
+  let tmpAssetPath = path.join(
+    os.tmpdir(),
+    `/gh-bin-asset-${owner}-${repo}.${path.extname(selectedAsset) || "bin"}`
+  );
+  try {
+    const res = await fetch(selectedAsset);
+    if (!res.ok || !res.body) {
+      console.error(`[ERROR] Failed to download '${selectedAsset}'\n`);
+      process.exit(1);
+    }
+    await fs.promises.writeFile(
+      tmpAssetPath,
+      Readable.fromWeb(res.body as any)
+    );
+  } finally {
+    downloadSpinner.stop(`Downloaded ${selectedAsset}`);
+  }
 
+  // TODO
   // if .zip or .tar.gz, unpack and prompt again which file to use
-  // TODO
+  if (selectedAsset.endsWith(".zip")) {
+  } else if (selectedAsset.endsWith(".tar.gz")) {
+  }
 
-  // prompt executable name
-  // TODO
+  // prompt an executable name
+  const binName = await prompts.text({
+    message: "Input a name of executable",
+    initialValue: repo,
+  });
+  if (prompts.isCancel(binName)) {
+    return;
+  }
 
   // install executable
-  // - chmod +x
-  // - move it to ~/.local/bin
-  //   prompt overwrite if already exists
-  // TODO
+  const destPath = path.join(os.homedir(), ".local", "bin", binName);
+  await fs.promises.mkdir(path.dirname(destPath), { recursive: true });
+  await fs.promises.copyFile(tmpAssetPath, destPath);
+  await fs.promises.chmod(destPath, 0o755);
+  console.log(`Executable is installed in ${destPath}`);
 }
 
 async function fetchGhApi(url: string) {

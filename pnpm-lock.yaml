@@ -71,7 +71,11 @@ importers:
 
   packages/cpgh: {}
 
-  packages/gh-bin: {}
+  packages/gh-bin:
+    dependencies:
+      '@clack/prompts':
+        specifier: ^0.9.1
+        version: 0.9.1
 
   packages/icheck-ts:
     dependencies:
@@ -642,6 +646,12 @@ packages:
 
   '@brillout/json-serializer@0.5.13':
     resolution: {integrity: sha512-9FpmgpuoSISw6fAPVB2qwW1dGAADN28YbWpfwOErfcZxpBH4lsnejuY89qcivInnWXYJvyyPwghCuOTbtuaYFg==}
+
+  '@clack/core@0.4.1':
+    resolution: {integrity: sha512-Pxhij4UXg8KSr7rPek6Zowm+5M22rbd2g1nfojHJkxp5YkFqiZ2+YLEM/XGVIzvGOcM0nqjIFxrpDwWRZYWYjA==}
+
+  '@clack/prompts@0.9.1':
+    resolution: {integrity: sha512-JIpyaboYZeWYlyP0H+OoPPxd6nqueG/CmN6ixBiNFsIDHREevjIf0n0Ohh5gr5C8pEDknzgvz+pIJ8dMhzWIeg==}
 
   '@discoveryjs/json-ext@0.5.7':
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
@@ -3253,6 +3263,9 @@ packages:
     resolution: {integrity: sha512-BPwJGUeDaDCHihkORDchNyyTvWFhcusy1XMmhEVTQTwGeybFbp8YEmB+njbPnth1FibULBSBVwCQni25XlCUDg==}
     engines: {node: '>=18'}
 
+  sisteransi@1.0.5:
+    resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
+
   sockjs@0.3.24:
     resolution: {integrity: sha512-GJgLTZ7vYb/JtPSSZ10hsOYIvEYsjbNU+zPdIHcUaWVNUEPivzxku31865sSSud0Da0W4lEeOPlmw93zLQchuQ==}
 
@@ -3859,6 +3872,17 @@ snapshots:
     optional: true
 
   '@brillout/json-serializer@0.5.13': {}
+
+  '@clack/core@0.4.1':
+    dependencies:
+      picocolors: 1.1.1
+      sisteransi: 1.0.5
+
+  '@clack/prompts@0.9.1':
+    dependencies:
+      '@clack/core': 0.4.1
+      picocolors: 1.1.1
+      sisteransi: 1.0.5
 
   '@discoveryjs/json-ext@0.5.7': {}
 
@@ -6458,6 +6482,8 @@ snapshots:
       '@polka/url': 1.0.0-next.28
       mrmime: 2.0.0
       totalist: 3.0.1
+
+  sisteransi@1.0.5: {}
 
   sockjs@0.3.24:
     dependencies:

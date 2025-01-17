@@ -19,6 +19,9 @@
     "docs-update": "inline-template ./README.md && prettier -w ./README.md",
     "prepack": "tsup --clean"
   },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1"
+  },
   "volta": {
     "extends": "../../package.json"
   }
