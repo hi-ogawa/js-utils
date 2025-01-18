@@ -1,6 +1,6 @@
 {
   "name": "gh-bin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/hi-ogawa/js-utils/tree/main/packages/gh-bin",
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
     "cli": "tsx ./src/cli.ts",
     "test": "vitest",
     "docs-update": "inline-template ./README.md && prettier -w ./README.md",
-    "prepack": "tsup --clean"
+    "prepack": "tsup --clean && pnpm docs-update"
   },
   "dependencies": {
     "@clack/prompts": "^0.9.1",

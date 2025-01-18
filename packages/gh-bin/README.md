@@ -2,7 +2,6 @@
 
 Download and install single file executables from GitHub release pages. Inspired by https://github.com/marcosnils/bin.
 
-
 ## usage
 
 <!--
@@ -20,7 +19,7 @@ $ npx gh-bin --help
 
 ```txt
 $ npx gh-bin --help
-gh-bin@0.0.0
+gh-bin@0.1.1
 
 Usage:
   npx gh-bin https://github.com/<owner>/<repo>
