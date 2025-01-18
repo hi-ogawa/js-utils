@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -25,6 +26,7 @@ async function main() {
     return;
   }
 
+  // https://github.com/bombshell-dev/clack/tree/main/packages/prompts
   const prompts = await import("@clack/prompts");
 
   // parse github url
@@ -91,8 +93,11 @@ async function main() {
     downloadSpinner.stop(`Downloaded ${selectedAsset}`);
   }
 
+  let defaultBinName = repo;
+
   // if .zip or .tar.gz, unpack and prompt again which file to use
   if (selectedAsset.endsWith(".zip")) {
+    // https://github.com/cthackers/adm-zip
     const { default: AdmZip } = await import("adm-zip");
     var zip = new AdmZip(tmpAssetPath);
     var zipEntries = zip.getEntries();
@@ -106,21 +111,47 @@ async function main() {
     if (prompts.isCancel(selectedEntry)) {
       return;
     }
+    defaultBinName = path.basename(selectedEntry.name);
     let tmpZipEntryPath = path.join(
       os.tmpdir(),
-      `gh-bin-asset-${owner}-${repo}-zip-${selectedEntry.name}${path.extname(selectedEntry.name)}`
+      `gh-bin-asset-${owner}-${repo}-zip-selected-item${path.extname(selectedEntry.name)}`
     );
     fs.promises.writeFile(tmpZipEntryPath, selectedEntry.getData());
     tmpAssetPath = tmpZipEntryPath;
-  } else if (selectedAsset.endsWith(".tar.gz")) {
-    console.log("[ERROR] .tar.gz unsupported (todo)");
-    process.exit(1);
+  } else if (
+    selectedAsset.endsWith(".tar.gz") ||
+    selectedAsset.endsWith(".tar")
+  ) {
+    // https://github.com/unjs/nanotar
+    const nanotar = await import("nanotar");
+    const tarData = await fs.promises.readFile(tmpAssetPath);
+    const items = selectedAsset.endsWith(".tar.gz")
+      ? await nanotar.parseTarGzip(tarData)
+      : nanotar.parseTar(tarData);
+    const selectedItem = await prompts.select({
+      message: "Select a file to extract from tar",
+      options: items.map((item) => ({
+        label: item.name,
+        value: item,
+      })),
+    });
+    if (prompts.isCancel(selectedItem)) {
+      return;
+    }
+    assert(selectedItem.data);
+    let tmpZipEntryPath = path.join(
+      os.tmpdir(),
+      `gh-bin-asset-${owner}-${repo}-tar-selected-item${path.extname(selectedItem.name)}`
+    );
+    defaultBinName = path.basename(selectedItem.name);
+    fs.promises.writeFile(tmpZipEntryPath, selectedItem.data);
+    tmpAssetPath = tmpZipEntryPath;
   }
 
   // prompt an executable name
   const binName = await prompts.text({
     message: "Input a name of executable",
-    initialValue: repo,
+    initialValue: defaultBinName,
   });
   if (prompts.isCancel(binName)) {
     return;
