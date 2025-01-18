@@ -1,6 +1,7 @@
 # gh-bin
 
-Downlaod and install single file executables from a GitHub release pages. Inspired by https://github.com/marcosnils/bin.
+Download and install single file executables from GitHub release pages. Inspired by https://github.com/marcosnils/bin.
+
 
 ## usage
 
