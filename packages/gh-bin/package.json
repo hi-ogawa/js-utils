@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.9.1",
-    "adm-zip": "^0.5.16"
+    "adm-zip": "^0.5.16",
+    "nanotar": "^0.1.1"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.7"

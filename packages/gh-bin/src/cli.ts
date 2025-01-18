@@ -3,8 +3,6 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { Readable } from "node:stream";
-import * as prompts from "@clack/prompts";
-import AdmZip from "adm-zip";
 import { name, version } from "../package.json";
 
 const HELP = `\
@@ -26,6 +24,8 @@ async function main() {
     console.log(HELP);
     return;
   }
+
+  const prompts = await import("@clack/prompts");
 
   // parse github url
   const input = args[0];
@@ -93,6 +93,7 @@ async function main() {
 
   // if .zip or .tar.gz, unpack and prompt again which file to use
   if (selectedAsset.endsWith(".zip")) {
+    const { default: AdmZip } = await import("adm-zip");
     var zip = new AdmZip(tmpAssetPath);
     var zipEntries = zip.getEntries();
     const selectedEntry = await prompts.select({
