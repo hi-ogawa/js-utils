@@ -58,6 +58,7 @@ async function main() {
   }
 
   // prompt which files to download from assets
+  // TODO: reorder by matching arch/os/platform
   const selectedAsset = await prompts.select<string>({
     message: "Select an asset to download",
     options: assets.map((asset: any) => ({
@@ -125,8 +126,9 @@ async function main() {
   }
 
   // install executable
-  const destPath = path.join(os.homedir(), ".local", "bin", binName);
-  await fs.promises.mkdir(path.dirname(destPath), { recursive: true });
+  const destDir = await findExecutablePathDirectory();
+  const destPath = path.join(destDir, binName);
+  await fs.promises.mkdir(destDir, { recursive: true });
   await fs.promises.copyFile(tmpAssetPath, destPath);
   await fs.promises.chmod(destPath, 0o755);
   console.log(`Executable is installed in ${destPath}`);
@@ -144,6 +146,12 @@ async function fetchGhApi(url: string) {
     process.exit(1);
   }
   return res.json();
+}
+
+// find a directory to install an executable
+async function findExecutablePathDirectory() {
+  // TODO https://github.com/marcosnils/bin/blob/94bbdcac69f74abb8b3d9e5dcc0fcb22d72d6782/pkg/config/config_unix.go#L17-L19
+  return path.join(os.homedir(), ".local", "bin");
 }
 
 main();
