@@ -173,7 +173,7 @@ describe(hydrate, () => {
         "props": {
           "children": "",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -207,7 +207,7 @@ describe(hydrate, () => {
         "props": {
           "children": " ",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -246,7 +246,7 @@ describe(hydrate, () => {
             "b",
           ],
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 

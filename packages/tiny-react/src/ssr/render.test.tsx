@@ -46,7 +46,7 @@ describe(renderToString, () => {
           ],
           "title": "a & b",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
     expect(renderToString(vnode)).toMatchInlineSnapshot(
