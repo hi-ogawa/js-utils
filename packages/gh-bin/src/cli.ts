@@ -98,28 +98,26 @@ async function main() {
     const total = contentLength ? Number(contentLength) : null;
     let current = 0;
     const stream = res.body.pipeThrough(
-      new TransformStream(
-        {
-          transform(chunk, controller) {
-            controller.enqueue(chunk);
-            current += chunk.byteLength;
-            if (total) {
-              downloadSpinner.message(
-                `Downloading ${selectedAsset} (${prettyBytes(total)} - ${((100 * current) / total!).toFixed(2)}%)`
-              );
-            } else {
-              downloadSpinner.message(
-                `Downloading ${selectedAsset} (${prettyBytes(current)})`
-              );
-            }
-          },
-          flush() {
-            downloadSpinner.stop(
-              `Download success ${selectedAsset} (${prettyBytes(current)})`
+      new TransformStream({
+        transform(chunk, controller) {
+          controller.enqueue(chunk);
+          current += chunk.byteLength;
+          if (total) {
+            downloadSpinner.message(
+              `Downloading ${selectedAsset} (${prettyBytes(total)} - ${((100 * current) / total!).toFixed(2)}%)`
             );
-          },
-        }
-      )
+          } else {
+            downloadSpinner.message(
+              `Downloading ${selectedAsset} (${prettyBytes(current)})`
+            );
+          }
+        },
+        flush() {
+          downloadSpinner.stop(
+            `Download success ${selectedAsset} (${prettyBytes(current)})`
+          );
+        },
+      })
     );
     await fs.promises.writeFile(tmpAssetPath, Readable.fromWeb(stream as any));
   } catch (e) {
