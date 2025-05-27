@@ -73,14 +73,11 @@ async function main() {
   }
 
   // download a selected asset
-  const selectedAssetName =
-    assets.find((asset: any) => asset.browser_download_url === selectedAsset)
-      ?.name || "asset";
   const downloadSpinner = prompts.spinner();
-  downloadSpinner.start(`Downloading ${selectedAssetName}`);
+  downloadSpinner.start(`Downloading ${selectedAsset}`);
   let tmpAssetPath = path.join(
     os.tmpdir(),
-    `gh-bin-asset-${owner}-${repo}${path.extname(selectedAssetName)}`
+    `gh-bin-asset-${owner}-${repo}${path.extname(selectedAsset)}`
   );
   try {
     const res = await fetch(selectedAsset);
@@ -88,48 +85,18 @@ async function main() {
       console.error(`[ERROR] Failed to download '${selectedAsset}'\n`);
       process.exit(1);
     }
-
-    const totalSize = parseInt(res.headers.get("content-length") || "0");
-    let downloadedSize = 0;
-
-    const reader = res.body.getReader();
-    const chunks: Uint8Array[] = [];
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      chunks.push(value);
-      downloadedSize += value.length;
-
-      if (totalSize > 0) {
-        const percentage = Math.round((downloadedSize / totalSize) * 100);
-        downloadSpinner.message(
-          `Downloading ${selectedAssetName} (${percentage}%)`
-        );
-      } else {
-        downloadSpinner.message(
-          `Downloading ${selectedAssetName} (${Math.round(downloadedSize / 1024)}KB)`
-        );
-      }
-    }
-
-    const finalBuffer = new Uint8Array(downloadedSize);
-    let offset = 0;
-    for (const chunk of chunks) {
-      finalBuffer.set(chunk, offset);
-      offset += chunk.length;
-    }
-
-    await fs.promises.writeFile(tmpAssetPath, finalBuffer);
+    await fs.promises.writeFile(
+      tmpAssetPath,
+      Readable.fromWeb(res.body as any)
+    );
   } finally {
-    downloadSpinner.stop(`Downloaded ${selectedAssetName}`);
+    downloadSpinner.stop(`Downloaded ${selectedAsset}`);
   }
 
   let defaultBinName = repo;
 
   // if .zip or .tar.gz, unpack and prompt again which file to use
-  if (selectedAssetName.endsWith(".zip")) {
+  if (selectedAsset.endsWith(".zip")) {
     // https://github.com/cthackers/adm-zip
     const { default: AdmZip } = await import("adm-zip");
     var zip = new AdmZip(tmpAssetPath);
