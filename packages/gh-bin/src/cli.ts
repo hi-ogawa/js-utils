@@ -61,18 +61,22 @@ async function main() {
 
   // prompt which files to download from assets
   // TODO: reorder by matching arch/os/platform
-  const selectedAsset = await prompts.select<string>({
+  const selectedAssetMeta = await prompts.select<{
+    name: string;
+    browser_download_url: string;
+  }>({
     message: "Select an asset to download",
     options: assets.map((asset: any) => ({
       label: asset.name,
-      value: asset.browser_download_url,
+      value: asset,
     })),
   });
-  if (prompts.isCancel(selectedAsset)) {
+  if (prompts.isCancel(selectedAssetMeta)) {
     return;
   }
 
   // download a selected asset
+  const selectedAsset = selectedAssetMeta.name;
   const downloadSpinner = prompts.spinner();
   downloadSpinner.start(`Downloading ${selectedAsset}`);
   let tmpAssetPath = path.join(
@@ -80,17 +84,41 @@ async function main() {
     `gh-bin-asset-${owner}-${repo}${path.extname(selectedAsset)}`
   );
   try {
-    const res = await fetch(selectedAsset);
+    const res = await fetch(selectedAssetMeta.browser_download_url);
     if (!res.ok || !res.body) {
       console.error(`[ERROR] Failed to download '${selectedAsset}'\n`);
       process.exit(1);
     }
-    await fs.promises.writeFile(
-      tmpAssetPath,
-      Readable.fromWeb(res.body as any)
-    );
-  } finally {
-    downloadSpinner.stop(`Downloaded ${selectedAsset}`);
+    let stream = res.body;
+    const contentLength = res.headers.get("content-length");
+    if (contentLength) {
+      const total = Number(contentLength);
+      const totalPrettry =
+        total > 1024 * 1024
+          ? `${(total / (1024 * 1024)).toFixed(2)} MB`
+          : `${(total / 1024).toFixed(2)} KB`;
+      let current = 0;
+      stream = stream.pipeThrough(
+        new TransformStream({
+          transform(chunk, controller) {
+            controller.enqueue(chunk);
+            current += chunk.byteLength;
+            downloadSpinner.message(
+              `Downloading ${selectedAsset} (${totalPrettry} - ${((100 * current) / total).toFixed(2)}%)`
+            );
+          },
+          flush() {
+            downloadSpinner.stop(
+              `Download success ${selectedAsset} (${totalPrettry})`
+            );
+          },
+        })
+      );
+    }
+    await fs.promises.writeFile(tmpAssetPath, Readable.fromWeb(stream as any));
+  } catch (e) {
+    downloadSpinner.stop(`Failed to download ${selectedAsset}`);
+    throw e;
   }
 
   let defaultBinName = repo;
