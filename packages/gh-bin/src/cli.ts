@@ -90,10 +90,6 @@ async function main() {
       console.error(`[ERROR] Failed to download '${selectedAssetUrl}'\n`);
       process.exit(1);
     }
-    const prettyBytes = (bytes: number) =>
-      bytes > 1024 * 1024
-        ? `${(bytes / (1024 * 1024)).toFixed(2)} MB`
-        : `${(bytes / 1024).toFixed(2)} KB`;
     const contentLength = res.headers.get("content-length");
     const total = contentLength ? Number(contentLength) : null;
     let current = 0;
@@ -196,6 +192,12 @@ async function main() {
   await fs.promises.copyFile(tmpAssetPath, destPath);
   await fs.promises.chmod(destPath, 0o755);
   console.log(`Executable is installed in ${destPath}`);
+}
+
+function prettyBytes(bytes: number): string {
+  return bytes > 1024
+    ? `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+    : `${(bytes / 1024).toFixed(2)} KB`;
 }
 
 async function fetchGhApi(url: string) {
