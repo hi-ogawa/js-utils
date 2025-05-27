@@ -19,7 +19,7 @@ $ npx gh-bin --help
 
 ```txt
 $ npx gh-bin --help
-gh-bin@0.1.1
+gh-bin@0.1.2
 
 Usage:
   npx gh-bin https://github.com/<owner>/<repo>

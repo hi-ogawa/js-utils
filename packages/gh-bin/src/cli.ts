@@ -61,18 +61,23 @@ async function main() {
 
   // prompt which files to download from assets
   // TODO: reorder by matching arch/os/platform
-  const selectedAsset = await prompts.select<string>({
+  const selectedAssetMeta = await prompts.select<{
+    name: string;
+    browser_download_url: string;
+  }>({
     message: "Select an asset to download",
     options: assets.map((asset: any) => ({
       label: asset.name,
-      value: asset.browser_download_url,
+      value: asset,
     })),
   });
-  if (prompts.isCancel(selectedAsset)) {
+  if (prompts.isCancel(selectedAssetMeta)) {
     return;
   }
 
   // download a selected asset
+  const selectedAsset = selectedAssetMeta.name;
+  const selectedAssetUrl = selectedAssetMeta.browser_download_url;
   const downloadSpinner = prompts.spinner();
   downloadSpinner.start(`Downloading ${selectedAsset}`);
   let tmpAssetPath = path.join(
@@ -80,17 +85,40 @@ async function main() {
     `gh-bin-asset-${owner}-${repo}${path.extname(selectedAsset)}`
   );
   try {
-    const res = await fetch(selectedAsset);
+    const res = await fetch(selectedAssetUrl);
     if (!res.ok || !res.body) {
-      console.error(`[ERROR] Failed to download '${selectedAsset}'\n`);
+      console.error(`[ERROR] Failed to download '${selectedAssetUrl}'\n`);
       process.exit(1);
     }
-    await fs.promises.writeFile(
-      tmpAssetPath,
-      Readable.fromWeb(res.body as any)
+    const contentLength = res.headers.get("content-length");
+    const total = contentLength ? Number(contentLength) : null;
+    let current = 0;
+    const stream = res.body.pipeThrough(
+      new TransformStream({
+        transform(chunk, controller) {
+          controller.enqueue(chunk);
+          current += chunk.byteLength;
+          if (total) {
+            downloadSpinner.message(
+              `Downloading ${selectedAsset} (${prettyBytes(total)} - ${((100 * current) / total!).toFixed(2)}%)`
+            );
+          } else {
+            downloadSpinner.message(
+              `Downloading ${selectedAsset} (${prettyBytes(current)})`
+            );
+          }
+        },
+        flush() {
+          downloadSpinner.stop(
+            `Download success ${selectedAsset} (${prettyBytes(current)})`
+          );
+        },
+      })
     );
-  } finally {
-    downloadSpinner.stop(`Downloaded ${selectedAsset}`);
+    await fs.promises.writeFile(tmpAssetPath, Readable.fromWeb(stream as any));
+  } catch (e) {
+    downloadSpinner.stop(`Failed to download '${selectedAssetUrl}'`);
+    throw e;
   }
 
   let defaultBinName = repo;
@@ -164,6 +192,12 @@ async function main() {
   await fs.promises.copyFile(tmpAssetPath, destPath);
   await fs.promises.chmod(destPath, 0o755);
   console.log(`Executable is installed in ${destPath}`);
+}
+
+function prettyBytes(bytes: number): string {
+  return bytes > 1024
+    ? `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+    : `${(bytes / 1024).toFixed(2)} KB`;
 }
 
 async function fetchGhApi(url: string) {
