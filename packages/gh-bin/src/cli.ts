@@ -77,6 +77,7 @@ async function main() {
 
   // download a selected asset
   const selectedAsset = selectedAssetMeta.name;
+  const selectedAssetUrl = selectedAssetMeta.browser_download_url;
   const downloadSpinner = prompts.spinner();
   downloadSpinner.start(`Downloading ${selectedAsset}`);
   let tmpAssetPath = path.join(
@@ -84,40 +85,45 @@ async function main() {
     `gh-bin-asset-${owner}-${repo}${path.extname(selectedAsset)}`
   );
   try {
-    const res = await fetch(selectedAssetMeta.browser_download_url);
+    const res = await fetch(selectedAssetUrl);
     if (!res.ok || !res.body) {
-      console.error(`[ERROR] Failed to download '${selectedAsset}'\n`);
+      console.error(`[ERROR] Failed to download '${selectedAssetUrl}'\n`);
       process.exit(1);
     }
-    let stream = res.body;
+    const prettyBytes = (bytes: number) =>
+      bytes > 1024 * 1024
+        ? `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+        : `${(bytes / 1024).toFixed(2)} KB`;
     const contentLength = res.headers.get("content-length");
-    if (contentLength) {
-      const total = Number(contentLength);
-      const totalPrettry =
-        total > 1024 * 1024
-          ? `${(total / (1024 * 1024)).toFixed(2)} MB`
-          : `${(total / 1024).toFixed(2)} KB`;
-      let current = 0;
-      stream = stream.pipeThrough(
-        new TransformStream({
+    const total = contentLength ? Number(contentLength) : null;
+    let current = 0;
+    const stream = res.body.pipeThrough(
+      new TransformStream(
+        {
           transform(chunk, controller) {
             controller.enqueue(chunk);
             current += chunk.byteLength;
-            downloadSpinner.message(
-              `Downloading ${selectedAsset} (${totalPrettry} - ${((100 * current) / total).toFixed(2)}%)`
-            );
+            if (total) {
+              downloadSpinner.message(
+                `Downloading ${selectedAsset} (${prettyBytes(total)} - ${((100 * current) / total!).toFixed(2)}%)`
+              );
+            } else {
+              downloadSpinner.message(
+                `Downloading ${selectedAsset} (${prettyBytes(current)})`
+              );
+            }
           },
           flush() {
             downloadSpinner.stop(
-              `Download success ${selectedAsset} (${totalPrettry})`
+              `Download success ${selectedAsset} (${prettyBytes(current)})`
             );
           },
-        })
-      );
-    }
+        }
+      )
+    );
     await fs.promises.writeFile(tmpAssetPath, Readable.fromWeb(stream as any));
   } catch (e) {
-    downloadSpinner.stop(`Failed to download ${selectedAsset}`);
+    downloadSpinner.stop(`Failed to download '${selectedAssetUrl}'`);
     throw e;
   }
 
