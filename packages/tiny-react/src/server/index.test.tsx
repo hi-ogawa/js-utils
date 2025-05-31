@@ -31,12 +31,12 @@ describe(serialize, () => {
                 "children": "world",
                 "title": "foo",
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
           ],
           "className": "flex",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -56,12 +56,12 @@ describe(serialize, () => {
                 "children": "world",
                 "title": "foo",
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
           ],
           "className": "flex",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -107,10 +107,10 @@ describe(serialize, () => {
             "props": {
               "children": "{"prop":123}",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -126,10 +126,10 @@ describe(serialize, () => {
             "props": {
               "children": "{"prop":123}",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -176,14 +176,14 @@ describe(serialize, () => {
                 "key": undefined,
                 "name": "span",
                 "props": {},
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             },
-            "type": "custom",
+            "type": Symbol(tiny-react.custom),
           },
           "id": "server",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -200,15 +200,15 @@ describe(serialize, () => {
                 "key": undefined,
                 "name": "span",
                 "props": {},
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             },
             "render": [Function],
-            "type": "custom",
+            "type": Symbol(tiny-react.custom),
           },
           "id": "server",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
 
@@ -273,17 +273,17 @@ describe(serialize, () => {
                     "key": undefined,
                     "name": "span",
                     "props": {},
-                    "type": "tag",
+                    "type": Symbol(tiny-react.tag),
                   },
                 },
-                "type": "custom",
+                "type": Symbol(tiny-react.custom),
               },
               "id": "server",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         },
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
 
@@ -306,19 +306,19 @@ describe(serialize, () => {
                     "key": undefined,
                     "name": "span",
                     "props": {},
-                    "type": "tag",
+                    "type": Symbol(tiny-react.tag),
                   },
                 },
                 "render": [Function],
-                "type": "custom",
+                "type": Symbol(tiny-react.custom),
               },
               "id": "server",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         },
         "render": [Function],
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
 
@@ -376,13 +376,13 @@ describe(serialize, () => {
                 "key": undefined,
                 "name": "span",
                 "props": {},
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             },
-            "type": "custom",
+            "type": Symbol(tiny-react.custom),
           },
         },
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
 
@@ -401,15 +401,15 @@ describe(serialize, () => {
                 "key": undefined,
                 "name": "span",
                 "props": {},
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
             },
             "render": [Function],
-            "type": "custom",
+            "type": Symbol(tiny-react.custom),
           },
         },
         "render": [Function],
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
 
@@ -436,17 +436,36 @@ describe(serialize, () => {
     ).rejects.toMatchInlineSnapshot(`[Error: Cannot serialize function]`);
   });
 
-  it("'type' collision", async () => {
+  it("no 'type' collision", async () => {
     function Custom(_props: { x: { type: "tag" } }) {
       return <></>;
     }
     registerClientReference(Custom, "#Custom");
 
-    await expect(() =>
-      serialize(<Custom x={{ type: "tag" }} />)
-    ).rejects.toMatchInlineSnapshot(
-      `[TypeError: Cannot convert undefined or null to object]`
+    const result = await serialize(
+      <Custom
+        x={{
+          type: "tag",
+        }}
+      />
     );
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "data": {
+          "$$id": "#Custom",
+          "key": undefined,
+          "props": {
+            "x": {
+              "type": "tag",
+            },
+          },
+          "type": Symbol(tiny-react.custom),
+        },
+        "referenceIds": [
+          "#Custom",
+        ],
+      }
+    `);
   });
 
   it("multiple nodes", async () => {
@@ -501,14 +520,14 @@ describe(serialize, () => {
                   "props": {
                     "children": "hey",
                   },
-                  "type": "custom",
+                  "type": Symbol(tiny-react.custom),
                 },
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
             "id": "server",
           },
-          "type": "tag",
+          "type": Symbol(tiny-react.tag),
         },
         "k2": [
           {
@@ -525,14 +544,14 @@ describe(serialize, () => {
                     "props": {
                       "children": "yo",
                     },
-                    "type": "custom",
+                    "type": Symbol(tiny-react.custom),
                   },
                 },
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
               "id": "server",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         ],
       }
@@ -558,14 +577,14 @@ describe(serialize, () => {
                     "children": "hey",
                   },
                   "render": [Function],
-                  "type": "custom",
+                  "type": Symbol(tiny-react.custom),
                 },
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
             "id": "server",
           },
-          "type": "tag",
+          "type": Symbol(tiny-react.tag),
         },
         "k2": [
           {
@@ -582,14 +601,14 @@ describe(serialize, () => {
                       "children": "yo",
                     },
                     "render": [Function],
-                    "type": "custom",
+                    "type": Symbol(tiny-react.custom),
                   },
                 },
-                "type": "tag",
+                "type": Symbol(tiny-react.tag),
               },
               "id": "server",
             },
-            "type": "tag",
+            "type": Symbol(tiny-react.tag),
           },
         ],
       }

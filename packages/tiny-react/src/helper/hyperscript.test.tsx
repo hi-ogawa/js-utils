@@ -34,7 +34,7 @@ describe("hyperscript", () => {
                 "value": "hello",
               },
               "render": [Function],
-              "type": "custom",
+              "type": Symbol(tiny-react.custom),
             },
             null,
             0,
@@ -42,7 +42,7 @@ describe("hyperscript", () => {
               "key": undefined,
               "props": {},
               "render": [Function],
-              "type": "custom",
+              "type": Symbol(tiny-react.custom),
             },
             undefined,
             {
@@ -53,7 +53,7 @@ describe("hyperscript", () => {
                 "className": "text-red",
                 "ref": [Function],
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
             {
               "key": undefined,
@@ -61,7 +61,7 @@ describe("hyperscript", () => {
               "props": {
                 "children": 0,
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
             {
               "key": undefined,
@@ -72,7 +72,7 @@ describe("hyperscript", () => {
                   1,
                 ],
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
             {
               "key": undefined,
@@ -82,7 +82,7 @@ describe("hyperscript", () => {
                   0,
                 ],
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
             {
               "key": undefined,
@@ -93,12 +93,12 @@ describe("hyperscript", () => {
                   1,
                 ],
               },
-              "type": "tag",
+              "type": Symbol(tiny-react.tag),
             },
           ],
           "className": "flex",
         },
-        "type": "tag",
+        "type": Symbol(tiny-react.tag),
       }
     `);
   });
@@ -109,7 +109,7 @@ describe("hyperscript", () => {
         "key": undefined,
         "props": {},
         "render": [Function],
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
     expect(h(Fragment, {}, 1)).toMatchInlineSnapshot(`
@@ -119,7 +119,7 @@ describe("hyperscript", () => {
           "children": 1,
         },
         "render": [Function],
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
     expect(h(Fragment, { children: 1 })).toMatchInlineSnapshot(`
@@ -129,7 +129,7 @@ describe("hyperscript", () => {
           "children": 1,
         },
         "render": [Function],
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
     expect(h(Fragment, { children: [1] })).toMatchInlineSnapshot(`
@@ -141,7 +141,7 @@ describe("hyperscript", () => {
           ],
         },
         "render": [Function],
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
     expect(h(Fragment, { children: 1 }, 2)).toMatchInlineSnapshot(`
@@ -151,7 +151,7 @@ describe("hyperscript", () => {
           "children": 2,
         },
         "render": [Function],
-        "type": "custom",
+        "type": Symbol(tiny-react.custom),
       }
     `);
   });

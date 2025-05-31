@@ -9,6 +9,7 @@ import {
 } from "@hiogawa/tiny-react";
 import { tinyassert } from "@hiogawa/utils";
 import { createReferenceMap } from "./integration/client-reference/runtime";
+import { jsonUnescapeSymbol } from "./integration/serialization";
 
 async function main() {
   if (window.location.href.includes("__nojs")) {
@@ -25,7 +26,7 @@ async function main() {
         url.searchParams.set("__serialize", "");
         const res = await fetch(url);
         tinyassert(res.ok);
-        const result: SerializeResult = await res.json();
+        const result: SerializeResult = jsonUnescapeSymbol(await res.text());
         const newVnode = deserialize<VNode>(
           result.data,
           await createReferenceMap(result.referenceIds)
@@ -38,7 +39,9 @@ async function main() {
   }
 
   // hydrate with initial SNode
-  const initResult: SerializeResult = (globalThis as any).__serialized;
+  const initResult: SerializeResult = jsonUnescapeSymbol(
+    (globalThis as any).__serialized
+  );
   const vnode = deserialize<VNode>(
     initResult.data,
     await createReferenceMap(initResult.referenceIds)
